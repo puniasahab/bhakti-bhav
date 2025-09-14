@@ -114,7 +114,7 @@ const Home: React.FC = () => {
           </section>
 
           {/* Button Row */}
-          <div className="mt-4 flex flex-row space-x-4">
+          <div className="mt-4 flex flex-row space-x-3">
             <Link 
               to="#"
               className="bg-[#610419] flex items-center justify-center w-1/2 rounded-[10px] font-semibold md:text-3xl text-lg text-white"
@@ -122,13 +122,18 @@ const Home: React.FC = () => {
               <img src="/img/vichar_icon.png" alt="" width="24" height="24" className="mr-3" />
               <p className="md:text-2xl text-sm text-white font-normal">आज का राशिफल</p>
             </Link>
-            {/* <Link to="#" className="w-1/2">
-              <div className="theme_bg rounded-xl p-4 md:p-6 flex items-center justify-center h-full text-center">
-                <CalendarFold className="w-6 h-6 md:w-8 md:h-8 text-white mb-2 mr-3" />
-                <p className="md:text-2xl text-sm text-white font-normal">कैलेंडर</p>
-              </div>
-            </Link> */}
-              <img src="/img/calendar.png" alt="Calendar" width="40" height="40" className = "mr-3" />
+            <img 
+              src="/img/calendar.png" 
+              alt="Calendar" 
+              style={{
+                width: 'calc(50%)',
+                height: 'auto',
+                minHeight: '48px',
+                maxWidth: '48vw',
+                objectFit: 'contain',
+                display: 'block'
+              }} 
+            />
           </div>
 
           {/* Grid Section */}
@@ -263,13 +268,13 @@ const Home: React.FC = () => {
       <footer className="mt-6 py-4">
         <div className="container mx-auto flex flex-col md:flex-row justify-between items-center text-2xl px-4">
           <div className="flex flex-col md:flex-row md:space-x-6 theme_text text-center font-eng mb-3 md:mb-0 space-y-2 md:space-y-0">
-            <Link to="/termsAndConditions" className="theme-text text-lg text-white hover:underline">
+            <Link to="/termsAndConditions" className="theme-text text-lg text-white hover:underline" style={{ fontFamily: 'Calibri, sans-serif' }}>
               Terms & Conditions
             </Link>
-            <Link to="/privacyPolicy" className="theme-text text-lg text-white hover:underline">
+            <Link to="/privacyPolicy" className="theme-text text-lg text-white hover:underline" style={{ fontFamily: 'Calibri, sans-serif' }}>
               Privacy Policy
             </Link>
-            <Link to="/aboutUs" className="theme-text text-lg text-white hover:underline">
+            <Link to="/aboutUs" className="theme-text text-lg text-white hover:underline" style={{ fontFamily: 'Calibri, sans-serif' }}>
               About us
             </Link>
           </div>

@@ -121,13 +121,13 @@ const TermsAndConditions: React.FC = () => {
       <footer className="mt-6 py-4">
         <div className="container mx-auto flex flex-col md:flex-row justify-between items-center text-2xl px-4">
           <div className="flex flex-col md:flex-row md:space-x-6 theme_text text-center font-eng mb-3 md:mb-0 space-y-2 md:space-y-0">
-            <Link to="/termsAndConditions" className="theme-text text-lg text-white hover:underline">
+            <Link to="/termsAndConditions" className="theme-text text-lg text-white hover:underline"  style={{ fontFamily: 'Calibri, sans-serif' }}>
               Terms & Conditions
             </Link>
-            <Link to="/privacyPolicy" className="theme-text text-lg text-white hover:underline">
+            <Link to="/privacyPolicy" className="theme-text text-lg text-white hover:underline" style={{ fontFamily: 'Calibri, sans-serif' }} >
               Privacy Policy
             </Link>
-            <Link to="/aboutUs" className="theme-text text-lg text-white hover:underline">
+            <Link to="/aboutUs" className="theme-text text-lg text-white hover:underline" style={{ fontFamily: 'Calibri, sans-serif' }}>
               About us
             </Link>
           </div>
