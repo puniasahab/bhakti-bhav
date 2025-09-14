@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Pagination, Autoplay } from 'swiper/modules';
+// @ts-ignore
 import { CalendarFold, BookOpenText, Facebook, Instagram } from 'lucide-react';
 
 // Import Swiper styles
