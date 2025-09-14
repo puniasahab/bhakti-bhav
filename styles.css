@@ -1,0 +1,57 @@
+@font-face {
+  font-family: 'KrutiDev';
+  src: url('fonts/KRDEV010.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Poppins';
+  src: url('fonts/poppins.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+body {
+  font-family: 'KrutiDev', sans-serif;
+  background-color: #f0f0f0;
+  margin: 0;
+  padding: 0px;
+}
+
+
+
+.hd_bg{
+  background-color: rgba(255,250,244, 0.9);
+}
+.theme_text{
+  color: #610419;
+}
+.theme_bg{
+  background-color: #610419;
+  color: #fff;
+}
+
+.font-hindi{
+    font-family: 'KrutiDev', sans-serif;
+}
+.font-eng{
+    font-family: Arial, Helvetica, sans-serif;
+}
+.card_bg{
+  background-color: rgba(255, 255, 255, 0.6);
+}
+.icon_24 {
+  width: 24px;
+  height: 24px;
+  vertical-align: middle;
+}
+
+.rupees_icon{
+  width: 26px;
+  height: 24px;
+  vertical-align: middle;
+}
+.notification_icon{
+  width: 24px;
+  height: 21px;
+  vertical-align: middle;
+}
