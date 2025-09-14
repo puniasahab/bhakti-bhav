@@ -45,7 +45,7 @@ const Home: React.FC = () => {
                 />
               </Link>
             </h1>
-            <div className="flex items-center md:space-x-6 space-x-4 text-xl">
+            {/* <div className="flex items-center md:space-x-6 space-x-4 text-xl">
               <Link to="#" className="rupees_icon">
                 <img 
                   src="/img/rupees_icon.png" 
@@ -73,7 +73,7 @@ const Home: React.FC = () => {
                   className="max-w-full h-auto" 
                 />
               </Link>
-            </div>
+            </div> */}
           </div>
         </div>
       </header>
@@ -214,7 +214,7 @@ const Home: React.FC = () => {
               <p className="text-2xl">उपदेश देना सरल है, पर उपाय बताना कठिन|</p>
               <p className="mt-1 text-lg">~ रवीन्द्रनाथ टैगोर</p>
 
-              <div className="flex justify-center space-x-4 mt-4 text-xl">
+              {/* <div className="flex justify-center space-x-4 mt-4 text-xl">
                 <Link to="#">
                   <img 
                     src="/img/hd_share_icon.png" 
@@ -242,7 +242,7 @@ const Home: React.FC = () => {
                     className="max-w-full h-auto mx-auto" 
                   />
                 </Link>
-              </div>
+              </div> */}
             </div>
 
             <div className="basis-[30%] flex flex-col justify-between items-center md:p-4 theme_text">
@@ -256,9 +256,9 @@ const Home: React.FC = () => {
                   className="max-w-full h-auto" 
                 />
               </div>
-              <button className="bg-[#6d001f] text-white px-6 py-2 rounded-[10px] font-eng md:text-lg text-sm">
+              {/* <button className="bg-[#6d001f] text-white px-6 py-2 rounded-[10px] font-eng md:text-lg text-sm">
                 Click here
-              </button>
+              </button> */}
             </div>
           </div>
         </div>
@@ -279,7 +279,7 @@ const Home: React.FC = () => {
             </Link>
           </div>
 
-          <div className="flex space-x-3">
+          {/* <div className="flex space-x-3">
             <Link 
               to="#"
               className="w-10 h-10 flex items-center justify-center rounded-full bg-[#5a001d] text-white text-lg hover:bg-[#7a0028]"
@@ -304,7 +304,7 @@ const Home: React.FC = () => {
                 className="max-w-full h-auto" 
               />
             </Link>
-          </div>
+          </div> */}
         </div>
       </footer>
     </div>
