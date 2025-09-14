@@ -55,7 +55,7 @@ const AboutUs: React.FC = () => {
                   
                   <div className="space-y-6 text-gray-700 max-w-4xl mx-auto">
                     <p className="text-lg md:text-xl leading-relaxed">
-                      Discover the ultimate devotional companion with the <span className="font-semibold theme_text">Praarthana app</span>. Immerse yourself in a rich collection of prayers, bhajans, and spiritual content tailored for devotees of Hinduism.
+                      Discover the ultimate devotional companion with the <span className="font-semibold theme_text">Bhakti Bhav app</span>. Immerse yourself in a rich collection of prayers, bhajans, and spiritual content tailored for devotees of Hinduism.
                     </p>
                     
                     <p className="text-lg md:text-xl leading-relaxed">

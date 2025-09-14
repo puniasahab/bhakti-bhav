@@ -122,13 +122,13 @@ const Home: React.FC = () => {
               <img src="/img/vichar_icon.png" alt="" width="24" height="24" className="mr-3" />
               <p className="md:text-2xl text-sm text-white font-normal">आज का राशिफल</p>
             </Link>
-
-            <Link to="#" className="w-1/2">
+            {/* <Link to="#" className="w-1/2">
               <div className="theme_bg rounded-xl p-4 md:p-6 flex items-center justify-center h-full text-center">
                 <CalendarFold className="w-6 h-6 md:w-8 md:h-8 text-white mb-2 mr-3" />
                 <p className="md:text-2xl text-sm text-white font-normal">कैलेंडर</p>
               </div>
-            </Link>
+            </Link> */}
+              <img src="/img/calendar.png" alt="Calendar" width="40" height="40" className = "mr-3" />
           </div>
 
           {/* Grid Section */}
@@ -136,14 +136,15 @@ const Home: React.FC = () => {
             <Link to="#">
               <div className="theme_bg rounded-xl p-4 md:text-2xl text-sm">
                 <CalendarFold className="w-6 h-6 md:w-8 md:h-8 text-white mx-auto mb-2" />
-                <p>व्रत तिथि
+                <p>हिंदी कैलेंडर
 </p>
               </div>
             </Link>
             <Link to="#">
               <div className="theme_bg rounded-xl p-4 md:text-2xl text-sm">
                 <BookOpenText className="w-6 h-6 md:w-8 md:h-8 text-white mx-auto mb-2" />
-                <p>ग्रंथ</p>
+                 {/* <img src="/img/kumbhKalash.png" alt="" width="24" height="24" className="mr-3" /> */}
+                <p>कथा</p>
               </div>
             </Link>
             <Link to="#">
@@ -171,7 +172,7 @@ const Home: React.FC = () => {
                   </defs>
                 </svg> */}
                 <div style={{display: 'flex', justifyContent: 'center'}}>
-                 <img src="/img/vichar_icon.png" alt="" width="24" height="24" className="mr-3" />
+                 <img src="/img/jaap_mala.svg" alt="" className="mr-3 w-6 h-6 md:w-8 md:h-8 mb-2" />
              </div>
                 <p>जाप माला</p>
               </div>
@@ -185,8 +186,9 @@ const Home: React.FC = () => {
               className="relative flex items-center justify-center rounded-xl font-semibold overflow-hidden px-12 py-6"
             >
               <span className="relative z-10 flex items-center">
-                <Images className="w-6 h-6 md:w-8 md:h-8 mr-3" />
-                <span className="text-2xl font-normal">वॉलपेपर</span>
+                {/* <Images className="w-6 h-6 md:w-8 md:h-8 mr-3" /> */}
+                <img src="/img/wall_paper.png" alt="Wallpaper" width="24" height="24" className="mr-3" />
+                <span className="text-2xl text-white font-normal">वॉलपेपर</span>
               </span>
             </Link>
           </div>
