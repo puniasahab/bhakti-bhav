@@ -1,7 +1,11 @@
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../components/firebase";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Pagination, Autoplay } from 'swiper/modules';
+import { useNavigate } from 'react-router-dom';
+import { useAppDispatch, useAppSelector } from '../hooks/redux';
 // @ts-ignore
 import { CalendarFold, BookOpenText, Facebook, Instagram } from 'lucide-react';
 
@@ -10,8 +14,11 @@ import { CalendarFold, BookOpenText, Facebook, Instagram } from 'lucide-react';
 import 'swiper/css';
 // @ts-ignore
 import 'swiper/css/pagination';
+import { setAuthour, setThoughts, setTodayThought } from './homeSlice';
 
 const Home: React.FC = () => {
+  const dispatch = useAppDispatch();
+  const { todayThought, authour } = useAppSelector(state => state.home);
   useEffect(() => {
     // Load external scripts if needed
     const script = document.createElement('script');
@@ -22,6 +29,37 @@ const Home: React.FC = () => {
       document.head.removeChild(script);
     };
   }, []);
+
+  useEffect(() => {
+    const fetchThought = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, "thought"));
+        // console.log("Fetched thoughts:", querySnapshot);
+        const thoughts = querySnapshot.docs.map(doc => doc.data());
+        // console.log("Fetched thoughts:", thoughts);
+        dispatch(setThoughts(thoughts));
+        const today = new Date().toISOString().split("T")[0];
+        const index = thoughts.findIndex((thought: any) => thought.date === today);
+        if(index >= 0) {
+          console.log("Today's thought found:", thoughts[index]);
+          dispatch(setTodayThought(thoughts[index].thought));
+          dispatch(setAuthour(thoughts[index].author));
+        }
+        else {
+          console.log("No thought found for today, setting default.");
+          dispatch(setTodayThought("उपदेश देना सरल है, पर उपाय बताना कठिन|"));
+          dispatch(setAuthour("~ रवीन्द्रनाथ टैगोर"));
+        }
+      }
+      catch (error) {
+        console.error("Error fetching thought:", error);
+      }
+    }
+
+    fetchThought();
+  }, [])
+
+  const navigate = useNavigate();
 
   return (
     <div 
@@ -117,7 +155,7 @@ const Home: React.FC = () => {
           {/* Button Row */}
           <div className="mt-4 flex flex-row space-x-3">
             <Link 
-              to="#"
+              to="/rashifal"
               className="bg-[#610419] flex items-center justify-center w-1/2 rounded-[10px] font-semibold md:text-3xl text-lg text-white"
             >
               <img src="/img/vichar_icon.png" alt="" width="24" height="24" className="mr-3" />
@@ -188,10 +226,10 @@ const Home: React.FC = () => {
           {/* Wallpaper Section */}
           <div className="mt-6 bg-[#610419] text-white rounded-xl p-4">
             <Link 
-              to=""
+              to="/wallpapers"
               className="relative flex items-center justify-center rounded-xl font-semibold overflow-hidden px-12 py-6"
             >
-              <span className="relative z-10 flex items-center">
+              <span className="relative z-10 flex items-center" onClick = {() => navigate("/wallpapers")}>
                 {/* <Images className="w-6 h-6 md:w-8 md:h-8 mr-3" /> */}
                 <img src="/img/wall_paper.png" alt="Wallpaper" width="24" height="24" className="mr-3" />
                 <span className="text-2xl text-white font-normal">वॉलपेपर</span>
@@ -212,8 +250,8 @@ const Home: React.FC = () => {
                   className="max-w-full h-auto mx-auto" 
                 />
               </div>
-              <p className="text-2xl">उपदेश देना सरल है, पर उपाय बताना कठिन|</p>
-              <p className="mt-1 text-lg">~ रवीन्द्रनाथ टैगोर</p>
+              <p className="text-2xl">{todayThought}</p>
+              <p className="mt-1 text-lg">~{authour}</p>
 
               {/* <div className="flex justify-center space-x-4 mt-4 text-xl">
                 <Link to="#">
