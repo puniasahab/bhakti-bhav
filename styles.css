@@ -1,15 +1,24 @@
 @font-face {
   font-family: 'KrutiDev';
-  src: url('fonts/KRDEV010.ttf') format('truetype');
+  src: url('src/fonts/KRDEV010.TTF') format('truetype');
   font-weight: normal;
   font-style: normal;
 }
+
 @font-face {
-  font-family: 'Poppins';
-  src: url('fonts/poppins.ttf') format('truetype');
+  font-family: 'KrutiDev-Bold';
+  src: url('src/fonts/KRDEV030-BOLD.TTF') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'KrutiDev-Normal';
+  src: url('src/fonts/Kruti_Dev_714_Normal.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
 }
+
 body {
   font-family: 'KrutiDev', sans-serif;
   background-color: #f0f0f0;
@@ -19,39 +28,174 @@ body {
 
 
 
-.hd_bg{
-  background-color: rgba(255,250,244, 0.9);
-}
-.theme_text{
-  color: #610419;
-}
-.theme_bg{
-  background-color: #610419;
-  color: #fff;
+.hd_bg {
+  /* web */
+  /* background: linear-gradient(to right, #FFF179  0%, #faca8e 100% );  */
+
+  /* mobile */
+  background: linear-gradient(to right, #EBA24A 0%, #FFF179 100%);
+
 }
 
-.font-hindi{
-    font-family: 'KrutiDev', sans-serif;
+.theme_text {
+  color: #9A283D;
 }
-.font-eng{
-    font-family: Arial, Helvetica, sans-serif;
+
+.theme_bg {
+  background-color: #fff;
+  color: #9A283D;
+  border: 1px solid #EBA24A;
 }
-.card_bg{
+
+.font-hindi {
+  font-family: 'KrutiDev', sans-serif;
+}
+
+.font-eng {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.card_bg {
   background-color: rgba(255, 255, 255, 0.6);
 }
+
+.icon_24,
+.rupees_icon,
+.notification_icon {
+  vertical-align: middle;
+}
+
 .icon_24 {
   width: 24px;
   height: 24px;
-  vertical-align: middle;
 }
 
-.rupees_icon{
+.rupees_icon {
   width: 26px;
   height: 24px;
-  vertical-align: middle;
 }
-.notification_icon{
+
+.notification_icon {
   width: 24px;
   height: 21px;
-  vertical-align: middle;
+}
+
+.custom_bg:before,
+.custom_bg:after {
+  content: '';
+  position: absolute;
+  top: 0;
+}
+
+.custom_bg:before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100px;
+  height: 200px;
+  background: url('/img/icon_11.png') no-repeat center center;
+  background-size: contain; 
+}
+
+.custom_bg:after {
+  content: '';
+  position: absolute;
+  top: 25%;
+  right: 50px;
+  width: 100px;
+  height: 50px;
+  background: url('/img/icon_13.png') no-repeat center center;
+  background-size: contain; 
+}
+
+.swiper-slide {
+  border-radius: 15px;
+}
+
+
+@keyframes floatUp {
+  0% { transform: translateY(50px); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: translateY(-150px); opacity: 0; }
+}
+
+.animate-float {
+  animation: floatUp 2.5s ease-in-out forwards;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 80px;
+  pointer-events: none;
+}
+
+
+/* Base style for all floating icons */
+.animate-icon {
+  position: absolute;
+  top: 60%; /* start lower */
+  width: 80px;
+  height: 80px;
+  pointer-events: none;
+}
+
+/* Float + fade (default movement upwards) */
+@keyframes floatUp {
+  0%   { transform: translateY(0px) scale(0.7); opacity: 0; }
+  30%  { opacity: 1; }
+  100% { transform: translateY(-250px) scale(1.2); opacity: 0; }
+}
+.floatUp { animation: floatUp 2.5s ease-in-out forwards; }
+
+/* Diya glow */
+@keyframes glow {
+  0%,100% { filter: drop-shadow(0 0 5px orange); opacity: 0; }
+  50% { filter: drop-shadow(0 0 20px gold); opacity: 1; }
+}
+.glow { animation: glow 2.5s ease-in-out forwards, floatUp 2.5s ease-in-out forwards; }
+
+/* Mandala rotate */
+@keyframes rotateUp {
+  0% { transform: translateY(0px) rotate(0deg) scale(0.6); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: translateY(-250px) rotate(360deg) scale(1.2); opacity: 0; }
+}
+.rotate { animation: rotateUp 3s ease-in-out forwards; }
+
+/* Shankh shake */
+@keyframes shakeUp {
+  0% { transform: translateY(0px) rotate(0deg); opacity: 0; }
+  20% { transform: translateY(-50px) rotate(-10deg); opacity: 1; }
+  40% { transform: translateY(-100px) rotate(10deg); }
+  60% { transform: translateY(-150px) rotate(-8deg); }
+  80% { transform: translateY(-200px) rotate(8deg); }
+  100% { transform: translateY(-250px) rotate(0deg); opacity: 0; }
+}
+.shake { animation: shakeUp 2.5s ease-in-out forwards; }
+
+/* Calendar flip */
+@keyframes flipUp {
+  0% { transform: translateY(0px) rotateY(0deg) scale(0.6); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: translateY(-250px) rotateY(180deg) scale(1.1); opacity: 0; }
+}
+.flip { animation: flipUp 2.5s ease-in-out forwards; }
+
+
+
+@media screen and (max-width: 768px) {
+  .custom_bg:before {
+    width: 55px;
+    height: 115px;
+
+  }
+
+  .custom_bg:after {
+     top: 10%;
+    right: 20px;
+    width: 30px;
+    height: 30px;
+  }
+
 }

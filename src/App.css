@@ -13,14 +13,21 @@
 /* Font faces */
 @font-face {
   font-family: 'KrutiDev';
-  src: url('./img/fonts/KRDEV010.ttf') format('truetype');
+  src: url('./fonts/KRDEV010.TTF') format('truetype');
   font-weight: normal;
   font-style: normal;
 }
 
 @font-face {
-  font-family: 'Poppins';
-  src: url('./img/fonts/poppins.ttf') format('truetype');
+  font-family: 'KrutiDev-Bold';
+  src: url('./fonts/KRDEV030-BOLD.TTF') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'KrutiDev-Normal';
+  src: url('./fonts/Kruti_Dev_714_Normal.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
 }
@@ -43,8 +50,9 @@ body {
 }
 
 .theme_bg {
-  background-color: #610419;
-  color: #fff;
+  background-color: #fff;
+  color: #9A283D;
+  border: 1px solid #EBA24A;
 }
 
 .font-hindi {

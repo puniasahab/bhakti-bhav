@@ -8,7 +8,10 @@ export default {
     extend: {
       fontFamily: {
         'kruti': ['KrutiDev', 'sans-serif'],
+        'kruti-bold': ['KrutiDev-Bold', 'sans-serif'],
+        'kruti-normal': ['KrutiDev-Normal', 'sans-serif'],
         'eng': ['Arial', 'Helvetica', 'sans-serif'],
+        'hindi': ['KrutiDev', 'sans-serif'],
       },
       colors: {
         'theme': {

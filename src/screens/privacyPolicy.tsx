@@ -9,11 +9,12 @@ const PrivacyPolicy: React.FC = () => {
     navigate('/');
   };
 
+  // const heading = "Privacy Policy";
   return (
     <div 
       className="bg-cover bg-top bg-no-repeat min-h-screen w-full text-white"
       style={{ 
-        backgroundImage: "url('/img/page_bg.jpg')",
+        backgroundImage: "url('/img/home_bg.png')",
         fontFamily: "'KrutiDev', sans-serif"
       }}
     >
@@ -28,7 +29,7 @@ const PrivacyPolicy: React.FC = () => {
               >
                 <ArrowLeft className="w-5 h-5" />
               </button>
-              <h1 className="text-lg font-bold theme_text" style={{fontSize: '20px'}}>Privacy Policy</h1>
+              <h1 className="text-lg font-eng font-bold theme_text" style={{fontSize: '20px'}}>Privacy Policy</h1>
             </div>
             {/* <Link to="/" className="rupees_icon"> */}
               <img 
@@ -210,13 +211,13 @@ const PrivacyPolicy: React.FC = () => {
       <footer className="mt-6 py-4">
         <div className="container mx-auto flex flex-col md:flex-row justify-between items-center text-2xl px-4">
           <div className="flex flex-col md:flex-row md:space-x-6 theme_text text-center font-eng mb-3 md:mb-0 space-y-2 md:space-y-0">
-            <Link to="/termsAndConditions" className="theme-text text-lg text-white hover:underline" style={{ fontFamily: 'Calibri, sans-serif' }}>
+            <Link to="/termsAndConditions" className="theme-text text-lg text-[#610419] hover:underline" style={{ fontFamily: 'Calibri, sans-serif' }}>
               Terms & Conditions
             </Link>
-            <Link to="/privacyPolicy" className="theme-text text-lg text-white hover:underline" style={{ fontFamily: 'Calibri, sans-serif' }}>
+            <Link to="/privacyPolicy" className="theme-text text-lg text-[#610419] hover:underline" style={{ fontFamily: 'Calibri, sans-serif' }}>
               Privacy Policy
             </Link>
-            <Link to="/aboutUs" className="theme-text text-lg text-white hover:underline" style={{ fontFamily: 'Calibri, sans-serif' }}>
+            <Link to="/aboutUs" className="theme-text text-lg text-[#610419] hover:underline" style={{ fontFamily: 'Calibri, sans-serif' }}>
               About us
             </Link>
           </div>
