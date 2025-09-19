@@ -5,9 +5,9 @@ import { Facebook, Instagram } from "lucide-react";
 const months = [
   "जनवरी", "फरवरी", "मार्च", "अप्रैल", "मई", "जून", "जुलाई", "अगस्त", "सितंबर", "अक्टूबर", "नवंबर", "दिसंबर"
 ];
-const monthsEng = [
-  "tuojh", "Qjojh", "ekpZ", "vizSy", "ebZ", "twu", "tqykbZ", "vXkLr", "flracj", "vDVwcj", "uoaEcj", "fnlacj"
-];
+// const monthsEng = [
+//   "tuojh", "Qjojh", "ekpZ", "vizSy", "ebZ", "twu", "tqykbZ", "vXkLr", "flracj", "vDVwcj", "uoaEcj", "fnlacj"
+// ];
 const currentMonth = "सितंबर";
 const currentYear = "2025";
 const events = [
@@ -62,7 +62,7 @@ const HindiCalendar: React.FC = () => {
       <main className="px-4 mt-6">
         <div className="container mx-auto">
           <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-            {months.map((month, idx) => (
+            {months.map((month) => (
               <li key={month}>
                 <Link
                   to="/"

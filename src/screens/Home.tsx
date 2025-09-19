@@ -4,7 +4,7 @@ import { collection, getDocs } from "firebase/firestore";
 import { db } from "../components/firebase";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Pagination, Autoplay } from 'swiper/modules';
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../hooks/redux';
 // @ts-ignore
 import { CalendarFold, BookOpenText, Facebook, Instagram } from 'lucide-react';
@@ -59,7 +59,7 @@ const Home: React.FC = () => {
     fetchThought();
   }, [])
 
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   return (
     <div 
