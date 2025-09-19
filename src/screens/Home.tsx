@@ -8,6 +8,22 @@ import { Pagination, Autoplay } from 'swiper/modules';
 import { useAppDispatch, useAppSelector } from '../hooks/redux';
 // @ts-ignore
 import { CalendarFold, BookOpenText, Facebook, Instagram } from 'lucide-react';
+import { 
+  logo, 
+  rupeesIcon, 
+  bell, 
+  hdUserIcon, 
+  hdShareIcon, 
+  hdWhatsappIcon, 
+  hdAdobeIcon, 
+  icon1, 
+  icon2, 
+  icon3, 
+  icon4, 
+  icon5, 
+  pujaBgs, 
+  whatssappIcon 
+} from '../assets/images';
 
 // Import Swiper styles
 // @ts-ignore
@@ -71,18 +87,18 @@ const Home: React.FC = () => {
     <div className="flex justify-between items-center px-4 py-6">
       <h1 className="text-lg font-bold">
         <Link to="/" className="rupees_icon">
-          <img src="/img/logo.png" alt="Logo" width="108" height="27" className="max-w-full h-auto" />
+          <img src={logo} alt="Logo" width="108" height="27" className="max-w-full h-auto" />
         </Link>
       </h1>
       <div className="flex items-center md:space-x-6 space-x-4 text-xl">
         <Link to="#" className="rupees_icon">
-          <img src="/img/rupees_icon.png" alt="Rupees" width="22" height="20" className="max-w-full h-auto" />
+          <img src={rupeesIcon} alt="Rupees" width="22" height="20" className="max-w-full h-auto" />
         </Link>
         <Link to="#" className="notification_icon">
-          <img src="/img/bell.png" alt="Notifications" width="24" height="21" className="max-w-full h-auto" />
+          <img src={bell} alt="Notifications" width="24" height="21" className="max-w-full h-auto" />
         </Link>
         <Link to="#" className="icon_24">
-          <img src="/img/hd_user_icon.png" alt="User" width="22" height="21" className="max-w-full h-auto" />
+          <img src={hdUserIcon} alt="User" width="22" height="21" className="max-w-full h-auto" />
         </Link>
       </div>
     </div>
@@ -114,13 +130,13 @@ const Home: React.FC = () => {
     <div className="mt-4 grid grid-cols-2 gap-3">
       <Link to="/rashifal" className="theme_bg bg-white rounded-xl shadow md:p-6 p-3 text-center hover:bg-yellow-50 transition w-auto flex">
         <div className="mx-auto flex md:flex-row flex-col items-center space-y-3 md:space-y-0">
-          <img src="/img/icon_1.png" alt="" width="36" height="36" className="md:mr-3" />
+          <img src={icon1} alt="" width="36" height="36" className="md:mr-3" />
           <p className="md:text-2xl text-lg font-normal">आज का राशिफल</p>
         </div>
       </Link>
       <Link to="#" className="theme_bg bg-white rounded-xl shadow md:p-6 p-3 text-center hover:bg-yellow-50 transition w-auto flex">
         <div className="mx-auto flex md:flex-row flex-col items-center space-y-3 md:space-y-0">
-          <img src="/img/icon_5.png" alt="" width="36" height="36" className="md:mr-3" />
+          <img src={icon5} alt="" width="36" height="36" className="md:mr-3" />
           <p className="md:text-2xl text-lg font-normal">पंचांग</p>
         </div>
       </Link>
@@ -128,19 +144,19 @@ const Home: React.FC = () => {
     <div className="grid grid-cols-3 md:gap-4 gap-2 mt-6 text-center font-medium">
       <Link to="/hindiCalendar" className="theme_bg bg-white rounded-xl shadow md:p-6 p-3 text-center hover:bg-yellow-50 transition w-auto flex">
         <div className="mx-auto flex flex-col items-center space-y-3 md:space-y-0">
-          <img src="/img/icon_2.png" alt="" width="36" height="36" className="md:mr-3" />
+          <img src={icon2} alt="" width="36" height="36" className="md:mr-3" />
           <p className="md:text-2xl text-lg font-normal">हिंदी कैलेंडर</p>
         </div>
       </Link>
       <Link to="/katha" className="theme_bg bg-white rounded-xl shadow md:p-6 p-3 text-center hover:bg-yellow-50 transition w-auto flex">
         <div className="mx-auto flex flex-col items-center space-y-3 md:space-y-0">
-          <img src="/img/icon_3.png" alt="" width="36" height="36" className="md:mr-3" />
+          <img src={icon3} alt="" width="36" height="36" className="md:mr-3" />
           <p className="md:text-2xl text-lg font-normal">व्रत कथा</p>
         </div>
       </Link>
       <Link to="/jaapMala" className="theme_bg bg-white rounded-xl shadow md:p-6 p-3 text-center hover:bg-yellow-50 transition w-auto flex">
         <div className="mx-auto flex flex-col items-center space-y-3 md:space-y-0">
-          <img src="/img/icon_4.png" alt="" width="36" height="36" className="md:mr-3" />
+          <img src={icon4} alt="" width="36" height="36" className="md:mr-3" />
           <p className="md:text-2xl text-lg font-normal"> जापमाला </p>
         </div>
       </Link>
@@ -162,14 +178,14 @@ const Home: React.FC = () => {
           <p className="mt-1 text-lg">{authour}</p>
         </div>
         <div className="flex justify-center space-x-4 mt-6">
-          <Link to="#"><img src="/img/hd_share_icon.png" alt="Share" width="24" height="24" className="max-w-full h-auto mx-auto" /></Link>
-          <Link to="#"><img src="/img/hd_whatsapp_icon.png" alt="WhatsApp" width="24" height="24" className="max-w-full h-auto mx-auto" /></Link>
-          <Link to="#"><img src="/img/hd_adobe_icon.png" alt="Adobe" width="24" height="24" className="max-w-full h-auto mx-auto" /></Link>
+          <Link to="#"><img src={hdShareIcon} alt="Share" width="24" height="24" className="max-w-full h-auto mx-auto" /></Link>
+          <Link to="#"><img src={hdWhatsappIcon} alt="WhatsApp" width="24" height="24" className="max-w-full h-auto mx-auto" /></Link>
+          <Link to="#"><img src={hdAdobeIcon} alt="Adobe" width="24" height="24" className="max-w-full h-auto mx-auto" /></Link>
         </div>
       </div>
       <div className="md:basis-[40%] basis-[40%] flex flex-col justify-between items-center md:p-4 theme_text">
         <span className="font-semibold md:text-3xl text-2xl">पूजा करें!</span>
-        <div className="my-4"><img src="/img/puja_bgs.png" alt="Puja" width="150" height="120" className="max-w-full h-auto" /></div>
+        <div className="my-4"><img src={pujaBgs} alt="Puja" width="150" height="120" className="max-w-full h-auto" /></div>
         <Link to="/pooja" className="relative bg-[#6d001f] bg-[url('/img/btn_icon_1.png'), url('/img/btn_icon_1.png')] text-white text-center px-4 py-2 rounded-full font-eng md:text-lg text-sm md:w-[70%] w-full hover:scale-105 transition-all duration-300 ease-in-out">
           {/* <span className="absolute left-2 top-1/2 -translate-y-1/2 bg-[url('/img/btn_icon_1.png')] bg-no-repeat bg-contain w-[14px] h-[14px]"></span> */}
           {/* <span className="absolute right-2 top-1/2 -translate-y-1/2 bg-[url('/img/btn_icon_2.png')] bg-no-repeat bg-contain w-[14px] h-[14px]"></span> */}
@@ -194,7 +210,7 @@ const Home: React.FC = () => {
         <Instagram className="w-5 h-5" />
       </Link>
       <Link to="#" className="w-10 h-10 flex items-center justify-center rounded-full bg-[#5a001d] text-white text-lg hover:bg-[#7a0028]">
-        <img src="/img/whatssapp_icon.png" alt="WhatsApp" width="20" height="20" className="max-w-full h-auto" />
+        <img src={whatssappIcon} alt="WhatsApp" width="20" height="20" className="max-w-full h-auto" />
       </Link>
     </div>
   </div>

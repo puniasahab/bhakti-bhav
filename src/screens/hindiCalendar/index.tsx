@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Facebook, Instagram } from "lucide-react";
+import { logo, rupeesIcon, bell, hdUserIcon, whatssappIcon } from "../../assets/images";
 
 const months = [
   "जनवरी", "फरवरी", "मार्च", "अप्रैल", "मई", "जून", "जुलाई", "अगस्त", "सितंबर", "अक्टूबर", "नवंबर", "दिसंबर"
@@ -34,18 +35,18 @@ const HindiCalendar: React.FC = () => {
           <div className="flex justify-between items-center px-4 py-6">
             <h1 className="text-lg font-bold">
               <Link to="/" className="rupees_icon">
-                <img src="/img/logo.png" alt="Logo" width="108" height="27" className="max-w-full h-auto" />
+                <img src={logo} alt="Logo" width="108" height="27" className="max-w-full h-auto" />
               </Link>
             </h1>
             <div className="flex items-center md:space-x-6 space-x-4 text-xl">
               <Link to="#" className="rupees_icon">
-                <img src="/img/rupees_icon.png" alt="Rupees" width="22" height="20" className="max-w-full h-auto" />
+                <img src={rupeesIcon} alt="Rupees" width="22" height="20" className="max-w-full h-auto" />
               </Link>
               <Link to="#" className="notification_icon">
-                <img src="/img/bell.png" alt="Notifications" width="24" height="21" className="max-w-full h-auto" />
+                <img src={bell} alt="Notifications" width="24" height="21" className="max-w-full h-auto" />
               </Link>
               <Link to="#" className="icon_24">
-                <img src="/img/hd_user_icon.png" alt="User" width="22" height="21" className="max-w-full h-auto" />
+                <img src={hdUserIcon} alt="User" width="22" height="21" className="max-w-full h-auto" />
               </Link>
             </div>
           </div>
@@ -118,7 +119,7 @@ const HindiCalendar: React.FC = () => {
               <Instagram className="w-5 h-5" />
             </Link>
             <Link to="#" className="w-10 h-10 flex items-center justify-center rounded-full bg-[#5a001d] text-white text-lg hover:bg-[#7a0028]">
-              <img src="/img/whatssapp_icon.png" alt="WhatsApp" width="20" height="20" className="max-w-full h-auto" />
+              <img src={whatssappIcon} alt="WhatsApp" width="20" height="20" className="max-w-full h-auto" />
             </Link>
           </div>
         </div>
