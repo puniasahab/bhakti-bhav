@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Facebook, Instagram } from "lucide-react";
-import { logo, rupeesIcon, bell, hdUserIcon, whatssappIcon } from "../../assets/images";
+// import { logo, rupeesIcon, bell, hdUserIcon, whatssappIcon } from "../../assets/images";
 
 const Katha: React.FC = () => {
   const kathaCards = [

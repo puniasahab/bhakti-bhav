@@ -8,3 +8,38 @@ const api = axios.create({
         "Content-Type": "application/json",
     }
 });
+
+api.interceptors.request.use(
+    (config: InternalAxiosRequestConfig) => {
+        const token = localStorage.getItem("authToken");
+        if(token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
+        return config;
+    },
+    (error: AxiosError) => {
+        return Promise.reject(error);
+    }
+);
+
+api.interceptors.response.use(
+    (response: AxiosResponse) => {
+        return response;
+    },
+    (error: AxiosError) => {
+        if(error.response?.status === 401) {
+            // Handle Unauthorized access
+            localStorage.removeItem("authToken");
+            window.location.href = "/"; // Redirect to login page
+        }
+        return Promise.reject(error);
+    }
+);
+
+
+// export const homePageApis = {
+//     fetchHomePageData: async () => api.
+// }
+
+
+
