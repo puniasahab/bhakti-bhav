@@ -37,9 +37,39 @@ api.interceptors.response.use(
 );
 
 
-// export const homePageApis = {
-//     fetchHomePageData: async () => api.
-// }
+export const homePageApis = {
+    
+}
 
 
+export const rashifalApis = {
+
+}
+
+export const panchangApis = {
+
+}
+
+export const hindiCalendarApis = {
+
+}
+
+export const vratKathaApis ={
+
+}
+
+export const jaapMalaApis = {
+
+}
+
+export const poojaApis = {
+    
+}
+
+
+export const paymentApis = {
+
+}
+
+export default api;
 
