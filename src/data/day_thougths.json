@@ -1,0 +1,24 @@
+{
+    "status": "success",
+    "code": 200,
+    "message": "Thought of the Day fetched successfully",
+    "data": {
+        "_id": "68cf822503b7be04ebfd841e",
+        "thought": {
+            "hi": "मन को शांति देने वाला व्यक्ति सबसे बड़ा योगी है।",
+            "en": "The one who gives peace to the mind is the greatest yogi.",
+            "_id": "68cf822503b7be04ebfd841f"
+        },
+        "author": {
+            "hi": "महर्षि पतंजलि",
+            "en": "Maharishi Patanjali",
+            "_id": "68cf822503b7be04ebfd8420"
+        },
+        "date": "2025-09-16",
+        "position": 1,
+        "active": true,
+        "createdAt": "2025-09-21T04:42:13.422Z",
+        "updatedAt": "2025-09-21T04:42:13.422Z",
+        "__v": 0
+    }
+}

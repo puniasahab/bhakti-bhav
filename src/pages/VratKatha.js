@@ -1,0 +1,87 @@
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
+
+export default function VratKatha() {
+  const [kathas, setKathas] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchKathas() {
+      try {
+        const res = await fetch("https://api.bhaktibhav.app/frontend/all-kathas");
+        const json = await res.json();
+
+        if (json.status === "success" && Array.isArray(json.data)) {
+          setKathas(json.data);
+        } else {
+          setKathas([]);
+        }
+      } catch (error) {
+        console.error("API Error:", error);
+        setKathas([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchKathas();
+  }, []);
+
+  if (loading) return <p className="text-center py-10 theme_text">⏳ Loading...</p>;
+  if (!kathas.length) return <p className="text-center py-10">❌ No kathas found</p>;
+
+  return (
+    <>
+      <Header />
+      <div className="flex justify-center items-center mb-3">
+        <p className="mb-0 text-2xl w-auto py-1 bg-[rgba(255,250,244,0.6)] rounded-b-xl mx-auto px-4 theme_text font-bold shadow-md">
+          कथा
+          <span className="font-eng text-sm ml-2">(Katha)</span>
+        </p>
+      </div>
+
+      <div className="container mx-auto px-4 mt-4">
+        <ul className="grid grid-cols-2 lg:grid-cols-4 gap-4 text-center">
+          {kathas.map((katha) => (
+            <li key={katha._id}>
+              <Link
+                to={`/vrat-katha/${katha._id}`} // ✅ use _id for routing
+                className="theme_bg bg-white rounded-xl shadow hover:bg-yellow-50 transition block overflow-hidden"
+              >
+                <div className="w-full h-40 flex items-center justify-center overflow-hidden  ">
+                  <img
+                    src={`${katha.imagethumb}`}
+                    alt={katha.name?.hi || katha.name?.en}
+                    className="w-auto rounded-md max-h-[100%] md:max-h-[100%]"
+                  />
+                </div>
+                <div className="p-2">
+                  {katha.name?.hi && (
+                    <h2 className="md:text-xl text-lg font-semibold truncate font-hindi">
+                      {katha.name.hi}
+                    </h2>
+                  )}
+                  {katha.name?.en && (
+                    <p className="text-sm truncate font-eng">{katha.name.en}</p>
+                  )}
+
+                  {/* <p className="text-sm text-gray-600">
+                    {new Date(katha.date).toLocaleDateString("hi-IN", {
+                      day: "numeric",
+                      month: "long",
+                      year: "numeric",
+                    })}
+                  </p> */}
+                </div>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <Footer />
+    </>
+  );
+}

@@ -1,0 +1,113 @@
+{
+    "status": "success",
+    "code": 200,
+    "message": "Panchang calendar fetched successfully",
+    "data": [
+        {
+            "_id": "68cf8aaf03b7be04ebfd8427",
+            "year": 2025,
+            "monthNumber": 3,
+            "month": "{\"hi\":\"मार्च\",\"en\":\"March\"}",
+            "festivals": [
+                {
+                    "date": "2025-03-05",
+                    "name": {
+                        "hi": "षष्ठी",
+                        "en": "Shashthi"
+                    },
+                    "_id": "68cf8aaf03b7be04ebfd8428",
+                    "createdAt": "2025-09-21T05:18:39.360Z",
+                    "updatedAt": "2025-09-21T05:18:39.360Z"
+                },
+                {
+                    "date": "2025-03-12",
+                    "name": {
+                        "hi": "चतुर्दशी",
+                        "en": "Chaturdashi(14)"
+                    },
+                    "_id": "68cf8aaf03b7be04ebfd8429",
+                    "createdAt": "2025-09-21T05:18:39.360Z",
+                    "updatedAt": "2025-09-21T05:18:39.360Z"
+                },
+                {
+                    "date": "2025-03-13",
+                    "name": {
+                        "hi": "पूर्णिमा",
+                        "en": "Purnima"
+                    },
+                    "_id": "68cf8aaf03b7be04ebfd842a",
+                    "createdAt": "2025-09-21T05:18:39.360Z",
+                    "updatedAt": "2025-09-21T05:18:39.360Z"
+                },
+                {
+                    "date": "2025-03-19",
+                    "name": {
+                        "hi": "पंचमी",
+                        "en": "Panchami"
+                    },
+                    "_id": "68cf8aaf03b7be04ebfd842b",
+                    "createdAt": "2025-09-21T05:18:39.360Z",
+                    "updatedAt": "2025-09-21T05:18:39.360Z"
+                },
+                {
+                    "date": "2025-03-26",
+                    "name": {
+                        "hi": "द्वादशी",
+                        "en": "Dwadashi"
+                    },
+                    "_id": "68cf8aaf03b7be04ebfd842c",
+                    "createdAt": "2025-09-21T05:18:39.360Z",
+                    "updatedAt": "2025-09-21T05:18:39.360Z"
+                },
+                {
+                    "date": "2025-03-29",
+                    "name": {
+                        "hi": "अमावस्या",
+                        "en": "Amavasya"
+                    },
+                    "_id": "68cf8aaf03b7be04ebfd842d",
+                    "createdAt": "2025-09-21T05:18:39.361Z",
+                    "updatedAt": "2025-09-21T05:18:39.361Z"
+                }
+            ],
+            "calendarImageUrl": "/uploads/panchang-calendar/calendar-1758431919334-400283061.jpeg",
+            "active": true,
+            "createdAt": "2025-09-21T05:18:39.361Z",
+            "updatedAt": "2025-09-21T07:15:42.479Z",
+            "__v": 1
+        },
+        {
+            "_id": "68cfa85d03b7be04ebfd8604",
+            "year": 2025,
+            "monthNumber": 8,
+            "month": "{\"hi\":\"अगस्त\",\"en\":\"August\"}",
+            "festivals": [
+                {
+                    "date": "2025-09-23",
+                    "name": {
+                        "hi": "ioiooi",
+                        "en": "Something new"
+                    },
+                    "_id": "68cfa85d03b7be04ebfd8605",
+                    "createdAt": "2025-09-21T07:25:17.837Z",
+                    "updatedAt": "2025-09-21T08:05:27.337Z"
+                },
+                {
+                    "date": "2025-09-30",
+                    "name": {
+                        "hi": "kl",
+                        "en": "klklkl"
+                    },
+                    "_id": "68cfa85d03b7be04ebfd8606",
+                    "createdAt": "2025-09-21T07:25:17.837Z",
+                    "updatedAt": "2025-09-21T08:05:27.337Z"
+                }
+            ],
+            "calendarImageUrl": "/uploads/panchang-calendar/calendar-1758439517824-756573433.png",
+            "active": true,
+            "createdAt": "2025-09-21T07:25:17.837Z",
+            "updatedAt": "2025-09-21T08:05:27.337Z",
+            "__v": 0
+        }
+    ]
+}

@@ -1,0 +1,44 @@
+{
+    "status": "success",
+    "code": 200,
+    "message": "All Rashifals fetched successfully",
+    "data": [
+        {
+            "_id": "68cfa67203b7be04ebfd8601",
+            "rashi": {
+                "_id": "68cfa63c03b7be04ebfd85fe",
+                "key": "vrishabh",
+                "name": {
+                    "hi": "मेष",
+                    "en": "Aries",
+                    "_id": "68cfa63c03b7be04ebfd85ff"
+                },
+                "createdAt": "2025-09-21T07:16:12.039Z",
+                "updatedAt": "2025-09-21T09:17:52.639Z",
+                "__v": 0
+            },
+            "date": "2025-09-20T00:00:00.000Z",
+            "points": {
+                "hi": [
+                    "आज का दिन शुभ रहेगा",
+                    "आर्थिक लाभ होगा",
+                    "परिवार का सहयोग मिलेगा",
+                    "स्वास्थ्य अच्छा रहेगा",
+                    "नए अवसर मिलेंगे"
+                ],
+                "en": [
+                    "Today will be lucky",
+                    "Financial gains are possible",
+                    "Family support will be strong",
+                    "Health will be good",
+                    "New opportunities will come"
+                ],
+                "_id": "68cfa67203b7be04ebfd8602"
+            },
+            "scheduled": true,
+            "createdAt": "2025-09-21T07:17:06.356Z",
+            "updatedAt": "2025-09-21T07:17:06.356Z",
+            "__v": 0
+        }
+    ]
+}

@@ -1,0 +1,1426 @@
+{
+    "status": "success",
+    "code": 200,
+    "message": "All JaapMala fetched successfully",
+    "data": [
+        {
+            "_id": "68cd67a6e1f40f8f96b6a38e",
+            "id": "durga_1758291878074",
+            "title": {
+                "en": "Shivji 108 names",
+                "hi": "शिवजी के 108 नाम"
+            },
+            "description": {
+                "en": "Shivji 108 complete names with their meanings",
+                "hi": "शिवजी के 108 पूर्ण नाम उनके अर्थ सहित"
+            },
+            "names": [
+                {
+                    "name": {
+                        "hi": "पार्वती पति",
+                        "en": "Parvati pati"
+                    },
+                    "meaning": {
+                        "hi": "ikai hai ",
+                        "en": "sunay hai "
+                    },
+                    "_id": "68cfc82203b7be04ebfd896d",
+                    "id": "68cfc82203b7be04ebfd896d"
+                },
+                {
+                    "name": {
+                        "hi": "3333",
+                        "en": "Shivji 3"
+                    },
+                    "meaning": {
+                        "hi": "Shivji 3rd index",
+                        "en": "Shivji 3rd index"
+                    },
+                    "_id": "68cfc82203b7be04ebfd896e",
+                    "id": "68cfc82203b7be04ebfd896e"
+                },
+                {
+                    "name": {
+                        "hi": "444444",
+                        "en": "Shivji 4"
+                    },
+                    "meaning": {
+                        "hi": "Shivji 4th index",
+                        "en": "Shivji 4th index"
+                    },
+                    "_id": "68cfc82203b7be04ebfd896f",
+                    "id": "68cfc82203b7be04ebfd896f"
+                }
+            ],
+            "type": "names",
+            "count": 3,
+            "active": true,
+            "createdAt": "2025-09-19T14:24:38.767Z",
+            "updatedAt": "2025-09-21T09:40:50.112Z",
+            "__v": 0,
+            "uid": "68cd67a6e1f40f8f96b6a38e"
+        },
+        {
+            "_id": "68ce80ba89c6874b9872f888",
+            "id": "durga_109",
+            "title": {
+                "en": "108 Names of Maa Durga",
+                "hi": "मां दुर्गा के 108 नाम"
+            },
+            "description": {
+                "en": "108 names of Maa Durga and their meanings",
+                "hi": "मां दुर्गा के 108 नाम और उनके अर्थ"
+            },
+            "names": [
+                {
+                    "name": {
+                        "hi": "सती",
+                        "en": "Sati"
+                    },
+                    "meaning": {
+                        "hi": "अग्नि में जल कर भी जीवित होने वाली",
+                        "en": "She who remained alive even after burning in fire"
+                    },
+                    "_id": "68ce810989c6874b9872f8ab",
+                    "id": "68ce810989c6874b9872f8ab"
+                },
+                {
+                    "name": {
+                        "hi": "भाविनी",
+                        "en": "klksalsklakslak"
+                    },
+                    "meaning": {
+                        "hi": "संसार की उत्पत्ति करने वाली",
+                        "en": "She who is the origin of the universe"
+                    },
+                    "_id": "68ce810989c6874b9872f8ac",
+                    "id": "68ce810989c6874b9872f8ac"
+                }
+            ],
+            "type": "names",
+            "count": 2,
+            "active": true,
+            "createdAt": "2025-09-20T10:23:54.136Z",
+            "updatedAt": "2025-09-20T10:25:13.529Z",
+            "__v": 0,
+            "uid": "68ce80ba89c6874b9872f888"
+        },
+        {
+            "_id": "68cfd5e37b39cdbf1a3b0f3d",
+            "id": "ganesh_ji_kei_108_naam_2",
+            "title": {
+                "en": "108 names of Ganesh ji",
+                "hi": "गणेश जी के 108 नाम "
+            },
+            "description": {
+                "en": "",
+                "hi": ""
+            },
+            "names": [
+                {
+                    "name": {
+                        "hi": "ॐ गजाननाय नमः",
+                        "en": "Om Gajananaya Namah"
+                    },
+                    "meaning": {
+                        "hi": "जो गज के समान मुख वाले हैं गणाध्यक्ष",
+                        "en": "Jo gaj ke samaan mukh wale hain, Ganadhyaksh."
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1cdb",
+                    "id": "68d0d83a7b39cdbf1a3b1cdb"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ विघ्नराजाय नमः।",
+                        "en": "Om Vighnarajaya Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो देवगणों के स्वामी हैं विघ्नराज",
+                        "en": "Jo devganon ke swami hain, Vighnaraj"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1cdc",
+                    "id": "68d0d83a7b39cdbf1a3b1cdc"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ विघ्नराजाय नमः।",
+                        "en": "Om Vighnarajaya Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो विघ्नों को दूर करने वाले एवं विघ्नों के स्वामी हैं",
+                        "en": "Jo vighnon ko door karne waale evam vighnon ke svaamee hain"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1cdd",
+                    "id": "68d0d83a7b39cdbf1a3b1cdd"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ विनायकाय नमः।",
+                        "en": "Om Vinayakaya Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो समस्त प्राणियों के स्वामी हैं",
+                        "en": "Jo samast praaniyon ke svaamee hain"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1cde",
+                    "id": "68d0d83a7b39cdbf1a3b1cde"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ द्वैमातुराय नमः।",
+                        "en": "Om Dvaimaturaya Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो दो माताओं वाले हैं",
+                        "en": "Jo do mataon waale hain"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1cdf",
+                    "id": "68d0d83a7b39cdbf1a3b1cdf"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ द्विमुखाय नमः।",
+                        "en": "Om Dvimukhaya Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो दो मुखों वाले हैं",
+                        "en": "Jo do mukhon waale hain"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1ce0",
+                    "id": "68d0d83a7b39cdbf1a3b1ce0"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ प्रमुखाय नमः।",
+                        "en": "Om Pramukhaya Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो सृष्टि के मुख्य देव हैं",
+                        "en": "Jo srishti ke mukhya dev hain"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1ce1",
+                    "id": "68d0d83a7b39cdbf1a3b1ce1"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ सुमुखाय नमः।",
+                        "en": "Om Sumukhaya Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो सुन्दर मुख वाले हैं",
+                        "en": "Jo sundar mukh waale hain"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1ce2",
+                    "id": "68d0d83a7b39cdbf1a3b1ce2"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ कृतिने नमः।",
+                        "en": "Om Kritine Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो स्वयं सृष्टि स्वरूप हैं",
+                        "en": "Jo svayam srishti swaroop hain"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1ce3",
+                    "id": "68d0d83a7b39cdbf1a3b1ce3"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ सुप्रदीपाय नमः।",
+                        "en": "Om Supradipaya Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो अज्ञान रूपी अन्धकार को नष्ट करने वाले हैं",
+                        "en": "Jo ajnaan roopi andhkaar ko nasht karne waale hain"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1ce4",
+                    "id": "68d0d83a7b39cdbf1a3b1ce4"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ सुखनिधये नमः।",
+                        "en": "Om Sukhanidhaye Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो सुख के सागर एवं सुख प्रदान करने वाले हैं",
+                        "en": "Jo sukh ke saagar evam sukh pradaan karne waale hain"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1ce5",
+                    "id": "68d0d83a7b39cdbf1a3b1ce5"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ सुराध्यक्षाय नमः।",
+                        "en": "Om Suradhyakshaya Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो देवताओं के अधिपति हैं",
+                        "en": "Om Suradhyakshaya Namah।"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1ce6",
+                    "id": "68d0d83a7b39cdbf1a3b1ce6"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ सुरारिघ्नाय नमः।",
+                        "en": "Om Surarighnaya Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो देवों के शत्रुओं का संहार करने वाले हैं",
+                        "en": "Jo devon ke shatruon ka sanhaar karne waale hain"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1ce7",
+                    "id": "68d0d83a7b39cdbf1a3b1ce7"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ महागणपतये नमः।",
+                        "en": "Om Mahaganapataye Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो सर्वोच्च एवं सर्वशक्तिमान हैं",
+                        "en": "Jo sarvochch evam sarvashaktimaan hain"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1ce8",
+                    "id": "68d0d83a7b39cdbf1a3b1ce8"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ मान्याय नमः।",
+                        "en": "Om Manyaya Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो सम्पूर्ण ब्रह्माण्ड में मान्य (पूज्य) हैं",
+                        "en": "Jo sampoorna brahmand mein many (poojya) hain"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1ce9",
+                    "id": "68d0d83a7b39cdbf1a3b1ce9"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ महाकालाय नमः।",
+                        "en": "Om Mahakalaya Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो काल (समय / मृत्यु) के स्वामी हैं",
+                        "en": "Jo kaal (samay/mrityu) ke svaamee hain"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1cea",
+                    "id": "68d0d83a7b39cdbf1a3b1cea"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ महाबलाय नमः।",
+                        "en": "Om Mahabalaya Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो अत्यधिक बलशाली हैं",
+                        "en": "Jo atyadhik balshaalee hain"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1ceb",
+                    "id": "68d0d83a7b39cdbf1a3b1ceb"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ हेरम्बाय नमः।",
+                        "en": "Om Herambaya Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो माता के प्रिय पुत्र हैं",
+                        "en": "Jo mata ke priya putra hain"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1cec",
+                    "id": "68d0d83a7b39cdbf1a3b1cec"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ लम्बजठराय नमः।",
+                        "en": "Om Lambajatharaya Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो लम्बे पेट वाले हैं",
+                        "en": "Jo lambe pet waale hain"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1ced",
+                    "id": "68d0d83a7b39cdbf1a3b1ced"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ ह्रस्वग्रीवाय नमः।",
+                        "en": "Om Hrasvagrivaya Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो छोटी गर्दन वाले हैं",
+                        "en": "Jo chhoti gardan waale hain"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1cee",
+                    "id": "68d0d83a7b39cdbf1a3b1cee"
+                },
+                {
+                    "name": {
+                        "hi": " ॐ महोदराय नमः।",
+                        "en": "Om Mahodaraya Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो विशाल पेट वाले हैं",
+                        "en": "Om Mahodaraya Namah।"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1cef",
+                    "id": "68d0d83a7b39cdbf1a3b1cef"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ मदोत्कटाय नमः।",
+                        "en": "Om Madotkataya Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो सदैव उन्मुक्त रहने वाले हैं",
+                        "en": "Jo sadaiv unmukt rehne waale hain"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1cf0",
+                    "id": "68d0d83a7b39cdbf1a3b1cf0"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ महावीराय नमः।",
+                        "en": "Om Mahaviraya Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो अत्यन्त वीर एवं पराक्रमी हैं",
+                        "en": "Jo atyant veer evam parakrami hain"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1cf1",
+                    "id": "68d0d83a7b39cdbf1a3b1cf1"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ मन्त्रिणे नमः।",
+                        "en": "Om Mantrine Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो समस्त मन्त्रों के ज्ञाता एवं स्वामी हैं",
+                        "en": "Jo samast mantron ke gyaata evam svaamee hain"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1cf2",
+                    "id": "68d0d83a7b39cdbf1a3b1cf2"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ मङ्गलस्वराय नमः।",
+                        "en": "Om Mangalasvaraya Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जिनका स्वर अत्यन्त मङ्गलमय है",
+                        "en": "Jinka svar atyant mangalmay hai"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1cf3",
+                    "id": "68d0d83a7b39cdbf1a3b1cf3"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ प्रमधाय नमः।",
+                        "en": "Om Pramadhaya Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो सृष्टि के समस्त अवयवों के मूल हैं",
+                        "en": "Jo srishti ke samast avayavon ke mool hain"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1cf4",
+                    "id": "68d0d83a7b39cdbf1a3b1cf4"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ प्रथमाय नमः।",
+                        "en": "Om Prathamaya Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो सर्वप्रथम पूजे जाने वाले हैं",
+                        "en": "Jo sarvpratham pooje jaane waale hain"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1cf5",
+                    "id": "68d0d83a7b39cdbf1a3b1cf5"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ प्राज्ञाय नमः।",
+                        "en": "Om Prajnaya Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो अत्यधिक बुद्धिमान हैं",
+                        "en": "Jo atyadhik buddhimaan hain"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1cf6",
+                    "id": "68d0d83a7b39cdbf1a3b1cf6"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ विघ्नकर्त्रे नमः।",
+                        "en": "Om Vighnakartre Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो विघ्न उत्पन्न करने वाले हैं",
+                        "en": "Jo vighn utpann karne waale hain"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1cf7",
+                    "id": "68d0d83a7b39cdbf1a3b1cf7"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ विघ्नहर्त्रे नमः।",
+                        "en": "Om Vighnahartre Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो विघ्न नष्ट करने वाले हैं",
+                        "en": "Jo vighn nasht karne waale hain"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1cf8",
+                    "id": "68d0d83a7b39cdbf1a3b1cf8"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ विश्वनेत्रे नमः।",
+                        "en": "Om Vishvanetre Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो सम्पूर्ण सृष्टि पर अपनी दृष्टि रखने वाले हैं",
+                        "en": "Jo sampoorna srishti par apni drishti rakhne waale hain"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1cf9",
+                    "id": "68d0d83a7b39cdbf1a3b1cf9"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ विराट्पतये नमः।",
+                        "en": "Om Viratpataye Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो विराट् सृष्टि के स्वामी हैं",
+                        "en": "Jo virat srishti ke svaamee hain"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1cfa",
+                    "id": "68d0d83a7b39cdbf1a3b1cfa"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ श्रीपतये नमः।",
+                        "en": "Om Shripataye Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो सौभाग्य प्रदान करने वाले हैं",
+                        "en": "Jo saubhagya pradaan karne waale hain"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1cfb",
+                    "id": "68d0d83a7b39cdbf1a3b1cfb"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ वाक्पतये नमः।",
+                        "en": "Om Vakpataye Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो वाणी के देवता हैं",
+                        "en": "Jo vaani ke devta hain"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1cfc",
+                    "id": "68d0d83a7b39cdbf1a3b1cfc"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ शृङ्गारिणे नमः।",
+                        "en": "Om Shringarine Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो लाल सिन्दूर से सुशोभित हैं",
+                        "en": "Jo laal sindoor se sushobhit hain"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1cfd",
+                    "id": "68d0d83a7b39cdbf1a3b1cfd"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ अश्रितवत्सलाय नमः।",
+                        "en": "Om Ashritavatsalaya Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो शरणार्थियों पर करुणा करने वाले हैं",
+                        "en": "Jo sharanarthiyon par karuna karne waale hain"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1cfe",
+                    "id": "68d0d83a7b39cdbf1a3b1cfe"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ शिवप्रियाय नमः।",
+                        "en": "Om Shivapriyaya Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो भगवान शिव को अति प्रिय हैं",
+                        "en": "Jo Bhagwan Shiv ko ati priya hain"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1cff",
+                    "id": "68d0d83a7b39cdbf1a3b1cff"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ शीघ्रकारिणे नमः।",
+                        "en": "Om Shighrakarine Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो शीघ्र मनोकामना पूर्ण करने वाले हैं",
+                        "en": "Jo shighr manokamna poorn karne waale hain"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1d00",
+                    "id": "68d0d83a7b39cdbf1a3b1d00"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ शाश्वताय नमः।",
+                        "en": "Om Shashvataya Namah।"
+                    },
+                    "meaning": {
+                        "hi": " जो अपरिवर्तनशील एवं अविनाशी हैं",
+                        "en": "Jo aparivartansheel evam avinaashi hain"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1d01",
+                    "id": "68d0d83a7b39cdbf1a3b1d01"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ बलाय नमः।",
+                        "en": "Om Balaya Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो स्वयं बल स्वरूप हैं",
+                        "en": "Jo svayam bal swaroop hain"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1d02",
+                    "id": "68d0d83a7b39cdbf1a3b1d02"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ बलोत्थिताय नमः।",
+                        "en": "Om Balotthitaya Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जिनके बल में निरन्तर वृद्धि होती है",
+                        "en": "Jinke bal mein nirantar vriddhi hoti hai"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1d03",
+                    "id": "68d0d83a7b39cdbf1a3b1d03"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ भवात्मजाय नमः।",
+                        "en": "Om Bhavatmajaya Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो सृष्टि के पुत्र के रूप में पूजे जाने वाले हैं",
+                        "en": "Jo srishti ke putra ke roop mein pooje jaane waale hain"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1d04",
+                    "id": "68d0d83a7b39cdbf1a3b1d04"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ पुराणपुरुषाय नमः।",
+                        "en": "Om Puranapurushaya Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो आदि पुरुष एवं पुराणों के ज्ञाता हैं",
+                        "en": "Jo adi purush evam puranon ke gyaata hain"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1d05",
+                    "id": "68d0d83a7b39cdbf1a3b1d05"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ पूष्णे नमः।",
+                        "en": "Om Pushne Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो प्राणियों का पोषण करने वाले हैं",
+                        "en": "Jo praaniyon ka poshan karne waale hain"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1d06",
+                    "id": "68d0d83a7b39cdbf1a3b1d06"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ पुष्करोत्षिप्तवारिणे नमः।",
+                        "en": "Om Pushkarotshiptavarine Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो कमल पुष्पयुक्त सरोवर में क्रीडा करने वाले हैं",
+                        "en": "Jo kamal pushp yukt sarovar mein kreeda karne waale hain"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1d07",
+                    "id": "68d0d83a7b39cdbf1a3b1d07"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ अग्रगण्याय नमः।",
+                        "en": "Om Agraganyaya Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो सभी देवगणों में श्रेष्ठ हैं",
+                        "en": "Jo sabhi devganon mein shreshth hain"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1d08",
+                    "id": "68d0d83a7b39cdbf1a3b1d08"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ अग्रपूज्याय नमः।",
+                        "en": "Om Agrapujyaya Namah।"
+                    },
+                    "meaning": {
+                        "hi": "सर्वप्रथम जिनकी पूजा की जाती है",
+                        "en": "Sarvpratham jinki pooja ki jaati hai"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1d09",
+                    "id": "68d0d83a7b39cdbf1a3b1d09"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ अग्रगामिने नमः।",
+                        "en": "Om Agragamine Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो नेतृत्व एवं मार्गदर्शन करने वाले हैं",
+                        "en": "Jo netritva evam margdarshan karne waale hain"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1d0a",
+                    "id": "68d0d83a7b39cdbf1a3b1d0a"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ मन्त्रकृते नमः।",
+                        "en": "Om Mantrakrite Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो मन्त्रों की रचना करने वाले हैं",
+                        "en": "Jo mantron ki rachna karne waale hain"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1d0b",
+                    "id": "68d0d83a7b39cdbf1a3b1d0b"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ चामीकरप्रभाय नमः।",
+                        "en": "Om Chamikaraprabhaya Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो सूर्य के समान आभामण्डल वाले हैं",
+                        "en": "Jo surya ke samaan abhamandal waale hain"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1d0c",
+                    "id": "68d0d83a7b39cdbf1a3b1d0c"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ सर्वाय नमः।",
+                        "en": "Om Sarvaya Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो सम्पूर्ण सृष्टि के स्वरूप में स्थित हैं",
+                        "en": "Jo sampoorn srishti ke swaroop mein sthit hain"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1d0d",
+                    "id": "68d0d83a7b39cdbf1a3b1d0d"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ सर्वोपास्याय नमः।",
+                        "en": "Om Sarvopasyaya Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो समस्त सृष्टि में पूज्य हैं",
+                        "en": "Jo samast srishti mein poojya hain"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1d0e",
+                    "id": "68d0d83a7b39cdbf1a3b1d0e"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ सर्वकर्त्रे नमः।",
+                        "en": "Om Sarvakartre Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो समस्त कार्यों के कर्ता एवं नियन्त्रक हैं",
+                        "en": "Jo samast karyo ke karta evam niyantrak hain"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1d0f",
+                    "id": "68d0d83a7b39cdbf1a3b1d0f"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ सर्वनेत्रे नमः।",
+                        "en": "Om Sarvanetre Namah।"
+                    },
+                    "meaning": {
+                        "hi": " जो सम्पूर्ण ब्रह्माण्ड की गतिविधियों पर दृष्टि रखने वाले हैं",
+                        "en": "Jo sampoorn brahmand ki gatividhiyon par drishti rakhne waale hain"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1d10",
+                    "id": "68d0d83a7b39cdbf1a3b1d10"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ सर्वसिद्धिप्रदाय नमः।",
+                        "en": "Om Sarvasiddhipradaya Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो समस्त प्रकार की सिद्धियाँ प्रदान करने वाले हैं",
+                        "en": "Jo samast prakar ki siddhiyan pradaan karne waale hain"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1d11",
+                    "id": "68d0d83a7b39cdbf1a3b1d11"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ सिद्धये नमः।",
+                        "en": "Om Siddhaye Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो स्वयं सिद्ध हैं",
+                        "en": "Jo svayam siddh hain"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1d12",
+                    "id": "68d0d83a7b39cdbf1a3b1d12"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ पञ्चहस्ताय नमः।",
+                        "en": " जो पाँच हाथों (चार हाथ एवं एक सूँड) वाले हैं"
+                    },
+                    "meaning": {
+                        "hi": " जो पाँच हाथों (चार हाथ एवं एक सूँड) वाले हैं",
+                        "en": " जो पाँच हाथों (चार हाथ एवं एक सूँड) वाले हैं"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1d13",
+                    "id": "68d0d83a7b39cdbf1a3b1d13"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ पार्वतीनन्दनाय नमः।",
+                        "en": "Om Parvatinandanaya Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो माता पार्वती के प्रिय पुत्र हैं",
+                        "en": "Jo mata Parvati ke priya putra hain"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1d14",
+                    "id": "68d0d83a7b39cdbf1a3b1d14"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ प्रभवे नमः।",
+                        "en": "Om Prabhave Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो सम्पूर्ण चराचर जगत के आदि स्रोत हैं",
+                        "en": "Jo sampoorn charachar jagat ke adi srot hain"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1d15",
+                    "id": "68d0d83a7b39cdbf1a3b1d15"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ कुमारगुरवे नमः।",
+                        "en": "Om Kumaragurave Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो कुमार (कार्तिकेय) के गुरु हैं",
+                        "en": "Jo Kumar (Karttikeya) ke guru hain"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1d16",
+                    "id": "68d0d83a7b39cdbf1a3b1d16"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ अक्षोभ्याय नमः।",
+                        "en": "Om Akshobhyaya Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो अभेद्य एवं अनश्वर हैं",
+                        "en": "Jo abhedya evam anashvar hain"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1d17",
+                    "id": "68d0d83a7b39cdbf1a3b1d17"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ कुञ्जरासुरभञ्जनाय नमः।",
+                        "en": "Om Kunjarasurabhanjanaya Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो कुञ्जरासुर का वध करने वाले हैं",
+                        "en": "Jo kunjarasur ka vadh karne waale hain"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1d18",
+                    "id": "68d0d83a7b39cdbf1a3b1d18"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ प्रमोदाय नमः।",
+                        "en": "Om Pramodaya Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो सदैव प्रसन्न रहने वाले हैं",
+                        "en": "Jo sadaiv prasann rehne waale hain"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1d19",
+                    "id": "68d0d83a7b39cdbf1a3b1d19"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ मोदकप्रियाय नमः।",
+                        "en": "Om Modakapriyaya Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जिन्हें मोदक अत्यन्त प्रिय हैं",
+                        "en": "Jinhen modak atyant priya hain"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1d1a",
+                    "id": "68d0d83a7b39cdbf1a3b1d1a"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ कान्तिमते नमः।",
+                        "en": "Om Kantimate Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जिनके मुखमण्डल पर अद्भुत तेज विद्यमान है",
+                        "en": "Om Kantimate Namah।"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1d1b",
+                    "id": "68d0d83a7b39cdbf1a3b1d1b"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ धृतिमते नमः।",
+                        "en": "Om Dhritimate Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो धैर्यशाली एवं दृढ हैं",
+                        "en": "Jo dhairyashaali evam drdh hain"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1d1c",
+                    "id": "68d0d83a7b39cdbf1a3b1d1c"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ कामिने नमः।",
+                        "en": "Om Kamine Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो कामनाओं की पूर्ति करने वाले हैं",
+                        "en": "Jo kaamanon ki poorti karne waale hain"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1d1d",
+                    "id": "68d0d83a7b39cdbf1a3b1d1d"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ कपित्थपनसप्रियाय नमः।",
+                        "en": "Om Kapitthapanasapriyaya Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जिन्हें कपित्थ (कैथा) एवं पनस (कटहल) के फल प्रिय हैं",
+                        "en": "Jinhen kapitth (kaitha) evam panas (kathal) ke phal priya hain"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1d1e",
+                    "id": "68d0d83a7b39cdbf1a3b1d1e"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ ब्रह्मचारिणे नमः।",
+                        "en": "Om Brahmacharine Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो ब्रह्मचर्य व्रत का पालन करने वाले हैं",
+                        "en": "Jo brahmacharya vrat ka paalan karne waale hain"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1d1f",
+                    "id": "68d0d83a7b39cdbf1a3b1d1f"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ ब्रह्मरूपिणे नमः।",
+                        "en": "Om Brahmarupine Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो स्वयं ब्रह्म स्वरूप हैं",
+                        "en": "Jo svayam Brahma swaroop hain"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1d20",
+                    "id": "68d0d83a7b39cdbf1a3b1d20"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ ब्रह्मविद्यादिदानभुवे नमः।",
+                        "en": "Om Brahmavidyadidanabhuve Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो ब्रह्मविद्या के स्वामी एवं दाता हैं",
+                        "en": "Jo Brahmavidya ke svaamee evam daata hain"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1d21",
+                    "id": "68d0d83a7b39cdbf1a3b1d21"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ जिष्णवे नमः।",
+                        "en": "Om Jishnave Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो सदैव विजय प्राप्त करने वाले हैं",
+                        "en": "Jo sadaiv vijay praapt karne waale hain"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1d22",
+                    "id": "68d0d83a7b39cdbf1a3b1d22"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ विष्णुप्रियाय नमः।",
+                        "en": "Om Vishnupriyaya Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो भगवान विष्णु को प्रिय हैं",
+                        "en": "Jo Bhagwan Vishnu ko priya hain"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1d23",
+                    "id": "68d0d83a7b39cdbf1a3b1d23"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ भक्तजीविताय नमः।",
+                        "en": "Om Bhaktajivitaya Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो भक्तों के जीवन की रक्षा करने वाले हैं",
+                        "en": "Jo bhakton ke jeevan ki raksha karne waale hain"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1d24",
+                    "id": "68d0d83a7b39cdbf1a3b1d24"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ जितमन्मथाय नमः।",
+                        "en": "Om Jitamanmathaya Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो मन एवं इन्द्रियों को वश में करने वाले हैं",
+                        "en": "Jo man evam indriyon ko vash mein karne waale hain"
+                    },
+                    "_id": "68d0d83a7b39cdbf1a3b1d25",
+                    "id": "68d0d83a7b39cdbf1a3b1d25"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ ऐश्वर्यकारणाय नमः।",
+                        "en": "Om Aishvaryakaranaya Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो ऐश्वर्य के स्वामी एवं दाता हैं",
+                        "en": "Jo aishwarya ke svaamee evam daata hain"
+                    },
+                    "_id": "68d0d83b7b39cdbf1a3b1d26",
+                    "id": "68d0d83b7b39cdbf1a3b1d26"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ ज्यायसे नमः।",
+                        "en": "Om Jyayase Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो सर्वोच्च एवं सर्वश्रेष्ठ हैं",
+                        "en": "Jo sarvochch evam sarveshth hain"
+                    },
+                    "_id": "68d0d83b7b39cdbf1a3b1d27",
+                    "id": "68d0d83b7b39cdbf1a3b1d27"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ यक्षकिन्नरसेविताय नमः।",
+                        "en": "Om Yakshakinnarasevitaya Namah।"
+                    },
+                    "meaning": {
+                        "hi": "यक्ष एवं किन्नर जिनकी सेवा में तत्पर हैं",
+                        "en": "Yaksh evam kinnar jinki seva mein tatpar hain"
+                    },
+                    "_id": "68d0d83b7b39cdbf1a3b1d28",
+                    "id": "68d0d83b7b39cdbf1a3b1d28"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ गङ्गासुताय नमः।",
+                        "en": "Om Gangasutaya Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो माँ गङ्गा के पुत्र हैं",
+                        "en": "Jo maa Ganga ke putra hain"
+                    },
+                    "_id": "68d0d83b7b39cdbf1a3b1d29",
+                    "id": "68d0d83b7b39cdbf1a3b1d29"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ गणाधीशाय नमः।",
+                        "en": "Om Ganadhishaya Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो समस्त गणों के अधिपति एवं नायक हैं",
+                        "en": "Jo samast ganon ke adhipati evam nayak hain"
+                    },
+                    "_id": "68d0d83b7b39cdbf1a3b1d2a",
+                    "id": "68d0d83b7b39cdbf1a3b1d2a"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ गम्भीरनिनदाय नमः।",
+                        "en": "Om Gambhiraninadaya Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो गम्भीर नाद उत्पन्न करने वाले हैं",
+                        "en": "Jo gambhir naad utpann karne waale hain"
+                    },
+                    "_id": "68d0d83b7b39cdbf1a3b1d2b",
+                    "id": "68d0d83b7b39cdbf1a3b1d2b"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ वटवे नमः।",
+                        "en": "Om Vatave Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो बालस्वरूप में विराजमान हैं",
+                        "en": "Jo baal swaroop mein virajmaan hain"
+                    },
+                    "_id": "68d0d83b7b39cdbf1a3b1d2c",
+                    "id": "68d0d83b7b39cdbf1a3b1d2c"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ अभीष्टवरदाय नमः।",
+                        "en": "Om Abhishtavaradaya Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो मनोवाञ्छित वर प्रदान करने वाले हैं",
+                        "en": "Jo manovanshit var pradaan karne waale hain"
+                    },
+                    "_id": "68d0d83b7b39cdbf1a3b1d2d",
+                    "id": "68d0d83b7b39cdbf1a3b1d2d"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ ज्योतिषे नमः।",
+                        "en": "Om Jyotishe Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो ज्योतिष शास्त्र के ज्ञाता हैं",
+                        "en": "Jo jyotish shastra ke gyaata hain"
+                    },
+                    "_id": "68d0d83b7b39cdbf1a3b1d2e",
+                    "id": "68d0d83b7b39cdbf1a3b1d2e"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ भक्तनिधये नमः।",
+                        "en": "Om Bhaktanidhaye Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो भक्तों के सर्वस्व हैं",
+                        "en": "Jo bhakton ke sarvasva hain"
+                    },
+                    "_id": "68d0d83b7b39cdbf1a3b1d2f",
+                    "id": "68d0d83b7b39cdbf1a3b1d2f"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ भावगम्याय नमः।",
+                        "en": "Om Bhavagamyaya Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जिन्हें मात्र भक्तिभाव द्वारा प्राप्त करना सम्भव है",
+                        "en": "Jinhen maatra bhaktibhav dvara praapt karna sambhav hai"
+                    },
+                    "_id": "68d0d83b7b39cdbf1a3b1d30",
+                    "id": "68d0d83b7b39cdbf1a3b1d30"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ मङ्गलप्रदाय नमः।",
+                        "en": "Om Mangalapradaya Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो जीवन में मङ्गल प्रदान करने वाले हैं",
+                        "en": "Jo jeevan mein mangal pradaan karne waale hain"
+                    },
+                    "_id": "68d0d83b7b39cdbf1a3b1d31",
+                    "id": "68d0d83b7b39cdbf1a3b1d31"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ अव्यक्ताय नमः।",
+                        "en": "Om Avyaktaya Namah।"
+                    },
+                    "meaning": {
+                        "hi": "मूल प्रकृति जिनसे सम्पूर्ण सृष्टि उत्पन्न हुई है",
+                        "en": "Mool prakriti jinse sampoorn srishti utpann hui hai"
+                    },
+                    "_id": "68d0d83b7b39cdbf1a3b1d32",
+                    "id": "68d0d83b7b39cdbf1a3b1d32"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ अप्राकृतपराक्रमाय नमः।",
+                        "en": "Om Aprakritaparakramaya Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो अतुलनीय पराक्रम के स्वामी हैं",
+                        "en": "Jo atulniya parakram ke svaamee hain"
+                    },
+                    "_id": "68d0d83b7b39cdbf1a3b1d33",
+                    "id": "68d0d83b7b39cdbf1a3b1d33"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ सत्यधर्मिणे नमः।",
+                        "en": "Om Satyadharmine Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो सत्य के पथ पर चलने वाले हैं",
+                        "en": "Jo satya ke path par chalne waale hain"
+                    },
+                    "_id": "68d0d83b7b39cdbf1a3b1d34",
+                    "id": "68d0d83b7b39cdbf1a3b1d34"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ सखये नमः।",
+                        "en": "Om Sakhaye Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो भक्तों के सखा व मित्र हैं",
+                        "en": "Jo bhakton ke sakha va mitra hain"
+                    },
+                    "_id": "68d0d83b7b39cdbf1a3b1d35",
+                    "id": "68d0d83b7b39cdbf1a3b1d35"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ सरसाम्बुनिधये नमः।",
+                        "en": "Om Sarasambunidhaye Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जिन्हें दूर्वा घास प्रिय है",
+                        "en": "Jinhen durva ghaas priya hai"
+                    },
+                    "_id": "68d0d83b7b39cdbf1a3b1d36",
+                    "id": "68d0d83b7b39cdbf1a3b1d36"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ महेशाय नमः।",
+                        "en": "Om Maheshaya Namah।"
+                    },
+                    "meaning": {
+                        "hi": "देवताओं में सबसे महान हैं / जो भगवान शिव के पुत्र हैं",
+                        "en": "Jo devtaon mein sabse mahaan hain / Jo Bhagwan Shiv ke putra hain"
+                    },
+                    "_id": "68d0d83b7b39cdbf1a3b1d37",
+                    "id": "68d0d83b7b39cdbf1a3b1d37"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ दिव्याङ्गाय नमः।",
+                        "en": "Om Divyangaya Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जिनके समस्त अङ्ग दिव्य एवं तेजोमय हैं",
+                        "en": "Jinke samast ang divya evam tejomay hain"
+                    },
+                    "_id": "68d0d83b7b39cdbf1a3b1d38",
+                    "id": "68d0d83b7b39cdbf1a3b1d38"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ मणिकिङ्किणीमेखलाय नमः।",
+                        "en": "Om Manikinkinimekhalaya Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो मणियुक्त मेखला (कटिसूत्र) धारण करने वाले हैं",
+                        "en": "Jo maniyukt mekhla (kati-sootra) dhaaran karne waale hain"
+                    },
+                    "_id": "68d0d83b7b39cdbf1a3b1d39",
+                    "id": "68d0d83b7b39cdbf1a3b1d39"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ समस्तदेवतामूर्तये नमः।",
+                        "en": "Om Samastadevatamurtaye Namah।"
+                    },
+                    "meaning": {
+                        "hi": "समस्त देव जिनकी उपासना करते हैं",
+                        "en": "Samast dev jinaki upasana karte hain"
+                    },
+                    "_id": "68d0d83b7b39cdbf1a3b1d3a",
+                    "id": "68d0d83b7b39cdbf1a3b1d3a"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ सहिष्णवे नमः।",
+                        "en": "Om Sahishnave Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो शान्त एवं सहनशील स्वभाव वाले हैं",
+                        "en": "Jo shaant evam sahansheel swabhaav waale hain"
+                    },
+                    "_id": "68d0d83b7b39cdbf1a3b1d3b",
+                    "id": "68d0d83b7b39cdbf1a3b1d3b"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ सततोत्थिताय नमः।",
+                        "en": "Om Satatotthitaya Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो सदैव प्रगति करने वाले हैं",
+                        "en": "Jo sadaiv pragati karne waale hain"
+                    },
+                    "_id": "68d0d83b7b39cdbf1a3b1d3c",
+                    "id": "68d0d83b7b39cdbf1a3b1d3c"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ विघातकारिणे नमः।",
+                        "en": "Om Vighatakarine Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो भक्तों की सुरक्षा करने वाले हैं",
+                        "en": "Jo bhakton ki suraksha karne waale hain"
+                    },
+                    "_id": "68d0d83b7b39cdbf1a3b1d3d",
+                    "id": "68d0d83b7b39cdbf1a3b1d3d"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ विश्वग्दृशे नमः।",
+                        "en": "Om Vishvagdrishe Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो सम्पूर्ण विश्व के क्रियाकलापों पर दृष्टि रखने वाले हैं",
+                        "en": "Jo sampoorn vishv ke kriyaklapon par drishti rakhne waale hain"
+                    },
+                    "_id": "68d0d83b7b39cdbf1a3b1d3e",
+                    "id": "68d0d83b7b39cdbf1a3b1d3e"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ विश्वरक्षाकृते नमः।",
+                        "en": "Om Vishvarakshakrite Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो सृष्टि की रक्षा करने वाले हैं",
+                        "en": "Jo srishti ki raksha karne waale hain"
+                    },
+                    "_id": "68d0d83b7b39cdbf1a3b1d3f",
+                    "id": "68d0d83b7b39cdbf1a3b1d3f"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ कल्याणगुरवे नमः।",
+                        "en": "Om Kalyanagurave Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो गुरु के रूप में कल्याण करने वाले हैं",
+                        "en": "Jo guru ke roop mein kalyan karne waale hain"
+                    },
+                    "_id": "68d0d83b7b39cdbf1a3b1d40",
+                    "id": "68d0d83b7b39cdbf1a3b1d40"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ उन्मत्तवेषाय नमः।",
+                        "en": "Om Unmattaveshaya Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो सदैव आनन्दमग्न रहने वाले हैं",
+                        "en": "Om Unmattaveshaya Namah।"
+                    },
+                    "_id": "68d0d83b7b39cdbf1a3b1d41",
+                    "id": "68d0d83b7b39cdbf1a3b1d41"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ अपराजिते नमः।",
+                        "en": "Om Aparajite Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जिन्हें पराजित करना असम्भव है",
+                        "en": "Jinhen parajit karna asambhav hai"
+                    },
+                    "_id": "68d0d83b7b39cdbf1a3b1d42",
+                    "id": "68d0d83b7b39cdbf1a3b1d42"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ समस्तजगदाधाराय नमः।",
+                        "en": "Om Samastajagadadharaya Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो समस्त ब्रह्माण्ड को धारण करने वाले हैं",
+                        "en": "Jo samast brahmand ko dhaaran karne waale hain"
+                    },
+                    "_id": "68d0d83b7b39cdbf1a3b1d43",
+                    "id": "68d0d83b7b39cdbf1a3b1d43"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ सर्वैश्वर्यप्रदाय नमः।",
+                        "en": "Om Sarvaishvaryapradaya Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो नाना प्रकार के धन-ऐश्वर्य प्रदान करने वाले हैं",
+                        "en": "जो नाना प्रकार के धन-ऐश्वर्य प्रदान करने वाले हैं"
+                    },
+                    "_id": "68d0d83b7b39cdbf1a3b1d44",
+                    "id": "68d0d83b7b39cdbf1a3b1d44"
+                },
+                {
+                    "name": {
+                        "hi": "जो नाना प्रकार के धन-ऐश्वर्य प्रदान करने वाले हैं",
+                        "en": "Om Akrantachidachitprabhave Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो समस्त सृष्टि के ज्ञान एवं बुद्धि के स्रोत हैं",
+                        "en": "Jo samast srishti ke gyaan evam buddhi ke srot hain"
+                    },
+                    "_id": "68d0d83b7b39cdbf1a3b1d45",
+                    "id": "68d0d83b7b39cdbf1a3b1d45"
+                },
+                {
+                    "name": {
+                        "hi": "ॐ श्री विघ्नेश्वराय नमः।",
+                        "en": "Om Shri Vighneshvaraya Namah।"
+                    },
+                    "meaning": {
+                        "hi": "जो समस्त विघ्नों को नष्ट करने वाले हैं",
+                        "en": "Jo samast vighnon ko nasht karne waale hain"
+                    },
+                    "_id": "68d0d83b7b39cdbf1a3b1d46",
+                    "id": "68d0d83b7b39cdbf1a3b1d46"
+                }
+            ],
+            "type": "names",
+            "count": 108,
+            "active": true,
+            "createdAt": "2025-09-21T10:39:31.503Z",
+            "updatedAt": "2025-09-22T05:01:46.956Z",
+            "__v": 0,
+            "uid": "68cfd5e37b39cdbf1a3b0f3d"
+        }
+    ]
+}

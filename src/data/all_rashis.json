@@ -1,0 +1,19 @@
+{
+    "status": "success",
+    "code": 200,
+    "message": "All Rashis fetched successfully",
+    "data": [
+        {
+            "_id": "68cfa63c03b7be04ebfd85fe",
+            "key": "vrishabh",
+            "name": {
+                "hi": "मेष",
+                "en": "Aries",
+                "_id": "68cfa63c03b7be04ebfd85ff"
+            },
+            "createdAt": "2025-09-21T07:16:12.039Z",
+            "updatedAt": "2025-09-21T09:17:52.639Z",
+            "__v": 0
+        }
+    ]
+}

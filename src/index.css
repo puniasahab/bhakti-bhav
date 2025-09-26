@@ -1,68 +1,332 @@
-:root {
-  font-family: 'KrutiDev', Arial, Helvetica, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+body {
+  font-family: 'Noto Sans Devanagari', sans-serif;
+  background-color: #fdfcf8;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
+/* @font-face {
+  font-family: 'KrutiDev';
+  src: url('fonts/KRDEV010.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+} */
+@font-face {
+  font-family: 'KrutiDev';
+  /* src: url('fonts/Kruti_Dev_714_Normal.ttf') format('truetype'); */
+  src: url('./assets/fonts/Kruti_Dev_714_Normal.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
 }
-a:hover {
-  color: #535bf2;
+
+@font-face {
+  font-family: 'PoppinsRegular';
+  src: url('./assets/fonts/Poppins-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'PoppinsBold';
+  src: url('./assets/fonts/Poppins-Bold.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'PoppinsSemiBold';
+  src: url('./assets/fonts/Poppins-SemiBold.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
 }
 
 body {
+  font-family: 'KrutiDev', sans-serif;
+  background-color: #f0f0f0;
   margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+  padding: 0px;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+
+
+.hd_bg {
+  background: linear-gradient(to right, #EBA24A 0%, #FFF179 100%);
 }
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+.theme_text {
+  color: #9A283D;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
+.theme_bg {
+  background-color: #fff;
+  color: #9A283D;
+  border: 1px solid #EBA24A;
+}
+
+.font-hindi {
+  font-family: 'KrutiDev', sans-serif;
+}
+
+.font-eng {
+  font-family: "PoppinsRegular";
+}
+
+.card_bg {
+  background-color: rgba(255, 255, 255, 0.6);
+}
+
+.icon_24,
+.rupees_icon,
+.notification_icon {
+  vertical-align: middle;
+}
+
+.icon_24 {
+  width: 24px;
+  height: 24px;
+}
+
+.rupees_icon {
+  width: 26px;
+  height: 24px;
+}
+
+.notification_icon {
+  width: 24px;
+  height: 21px;
+}
+
+.custom_bg:before,
+.custom_bg:after {
+  content: '';
+  position: absolute;
+  top: 0;
+}
+
+.custom_bg:before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100px;
+  height: 200px;
+  background: url('./assets/img/icon_11.png') no-repeat center center;
+  background-size: contain;
+}
+
+.custom_bg:after {
+  content: '';
+  position: absolute;
+  top: 25%;
+  right: 50px;
+  width: 100px;
+  height: 50px;
+  background: url('./assets/img/icon_13.png') no-repeat center center;
+  background-size: contain;
+}
+
+.swiper-slide {
+  border-radius: 15px;
+}
+
+
+@keyframes floatUp {
+  0% {
+    transform: translateY(50px);
+    opacity: 0;
   }
-  a:hover {
-    color: #747bff;
+
+  50% {
+    opacity: 1;
   }
-  button {
-    background-color: #f9f9f9;
+
+  100% {
+    transform: translateY(-150px);
+    opacity: 0;
   }
+}
+
+.animate-float {
+  animation: floatUp 2.5s ease-in-out forwards;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 80px;
+  pointer-events: none;
+}
+
+.animate-icon {
+  position: absolute;
+  top: 60%;
+  width: 80px;
+  height: 80px;
+  pointer-events: none;
+}
+
+@keyframes floatUp {
+  0% {
+    transform: translateY(0px) scale(0.7);
+    opacity: 0;
+  }
+
+  30% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(-250px) scale(1.2);
+    opacity: 0;
+  }
+}
+
+.floatUp {
+  animation: floatUp 2.5s ease-in-out forwards;
+}
+
+@keyframes glow {
+
+  0%,
+  100% {
+    filter: drop-shadow(0 0 5px orange);
+    opacity: 0;
+  }
+
+  50% {
+    filter: drop-shadow(0 0 20px gold);
+    opacity: 1;
+  }
+}
+
+.glow {
+  animation: glow 2.5s ease-in-out forwards, floatUp 2.5s ease-in-out forwards;
+}
+
+@keyframes rotateUp {
+  0% {
+    transform: translateY(0px) rotate(0deg) scale(0.6);
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(-250px) rotate(360deg) scale(1.2);
+    opacity: 0;
+  }
+}
+
+.rotate {
+  animation: rotateUp 3s ease-in-out forwards;
+}
+
+@keyframes shakeUp {
+  0% {
+    transform: translateY(0px) rotate(0deg);
+    opacity: 0;
+  }
+
+  20% {
+    transform: translateY(-50px) rotate(-10deg);
+    opacity: 1;
+  }
+
+  40% {
+    transform: translateY(-100px) rotate(10deg);
+  }
+
+  60% {
+    transform: translateY(-150px) rotate(-8deg);
+  }
+
+  80% {
+    transform: translateY(-200px) rotate(8deg);
+  }
+
+  100% {
+    transform: translateY(-250px) rotate(0deg);
+    opacity: 0;
+  }
+}
+
+.shake {
+  animation: shakeUp 2.5s ease-in-out forwards;
+}
+
+@keyframes flipUp {
+  0% {
+    transform: translateY(0px) rotateY(0deg) scale(0.6);
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(-250px) rotateY(180deg) scale(1.1);
+    opacity: 0;
+  }
+}
+
+.flip {
+  animation: flipUp 2.5s ease-in-out forwards;
+}
+
+
+.splash_bg {
+  background-size: 100%;
+  background-position: 100% 35%;
+}
+
+@media screen and (max-width: 768px) {
+  .custom_bg:before {
+    width: 55px;
+    height: 115px;
+
+  }
+
+  .custom_bg:after {
+    top: 10%;
+    right: 20px;
+    width: 30px;
+    height: 30px;
+  }
+}
+
+
+.jaapmala_bg {
+  background-image: url('./assets/img/jaapMala_bgs.png');
+  background-size: cover;
+  background-position: center;
+  min-height: 320px;
+}
+
+.overflow_bg::before {
+  content: '';
+  position: absolute;
+  max-height: 70px;
+  height: 70px;
+  top: 50%;
+  max-width: 80%;
+  width: 100%;
+  margin: auto;
+  border-radius: 15px;
+  bottom: 20%;
+  background: rgba(255, 255, 255, 0.7);
+  z-index: 9;
+  left: 0;
+  right: 0;
+} 
+
+.custom-circle {
+  list-style-type: circle; /* ensures a hollow dot */
+  padding-left: 1.5rem;
+}
+.custom-circle li {
+  margin-bottom: 0.5rem;
 }
