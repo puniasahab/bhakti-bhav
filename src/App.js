@@ -23,7 +23,7 @@ import ChalisaDetail from "./pages/ChalisaDetail";
 import Login from "./pages/Login";
 import VerifyOtp from "./pages/VerifyOtp";
 import { LanguageProvider } from "./contexts/LanguageContext";
-import TermsPolicy from "./pages/TermsPolicy";
+import TermsAndConditions from "./pages/TermsPolicy";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import AboutUs from "./pages/AboutUs";
 import EditProfile from "./pages/EditProfile";
@@ -72,9 +72,9 @@ function App() {
         <Route path="/chalisa/:id" element={<ChalisaDetail />} />
         <Route path="/login" element={<Login />} />
         <Route path="/verify-otp" element={<VerifyOtp />} />
-        <Route path="/terms-condition" element={<TermsPolicy />} />
-        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-        <Route path="/about-us" element={<AboutUs />} />
+        <Route path="/termsAndConditions" element={<TermsAndConditions />} />
+        <Route path="/privacyPolicy" element={<PrivacyPolicy />} />
+        <Route path="/aboutUs" element={<AboutUs />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/edit-profile" element={<EditProfile />} />
       </Routes>

@@ -8,9 +8,9 @@ function Footer() {
 
                 <div
                     className="flex flex-col md:flex-row md:space-x-6 theme_text text-center font-eng mb-3 md:mb-0 space-y-2 md:space-y-0">
-                    <a href="terms-policy" className="theme-text text-lg hover:underline">Terms & Conditions</a>
-                    <a href="#" className="theme-text text-lg hover:underline">Privacy Policy</a>
-                    <a href="#" className="theme-text text-lg hover:underline">About us</a>
+                    <a href="termsAndConditions" className="theme-text text-lg hover:underline">Terms & Conditions</a>
+                    <a href="privacyPolicy" className="theme-text text-lg hover:underline">Privacy Policy</a>
+                    <a href="aboutUs" className="theme-text text-lg hover:underline">About us</a>
                 </div>
 
                 <div className="flex space-x-3">
