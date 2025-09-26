@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { Link } from "react-router-dom";
+import Loader from "../components/Loader";
 
 export default function PujaKare() {
   const [items, setItems] = useState([]);
@@ -28,8 +29,7 @@ export default function PujaKare() {
     fetchItems();
   }, []);
 
-  if (loading)
-    return <p className="text-center py-10 theme_text">⏳ Loading...</p>;
+if (loading) return <Loader message="🙏 Loading भक्ति भाव 🙏" size={200} />;
 
   if (!items.length)
     return <p className="text-center py-10 text-white">❌ No items found</p>;

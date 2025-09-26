@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { Link } from "react-router-dom";
+import Loader from "../components/Loader";
 
 export default function HindiCalendar() {
   const [months, setMonths] = useState([]);
@@ -29,7 +30,7 @@ export default function HindiCalendar() {
     fetchCalendar();
   }, []);
 
-  if (loading) return <p className="text-center py-10 theme_text">⏳ Loading...</p>;
+ if (loading) return <Loader message="🙏 Loading भक्ति भाव 🙏" size={200} />;
   if (!months.length) return <p className="text-center py-10 text-white">❌ No data found</p>;
 
 const currentMonthNumber = new Date().getMonth() + 1; // JS gives 0–11
@@ -44,7 +45,7 @@ const currentMonth = months.find(
       <Header />
 
       <div className="flex justify-center items-center">
-        <p className="mb-0 text-2xl w-auto py-1 bg-[rgba(255,250,244,0.6)] rounded-b-xl px-4 theme_text font-bold shadow-md">
+        <p className="mb-0 text-xl w-auto py-1 bg-[rgba(255,250,244,0.6)] rounded-b-xl mx-auto px-4 theme_text border-tl-[#EF5300] font-bold shadow-md">
           fgUnh dySUMj
           <span className="font-eng text-sm ml-2">(Hindi Calendar)</span>
         </p>

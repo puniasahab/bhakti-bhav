@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { Link } from "react-router-dom";
+import Loader from "../components/Loader";
 
 export default function PujaKare() {
   const [items, setItems] = useState([]);
@@ -23,7 +24,7 @@ export default function PujaKare() {
     fetchItems();
   }, []);
 
-  if (loading) return <p className="text-center py-10 theme_text">⏳ Loading...</p>;
+  if (loading) return <Loader message="🙏 Loading भक्ति भाव 🙏" size={200} />;
   if (!items.length) return <p className="text-center py-10 text-white">❌ No items found</p>;
 
   return (
@@ -41,7 +42,7 @@ export default function PujaKare() {
           {items.map((item) => (
             <li key={item.id}>
               <Link
-                to={`/puja-kare/${item.id}`} // dynamic link for each puja item
+                to={`/puja-kare/${item.id}`}  
                 className="theme_bg bg-white rounded-xl shadow md:p-6 p-3 text-center hover:bg-yellow-50 transition w-auto flex flex-col"
               >
                 <div className="w-full h-36 flex items-center justify-center">

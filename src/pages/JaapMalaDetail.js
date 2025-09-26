@@ -7,6 +7,8 @@ import "swiper/css";
 import "swiper/css/pagination";
 import { Navigation } from "swiper/modules";
 import { LanguageContext } from "../contexts/LanguageContext";
+import Loader from "../components/Loader";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 function JaapMalaDetail() {
   const { id } = useParams();
@@ -26,23 +28,23 @@ function JaapMalaDetail() {
       .catch((err) => console.error(err));
   }, [id]);
 
-  if (loading) return <p className="text-center mt-10">Loading...</p>;
+  if (loading) return <Loader message="🙏 Loading भक्ति भाव 🙏" size={200} />;
   if (!detail) return <p className="text-center mt-10">No data found!</p>;
 
   return (
     <>
       <Header />
+      <div className="flex justify-center items-center mb-3">
+        <p
+          className={`mb-0 text-xl w-auto py-1 bg-[rgba(255,250,244,0.6)] rounded-b-xl mx-auto px-4 theme_text font-bold shadow-md ${fontSize}`}
+        >
+          {language === "hi" ? detail.title.hi : detail.title.en}
+          <span className="font-eng text-sm ml-2">
+            ({language === "hi" ? detail.title.en : detail.title.hi})
+          </span>
+        </p>
+      </div>
       <div className="container mx-auto px-4 relative">
-        <div className="flex justify-center items-center mb-3">
-          <p
-            className={`mb-0 text-xl w-auto py-1 bg-[rgba(255,250,244,0.6)] rounded-b-xl mx-auto px-4 theme_text font-bold shadow-md ${fontSize}`}
-          >
-            {language === "hi" ? detail.title.hi : detail.title.en}
-            <span className="font-eng text-sm ml-2">
-              ({language === "hi" ? detail.title.en : detail.title.hi})
-            </span>
-          </p>
-        </div>
 
         <Swiper
           pagination={{ clickable: true }}
@@ -79,11 +81,13 @@ function JaapMalaDetail() {
               </SwiperSlide>
             ))}
         </Swiper>
-        <div className="swiper-button-prev !text-white !w-10 !h-10 !bg-[#9A283D] !rounded-full shadow flex items-center justify-center 
-absolute top-1/2 left-2 -translate-y-1/2 z-10"></div>
 
-<div className="swiper-button-next !text-white !w-10 !h-10 !bg-[#9A283D] !rounded-full shadow flex items-center justify-center 
-absolute top-1/2 right-2 -translate-y-1/2 z-10"></div>
+        <div className="swiper-button-prev absolute top-1/2 left-2 -translate-y-1/2 bg-white rounded-full p-2 shadow z-20">
+          <ChevronLeft className="theme_text" />
+        </div>
+        <div className="swiper-button-next absolute top-1/2 right-2 -translate-y-1/2 bg-white rounded-full p-2 shadow z-20">
+          <ChevronRight className="theme_text" />
+        </div>
       </div>
       <Footer />
     </>

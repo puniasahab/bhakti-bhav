@@ -2,12 +2,13 @@ import { useEffect, useState, useContext, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { LanguageContext } from "../contexts/LanguageContext";
 import Header from "../components/Header";
+import Loader from "../components/Loader";
 
 export default function MantraDetail() {
   const { id } = useParams();
-  const [mantras, setMantras] = useState([]);
+  const [detail, setDetail] = useState(null); // store object, not array
   const [loading, setLoading] = useState(true);
-  const { language, fontSize, setLanguage, setFontSize} = useContext(LanguageContext); // ✅ use context
+  const { language, fontSize } = useContext(LanguageContext);
   const [currentAudio, setCurrentAudio] = useState(null);
   const audioRef = useRef(null);
 
@@ -16,10 +17,10 @@ export default function MantraDetail() {
       try {
         const res = await fetch(`https://api.bhaktibhav.app/frontend/mantra/${id}`);
         const json = await res.json();
-        setMantras(json.data || []);
+        setDetail(json.data || null);
       } catch (error) {
         console.error("API Error:", error);
-        setMantras([]);
+        setDetail(null);
       } finally {
         setLoading(false);
       }
@@ -28,6 +29,7 @@ export default function MantraDetail() {
   }, [id]);
 
   const handlePlay = (url) => {
+    if (!url) return; // no audio available
     if (currentAudio === url) {
       audioRef.current.pause();
       setCurrentAudio(null);
@@ -45,48 +47,94 @@ export default function MantraDetail() {
     }
   };
 
-  if (loading) return <p className="text-center py-10">⏳ Loading...</p>;
-  if (!mantras.length) return <p className="text-center py-10">❌ No mantras found</p>;
+  if (loading) return <Loader message="🙏 Loading भक्ति भाव 🙏" size={200} />;
+  if (!detail) return <p className="text-center py-10">❌ No mantras found</p>;
 
   return (
-    <div className="min-h-screen bg-[url('../img/home_bg.png')] bg-cover bg-top bg-no-repeat">
-      
+    <div className="min-h-screen">
       <Header />
+      <div className="flex justify-center items-center mb-3">
+        <p
+          className={`mb-0 text-xl w-auto py-1 bg-[rgba(255,250,244,0.6)] rounded-b-xl mx-auto px-4 theme_text font-bold shadow-md ${fontSize}`}
+        >
+          ea=
+          <span className="font-eng text-sm ml-2">
+            (Mantra)
+          </span>
+        </p>
+      </div>
 
-      <div className="container mx-auto px-4 py-6">
-         
+      <div className="container mx-auto px-4 py-6"> 
         <div className="flex justify-center mb-6">
           <img
-              src={
-                mantras.image.startsWith("http")
-                  ? mantras.image
-                  : `https://api.bhaktibhav.app${mantras.image}`
-              }
-              alt={mantras.name?.hi || mantras.name?.en}
-               className="max-w-[300px] max-h-[300px] mx-auto mt-4 rounded-lg shadow-lg"
-            />
+            src={
+              detail.image?.startsWith("http")
+                ? detail.image
+                : `https://api.bhaktibhav.app${detail.image}`
+            }
+            alt={detail.name?.hi || detail.name?.en}
+            className="max-w-[300px] max-h-[300px] mx-auto mt-4 rounded-lg shadow-lg"
+          />
         </div>
- 
+
         <div className="space-y-4">
-          {mantras.map((item, index) => (
+          {detail.mantras?.map((item, index) => (
             <div
               key={item._id || index}
               className="bg-[#FFD35A] text-center p-4 rounded-lg shadow relative"
             >
-              <p className={`${fontSize} text-[#5a001d] font-semibold ${language === "hi" ? "font-hindi" : "font-eng"}`}>
-                {language === "hi" ? item.text?.hi : item.text?.en}
-              </p>
- 
-              <button
-                onClick={() => handlePlay(item.audioUrl)}
-                className={`absolute bottom-2 right-2 p-2 rounded-full transition ${
-                  currentAudio === item.audioUrl
-                    ? "bg-red-600 text-white"
-                    : "bg-[#610419] text-white hover:bg-[#7a0028]"
-                }`}
+              <p
+                className={`theme_text text-[24px] font-semibold ${language === "hi" ? "font-hindi" : "font-eng"
+                  }`}
               >
-                {currentAudio === item.audioUrl ? "⏸" : "▶"}
-              </button>
+                {language === "hi" ? item.text?.hi : item.text?.en}
+              </p> 
+
+              <div className="mt-4 w-full flex items-center justify-center">
+                <button
+                  onClick={() => handlePlay(item.audioUrl?.hi)}
+                  disabled={!item.audioUrl?.hi}
+                  className={`p-2 flex items-center justify-center rounded-full 
+                    transition font-hindi 
+                    ${!item.audioUrl?.hi
+                      ? "bg-[#9A283D]/50 text-gray-500 cursor-not-allowed"
+                      : currentAudio === item.audioUrl?.hi
+                        ? "bg_theme text-white"
+                        : "bg_theme text-white"
+                    }`}
+                >
+                  {currentAudio === item.audioUrl?.hi ? (
+                    <span className="audio_pause_icon"></span>
+                  ) : (
+                    <span className="audio_icon"></span>
+                  )}
+                </button>
+
+                <button
+                  onClick={() => {
+                    if (audioRef.current) {
+                      audioRef.current.loop = !audioRef.current.loop;
+                    }
+                  }}
+                  disabled={!item.audioUrl?.hi}
+                  className={`ml-3 p-2 flex items-center justify-center rounded-full transition font-hindi 
+                    ${!item.audioUrl?.hi
+                      ? "bg-[#9A283D]/50 text-gray-500 cursor-not-allowed"
+                      : audioRef.current?.loop
+                        ? "bg-green-600 text-white"
+                        : "bg_theme text-white"
+                    }`}
+                >
+                  <span className="audio_repeat_icon"></span>
+                </button>
+
+                {item.audioUrl?.hi && (
+                  <audio ref={audioRef} className="hidden">
+                    <source src={item.audioUrl.hi} type="audio/mpeg" />
+                    Your browser does not support the audio element.
+                  </audio>
+                )}
+              </div>
             </div>
           ))}
         </div>

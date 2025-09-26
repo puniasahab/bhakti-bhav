@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import Loader from "../components/Loader";
 
 function HindiCalendarDetail() {
   const { id } = useParams();
@@ -33,7 +34,7 @@ function HindiCalendarDetail() {
     fetchMonth();
   }, [id]);
 
-  if (loading) return <p className="text-center mt-10 text-white">⏳ Loading...</p>;
+if (loading) return <Loader message="🙏 Loading भक्ति भाव 🙏" size={200} />;
   if (!month) return <p className="text-center mt-10 text-white">❌ Month not found</p>;
 
   let monthName = { hi: "अज्ञात", en: "Unknown" };

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import Loader from "../components/Loader";
 
 function Rashifal() {
   const [rashis, setRashis] = useState([]);
@@ -79,12 +80,7 @@ function Rashifal() {
     setSelectedRashi(null);
   };
 
-  if (loading)
-    return (
-      <p className="text-center mt-10 text-white text-lg">
-        ⏳ Loading Rashifals...
-      </p>
-    );
+  if (loading) return <Loader message="🙏 Loading भक्ति भाव 🙏" size={200} />;
 
   return (
     <>

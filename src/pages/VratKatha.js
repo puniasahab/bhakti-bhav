@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import Loader from "../components/Loader";
 
 export default function VratKatha() {
   const [kathas, setKathas] = useState([]);
@@ -29,7 +30,7 @@ export default function VratKatha() {
     fetchKathas();
   }, []);
 
-  if (loading) return <p className="text-center py-10 theme_text">⏳ Loading...</p>;
+  if (loading) return <Loader message="🙏 Loading भक्ति भाव 🙏" size={200} />;
   if (!kathas.length) return <p className="text-center py-10">❌ No kathas found</p>;
 
   return (

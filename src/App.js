@@ -28,6 +28,8 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import AboutUs from "./pages/AboutUs";
 import EditProfile from "./pages/EditProfile";
 import Profile from "./pages/Profile";
+import Payment from "./pages/Payment";
+import Transactions from "./pages/transactions";
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -77,6 +79,8 @@ function App() {
         <Route path="/about-us" element={<AboutUs />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/edit-profile" element={<EditProfile />} />
+        <Route path="/payment" element={<Payment />} />
+        <Route path="/transactions" element={<Transactions />} />
       </Routes>
     </LanguageProvider>
   );

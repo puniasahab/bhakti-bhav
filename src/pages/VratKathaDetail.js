@@ -2,6 +2,7 @@ import { useEffect, useState, useContext, useRef } from "react";
 import { useParams } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import Loader from "../components/Loader";
 import { LanguageContext } from "../contexts/LanguageContext";
 
 function VratKathaDetail() {
@@ -48,7 +49,7 @@ function VratKathaDetail() {
         }
     };
 
-    if (loading) return <p className="text-center py-10 theme_text">⏳ Loading...</p>;
+    if (loading) return <Loader message="🙏 Loading भक्ति भाव 🙏" size={200} />;
     if (!detail) return <p className="text-center py-10 theme_text">❌ No data found!</p>;
 
     return (

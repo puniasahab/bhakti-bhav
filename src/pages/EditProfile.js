@@ -1,4 +1,8 @@
 import React, { useState } from "react";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
+import { Camera } from "lucide-react";
+import kundaliBanner from "../assets/img/kundali_banner.png";
 
 function EditProfile() {
   const [formData, setFormData] = useState({
@@ -46,142 +50,119 @@ function EditProfile() {
   };
 
   return (
-    <div className="max-w-md mx-auto p-4 bg-white rounded-lg shadow-md">
-      <button className="bg-yellow-200 px-4 py-2 rounded mb-4">← Edit Profile</button>
-
-      <h1 className="text-center text-2xl font-bold mb-4">भक्ति भाव</h1>
-
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Name */}
-        <div>
+    <>
+      <Header />
+      <div className="container mx-auto px-4 mt-4 text-center font-eng"> 
+        <div className="flex justify-center mb-6">
+          <div className="relative">
+            <div className="w-28 h-28 rounded-full border flex items-center justify-center text-[#9A283D] font-bold text-lg bg-white">
+              भक्ति भाव
+            </div>
+            <div className="absolute bottom-0 right-0 bg-white rounded-full p-1 shadow">  
+              <Camera className="theme_text"/>
+            </div>
+          </div>
+        </div>
+ 
+        <form onSubmit={handleSubmit} className="space-y-4 theme_text">
           <input
             type="text"
             name="name"
-            placeholder="Name"
+            placeholder="Name*"
             value={formData.name}
             onChange={handleChange}
-            className="w-full border rounded px-3 py-2"
+            className="w-full border border-[#9A283D] rounded-lg px-4 py-3 bg-[#FFFAF8] focus:outline-none"
           />
-          {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
-        </div>
-
-        {/* Mobile */}
-        <div>
           <input
             type="text"
             name="mobile"
-            placeholder="Mobile number"
+            placeholder="Mobile number*"
             value={formData.mobile}
             onChange={handleChange}
-            className="w-full border rounded px-3 py-2"
+            className="w-full border border-[#9A283D] rounded-lg px-4 py-3 bg-[#FFFAF8] focus:outline-none"
           />
-          {errors.mobile && <p className="text-red-500 text-sm">{errors.mobile}</p>}
-        </div>
-
-        {/* Email */}
-        <div>
           <input
             type="email"
             name="email"
-            placeholder="Email"
+            placeholder="Email*"
             value={formData.email}
             onChange={handleChange}
-            className="w-full border rounded px-3 py-2"
+            className="w-full border border-[#9A283D] rounded-lg px-4 py-3 bg-[#FFFAF8] focus:outline-none"
           />
-          {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
-        </div>
-
-        {/* State */}
-        <div>
           <input
             type="text"
             name="state"
-            placeholder="State"
+            placeholder="State*"
             value={formData.state}
             onChange={handleChange}
-            className="w-full border rounded px-3 py-2"
+            className="w-full border border-[#9A283D] rounded-lg px-4 py-3 bg-[#FFFAF8] focus:outline-none"
           />
-          {errors.state && <p className="text-red-500 text-sm">{errors.state}</p>}
-        </div>
 
-        <button
-          type="submit"
-          className="w-full bg-red-600 text-white py-2 rounded font-semibold"
-        >
-          Confirm
-        </button>
-      </form>
-
-      <div className="my-6 p-4 bg-yellow-100 rounded text-center font-semibold">
-        Free Kundli
-      </div>
-
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {/* DOB */}
-        <div>
-          <input
-            type="date"
-            name="dob"
-            value={formData.dob}
-            onChange={handleChange}
-            className="w-full border rounded px-3 py-2"
-          />
-          {errors.dob && <p className="text-red-500 text-sm">{errors.dob}</p>}
-        </div>
-
-        {/* Birth Place */}
-        <div>
-          <input
-            type="text"
-            name="birthPlace"
-            placeholder="Birth place"
-            value={formData.birthPlace}
-            onChange={handleChange}
-            className="w-full border rounded px-3 py-2"
-          />
-          {errors.birthPlace && (
-            <p className="text-red-500 text-sm">{errors.birthPlace}</p>
-          )}
-        </div>
-
-        {/* Time of Birth */}
-        <div>
-          <input
-            type="time"
-            name="birthTime"
-            value={formData.birthTime}
-            onChange={handleChange}
-            className="w-full border rounded px-3 py-2"
-          />
-          {errors.birthTime && (
-            <p className="text-red-500 text-sm">{errors.birthTime}</p>
-          )}
-        </div>
-
-        {/* Gender */}
-        <div>
-          <select
-            name="gender"
-            value={formData.gender}
-            onChange={handleChange}
-            className="w-full border rounded px-3 py-2"
+          <button
+            type="submit"
+            className="w-full bg-[#9A283D] text-white py-3 rounded-full shadow-md"
           >
-            <option value="">Select Gender</option>
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-            <option value="other">Other</option>
-          </select>
-          {errors.gender && <p className="text-red-500 text-sm">{errors.gender}</p>}
+            Confirm
+          </button>
+        </form>
+ 
+        <div className="my-6 text-center py-2">
+          <img
+              src={kundaliBanner}
+              alt={"kundali banner"}
+              className="max-w-md w-full rounded-lg"
+            />
         </div>
+ 
+        <form onSubmit={handleSubmit} className="space-y-4 theme_text">
+          <div className="grid grid-cols-2 gap-4">
+            <input
+              type="date"
+              name="dob"
+              value={formData.dob}
+              onChange={handleChange}
+              placeholder="Date of birth"
+              className="w-full border border-[#9A283D] rounded-lg px-4 py-3 bg-[#FFFAF8] focus:outline-none"
+            />
+            <input
+              type="text"
+              name="birthPlace"
+              placeholder="Birth place"
+              value={formData.birthPlace}
+              onChange={handleChange}
+              className="w-full border border-[#9A283D] rounded-lg px-4 py-3 bg-[#FFFAF8] focus:outline-none"
+            />
+            <input
+              type="time"
+              name="birthTime"
+              value={formData.birthTime}
+              onChange={handleChange}
+              placeholder="Time of birth"
+              className="w-full border border-[#9A283D] rounded-lg px-4 py-3 bg-[#FFFAF8] focus:outline-none"
+            />
+            <select
+              name="gender"
+              value={formData.gender}
+              onChange={handleChange}
+              className="w-full border border-[#9A283D] rounded-lg px-4 py-3 bg-[#FFFAF8] focus:outline-none"
+            >
+              <option value="">Gender</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
 
-        <button
-          type="submit"
-          className="w-full bg-red-600 text-white py-2 rounded font-semibold"
-        >
-          Yes, I’m in
-        </button>
-      </form>
-    </div>
+          <button
+            type="submit"
+            className="w-full border-2 border-[#9A283D] text-[#9A283D] py-3 rounded-full font-bold shadow-md bg-white"
+          >
+            Yes, I'm in
+          </button>
+        </form>
+      </div>
+      <Footer />
+    </>
   );
 }
 

@@ -65,6 +65,11 @@ body {
   border: 1px solid #EBA24A;
 }
 
+.bg_theme{
+  background-color:#9A283D;
+  color: #fff ;
+}
+
 .font-hindi {
   font-family: 'KrutiDev', sans-serif;
 }
@@ -330,3 +335,27 @@ body {
 .custom-circle li {
   margin-bottom: 0.5rem;
 }
+
+.audio_icon{
+  background: url("../public/img/music_icon1.png");
+  width: 20px;
+  height: 20px;
+  display: inline-block;
+  background-position: center;
+  background-size: 100%;  
+}
+.audio_repeat_icon{
+  background: url("../public/img/repeat_icon1.png");
+  width: 20px;
+  height: 20px;
+  display: inline-block;
+  background-position: center;
+  background-size: 100%;  
+}
+.share_icon{
+  background: url("../public/img/share_icon.png");
+  width: 15px;
+  height: 15px;
+display: inline-block; 
+}
+ 

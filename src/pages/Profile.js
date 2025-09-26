@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import Loader from "../components/Loader";
 
 const Profile = () => {
     const [profile, setProfile] = useState({
@@ -18,7 +19,7 @@ const Profile = () => {
             try {
                 const res = await fetch("https://api.bhaktibhav.app/user/profile");
                 const data = await res.json();
-                setProfile(data); // assume API returns { name, mobile, email, state }
+                setProfile(data);  
             } catch (error) {
                 console.error("Error fetching profile:", error);
             } finally {
@@ -64,7 +65,7 @@ const Profile = () => {
         }
     };
 
-    if (loading) return <div className="text-center p-6">Loading...</div>;
+    if (loading) return <Loader message="🙏 Loading भक्ति भाव 🙏" size={200} />;
 
     return (
         <>

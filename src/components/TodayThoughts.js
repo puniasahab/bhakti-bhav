@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import Loader from "./Loader";
 
 function TodayThoughts() {
   const [thoughtData, setThoughtData] = useState(null);
@@ -20,9 +21,7 @@ function TodayThoughts() {
       });
   }, []);
 
-  if (loading) {
-    return <p className="text-center mt-4">Loading Thought...</p>;
-  }
+  if (loading) return <Loader message="🙏 Loading भक्ति भाव 🙏" size={200} />;
 
   if (!thoughtData) {
     return <p className="text-center mt-4 text-red-500">No thought available.</p>;
@@ -68,14 +67,10 @@ function TodayThoughts() {
 
         <p className="md:text-3xl font-bold text-md mt-[30px]">
           ^^{thoughtData.thought.hi}**
-        </p>
-        {/* <p className="mt-1 text-lg font-eng italic">
-          “{thoughtData.thought.en}”
-        </p> */}
+        </p> 
 
         <p className="mt-5 text-sm">
           &ndash; {thoughtData.author.hi} 
-          {/* <br/><span className="font-eng text-sm" >({thoughtData.author.en})</span> */}
         </p>
       </div>
 

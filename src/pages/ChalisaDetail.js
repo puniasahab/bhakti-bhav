@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { LanguageContext } from "../contexts/LanguageContext";
+import Loader from "../components/Loader";
 
 export default function ChalisaDetail() {
   const { id } = useParams();
@@ -44,8 +45,7 @@ export default function ChalisaDetail() {
     }
   };
 
-  if (loading)
-    return <p className="text-center py-10 theme_text">⏳ Loading...</p>;
+ if (loading) return <Loader message="🙏 Loading भक्ति भाव 🙏" size={200} />;
   if (!chalisa)
     return <p className="text-center py-10">❌ No chalisa found</p>;
 
@@ -55,7 +55,7 @@ export default function ChalisaDetail() {
  
       <div className="flex justify-center items-center mb-3">
         <p
-          className={`mb-0 text-2xl w-auto py-1 bg-[rgba(255,250,244,0.6)] rounded-b-xl mx-auto px-4 theme_text font-bold shadow-md ${fontSize}`}
+          className={`mb-0 text-xl w-auto py-1 bg-[rgba(255,250,244,0.6)] rounded-b-xl mx-auto px-4 theme_text border-tl-[#EF5300] font-bold shadow-md`}
         >
           {language === "hi" ? chalisa.name.hi : chalisa.name.en}
           <span className="font-eng text-sm ml-2">

@@ -2,6 +2,7 @@ import { useEffect, useState, useContext } from "react";
 import { useParams } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import Loader from "../components/Loader";
 import { LanguageContext } from "../contexts/LanguageContext";
 
 function AartiDetail() {
@@ -30,8 +31,7 @@ function AartiDetail() {
       });
   }, [id]);
 
-  if (loading)
-    return <p className="text-center py-10 theme_text">⏳ Loading...</p>;
+  if (loading) return <Loader message="🙏 Loading भक्ति भाव 🙏" size={200} />;
   if (!detail)
     return <p className="text-center py-10 theme_text">❌ No data found!</p>;
 
@@ -44,15 +44,15 @@ function AartiDetail() {
       <div className="container mx-auto px-4">
         <div className="flex justify-center items-center mb-3">
           <p
-            className={`mb-0 text-2xl w-auto py-1 bg-[rgba(255,250,244,0.6)] rounded-b-xl mx-auto px-4 theme_text font-bold shadow-md ${fontSize}`}
+            className={`mb-0 text-xl w-auto py-1 bg-[rgba(255,250,244,0.6)] rounded-b-xl mx-auto px-4 theme_text border-tl-[#EF5300] font-bold shadow-md`}
           >
             {language === "hi" ? detail.name?.hi : detail.name?.en}
             <span className="font-eng text-sm ml-2">
               ({language === "hi" ? detail.name?.en : detail.name?.hi})
             </span>
           </p>
-        </div>
- 
+        </div> 
+        
         {detail.imageUrl && (
           <img
             src={
