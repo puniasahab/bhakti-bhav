@@ -1,6 +1,8 @@
 import axios from 'axios';
+import { getTokenFromLS } from './commonFunctions';
+import { endPoints } from './endpoints';
 
-const BASEURL = process.env.VITE_BASE_PUBLIC_URL || 'http://localhost:3000/api';
+const BASEURL = process.env.API_BASE_PUBLIC_URL;
 const api = axios.create({
   baseURL: BASEURL,
   headers: {
@@ -8,9 +10,6 @@ const api = axios.create({
   },
 });
 
-export default api;
-
-import { getTokenFromLS } from './commonFunctions';
 
 api.interceptors.request.use(
   (config) => {
@@ -23,17 +22,42 @@ api.interceptors.request.use(
   (error) => {
     return Promise.reject(error);
   }
-);  
+);
 
 
 export const mantraApis = {
-  getMantra: async () => {
+  getAllMantras: async () => {
     try {
-      const response = await api.get("/mantras");
+      const response = await api.get(endPoints.getAllMantras);
       return response.data;
     } catch (error) {
       console.error("Error fetching mantras:", error);
       throw error;
     }
+  },
+
+  getMantraById: async (id) => {
+    try {
+      const response = await api.get(`${endPoints.getMantraById}/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error(`Error fetching mantra with ID ${id}:`, error);
+      throw error;
+    }
   }
 }
+
+
+export const hinduCalendarApis = {
+  getPanchangCalendar: async () => {
+    try {
+      const response = await api.get('frontend/panchang-calendar');
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching Panchang Calendar:", error);
+      throw error;
+    }
+  }
+}
+
+export default api;
