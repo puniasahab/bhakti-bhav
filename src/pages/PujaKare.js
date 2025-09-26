@@ -11,9 +11,9 @@ export default function PujaKare() {
   useEffect(() => {
     async function fetchItems() {
       try {
-        const res = await fetch("https://api.bhaktibhav.app/frontend/all-data");
+        const res = await fetch("https://api.bhaktibhav.app/frontend/puja-kare");
         const json = await res.json();
-        setItems(json.data || []); // Adjust according to API response
+        setItems(json.data || []); 
       } catch (error) {
         console.error("API Error:", error);
       } finally {

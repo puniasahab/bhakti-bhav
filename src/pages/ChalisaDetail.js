@@ -45,14 +45,14 @@ export default function ChalisaDetail() {
     }
   };
 
- if (loading) return <Loader message="🙏 Loading भक्ति भाव 🙏" size={200} />;
+  if (loading) return <Loader message="🙏 Loading भक्ति भाव 🙏" size={200} />;
   if (!chalisa)
     return <p className="text-center py-10">❌ No chalisa found</p>;
 
   return (
     <>
       <Header />
- 
+
       <div className="flex justify-center items-center mb-3">
         <p
           className={`mb-0 text-xl w-auto py-1 bg-[rgba(255,250,244,0.6)] rounded-b-xl mx-auto px-4 theme_text border-tl-[#EF5300] font-bold shadow-md`}
@@ -63,9 +63,9 @@ export default function ChalisaDetail() {
           </span>
         </p>
       </div>
- 
-      <div className="container mx-auto px-4 mt-4"> 
-        
+
+      <div className="container mx-auto px-4 mt-4">
+
         {chalisa.imageUrl && (
           <div className="w-full h-64 flex items-center justify-center mb-4">
             <img
@@ -75,29 +75,40 @@ export default function ChalisaDetail() {
                   : `https://api.bhaktibhav.app${chalisa.imageUrl}`
               }
               alt={chalisa.name?.hi || chalisa.name?.en}
-               className="max-w-[300px] max-h-[300px] mx-auto mt-4 rounded-lg shadow-lg"
+              className="max-w-[300px] max-h-[300px]  rounded-lg shadow-lg "
             />
           </div>
         )}
-        
 
-        <div className="mt-4"> 
-          {chalisa.audioUrl && (
-            <button
-              onClick={handlePlay}
-              className="px-4 py-2 theme_bg text-white rounded hover:bg-orange-600 transition"
-            >
-              <span className="audio_icon"></span> Chalisa Sune
+
+        <div className="flex justify-center gap-4 my-6">
+          <div className="mt-4">
+
+            <button className="bg-[#9A283D] text-white px-6 py-2 rounded-full shadow flex items-center font-hindi">
+              <img src="../img/share_icon.png" alt="" className="w-[15px] h-[15px] mr-2" /> 'ks;j djsa
             </button>
-          )}
+          </div>
 
-          <audio ref={audioRef} className="hidden">
-            <source src={chalisa.audioUrl} type="audio/mpeg" />
-            Your browser does not support the audio element.
-          </audio>
+          <div className="mt-4">
+            {chalisa.audioUrl && (
+              <button
+                onClick={handlePlay}
+                className="bg-[#9A283D] text-white px-6 py-2 rounded-full shadow flex items-center"
+              >
+                <span className="audio_icon mr-2"></span> vkjrh lqusa
+              </button>
+            )}
+
+            <audio ref={audioRef} className="hidden">
+              <source src={chalisa.audioUrl} type="audio/mpeg" />
+              Your browser does not support the audio element.
+            </audio>
+          </div>
         </div>
 
-        <div className={`theme_text text-base leading-loose ${language === "hi" ? "font-hindi" : "font-eng"}`}>
+
+
+        <div className={`theme_text text-center text-base leading-loose ${language === "hi" ? "font-hindi" : "font-eng"}`}>
           {language === "hi"
             ? chalisa.text.hi.split("\n").map((line, idx) => (
               <p key={idx}>{line.replace(/,/g, ']')}</p>
@@ -108,13 +119,6 @@ export default function ChalisaDetail() {
           }
         </div>
  
-        <div className="mt-4">
-          <audio controls className="w-full">
-            <source src={chalisa.audioUrl} type="audio/mpeg" />
-            Your browser does not support the audio element.
-          </audio>
-        </div>
-        {/* )} */}
       </div>
 
       <Footer />
