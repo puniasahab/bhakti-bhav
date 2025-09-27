@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { LanguageContext } from "../contexts/LanguageContext";
 import Header from "../components/Header";
 import Loader from "../components/Loader";
+import PageTitleCard from "../components/PageTitleCard";
 
 export default function MantraDetail() {
   const { id } = useParams();
@@ -52,19 +53,14 @@ export default function MantraDetail() {
 
   return (
     <div className="min-h-screen">
-      <Header />
-      <div className="flex justify-center items-center mb-3">
-        <p
-          className={`mb-0 text-xl w-auto py-1 bg-[rgba(255,250,244,0.6)] rounded-b-xl mx-auto px-4 theme_text font-bold shadow-md ${fontSize}`}
-        >
-          ea=
-          <span className="font-eng text-sm ml-2">
-            (Mantra)
-          </span>
-        </p>
-      </div>
+      <Header pageName={{ hi: "ea=", en: "Mantra" }} fontSizeOption="true" />
+      <PageTitleCard
+        titleHi={"ea="}
+        titleEn={"Mantra"} 
+        textSize="text-lg"
+      /> 
 
-      <div className="container mx-auto px-4 py-6"> 
+      <div className="container mx-auto px-4 py-6">
         <div className="flex justify-center mb-6">
           <img
             src={
@@ -84,11 +80,11 @@ export default function MantraDetail() {
               className="bg-[#FFD35A] text-center p-4 rounded-lg shadow relative"
             >
               <p
-                className={`theme_text text-[24px] font-semibold ${language === "hi" ? "font-hindi" : "font-eng"
+                className={`theme_text text-[24px] font-semibold font-hindi ${fontSize}
                   }`}
               >
-                {language === "hi" ? item.text?.hi : item.text?.en}
-              </p> 
+                {item.text?.hi}
+              </p>
 
               <div className="mt-4 w-full flex items-center justify-center">
                 <button

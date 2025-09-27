@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Loader from "../components/Loader";
+import PageTitleCard from "../components/PageTitleCard";
 
 function Rashifal() {
   const [rashis, setRashis] = useState([]);
@@ -84,17 +85,15 @@ function Rashifal() {
 
   return (
     <>
-      <Header />
+      <Header pageName={{ hi: "jkf'kQy", en: "Rashifal" }} />
 
-      <div className="flex justify-center items-center mb-4">
-        <p className="text-2xl py-1 px-4 bg-[rgba(255,250,244,0.6)] rounded-b-xl font-bold shadow-md theme_text">
-          vkt dk jkf'kQy
-          <span className="font-eng text-sm ml-2">(Aaj Ka Rashifal)</span>
-        </p>
-      </div>
+      <PageTitleCard
+        titleHi={"vkt dk jkf'kQy"}
+        titleEn={"Aaj Ka Rashifal"}
+        textSize="text-lg"
+      />
 
-      <main className="px-4">
-        <div className="container mx-auto mt-4">
+        <div className="container mx-auto mt-4 px-4">
           <ul className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 md:py-6 py-3 text-center">
             {rashis.map((item) => (
               <li key={item._id}>
@@ -143,7 +142,7 @@ function Rashifal() {
                 <h2 className="text-2xl theme_text mb-1 font-eng">
                   {selectedRashi.name?.hi} <span className="ml-2 text-lg">({selectedRashi.name?.en})</span>
                 </h2>
-                
+
               </div>
 
               <div className="text-center theme_text">
@@ -179,7 +178,6 @@ function Rashifal() {
             </div>
           </div>
         )}
-      </main>
 
       <Footer />
     </>

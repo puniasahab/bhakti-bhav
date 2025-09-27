@@ -4,6 +4,7 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Loader from "../components/Loader";
 import { LanguageContext } from "../contexts/LanguageContext";
+import PageTitleCard from "../components/PageTitleCard";
 
 function VratKathaDetail() {
     const { id } = useParams();
@@ -11,6 +12,7 @@ function VratKathaDetail() {
     const [loading, setLoading] = useState(true);
     const { language, setLanguage, fontSize, setFontSize } = useContext(LanguageContext);
     const audioRef = useRef(null);
+    const [currentAudio, setCurrentAudio] = useState(null);
 
     useEffect(() => {
         if (!id) return;
@@ -43,9 +45,22 @@ function VratKathaDetail() {
             });
     }, [id]);
 
-    const handlePlay = () => {
-        if (audioRef.current) {
+    const handlePlay = (url) => {
+        if (!url) return;
+        if (currentAudio === url) {
+            audioRef.current.pause();
+            setCurrentAudio(null);
+        } else {
+            if (audioRef.current) {
+                audioRef.current.pause();
+            }
+            audioRef.current = new Audio(url);
             audioRef.current.play();
+            setCurrentAudio(url);
+
+            audioRef.current.onended = () => {
+                setCurrentAudio(null);
+            };
         }
     };
 
@@ -54,16 +69,14 @@ function VratKathaDetail() {
 
     return (
         <>
-            <Header />
+            <Header pageName={{ hi: "dFkk", en: "Katha" }} hindiFontSize="true" />
+            <PageTitleCard
+                titleHi={detail.name.hi}
+                titleEn={detail.name.en}
+                textSize="text-lg"
+            />
+
             <div className="container mx-auto px-4 pb-6 theme_text">
-
-                <div className="flex justify-center items-center mb-3">
-                    <h1 className="mb-0 text-xl w-auto py-1 bg-[rgba(255,250,244,0.6)] rounded-b-xl mx-auto px-4 theme_text border-tl-[#EF5300] font-bold shadow-md">
-                        <span className={`${language === "hi" ? "font-hindi" : "hidden"}`}>{detail.name?.hi}</span>
-                        <span className={`${language === "en" ? "font-eng text-lg" : "hidden"}`}>({detail.name?.en})</span>
-                    </h1>
-                </div>
-
                 {detail.imageUrl && (
                     <div className="flex justify-center mt-4">
                         <img
@@ -75,14 +88,14 @@ function VratKathaDetail() {
                 )}
 
                 <div className="flex justify-center mt-4">
-                    <div className="bg-white shadow rounded-lg px-6 py-3  md:flex-row gap-4 text-center">
-                        <div className="flex justify-center">
-                            <p className="font-semibold text-gray-600">प्रारंभ %</p>
-                            <p className="text-sm text-gray-800 font-eng">{new Date(detail.time?.start).toLocaleString()}</p>
+                    <div className="bg-[rgba(255,250,244,0.6)] shadow rounded-lg px-6 py-3 md:flex-row gap-4 text-center border border-[#9A283D]">
+                        <div className="flex justify-center items-center">
+                            <p className="font-semibold text-black text-sm">प्रारंभ %</p>
+                            <p className="text-sm text-black font-eng ml-2">{new Date(detail.time?.start).toLocaleString()}</p>
                         </div>
-                        <div className="flex justify-center">
-                            <p className="font-semibold text-gray-600">समाप्त %</p>
-                            <p className="text-sm text-gray-800 font-eng">{new Date(detail.time?.end).toLocaleString()}</p>
+                        <div className="flex justify-center items-center">
+                            <p className="font-semibold text-black text-sm">समाप्त %</p>
+                            <p className="text-sm text-black font-eng ml-2">{new Date(detail.time?.end).toLocaleString()}</p>
                         </div>
                     </div>
                 </div>
@@ -95,15 +108,29 @@ function VratKathaDetail() {
                         </button>
                     </div>
 
+
                     <div className="mt-4">
-                        {detail.audioUrl && (
-                            <button
-                                onClick={handlePlay}
-                                className="bg-[#9A283D] text-white px-6 py-2 rounded-full shadow flex items-center"
-                            >
-                                <span className="audio_icon mr-2"></span> vkjrh lqusa
-                            </button>
-                        )}
+                        <button
+                            onClick={() => handlePlay(detail.audioUrl?.hi)}
+                            disabled={!detail.audioUrl?.hi}
+                            className={`p-2 flex items-center justify-center rounded-full 
+                             transition font-hindi ${!detail.audioUrl?.hi
+                                    ? "bg-[#9A283D]/50 text-white cursor-not-allowed"
+                                    : currentAudio === detail.audioUrl?.hi
+                                        ? "bg_theme text-white"
+                                        : "bg_theme text-white"
+                                }`}
+                        >
+                            {currentAudio === detail.audioUrl?.hi ? (
+                                <>
+                                    <span className="audio_pause_icon mr-2"></span> dFkk lqusa
+                                </>
+                            ) : (
+                                <>
+                                    <span className="audio_icon mr-2"></span> dFkk lqusa
+                                </>
+                            )}
+                        </button>
 
                         <audio ref={audioRef} className="hidden">
                             <source src={detail.audioUrl} type="audio/mpeg" />
@@ -118,24 +145,20 @@ function VratKathaDetail() {
                 </div>
 
                 <div className="mb-4">
-                    {/* <h2 className="text-xl font-semibold"> <span className="font-hindi">प्रारम्भ </span> <span className="font-eng">/ Start </span>  </h2> */}
                     <p className={`${language === "hi" ? " font-hindi" : "hidden"} text-[rgba(0,0,0,0.7)] ${fontSize}`}>{detail.prarambh?.hi}</p>
                     <p className={`${language === "en" ? " font-eng" : "hidden"} text-[rgba(0,0,0,0.7)] ${fontSize}`}>{detail.prarambh?.en}</p>
 
                 </div>
 
                 <div className="mb-4">
-                    {/* <h2 className="text-xl font-semibold"> <span className="font-hindi">समाप्ति </span> <span className="font-eng">/ End </span></h2> */}
-
                     <p className={`${language === "hi" ? " font-hindi" : "hidden"} text-[rgba(0,0,0,0.7)] ${fontSize}`}>{detail.samapt?.hi}</p>
                     <p className={`${language === "en" ? " font-eng" : "hidden"} text-[rgba(0,0,0,0.7)] ${fontSize}`}>{detail.samapt?.en}</p>
-
                 </div>
 
                 <div className="mb-4">
-                    <h2 className="text-xl font-semibold mb-3">
+                    <h2 className={`text-xl font-semibold mb-3 ${fontSize} `}>
                         {language === "hi" ? (
-                            <span className=" ">पूजा विधि </span>
+                            <span className="font-hindi text-2xl">iwtk fof/k </span>
                         ) : (
                             <span className="font-eng"> Puja Vidhi </span>
 
@@ -157,15 +180,15 @@ function VratKathaDetail() {
                 </div>
 
                 <div className="mb-4">
-                    <h2 className="text-xl font-semibold mb-3">
+                    <h2 className={`text-xl font-semibold mb-3 ${fontSize} `}>
                         {language === "hi" ? (
-                            <span className="">पूजा सामग्री </span>
+                            <span className="font-hindi text-2xl">iwtk lkexzh</span>
                         ) : (
                             <span className="font-eng">Puja Samagri</span>
                         )}
 
                     </h2>
-                    <ul className="list-inside text-[rgba(0,0,0,0.7)]">
+                    <ul className={`list-inside text-[rgba(0,0,0,0.7)] ${fontSize} `}>
                         {language === "hi"
                             ? Array.isArray(detail.pujaSamagri?.hi)
                                 ? detail.pujaSamagri.hi.map((item, i) => (
@@ -183,14 +206,14 @@ function VratKathaDetail() {
                             : Array.isArray(detail.pujaSamagri?.en)
                                 ? detail.pujaSamagri.en.map((item, i) => (
                                     <li key={`en-${i}`} className="font-eng">
-                                        {item.replace(/,/g, "]")}
+                                        {item.replace(/,/g, ",")}
                                     </li>
                                 ))
                                 : detail.pujaSamagri?.en
                                     ?.split(/\n|,/)
                                     .map((item, i) => (
                                         <li key={`en-${i}`} className="font-eng">
-                                            {item.trim().replace(/,/g, "]")}
+                                            {item.trim().replace(/,/g, ",")}
                                         </li>
                                     ))}
 
@@ -200,21 +223,21 @@ function VratKathaDetail() {
                 </div>
 
                 <div className="mb-4">
-                    <h2 className="text-xl font-semibold mb-3">
+                    <h2 className={`text-xl font-semibold mb-3 ${fontSize} `} >
                         {language === "hi" ? (
-                            <span className=""> पूजा महत्व </span>
+                            <span className="font-hindi text-2xl"> dFkk egRo </span>
                         ) : (
-                            <span className="font-eng">Puja Importance</span>
+                            <span className="font-eng">katha Mahatva</span>
                         )}
 
                     </h2>
                     {language === "hi"
-                        ? detail.pujaMahatva?.hi?.split("\n").map((line, idx) => (
+                        ? detail.pujaMahatva?.hi?.split("\n\n").map((line, idx) => (
                             <p key={idx} className={`font-hindi text-[rgba(0,0,0,0.7)] ${fontSize}`}>
                                 {line.replace(/,/g, '•')}
                             </p>
                         ))
-                        : detail.pujaMahatva?.en?.split("\n").map((line, idx) => (
+                        : detail.pujaMahatva?.en?.split("\n\n").map((line, idx) => (
                             <p key={idx} className={`font-eng text-[rgba(0,0,0,0.7)] ${fontSize}`}>
                                 {line}
                             </p>
@@ -222,19 +245,11 @@ function VratKathaDetail() {
                 </div>
 
                 <div className="mt-4 w-full text-center">
-                    {detail.audioUrl && (
-                        <button
-                            onClick={handlePlay}
-                            className="bg-[#9A283D] text-white px-6 py-2 rounded-full shadow"
-                        >
-                            <span className="audio_icon"></span> vkjrh lqusa
-                        </button>
-                    )}
-
-                    <audio ref={audioRef} className="hidden">
-                        <source src={detail.audioUrl} type="audio/mpeg" />
-                        Your browser does not support the audio element.
-                    </audio>
+                    <a href="/aarti"
+                        className="bg-[#9A283D] text-white px-6 py-2 rounded-full shadow inline-flex items-center"
+                    >
+                        <span className="audio_icon mr-2"></span> vkjrh
+                    </a>
                 </div>
             </div>
             <Footer />

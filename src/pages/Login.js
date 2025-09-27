@@ -2,14 +2,14 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 function Login() {
-    const [phone, setPhone] = useState("");
+    const [mobile, setMobile] = useState("");
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!phone || phone.length !== 10) {
+        if (!mobile || mobile.length !== 10) {
             alert("Please enter a valid 10-digit phone number");
             return;
         }
@@ -20,13 +20,13 @@ function Login() {
             const res = await fetch("https://api.bhaktibhav.app/frontend/generate-otp", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ phone }),
+                body: JSON.stringify({ mobile }),
             });
 
             const data = await res.json();
 
             if (data.success) {
-                navigate("/verify-otp", { state: { phone } });
+                navigate("/verify-otp", { state: { mobile } });
             } else {
                 alert(data.message || "Failed to send OTP");
             }
@@ -55,13 +55,13 @@ function Login() {
                     <div className="w-full bg-[rgba(255,250,244,0.6)] rounded-xl shadow-md p-6 border-[#9A283D] border-[0.2px]">
 
                         <form onSubmit={handleSubmit}>
-                            <p className="md:text-xl text-3xl font-semibold mb-4 theme_text font-eng">Sign in</p>
+                            <p className="md:text-xl text-3xl font-semibold mb-4 theme_text font-eng">Sign In</p>
                             <div className="mb-4">
                                 <input
                                     type="tel"
-                                    value={phone}
+                                    value={mobile}
                                     onChange={(e) =>
-                                        setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))  
+                                        setMobile(e.target.value.replace(/\D/g, "").slice(0, 10))  
                                     }
                                     placeholder="+91 Phone Number"
                                     className="w-full border border-red-300 rounded-lg px-4 md:text-lg text-3xl py-2 focus:outline-none focus:ring-2 focus:ring-red-400 theme_text"

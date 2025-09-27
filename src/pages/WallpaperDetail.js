@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Download, Eye, Heart } from "lucide-react";
 import Loader from "../components/Loader";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import PageTitleCard from "../components/PageTitleCard";
 
 function WallpaperDetail() {
   const { id } = useParams();
@@ -45,8 +45,16 @@ function WallpaperDetail() {
         downloads={detail.downloads}
         views={detail.views}
         likes={detail.likes}
+        pageName={{ hi: "okyisij", en: "Wallpaper" }}
       />
-      <div className="container mx-auto px-4 mt-4"> 
+
+      <PageTitleCard
+        titleHi={"okYisij"}
+        titleEn={"Wallpaper"} 
+        textSize="text-lg"
+      />
+
+      <div className="container mx-auto px-4 mt-4">
         <div className="flex flex-col space-y-8">
           <div className="flex-1 flex justify-center items-center p-4">
             <img

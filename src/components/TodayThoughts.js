@@ -66,7 +66,7 @@ function TodayThoughts() {
         <h2 className="mb-2 text-lg mt-[30px]">vkt dk lqfopkj</h2>
 
         <p className="md:text-3xl font-bold text-md mt-[30px]">
-          ^^{thoughtData.thought.hi}**
+          ^^{thoughtData.thought.hi.replace(/,/g, ']')}**
         </p> 
 
         <p className="mt-5 text-sm">

@@ -2,10 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
+/* body {
   font-family: 'Noto Sans Devanagari', sans-serif;
   background-color: #fdfcf8;
-}
+} */
 
 /* @font-face {
   font-family: 'KrutiDev';
@@ -42,14 +42,33 @@ body {
   font-style: normal;
 }
 
-body {
-  font-family: 'KrutiDev', sans-serif;
-  background-color: #f0f0f0;
-  margin: 0;
-  padding: 0px;
+html, body {
+  height: 100%;
 }
 
+body {
+  font-family: 'KrutiDev', sans-serif;
+  background-color: #fff;
+  margin: 0;
+  padding: 0px;
+  padding-bottom: 100px;
+}
 
+body::before {
+  background-image: url('../public/img/repeat_bg.png');
+  background-repeat: repeat-y;
+  background-position: center;
+  background-size: 100%;
+  content: '';
+  width: 100%;
+  min-height: 100vh;  
+  height: 100%;         
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  background-color: #fff;
+}
 
 .hd_bg {
   background: linear-gradient(to right, #EBA24A 0%, #FFF179 100%);

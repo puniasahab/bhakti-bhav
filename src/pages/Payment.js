@@ -28,27 +28,27 @@ export default function Payment() {
   const items = [
     {
       en: "Complete Vrat Katha for your rituals",
-      hi: "आपके व्रत अनुष्ठान के लिए संपूर्ण व्रत कथा**",
+      hi: "आपके व्रत अनुष्ठान के लिए संपूर्ण व्रत कथा",
     },
     {
       en: "Sacred Jaap Maala & Powerful Mantras",
-      hi: "पूजन के लिए पवित्र जाप माला एवं शक्तिशाली मंत्र**",
+      hi: "पूजन के लिए पवित्र जाप माला एवं शक्तिशाली मंत्र",
     },
     {
       en: "Aarti & Chalisa for daily devotion",
-      hi: "दैनिक भक्ति हेतु आरती एवं चालीसा**",
+      hi: "दैनिक भक्ति हेतु आरती एवं चालीसा",
     },
     {
       en: "Spiritual Wallpaper for divine inspiration",
-      hi: "आध्यात्मिक प्रेरणा देने वाले भक्ति भाव से भरपूर वॉलपेपर**",
+      hi: "आध्यात्मिक प्रेरणा देने वाले भक्ति भाव से भरपूर वॉलपेपर",
     },
     {
       en: "Daily Mantra for peace and positivity",
-      hi: "शांति एवं सकारात्मकता के लिए दैनिक मंत्र**",
+      hi: "शांति एवं सकारात्मकता के लिए दैनिक मंत्र",
     },
     {
       en: "Personalized Rashifal based on your zodiac",
-      hi: "आध्यात्मिक प्रेरणा देने वाले भक्ति भाव से भरपूर वॉलपेपर**",
+      hi: "आध्यात्मिक प्रेरणा देने वाले भक्ति भाव से भरपूर वॉलपेपर",
     },
     {
       en: "Daily Panchang with auspicious timings",
@@ -103,11 +103,11 @@ export default function Payment() {
           ))}
         </div>
 
-        <div className="container mx-auto px-4 mt-6 flex flex-col space-y-3 font-eng">
+        <div className="mx-auto px-4 mt-6 flex flex-col space-y-3 font-eng justify-between">
           <button className="bg-[#9A283D] text-white py-3 rounded-xl shadow ">
             Get Started
           </button>
-          <button className="border border-[#9A283D] text-[#9A283D] py-3 rounded-xl font-semibold">
+          <button className="border border-[#9A283D] text-[#9A283D] py-3 rounded-xl font-semibold w-[200px] self-center">
             Skip
           </button>
         </div>
@@ -116,7 +116,7 @@ export default function Payment() {
           <h3 className="text-center font-hindi theme_text ">
             आपको क्या प्राप्त होगा
           </h3>
-          <h3 className="text-center text-xl theme_text mb-4 font-eng">
+          <h3 className="text-center text-xl text-black mb-4 font-eng">
             What will you get?
           </h3>
 
@@ -124,13 +124,13 @@ export default function Payment() {
             {items.map((item, index) => (
               <div
                 key={index}
-                className="p-2 flex items-top gap-3"
+                className="p-2 flex items-top gap-3 border border-['#9A283D'] rounded"
               >
                 <Check className="theme_text w-6 h-6 flex-shrink-0" />
 
                 <div className="flex flex-col text-left">
                   <span className="font-hindi font-bold">{item.hi}</span>
-                  <span className="font-eng text-sm">{item.en}</span>
+                  <span className="font-eng text-sm  text-black">{item.en}</span>
                 </div>
               </div>
             ))}

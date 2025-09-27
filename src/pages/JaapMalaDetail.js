@@ -9,6 +9,7 @@ import { Navigation } from "swiper/modules";
 import { LanguageContext } from "../contexts/LanguageContext";
 import Loader from "../components/Loader";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import PageTitleCard from "../components/PageTitleCard";
 
 function JaapMalaDetail() {
   const { id } = useParams();
@@ -33,17 +34,14 @@ function JaapMalaDetail() {
 
   return (
     <>
-      <Header />
-      <div className="flex justify-center items-center mb-3">
-        <p
-          className={`mb-0 text-xl w-auto py-1 bg-[rgba(255,250,244,0.6)] rounded-b-xl mx-auto px-4 theme_text font-bold shadow-md ${fontSize}`}
-        >
-          {language === "hi" ? detail.title.hi : detail.title.en}
-          <span className="font-eng text-sm ml-2">
-            ({language === "hi" ? detail.title.en : detail.title.hi})
-          </span>
-        </p>
-      </div>
+      <Header pageName={{ hi: "tki ekyk", en: "Jaap mala" }} />
+
+      <PageTitleCard
+        titleHi={detail.title.hi}
+        titleEn={detail.title.en} 
+        textSize="text-lg"
+      />
+
       <div className="container mx-auto px-4 relative">
 
         <Swiper
@@ -63,17 +61,17 @@ function JaapMalaDetail() {
                 <div className="flex flex-col items-center justify-center px-4">
                   <div
                     className="relative w-[95%] max-w-md px-6 py-[150px] text-center jaapmala_bg" >
-                    <p className="text-3xl font-bold text-red-900 mb-2">
+                    <p className="text-[20px] font-bold text-red-900 mb-2">
                       {item.name.hi}
                     </p>
                   </div>
 
                   <div className="mt-6 text-center max-w-md">
-                    <p className="text-2xl font-semibold theme_text">अर्थ%</p>
+                    <p className="text-2xl font-semibold theme_text mb-4">अर्थ%</p>
                     <p className="text-lg md:text-lg text-gray-700">
                       {item.meaning.hi}
                     </p>
-                    <p className="text-lg text-gray-500 mt-1 font-eng">
+                    <p className="text-lg text-gray-500 font-eng">
                       {item.meaning.en}
                     </p>
                   </div>

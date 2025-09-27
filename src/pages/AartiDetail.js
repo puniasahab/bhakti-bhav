@@ -4,12 +4,13 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Loader from "../components/Loader";
 import { LanguageContext } from "../contexts/LanguageContext";
+import PageTitleCard from "../components/PageTitleCard";
 
 function AartiDetail() {
   const { id } = useParams();
   const [detail, setDetail] = useState(null);
   const [loading, setLoading] = useState(true);
-    const audioRef = useRef(null);
+  const audioRef = useRef(null);
 
   const { language, fontSize } = useContext(LanguageContext);
 
@@ -32,7 +33,7 @@ function AartiDetail() {
       });
   }, [id]);
 
-  
+
   const handlePlay = () => {
     if (audioRef.current) {
       audioRef.current.play();
@@ -45,23 +46,13 @@ function AartiDetail() {
 
   return (
     <>
-      <Header />
-
-
-
-      <div className="container mx-auto px-4">
-        <div className="flex justify-center items-center mb-3">
-          <p
-            className={`mb-0 text-xl w-auto py-1 bg-[rgba(255,250,244,0.6)] rounded-b-xl mx-auto px-4 theme_text border-tl-[#EF5300] font-bold shadow-md`}
-          >
-            {detail.name?.hi}
-            
-            <span className="font-eng text-sm ml-2">
-               ({detail.name?.en})
-            </span>
-          </p>
-        </div>
-
+      <Header pageName={{ hi: "vkjrh", en: "Aarti" }} hindiFontSize="true" />
+      <PageTitleCard
+        titleHi={"vkjrh"}
+        titleEn={"Aarti"} 
+        textSize="text-lg"
+      />
+      <div className="container mx-auto px-4"> 
         {detail.imageUrl && (
           <img
             src={
@@ -99,7 +90,7 @@ function AartiDetail() {
           </div>
         </div>
 
-        <div className={`theme_text text-base leading-loose mt-4 text-center ${language === "hi" ? "font-hindi" : "font-eng"}`}>
+        <div className={`theme_text text-base leading-loose mt-4 text-center ${fontSize}  ${language === "hi" ? "font-hindi" : "font-eng"}`}>
           {language === "hi"
             ? detail.description?.hi.split("\n").map((line, idx) => (
               <p key={idx}>{line.replace(/,/g, ']')}</p>
@@ -110,24 +101,23 @@ function AartiDetail() {
           }
         </div>
 
+        <div className="flex justify-center gap-4 my-6">
+          <div className="mt-4">
+            {detail.audioUrl && (
+              <button
+                onClick={handlePlay}
+                className="bg-[#9A283D] text-white px-6 py-2 rounded-full shadow flex items-center"
+              >
+                <span className="audio_icon mr-2"></span> vkjrh lqusa
+              </button>
+            )}
 
-        <div className="mt-4 text-center">
-          <p
-            className={`theme_text ${language === "hi" ? fontSize : `italic font-eng ${fontSize}`}`}
-          >
-            {language === "hi" ? detail.description?.hi : detail.description?.en}
-          </p>
-        </div>
-
-        {/* Audio */}
-        {detail.audioUrl && (
-          <div className="mt-6 flex justify-center">
-            <audio controls className="w-full max-w-md">
-              <source src={detail.audioUrl} type="audio/mp3" />
+            <audio ref={audioRef} className="hidden">
+              <source src={detail.audioUrl} type="audio/mpeg" />
               Your browser does not support the audio element.
             </audio>
           </div>
-        )}
+        </div>
 
         {/* Text */}
         {detail.text && (

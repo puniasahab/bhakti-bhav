@@ -4,6 +4,7 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { LanguageContext } from "../contexts/LanguageContext";
 import Loader from "../components/Loader";
+import PageTitleCard from "../components/PageTitleCard";
 
 export default function ChalisaDetail() {
   const { id } = useParams();
@@ -51,18 +52,13 @@ export default function ChalisaDetail() {
 
   return (
     <>
-      <Header />
+      <Header pageName={{ hi: "pkyhlk", en: "Chalisa" }} hindiFontSize="true" />
 
-      <div className="flex justify-center items-center mb-3">
-        <p
-          className={`mb-0 text-xl w-auto py-1 bg-[rgba(255,250,244,0.6)] rounded-b-xl mx-auto px-4 theme_text border-tl-[#EF5300] font-bold shadow-md`}
-        >
-          {language === "hi" ? chalisa.name.hi : chalisa.name.en}
-          <span className="font-eng text-sm ml-2">
-            ({language === "hi" ? chalisa.name.en : chalisa.name.hi})
-          </span>
-        </p>
-      </div>
+      <PageTitleCard
+        titleHi={chalisa.name.hi}
+        titleEn={chalisa.name.en}
+        textSize="text-lg"
+      />
 
       <div className="container mx-auto px-4 mt-4">
 
@@ -95,7 +91,7 @@ export default function ChalisaDetail() {
                 onClick={handlePlay}
                 className="bg-[#9A283D] text-white px-6 py-2 rounded-full shadow flex items-center"
               >
-                <span className="audio_icon mr-2"></span> vkjrh lqusa
+                <span className="audio_icon mr-2"></span> pkyhlk lqusa
               </button>
             )}
 
@@ -108,7 +104,7 @@ export default function ChalisaDetail() {
 
 
 
-        <div className={`theme_text text-center text-base leading-loose ${language === "hi" ? "font-hindi" : "font-eng"}`}>
+        <div className={`theme_text text-center text-base leading-loose ${fontSize} ${language === "hi" ? "font-hindi" : "font-eng"}`}>
           {language === "hi"
             ? chalisa.text.hi.split("\n").map((line, idx) => (
               <p key={idx}>{line.replace(/,/g, ']')}</p>
@@ -118,7 +114,7 @@ export default function ChalisaDetail() {
             ))
           }
         </div>
- 
+
       </div>
 
       <Footer />
