@@ -1,19 +1,22 @@
 {
   "files": {
-    "main.css": "/static/css/main.4e0df0cc.css",
-    "main.js": "/static/js/main.0fa7b0ef.js",
+    "main.css": "/static/css/main.b53bff99.css",
+    "main.js": "/static/js/main.db69e7d9.js",
+    "static/media/repeat_bg.png": "/static/media/repeat_bg.8dd1983cdffb3ac0324e.png",
     "static/media/jaapMala_bgs.png": "/static/media/jaapMala_bgs.ee5726354a96ee5ed2da.png",
     "static/media/Poppins-Regular.ttf": "/static/media/Poppins-Regular.35d26b781dc5fda684cc.ttf",
     "static/media/Poppins-SemiBold.ttf": "/static/media/Poppins-SemiBold.ac8d04b620e54be9b0f0.ttf",
     "static/media/Poppins-Bold.ttf": "/static/media/Poppins-Bold.cdb29a5d7ccf57ff05a3.ttf",
+    "static/media/banner_bg.png": "/static/media/banner_bg.b7d5124c9018e38f75ed.png",
+    "static/media/kundali_banner.png": "/static/media/kundali_banner.dbc2e90cee68507fd738.png",
     "static/media/Kruti_Dev_714_Normal.ttf": "/static/media/Kruti_Dev_714_Normal.1fd4f8bbe197c180100b.ttf",
     "index.html": "/index.html",
     "static/media/back_icon.svg": "/static/media/back_icon.7e7814d35251d606ef1805bb74b76d9f.svg",
-    "main.4e0df0cc.css.map": "/static/css/main.4e0df0cc.css.map",
-    "main.0fa7b0ef.js.map": "/static/js/main.0fa7b0ef.js.map"
+    "main.b53bff99.css.map": "/static/css/main.b53bff99.css.map",
+    "main.db69e7d9.js.map": "/static/js/main.db69e7d9.js.map"
   },
   "entrypoints": [
-    "static/css/main.4e0df0cc.css",
-    "static/js/main.0fa7b0ef.js"
+    "static/css/main.b53bff99.css",
+    "static/js/main.db69e7d9.js"
   ]
 }
