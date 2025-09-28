@@ -106,12 +106,15 @@ export default function ChalisaDetail() {
 
         <div className={`theme_text text-center text-base leading-loose ${fontSize} ${language === "hi" ? "font-hindi" : "font-eng"}`}>
           {language === "hi"
-            ? chalisa.text.hi.split("\n").map((line, idx) => (
-              <p key={idx}>{line.replace(/,/g, ']')}</p>
-            ))
-            : chalisa.text.en.split("\n").map((line, idx) => (
-              <p key={idx}>{line}</p>
-            ))
+            ? 
+            <div dangerouslySetInnerHTML={{ __html: chalisa.text.hi}} />
+            // chalisa.text.hi.split("\n").map((line, idx) => (
+            //   <p key={idx}>{line.replace(/,/g, ']')}</p>
+            // ))
+            // : chalisa.text.en.split("\n").map((line, idx) => (
+            //   <p key={idx}>{line}</p>
+            // ))
+            :<div dangerouslySetInnerHTML={{ __html: chalisa.text.en}} />
           }
         </div>
 

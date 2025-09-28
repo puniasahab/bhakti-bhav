@@ -1,3 +1,5 @@
+// const wallpaper = require('wallpaper');
+
 export const setTokenInLS = (token) => {
     localStorage.setItem('authToken', token);
 }
@@ -13,3 +15,7 @@ export const removeTokenFromLS = () => {
 export const isAuthenticated = () => {
     return !!getTokenFromLS();
 }
+
+// export async function setWallpaper(imagePath) {
+//     await wallpaper.set(imagePath);
+// }

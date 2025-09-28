@@ -40,8 +40,8 @@ export default function Chalisa() {
       <Header pageName={{ hi: "pkyhlk", en: "Chalisa" }} />
 
       <PageTitleCard
-        titleHi={chalisa.title.hi}
-        titleEn={chalisa.title.en}
+        titleHi={"चालीसा"}
+        titleEn={"Chalisa"}
         textSize="text-lg"
       /> 
 

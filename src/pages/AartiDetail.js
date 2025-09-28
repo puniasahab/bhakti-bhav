@@ -92,12 +92,16 @@ function AartiDetail() {
 
         <div className={`theme_text text-base leading-loose mt-4 text-center ${fontSize}  ${language === "hi" ? "font-hindi" : "font-eng"}`}>
           {language === "hi"
-            ? detail.description?.hi.split("\n").map((line, idx) => (
-              <p key={idx}>{line.replace(/,/g, ']')}</p>
-            ))
-            : detail.description?.en.split("\n").map((line, idx) => (
-              <p key={idx}>{line}</p>
-            ))
+            ? 
+            // detail.description?.hi.split("\n").map((line, idx) => (
+            //   <p key={idx}>{line.replace(/,/g, ']')}</p>
+            // ))
+            <div dangerouslySetInnerHTML={{ __html: detail.description?.hi }} />
+            : 
+              // detail.description?.en.split("\n").map((line, idx) => (
+              //   <p key={idx}>{line}</p>
+              // ))
+            <div dangerouslySetInnerHTML={{ __html: detail.description?.en }} />
           }
         </div>
 

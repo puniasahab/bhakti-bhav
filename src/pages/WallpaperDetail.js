@@ -36,6 +36,89 @@ function WallpaperDetail() {
   if (loading) return <Loader message="🙏 Loading भक्ति भाव 🙏" size={200} />;
   if (!detail) return <p>No data found!</p>;
 
+  const handleShare = (imageUrl) => {
+    // const shareUrl = `https://yourapp.com/wallpaper/${wallpaperId}`;
+    if (navigator.share) {
+      navigator
+        .share({
+          title: "Check out this wallpaper!",
+          text: "Beautiful wallpaper for your phone/desktop.",
+          url: imageUrl,
+        })
+        .catch(console.error);
+    } else {
+      // Fallback: copy link
+      navigator.clipboard.writeText(imageUrl);
+      alert("Link copied to clipboard!");
+    }
+  }
+  const handleWhatsAppShare = (imageUrl) => {
+    // First try Web Share API for better image sharing support
+    if (navigator.share && navigator.canShare && navigator.canShare({ files: [] })) {
+      // Try to fetch and share the image as a file
+      fetch(imageUrl)
+        .then(response => response.blob())
+        .then(blob => {
+          const file = new File([blob], 'bhakti-bhav-wallpaper.jpg', { type: 'image/jpeg' });
+          const shareData = {
+            title: '🙏 Beautiful wallpaper from Bhakti Bhav! 🙏',
+            text: '📱 Please download Bhakti Bhav app from Play Store for more spiritual wallpapers, mantras, and devotional content!\n\n🔗 https://play.google.com/store/apps/details?id=com.bhaktibhav',
+            files: [file]
+          };
+          
+          if (navigator.canShare(shareData)) {
+            return navigator.share(shareData);
+          } else {
+            throw new Error('Cannot share files');
+          }
+        })
+        .catch(() => {
+          // Fallback to WhatsApp URL with optimized message
+          const message = `🙏 Beautiful wallpaper from Bhakti Bhav! 🙏
+
+Check out this amazing wallpaper: ${imageUrl}
+
+📱 Download Bhakti Bhav app from Play Store for more spiritual content!
+🔗 https://play.google.com/store/apps/details?id=com.bhaktibhav`;
+          
+          const whatsappUrl = `whatsapp://send?text=${encodeURIComponent(message)}`;
+          const whatsappWebUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+          
+          // Try WhatsApp app first, then web version
+          const tryWhatsAppApp = () => {
+            window.location.href = whatsappUrl;
+            // Fallback to web version after a short delay if app doesn't open
+            setTimeout(() => {
+              window.open(whatsappWebUrl, '_blank');
+            }, 1000);
+          };
+          
+          tryWhatsAppApp();
+        });
+    } else {
+      // Fallback for browsers without Web Share API
+      const message = `🙏 Beautiful wallpaper from Bhakti Bhav! 🙏
+
+Check out this amazing wallpaper: ${imageUrl}
+
+📱 Download Bhakti Bhav app from Play Store for more spiritual content!
+🔗 https://play.google.com/store/apps/details?id=com.bhaktibhav`;
+      
+      const whatsappUrl = `whatsapp://send?text=${encodeURIComponent(message)}`;
+      const whatsappWebUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+      
+      // Try WhatsApp app first, then web version
+      try {
+        window.location.href = whatsappWebUrl;
+        setTimeout(() => {
+          window.open(whatsappWebUrl, '_blank');
+        }, 1000);
+      } catch (error) {
+        window.open(whatsappWebUrl, '_blank');
+      }
+    }
+  };
+
   return (
     <>
 
@@ -50,7 +133,7 @@ function WallpaperDetail() {
 
       <PageTitleCard
         titleHi={"okYisij"}
-        titleEn={"Wallpaper"} 
+        titleEn={"Wallpaper"}
         textSize="text-lg"
       />
 
@@ -58,7 +141,7 @@ function WallpaperDetail() {
         <div className="flex flex-col space-y-8">
           <div className="flex-1 flex justify-center items-center p-4">
             <img
-              src={`https://api.bhaktibhav.app${detail.imageUrl}`}
+              src={`${detail.imageUrl}`}
               alt={detail.godName}
               className="max-w-[300px] max-h-[300px] mx-auto mt-4 rounded-lg shadow-lg"
             />
@@ -74,7 +157,7 @@ function WallpaperDetail() {
             <button className="px-6 py-2 border-2 border-[#9A283D] rounded-xl theme_text">
               Download
             </button>
-            <button className="px-6 py-2 border-2 border-[#9A283D] rounded-xl theme_text">
+            <button className="px-6 py-2 border-2 border-[#9A283D] rounded-xl theme_text" onClick={handleWhatsAppShare.bind(this, detail.imageUrl)}>
               Share
             </button>
           </div>
@@ -88,7 +171,7 @@ function WallpaperDetail() {
                   {["Home Screen", "Lock Screen", "Both"].map((option) => (
                     <button
                       key={option}
-                      onClick={() => setMethod(option)}
+                      onClick={() => { setMethod(option) }}
                       className={`w-full py-2 border-2 rounded-xl ${method === option
                         ? "bg-[#9A283D] text-white border-[#9A283D]"
                         : "border-[#9A283D] text-[#9A283D]"

@@ -232,16 +232,9 @@ function VratKathaDetail() {
 
                     </h2>
                     {language === "hi"
-                        ? detail.pujaMahatva?.hi?.split("\n\n").map((line, idx) => (
-                            <p key={idx} className={`font-hindi text-[rgba(0,0,0,0.7)] ${fontSize}`}>
-                                {line.replace(/,/g, '•')}
-                            </p>
-                        ))
-                        : detail.pujaMahatva?.en?.split("\n\n").map((line, idx) => (
-                            <p key={idx} className={`font-eng text-[rgba(0,0,0,0.7)] ${fontSize}`}>
-                                {line}
-                            </p>
-                        ))}
+                        ? <div className = {`font-eng text-[rgba(0,0,0,0.7)] ${fontSize}`} dangerouslySetInnerHTML={{ __html: detail.pujaMahatva?.hi }} />
+                        : <div className = {`font-eng text-[rgba(0,0,0,0.7)] ${fontSize}`} dangerouslySetInnerHTML={{ __html: detail.pujaMahatva?.en }} />
+                    }
                 </div>
 
                 <div className="mt-4 w-full text-center">
