@@ -192,11 +192,18 @@ function VratKathaDetail() {
 
                     </h2>
                     {language === "hi"
-                        ? detail.pujaMahatva?.hi?.split("\n").map((line, idx) => (
-                            <p key={idx} className={`font-hindi text-[rgba(0,0,0,0.7)] ${fontSize}`}>
-                                {line.replace(/,/g, '•')}
-                            </p>
-                        ))
+                        ? 
+
+                        (<div dangerouslySetInnerHTML={{ __html: detail.pujaMahatva?.hi }} />)
+                        // <pre>
+                        //     {detail.pujaMahatva?.hi}
+                        // </pre>
+                        
+                        // detail.pujaMahatva?.hi?.split("\n").map((line, idx) => (
+                        //     <p key={idx} className={`font-hindi text-[rgba(0,0,0,0.7)] ${fontSize}`}>
+                        //         {line.replace(/,/g, '•')}
+                        //     </p>
+                        // ))
                         : detail.pujaMahatva?.en?.split("\n").map((line, idx) => (
                             <p key={idx} className={`font-eng text-[rgba(0,0,0,0.7)] ${fontSize}`}>
                                 {line}
