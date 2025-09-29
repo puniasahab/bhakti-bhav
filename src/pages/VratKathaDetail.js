@@ -139,9 +139,9 @@ function VratKathaDetail() {
                     </div>
                 </div>
 
-                <div className="text-center my-8 text-2xl">
-                    <p className={`${language === "hi" ? " font-hindi" : "hidden"} text-[#9A283D] ${fontSize}`}>{detail.mantra?.hi}</p>
-                    <p className={`${language === "en" ? " font-eng" : "hidden"} text-[#9A283D] ${fontSize}`}>{detail.mantra?.en}</p>
+                <div className="text-center my-8 text-xl">
+                    <p className={`${language === "hi"  ? " font-hindi" : "hidden"} text-[#9A283D] ${fontSize}`}>{detail.mantra?.hi}</p>
+                    <p className={`${language === "en" ? " font-eng" : "hidden"} text-[#9A283D] ${fontSize}`}>{detail.mantra?.hi}</p>
                 </div>
 
                 <div className="mb-4">
