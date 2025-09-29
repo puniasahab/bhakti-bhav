@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
+import Header from '../components/Header';
 
 const AboutUs = () => {
   const navigate = useNavigate();
@@ -17,31 +18,7 @@ const AboutUs = () => {
         fontFamily: "'KrutiDev', sans-serif"
       }}
     >
-      {/* Header with Back Button */}
-      <header className="p-4">
-        <div className="container mx-auto hd_bg rounded-xl">
-          <div className="flex justify-between items-center px-4 py-6">
-            <div className="flex items-center">
-              <button 
-                onClick={handleBack}
-                className="mr-4 p-2 rounded-full bg-[#610419] text-white hover:bg-[#7a0028] transition-colors"
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </button>
-              <h1 className="text-lg font-eng font-bold theme_text" style={{fontSize: '20px'}}>About Us</h1>
-            </div>
-            {/* <Link to="/" className="rupees_icon"> */}
-              <img 
-                src="/img/logo.png" 
-                alt="Logo" 
-                className="max-w-full h-auto" 
-                style={{width: '100px', height: '22px'}} 
-              />
-            {/* </Link> */}
-          </div>
-        </div>
-      </header>
-
+      <Header />
       {/* Main Content */}
       <main className="p-4">
         <div className="container mx-auto">

@@ -22,7 +22,7 @@ function Header({
     const navigate = useNavigate();
     const { language, setLanguage, fontSize, setFontSize } = useContext(LanguageContext);
  
-    const homeRoutes = ["/", "/home", "/Rashifal", "/payment", "/hindi-calendar", "/vrat-katha", "/chalisa", "/aarti", '/jaap-mala', "/mantra", "/wallpaper"];
+    const homeRoutes = ["/", "/home", "/Rashifal", "/payment", "/hindi-calendar", "/vrat-katha", "/chalisa", "/aarti", '/jaap-mala', "/mantra", "/wallpaper", "/termsAndConditions", "/aboutUs", "/privacyPolicy"];
 
     const isHomeRoute = homeRoutes.includes(pathname);
 
