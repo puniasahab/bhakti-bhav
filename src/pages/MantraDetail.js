@@ -64,12 +64,12 @@ export default function MantraDetail() {
         <div className="flex justify-center mb-6">
           <img
             src={
-              detail.image?.startsWith("http")
-                ? detail.image
-                : `https://api.bhaktibhav.app${detail.image}`
+              detail.imageUrl?.startsWith("http")
+                ? detail.imageUrl
+                : `https://api.bhaktibhav.app${detail.imageUrl}`
             }
             alt={detail.name?.hi || detail.name?.en}
-            className="max-w-[300px] max-h-[300px] mx-auto mt-4 rounded-lg shadow-lg"
+            className="max-w-[300px] max-h-[300px] mx-auto mt-4 rounded-xl shadow-lg"
           />
         </div>
 
