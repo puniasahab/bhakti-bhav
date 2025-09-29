@@ -37,23 +37,23 @@ function Home() {
                 const res = await fetch("https://api.bhaktibhav.app/frontend/daily-panchang");
                 const data = await res.json();
 
-                if (data?.status === "success" && data.data) {
+                if (data?.success && data.data) {
 
                     const formatted = [
                         {
                             side: "left",
                             items: [
-                                `तिथि % ${data.data.tithi || "-"}`,
-                                `नक्षत्र % ${data.data.nakshatra || "-"}`,
-                                `करण % ${data.data.karan || "-"}`,
+                                `तिथि % ${data.data.tithi.hi || "-"}`,
+                                `नक्षत्र % ${data.data.nakshatra.hi || "-"}`,
+                                `करण % ${data.data.karana.hi || "-"}`,
                             ],
                         },
                         {
                             side: "right",
                             items: [
-                                `पक्ष % ${data.data.paksha || "-"}`,
-                                `योग % ${data.data.yoga || "-"}`,
-                                `वार % ${data.data.var || "-"}`,
+                                `पक्ष % ${data.data.paksha.hi || "-"}`,
+                                `योग % ${data.data.yoga.hi || "-"}`,
+                                `वार % ${data.data.vaar.hi || "-"}`,
                             ],
                         },
                     ];
@@ -218,9 +218,12 @@ function Home() {
                             <div className="grid grid-cols-2 gap-4 p-3 border border-[#9A283D] bg-[rgba(255,250,244,0.6)] font-hindi theme_text rounded-xl">
                                 {panchangData.map((col, index) => (
                                     <div key={index} className="text-left pr-2 text-xl">
-                                        {col.items.map((text, i) => (
-                                            <p key={i}>{text}</p>
-                                        ))}
+                                        {col.items.map((text, i) => {
+                                            console.log({text});
+                                            return (
+                                                <p key={i}>{text}</p>
+                                            )
+                                        })}
                                     </div>
                                 ))}
                             </div>
