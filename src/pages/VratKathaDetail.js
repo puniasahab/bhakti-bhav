@@ -45,6 +45,15 @@ function VratKathaDetail() {
             });
     }, [id]);
 
+    const redirectToAartiPage = (artiId) => {
+        if (!artiId) {
+            // alert("No Arti ID available for this Katha.");
+            return "/aarti";
+        }
+
+        return `/aarti/${artiId}`;
+    };
+
     const handlePlay = (url) => {
         if (!url) return;
         if (currentAudio === url) {
@@ -238,7 +247,7 @@ function VratKathaDetail() {
                 </div>
 
                 <div className="mt-4 w-full text-center">
-                    <a href="/aarti"
+                    <a href={redirectToAartiPage(detail.artiId)}
                         className="bg-[#9A283D] text-white px-6 py-2 rounded-full shadow inline-flex items-center"
                     >
                         <span className="audio_icon mr-2"></span> vkjrh
