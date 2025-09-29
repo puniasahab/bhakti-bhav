@@ -35,7 +35,7 @@ function JaapMala() {
       <PageTitleCard
         titleHi={"tkkp ekyk"}
         titleEn={"Jaap mala"}
-        textSize="text-lg"
+        
       />
 
       <div className="container mx-auto px-4">
@@ -69,7 +69,7 @@ function JaapMala() {
           ))}
         </ul>
       </div>
-      <Footer />
+      
     </>
   );
 }

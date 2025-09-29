@@ -39,7 +39,7 @@ function JaapMalaDetail() {
       <PageTitleCard
         titleHi={detail.title.hi}
         titleEn={detail.title.en} 
-        textSize="text-lg"
+        
       />
 
       <div className="container mx-auto px-4 relative">
@@ -87,7 +87,7 @@ function JaapMalaDetail() {
           <ChevronRight className="theme_text" />
         </div>
       </div>
-      <Footer />
+      
     </>
   );
 }

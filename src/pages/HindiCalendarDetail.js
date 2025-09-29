@@ -35,10 +35,10 @@ function HindiCalendarDetail() {
 
     fetchMonth();
   }, [id]);
- 
+
   if (loading) return <Loader message="🙏 Loading भक्ति भाव 🙏" size={200} />;
   if (!month) return <p className="text-center mt-10 text-white">❌ Month not found</p>;
- 
+
   let monthName = { hi: "अज्ञात", en: "Unknown" };
   try {
     monthName = typeof month.month === "string" ? JSON.parse(month.month) : month.month;
@@ -47,21 +47,21 @@ function HindiCalendarDetail() {
   }
 
   return (
-    <> 
+    <>
       <Header pageName={{ hi: "fgUnh dySaMj", en: "Hindi Calender" }} />
 
       <PageTitleCard
         titleHi={"fgUnh dySaMj"}
         titleEn={"Hindi Calender"}
-        textSize="text-lg"
-      /> 
 
-      <div className="px-4 mt-6"> 
+      />
+
+      <div className="px-4 mt-6">
         <h2 className="theme_text text-2xl font-bold mb-4">
           {monthName.hi}{" "}
           <span className="font-eng">({monthName.en}) – {month.year}</span>
         </h2>
- 
+
         {month.imageUrl && (
           <div className="mb-6">
             <img
@@ -72,36 +72,41 @@ function HindiCalendarDetail() {
           </div>
         )}
 
-        {/* Festivals */} 
+        {/* Festivals */}
         {month.festivals?.length ? (
           <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
             {month.festivals.map((festival) => {
               const dateObj = new Date(festival.date);
               const day = dateObj.getDate().toString().padStart(2, "0");
-              const weekday = dayData[dateObj.getDay()];
+
+              const weekdayHi = dateObj.toLocaleDateString("hi-IN", { weekday: "long" });
+              const weekdayEn = dateObj.toLocaleDateString("en-US", { weekday: "long" });
 
               return (
                 <li
                   key={festival._id}
-                  className="bg-[#9A283D] text-white rounded-lg flex items-center justify-between px-4 py-3 shadow-md"
+                  className="bg-[#9A283D] text-white rounded-lg flex items-center px-4 py-3 shadow-md"
                 >
-                  {/* Date */}
-                  <div className="flex flex-row items-center text-sm font-medium">
-                    <span className="text-lg font-eng mr-2">{day}</span>
-                    <span className="text-xs font-eng">{weekday}</span>
+                  <div className="flex items-center text-sm font-medium w-1/2">
+                    <div className="text-lg font-bold font-eng mr-2">{day}</div>
+                    <div>
+                      <p className="font-hindi text-lg">{weekdayHi}</p>
+                      <p className="font-eng text-sm">({weekdayEn})</p>
+                    </div>
                   </div>
 
                   <div className="w-px h-10 bg-white/50 mx-3"></div>
 
-                  {/* Festival Name */}
-                  <div className="flex flex-col flex-1">
-                    <span className="font-semibold">{festival.name.hi}</span>
-                    <span className="text-xs text-gray-200 font-eng">
+                  <div className="flex flex-col w-[70%]">
+                    <span className="text-lg font-hindi">{festival.name.hi}</span>
+                    <span className="text-sm font-eng">
                       {festival.name.en}
                     </span>
                   </div>
 
-                  <div className="ml-3 text-xl font-eng">›</div>
+                  <div className="ml-3">
+                    <span className="text-3xl font-eng">›</span>
+                  </div>
                 </li>
               );
             })}
@@ -111,7 +116,7 @@ function HindiCalendarDetail() {
         )}
       </div>
 
-      <Footer />
+
     </>
   );
 }

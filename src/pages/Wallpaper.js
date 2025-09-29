@@ -111,7 +111,7 @@ export default function Wallpaper() {
         </ul>
       </div>
 
-      <Footer />
+      
     </>
   );
 }

@@ -90,7 +90,6 @@ function Rashifal() {
       <PageTitleCard
         titleHi={"vkt dk jkf'kQy"}
         titleEn={"Aaj Ka Rashifal"}
-        textSize="text-lg"
       />
 
         <div className="container mx-auto mt-4 px-4">
@@ -150,7 +149,7 @@ function Rashifal() {
                   <ul className="list-disc list-inside space-y-1">
                     {selectedRashi.content.hi.map((line, idx) => (
                       <li key={idx} className="text-lg leading-relaxed">
-                        {line}
+                        {line.replace(/\.\.\./g, "---").replace(/,/g, "]")}
                       </li>
                     ))}
                   </ul>
@@ -160,7 +159,7 @@ function Rashifal() {
                   <ul className="list-disc list-inside space-y-1 mt-4">
                     {selectedRashi.content.en.map((line, idx) => (
                       <li key={idx} className="text-lg leading-relaxed font-eng">
-                        {line}
+                        {line.replace(/\.\.\./g, "---").replace(/,/g, "]")}
                       </li>
                     ))}
                   </ul>
@@ -179,7 +178,7 @@ function Rashifal() {
           </div>
         )}
 
-      <Footer />
+      
     </>
   );
 }

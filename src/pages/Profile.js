@@ -44,7 +44,7 @@ const Profile = () => {
                 <InfoCard label="Email" value={profile.email} />
                 <InfoCard label="State" value={profile.state} />
             </div>
-            <Footer />
+            
         </div>
     );
 };

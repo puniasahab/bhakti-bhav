@@ -35,7 +35,7 @@ export default function PujaKare() {
       <PageTitleCard
         titleHi={items.title.hi}
         titleEn={items.title.en}
-        textSize="text-lg"
+        
       /> 
 
       <div className="mt-4 container mx-auto px-4">
@@ -54,7 +54,7 @@ export default function PujaKare() {
                   />
                 </div>
                 <div className="p-2">
-                  <h2 className="md:text-3xl text-lg font-normal">{item.title}</h2>
+                  <h2 className="md:text-lg text-lg font-semibold truncate font-hindi pt-2">{item.title}</h2>
                 </div>
               </Link>
             </li>
@@ -62,7 +62,7 @@ export default function PujaKare() {
         </ul>
       </div>
 
-      <Footer />
+      
     </>
   );
 }

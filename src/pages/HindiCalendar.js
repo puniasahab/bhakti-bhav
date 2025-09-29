@@ -48,11 +48,11 @@ export default function HindiCalendar() {
       <PageTitleCard
         titleHi={"fgUnh dySaMj"}
         titleEn={"Hindi Calender"}
-        textSize="text-lg"
-      /> 
 
-      <main className="px-4 mt-6">
-        <div className="container mx-auto"> 
+      />
+
+      <div className="px-4 mt-6">
+        <div className="container mx-auto">
           <ul className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
             {months.map((m, idx) => {
               const monthData = JSON.parse(m.month);
@@ -80,42 +80,48 @@ export default function HindiCalendar() {
                 {currentMonth.festivals.map((festival) => {
                   const dateObj = new Date(festival.date);
                   const day = dateObj.getDate().toString().padStart(2, "0");
-                  const weekday = dateObj.toLocaleDateString("hi-IN", {
-                    weekday: "long",
-                  });
+ 
+                  const weekdayHi = dateObj.toLocaleDateString("hi-IN", { weekday: "long" });
+                  const weekdayEn = dateObj.toLocaleDateString("en-US", { weekday: "long" });
 
                   return (
                     <li
                       key={festival._id}
-                      className="bg-[#9A283D] text-white rounded-lg flex items-center justify-between px-4 py-3 shadow-md"
-                    >
-                      <div className="flex flex-col items-start text-sm font-medium">
-                        <span className="text-lg font-bold font-eng">{day}</span>
-                        <span className="text-xs">{weekday}</span>
+                      className="bg-[#9A283D] text-white rounded-lg flex items-center px-4 py-3 shadow-md"
+                    > 
+                      <div className="flex items-center text-sm font-medium w-1/2">
+                        <div className="text-lg font-bold font-eng mr-2">{day}</div>
+                        <div>
+                          <p className="font-hindi text-lg">{weekdayHi}</p>
+                          <p className="font-eng text-sm">({weekdayEn})</p>
+                        </div>
                       </div>
-
+ 
                       <div className="w-px h-10 bg-white/50 mx-3"></div>
-
-                      <div className="flex flex-col flex-1">
-                        <span className="font-semibold">{festival.name.hi}</span>
-                        <span className="text-xs text-gray-200 font-eng">
+ 
+                      <div className="flex flex-col w-[70%]">
+                        <span className="text-lg font-hindi">{festival.name.hi}</span>
+                        <span className="text-sm font-eng">
                           {festival.name.en}
                         </span>
                       </div>
-
+ 
                       <div className="ml-3">
-                        <span className="text-xl font-eng">›</span>
+                        <span className="text-3xl font-eng">›</span>
                       </div>
                     </li>
                   );
                 })}
               </ul>
+
+
+
             </section>
           )}
         </div>
-      </main>
+      </div>
 
-      <Footer />
+      
     </div>
   );
 }

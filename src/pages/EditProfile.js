@@ -161,7 +161,7 @@ function EditProfile() {
           </button>
         </form>
       </div>
-      <Footer />
+      
     </>
   );
 }

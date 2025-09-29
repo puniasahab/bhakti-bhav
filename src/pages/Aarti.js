@@ -44,8 +44,7 @@ export default function Aarti() {
 
       <PageTitleCard
         titleHi={"vkjrh"}
-        titleEn={"Aarti"} 
-        textSize="text-lg"
+        titleEn={"Aarti"}  
       />
       
       <div className="container mx-auto px-4 mt-6">
@@ -84,7 +83,7 @@ export default function Aarti() {
         </ul>
       </div>
 
-      <Footer />
+      
     </>
   );
 }

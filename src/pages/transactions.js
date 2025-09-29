@@ -75,7 +75,7 @@ function Transactions() {
           ))}
         </div>
       </div>
-      <Footer />
+      
     </>
   );
 }

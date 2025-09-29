@@ -27,7 +27,7 @@ function Header({
     const isHomeRoute = homeRoutes.includes(pathname);
 
     return (
-        <header className="px-4">
+        <header className="px-4 pt-3">
             <div className="container mx-auto hd_bg rounded-xl">
                 <div className="flex justify-between items-center px-4 py-6">
  

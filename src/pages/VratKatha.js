@@ -41,7 +41,7 @@ export default function VratKatha() {
       <PageTitleCard
         titleHi={"dFkk"}
         titleEn={"Katha"}
-        textSize="text-lg"
+        
       />
 
       <div className="container mx-auto px-4 mt-4">
@@ -76,7 +76,7 @@ export default function VratKatha() {
         </ul>
       </div>
 
-      <Footer />
+      
     </>
   );
 }

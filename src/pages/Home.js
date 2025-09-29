@@ -4,14 +4,14 @@ import Footer from "../components/Footer";
 import { Link } from "react-router-dom";
 import TodayThoughts from "../components/TodayThoughts";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Pagination, Autoplay } from "swiper/modules"; 
+import { Pagination, Autoplay } from "swiper/modules";
 
 import "swiper/css";
 import "swiper/css/pagination";
 
 function Home() {
 
-    const [isOpen, setIsOpen] = useState(false); 
+    const [isOpen, setIsOpen] = useState(false);
     const [panchangData, setPanchangData] = useState([]);
 
 
@@ -29,20 +29,21 @@ function Home() {
                         {
                             side: "left",
                             items: [
-                                `तिथि % ${data.data.tithi.hi || "-"}`,
-                                `नक्षत्र % ${data.data.nakshatra.hi || "-"}`,
-                                `करण % ${data.data.karana.hi || "-"}`,
+                                <span><strong>तिथि</strong> % {data.data.tithi.hi || "-"}</span>,
+                                <span><strong>नक्षत्र</strong> % {data.data.nakshatra.hi || "-"}</span>,
+                                <span><strong>करण</strong> % {data.data.karana.hi || "-"}</span>,
                             ],
                         },
                         {
                             side: "right",
                             items: [
-                                `पक्ष % ${data.data.paksha.hi || "-"}`,
-                                `योग % ${data.data.yoga.hi || "-"}`,
-                                `वार % ${data.data.vaar.hi || "-"}`,
+                                <span><strong>पक्ष</strong> % {data.data.paksha.hi || "-"}</span>,
+                                <span><strong>योग</strong> % {data.data.yoga.hi || "-"}</span>,
+                                <span><strong>वार</strong> % {data.data.vaar.hi || "-"}</span>,
                             ],
                         },
                     ];
+
                     setPanchangData(formatted);
                 } else {
                     setPanchangData([]);
@@ -203,9 +204,9 @@ function Home() {
                         <div className="p-6 max-h-[80vh] overflow-y-auto">
                             <div className="grid grid-cols-2 gap-4 p-3 border border-[#9A283D] bg-[rgba(255,250,244,0.6)] font-hindi theme_text rounded-xl">
                                 {panchangData.map((col, index) => (
-                                    <div key={index} className="text-left pr-2 text-xl">
+                                    <div key={index} className=" mx-auto text-xl text-center">
                                         {col.items.map((text, i) => {
-                                            console.log({text});
+                                            console.log({ text });
                                             return (
                                                 <p key={i}>{text}</p>
                                             )

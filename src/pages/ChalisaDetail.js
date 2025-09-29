@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext, useRef } from "react";
-import { useParams} from "react-router-dom";
+import { useParams } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { LanguageContext } from "../contexts/LanguageContext";
@@ -8,7 +8,7 @@ import PageTitleCard from "../components/PageTitleCard";
 
 export default function ChalisaDetail() {
   const { id } = useParams();
-  const [chalisa, setChalisa] = useState(null);  
+  const [chalisa, setChalisa] = useState(null);
   const [loading, setLoading] = useState(true);
   const audioRef = useRef(null);
 
@@ -57,23 +57,22 @@ export default function ChalisaDetail() {
       <PageTitleCard
         titleHi={chalisa.name.hi}
         titleEn={chalisa.name.en}
-        textSize="text-lg"
       />
 
       <div className="container mx-auto px-4 mt-4">
 
         {chalisa.imageUrl && (
-          <div className="w-full h-64 flex items-center justify-center mb-4">
-            <img
-              src={
+          <div className="flex justify-center mb-6">
+          <img
+             src={
                 chalisa.imageUrl.startsWith("http")
                   ? chalisa.imageUrl
                   : `https://api.bhaktibhav.app${chalisa.imageUrl}`
-              }
-              alt={chalisa.name?.hi || chalisa.name?.en}
-              className="max-w-[300px] max-h-[300px]  rounded-lg shadow-lg "
-            />
-          </div>
+            }
+            alt={chalisa.name?.hi || chalisa.name?.en}
+            className="max-w-[300px] max-h-[300px] mx-auto mt-4 rounded-xl shadow-lg"
+          />
+        </div> 
         )}
 
 
@@ -106,21 +105,21 @@ export default function ChalisaDetail() {
 
         <div className={`theme_text text-center text-base leading-loose ${fontSize} ${language === "hi" ? "font-hindi" : "font-eng"}`}>
           {language === "hi"
-            ? 
-            <div dangerouslySetInnerHTML={{ __html: chalisa.text.hi}} />
+            ?
+            <div dangerouslySetInnerHTML={{ __html: chalisa.text.hi.replace(/,/g, "]").replace(/\(/g, "¼").replace(/\)/g, "½").replace(/\:/g, "%") }} />
             // chalisa.text.hi.split("\n").map((line, idx) => (
             //   <p key={idx}>{line.replace(/,/g, ']')}</p>
             // ))
             // : chalisa.text.en.split("\n").map((line, idx) => (
             //   <p key={idx}>{line}</p>
             // ))
-            :<div dangerouslySetInnerHTML={{ __html: chalisa.text.en}} />
+            : <div dangerouslySetInnerHTML={{ __html: chalisa.text.en }} />
           }
         </div>
 
       </div>
 
-      <Footer />
+
     </>
   );
 }

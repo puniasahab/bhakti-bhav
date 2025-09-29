@@ -50,7 +50,7 @@ function AartiDetail() {
       <PageTitleCard
         titleHi={"vkjrh"}
         titleEn={"Aarti"} 
-        textSize="text-lg"
+        
       />
       <div className="container mx-auto px-4"> 
         {detail.imageUrl && (
@@ -131,7 +131,7 @@ function AartiDetail() {
 
       </div>
 
-      <Footer />
+      
     </>
   );
 }

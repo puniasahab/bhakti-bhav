@@ -73,7 +73,7 @@ function VratKathaDetail() {
             <PageTitleCard
                 titleHi={detail.name.hi}
                 titleEn={detail.name.en}
-                textSize="text-lg"
+                
             />
 
             <div className="container mx-auto px-4 pb-6 theme_text">
@@ -113,7 +113,7 @@ function VratKathaDetail() {
                         <button
                             onClick={() => handlePlay(detail.audioUrl?.hi)}
                             disabled={!detail.audioUrl?.hi}
-                            className={`p-2 flex items-center justify-center rounded-full 
+                            className={`px-6 py-2 flex items-center justify-center rounded-full 
                              transition font-hindi ${!detail.audioUrl?.hi
                                     ? "bg-[#9A283D]/50 text-white cursor-not-allowed"
                                     : currentAudio === detail.audioUrl?.hi
@@ -139,7 +139,7 @@ function VratKathaDetail() {
                     </div>
                 </div>
 
-                <div className="text-center my-4 text-2xl">
+                <div className="text-center my-8 text-2xl">
                     <p className={`${language === "hi" ? " font-hindi" : "hidden"} text-[#9A283D] ${fontSize}`}>{detail.mantra?.hi}</p>
                     <p className={`${language === "en" ? " font-eng" : "hidden"} text-[#9A283D] ${fontSize}`}>{detail.mantra?.en}</p>
                 </div>
@@ -156,7 +156,7 @@ function VratKathaDetail() {
                 </div>
 
                 <div className="mb-4">
-                    <h2 className={`text-xl font-semibold mb-3 ${fontSize} `}>
+                    <h2 className={`text-xl font-semibold mb-4 ${fontSize} `}>
                         {language === "hi" ? (
                             <span className="font-hindi text-2xl">iwtk fof/k </span>
                         ) : (
@@ -180,7 +180,7 @@ function VratKathaDetail() {
                 </div>
 
                 <div className="mb-4">
-                    <h2 className={`text-xl font-semibold mb-3 ${fontSize} `}>
+                    <h2 className={`text-xl font-semibold mb-4 ${fontSize} `}>
                         {language === "hi" ? (
                             <span className="font-hindi text-2xl">iwtk lkexzh</span>
                         ) : (
@@ -223,11 +223,11 @@ function VratKathaDetail() {
                 </div>
 
                 <div className="mb-4">
-                    <h2 className={`text-xl font-semibold mb-3 ${fontSize} `} >
+                    <h2 className={`text-xl font-semibold mb-4 ${fontSize} `} >
                         {language === "hi" ? (
-                            <span className="font-hindi text-2xl"> dFkk egRo </span>
+                            <span className="font-hindi text-2xl"> dFkk </span>
                         ) : (
-                            <span className="font-eng">katha Mahatva</span>
+                            <span className="font-eng">Katha</span>
                         )}
 
                     </h2>
@@ -245,7 +245,7 @@ function VratKathaDetail() {
                     </a>
                 </div>
             </div>
-            <Footer />
+            
         </>
     );
 }

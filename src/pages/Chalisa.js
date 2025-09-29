@@ -42,7 +42,7 @@ export default function Chalisa() {
       <PageTitleCard
         titleHi={"चालीसा"}
         titleEn={"Chalisa"}
-        textSize="text-lg"
+        
       /> 
 
       {/* Katha Grid */}
@@ -51,10 +51,9 @@ export default function Chalisa() {
           {chalisa.map((chalisa) => (
             <li key={chalisa._id}>
               <Link
-                to={`/chalisa/${chalisa._id}`} // ✅ navigate using _id
+                to={`/chalisa/${chalisa._id}`}  
                 className="theme_bg bg-white rounded-xl shadow hover:bg-yellow-50 transition block overflow-hidden"
-              >
-                {/* Image */}
+              > 
                 <div className="w-full h-40 flex items-center justify-center bg-gray-50">
                   <img
                     src={chalisa.imagethumb?.startsWith("http")
@@ -64,25 +63,17 @@ export default function Chalisa() {
                     alt={chalisa.name?.hi || chalisa.name?.en}
                     className="w-auto rounded-md max-h-[100%] md:max-h-[100%]"
                   />
-                </div>
+                </div> 
 
-                {/* Text */}
                 <div className="px-3 py-4">
                   {chalisa.name?.hi && (
-                    <h2 className="md:text-lg text-lg font-semibold truncate font-hindi">
+                    <h2 className="md:text-lg text-lg font-semibold truncate font-hindi pt-2">
                       {chalisa.name.hi}
                     </h2>
                   )}
                   {chalisa.name?.en && (
                     <p className="text-sm truncate font-eng">{chalisa.name.en}</p>
-                  )}
-
-                  {/* Short Description (optional preview) */}
-                  {/* {chalisa.description?.hi && (
-                    <p className="text-xs text-gray-600 mt-1 line-clamp-2">
-                      {chalisa.description.hi}
-                    </p>
-                  )} */}
+                  )} 
                 </div>
               </Link>
             </li>
@@ -90,7 +81,7 @@ export default function Chalisa() {
         </ul>
       </div>
 
-      <Footer />
+      
     </>
   );
 }

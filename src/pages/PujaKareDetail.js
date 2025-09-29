@@ -42,7 +42,7 @@ export default function PujaKare() {
       <PageTitleCard
         titleHi={items.title.hi}
         titleEn={items.title.en}
-        textSize="text-lg"
+        
       />
 
       <div className="flex justify-center items-center mb-3">
@@ -101,7 +101,7 @@ export default function PujaKare() {
         </div>
       </div>
 
-      <Footer />
+      
     </>
   );
 }

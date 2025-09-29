@@ -57,11 +57,11 @@ export default function MantraDetail() {
       <PageTitleCard
         titleHi={"ea="}
         titleEn={"Mantra"} 
-        textSize="text-lg"
+        
       /> 
 
-      <div className="container mx-auto px-4 py-6">
-        <div className="flex justify-center mb-6">
+      <div className="container mx-auto px-4">
+        <div className="flex justify-center my-6">
           <img
             src={
               detail.imageUrl?.startsWith("http")
@@ -69,7 +69,7 @@ export default function MantraDetail() {
                 : `https://api.bhaktibhav.app${detail.imageUrl}`
             }
             alt={detail.name?.hi || detail.name?.en}
-            className="max-w-[300px] max-h-[300px] mx-auto mt-4 rounded-xl shadow-lg"
+            className="max-w-[300px] max-h-[300px] rounded-xl shadow-lg"
           />
         </div>
 

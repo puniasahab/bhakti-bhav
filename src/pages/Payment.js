@@ -138,7 +138,7 @@ export default function Payment() {
         </div>
       </div>
 
-      <Footer />
+      
     </div>
   );
 }

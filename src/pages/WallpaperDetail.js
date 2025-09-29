@@ -130,9 +130,9 @@ Check out this amazing wallpaper: ${imageUrl}
       />
 
       <PageTitleCard
-        titleHi={"okYisij"}
+        titleHi={"okyisij"}
         titleEn={"Wallpaper"}
-        textSize="text-lg"
+        
       />
 
       <div className="container mx-auto px-4 mt-4">
@@ -141,7 +141,7 @@ Check out this amazing wallpaper: ${imageUrl}
             <img
               src={`${detail.imageUrl}`}
               alt={detail.godName}
-              className="max-w-[300px] max-h-[300px] mx-auto mt-4 rounded-lg shadow-lg"
+              className="max-w-[100%] mx-auto mt-4 rounded-lg shadow-lg"
             />
           </div>
 
@@ -202,7 +202,7 @@ Check out this amazing wallpaper: ${imageUrl}
           )}
         </div>
       </div>
-      <Footer />
+      
     </>
   );
 }
