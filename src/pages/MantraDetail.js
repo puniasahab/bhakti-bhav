@@ -48,6 +48,14 @@ export default function MantraDetail() {
     }
   };
 
+  const replayAudio = () => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = 0;
+      audioRef.current.play();
+      setCurrentAudio(audioRef.current.src);
+    }
+  };
+
   if (loading) return <Loader message="🙏 Loading भक्ति भाव 🙏" size={200} />;
   if (!detail) return <p className="text-center py-10">❌ No mantras found</p>;
 
@@ -74,65 +82,72 @@ export default function MantraDetail() {
         </div>
 
         <div className="space-y-4">
-          {detail.mantras?.map((item, index) => (
-            <div
-              key={item._id || index}
-              className="bg-[#FFD35A] text-center p-4 rounded-lg shadow relative"
-            >
-              <p
-                className={`theme_text text-[24px] font-semibold font-hindi ${fontSize}
-                  }`}
+          {detail.mantras
+            ?.sort((a, b) => {
+              const lengthA = a.text?.hi?.length || 0;
+              const lengthB = b.text?.hi?.length || 0;
+              return lengthA - lengthB; // Sort by ascending order (shortest first)
+              // Use: return lengthB - lengthA; // For descending order (longest first)
+            })
+            ?.map((item, index) => (
+              <div
+                key={item._id || index}
+                className="bg-[#FFD35A] text-center p-4 rounded-lg shadow relative"
               >
-                {item.text?.hi}
-              </p>
+                <p
+                  className={`theme_text text-[24px] font-semibold font-hindi ${fontSize}
+                  }`}
+                >
+                  {item.text?.hi}
+                </p>
 
-              <div className="mt-4 w-full flex items-center justify-center">
-                <button
-                  onClick={() => handlePlay(item.audioUrl?.hi)}
-                  disabled={!item.audioUrl?.hi}
-                  className={`p-2 flex items-center justify-center rounded-full 
+                <div className="mt-4 w-full flex items-center justify-center">
+                  <button
+                    onClick={() => handlePlay(item.audioUrl?.hi)}
+                    disabled={!item.audioUrl?.hi}
+                    className={`p-2 flex items-center justify-center rounded-full 
                     transition font-hindi 
                     ${!item.audioUrl?.hi
-                      ? "bg-[#9A283D]/50 text-gray-500 cursor-not-allowed"
-                      : currentAudio === item.audioUrl?.hi
-                        ? "bg_theme text-white"
-                        : "bg_theme text-white"
-                    }`}
-                >
-                  {currentAudio === item.audioUrl?.hi ? (
-                    <span className="audio_pause_icon"></span>
-                  ) : (
-                    <span className="audio_icon"></span>
-                  )}
-                </button>
+                        ? "bg-[#9A283D]/50 text-gray-500 cursor-not-allowed"
+                        : currentAudio === item.audioUrl?.hi
+                          ? "bg_theme text-white"
+                          : "bg_theme text-white"
+                      }`}
+                  >
+                    {currentAudio === item.audioUrl?.hi ? (
+                      <span className="audio_pause_icon"></span>
+                    ) : (
+                      <span className="audio_icon"></span>
+                    )}
+                  </button>
 
-                <button
-                  onClick={() => {
-                    if (audioRef.current) {
-                      audioRef.current.loop = !audioRef.current.loop;
-                    }
-                  }}
-                  disabled={!item.audioUrl?.hi}
-                  className={`ml-3 p-2 flex items-center justify-center rounded-full transition font-hindi 
+                  <button
+                    onClick={() => {
+                      if (audioRef.current) {
+                        audioRef.current.loop = !audioRef.current.loop;
+                      }
+                    }}
+                    disabled={!item.audioUrl?.hi}
+                    className={`ml-3 p-2 flex items-center justify-center rounded-full transition font-hindi 
                     ${!item.audioUrl?.hi
-                      ? "bg-[#9A283D]/50 text-gray-500 cursor-not-allowed"
-                      : audioRef.current?.loop
-                        ? "bg-green-600 text-white"
-                        : "bg_theme text-white"
-                    }`}
-                >
-                  <span className="audio_repeat_icon"></span>
-                </button>
+                        ? "bg-[#9A283D]/50 text-gray-500 cursor-not-allowed"
+                        : audioRef.current?.loop
+                          ? "bg-green-600 text-white"
+                          : "bg_theme text-white"
+                      }`}
+                  >
+                    <span className="audio_repeat_icon" onClick={replayAudio}></span>
+                  </button>
 
-                {item.audioUrl?.hi && (
-                  <audio ref={audioRef} className="hidden">
-                    <source src={item.audioUrl.hi} type="audio/mpeg" />
-                    Your browser does not support the audio element.
-                  </audio>
-                )}
+                  {item.audioUrl?.hi && (
+                    <audio ref={audioRef} className="hidden">
+                      <source src={item.audioUrl.hi} type="audio/mpeg" />
+                      Your browser does not support the audio element.
+                    </audio>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
         </div>
       </div>
     </div>
