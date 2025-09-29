@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext, useRef } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams} from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { LanguageContext } from "../contexts/LanguageContext";
@@ -8,7 +8,7 @@ import PageTitleCard from "../components/PageTitleCard";
 
 export default function ChalisaDetail() {
   const { id } = useParams();
-  const [chalisa, setChalisa] = useState(null); // single object
+  const [chalisa, setChalisa] = useState(null);  
   const [loading, setLoading] = useState(true);
   const audioRef = useRef(null);
 

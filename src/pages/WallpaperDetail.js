@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams} from "react-router-dom";
 import Loader from "../components/Loader";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
@@ -7,7 +7,6 @@ import PageTitleCard from "../components/PageTitleCard";
 
 function WallpaperDetail() {
   const { id } = useParams();
-  const navigate = useNavigate();
   const [detail, setDetail] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -36,8 +35,7 @@ function WallpaperDetail() {
   if (loading) return <Loader message="🙏 Loading भक्ति भाव 🙏" size={200} />;
   if (!detail) return <p>No data found!</p>;
 
-  const handleShare = (imageUrl) => {
-    // const shareUrl = `https://yourapp.com/wallpaper/${wallpaperId}`;
+  const handleShare = (imageUrl) => { 
     if (navigator.share) {
       navigator
         .share({

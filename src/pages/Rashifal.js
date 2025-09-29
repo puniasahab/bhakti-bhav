@@ -145,7 +145,7 @@ function Rashifal() {
 
               </div>
 
-              <div className="text-center theme_text">
+              <div className="text-start theme_text my-5">
                 {selectedRashi.content?.hi?.length > 0 && (
                   <ul className="list-disc list-inside space-y-1">
                     {selectedRashi.content.hi.map((line, idx) => (

@@ -168,7 +168,7 @@ function VratKathaDetail() {
                     {language === "hi"
                         ? detail.pujaVidhi?.hi?.split("\n").map((line, idx) => (
                             <p key={idx} className={`font-hindi text-[rgba(0,0,0,0.7)] ${fontSize}`}>
-                                {line.replace(/,/g, '•')}
+                                {line.replace(/,/g, '•').replace(/\(/g, "¼").replace(/\)/g, "½")}
                             </p>
                         ))
                         : detail.pujaVidhi?.en?.split("\n").map((line, idx) => (
@@ -193,14 +193,14 @@ function VratKathaDetail() {
                             ? Array.isArray(detail.pujaSamagri?.hi)
                                 ? detail.pujaSamagri.hi.map((item, i) => (
                                     <li key={`hi-${i}`} className="font-hindi">
-                                        {item.replace(/,/g, "]")}
+                                        {item.replace(/,/g, "]").replace(/\(/g, "¼").replace(/\)/g, "½").replace(/\:/g, "%")}
                                     </li>
                                 ))
                                 : detail.pujaSamagri?.hi
                                     ?.split(/\n|,/)
                                     .map((item, i) => (
                                         <li key={`hi-${i}`} className="font-hindi">
-                                            {item.trim().replace(/,/g, "]")}
+                                            {item.trim().replace(/,/g, "]").replace(/\(/g, "¼").replace(/\)/g, "½").replace(/\:/g, "%")}
                                         </li>
                                     ))
                             : Array.isArray(detail.pujaSamagri?.en)
@@ -232,7 +232,7 @@ function VratKathaDetail() {
 
                     </h2>
                     {language === "hi"
-                        ? <div className = {`font-eng text-[rgba(0,0,0,0.7)] ${fontSize}`} dangerouslySetInnerHTML={{ __html: detail.pujaMahatva?.hi }} />
+                        ? <div className = {`font-hindi text-[rgba(0,0,0,0.7)] ${fontSize}`} dangerouslySetInnerHTML={{ __html: detail.pujaMahatva?.hi.replace(/,/g, "]").replace(/\(/g, "¼").replace(/\)/g, "½").replace(/\:/g, "%") }} />
                         : <div className = {`font-eng text-[rgba(0,0,0,0.7)] ${fontSize}`} dangerouslySetInnerHTML={{ __html: detail.pujaMahatva?.en }} />
                     }
                 </div>

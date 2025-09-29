@@ -1,32 +1,18 @@
-import React, { useState, useContext, useEffect, } from "react";
+import React, { useState, useEffect, } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { Link } from "react-router-dom";
 import TodayThoughts from "../components/TodayThoughts";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Pagination, Autoplay } from "swiper/modules";
-import { LanguageContext } from "../contexts/LanguageContext";
+import { Pagination, Autoplay } from "swiper/modules"; 
 
 import "swiper/css";
 import "swiper/css/pagination";
 
 function Home() {
 
-    const [isOpen, setIsOpen] = useState(false);
-    const { language, fontSize } = useContext(LanguageContext);
+    const [isOpen, setIsOpen] = useState(false); 
     const [panchangData, setPanchangData] = useState([]);
-    // const panchangData = [
-    //     {
-    //         side: "left",
-    //         items: ["frfFk % prqnZ'kh", "u{k= % e?kk", 'dj.k % fo"V'],
-    //     },
-    //     {
-    //         side: "right",
-    //         items: ['i{k % d`".k', ";ksx % lk?;", "okj % 'kfuokj"],
-    //     },
-    // ];
-
-
 
 
     useEffect(() => {
