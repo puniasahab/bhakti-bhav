@@ -65,6 +65,8 @@ export default function MantraDetail() {
       <PageTitleCard
         titleHi={"ea="}
         titleEn={"Mantra"} 
+        customEngFontSize={"13px"}
+        customFontSize={"23px"}
         
       /> 
 
@@ -95,13 +97,13 @@ export default function MantraDetail() {
                 className="bg-[#FFD35A] text-center p-4 rounded-lg shadow relative"
               >
                 <p
-                  className={`theme_text text-[24px] font-semibold font-hindi ${fontSize}
+                  className={`theme_text text-[21px] font-semibold font-hindi ${fontSize}
                   }`}
                 >
                   {item.text?.hi}
                 </p>
 
-                <div className="mt-4 w-full flex items-center justify-center">
+                <div className="mt-8 mb-2 w-full flex items-center justify-center">
                   <button
                     onClick={() => handlePlay(item.audioUrl?.hi)}
                     disabled={!item.audioUrl?.hi}

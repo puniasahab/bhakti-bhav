@@ -71,16 +71,16 @@ export default function Wallpaper() {
       </div>
 
       <div className="container mx-auto px-4">
-        <ul className="grid grid-cols-2 gap-4">
+        <ul className="grid grid-cols-2 gap-3">
           {filteredWallpapers.map((wp) => (
             <li key={wp._id}>
               <Link to={`/wallpaper/${wp._id}`} className="block">
-                <div className="relative rounded-2xl overflow-hidden shadow-lg">
-                  <div className="w-full h-40 flex items-center justify-center overflow-hidden">
+                <div className="relative rounded-2xl overflow-hidden shadow-lg bg-white">
+                  <div className="w-full aspect-[3/4] overflow-hidden">
                     <img
                       src={getImageUrl(wp)}
                       alt={wp.godName}
-                      className="w-auto rounded-md max-h-[100%] md:max-h-[100%]"
+                      className="w-full h-full object-cover"
                     />
                   </div>
 
@@ -90,18 +90,18 @@ export default function Wallpaper() {
                     </div>
                   )} */}
 
-                  <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-3 theme_text">
-                    <div className="flex items-center gap-1 bg-white px-2 py-1 rounded-md shadow text-xs font-eng">
-                      <Download size={14} className="text-[#9A283D]" />
-                      {wp.downloads}
+                  <div className="absolute bottom-2 left-2 right-2 flex justify-center gap-2">
+                    <div className="flex items-center gap-1 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full shadow-sm text-xs font-eng">
+                      <Download size={12} className="text-[#9A283D]" />
+                      <span className="text-gray-700">{wp.downloads}</span>
                     </div>
-                    <div className="flex items-center gap-1 bg-white px-2 py-1 rounded-md shadow text-xs font-eng">
-                      <Eye size={14} className="text-[#9A283D]" />
-                      {wp.views}
+                    <div className="flex items-center gap-1 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full shadow-sm text-xs font-eng">
+                      <Eye size={12} className="text-[#9A283D]" />
+                      <span className="text-gray-700">{wp.views}</span>
                     </div>
-                    <div className="flex items-center gap-1 bg-white px-2 py-1 rounded-md shadow text-xs font-eng">
-                      <Heart size={14} className="text-[#9A283D]" />
-                      {wp.likes}
+                    <div className="flex items-center gap-1 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full shadow-sm text-xs font-eng">
+                      <Heart size={12} className="text-[#9A283D]" />
+                      <span className="text-gray-700">{wp.likes}</span>
                     </div>
                   </div>
                 </div>

@@ -90,6 +90,8 @@ function Rashifal() {
       <PageTitleCard
         titleHi={"vkt dk jkf'kQy"}
         titleEn={"Aaj Ka Rashifal"}
+        customEngFontSize={"14px"}
+        customFontSize={"22px"}
       />
 
         <div className="container mx-auto mt-4 px-4">
@@ -146,20 +148,26 @@ function Rashifal() {
 
               <div className="text-start theme_text my-5">
                 {selectedRashi.content?.hi?.length > 0 && (
-                  <ul className="list-disc list-inside space-y-1">
+                  <ul className="space-y-2">
                     {selectedRashi.content.hi.map((line, idx) => (
-                      <li key={idx} className="text-lg leading-relaxed">
-                        {line.replace(/\.\.\./g, "---").replace(/,/g, "]")}
+                      <li key={idx} className="text-lg leading-relaxed flex items-start">
+                        <span className="text-[#9A283D] mr-3 mt-1 flex-shrink-0 font-bold text-lg min-w-[16px]">●</span>
+                        <span className="flex-1 text-md">
+                          {line.replace(/\.\.\./g, "---").replace(/,/g, "]")}
+                        </span>
                       </li>
                     ))}
                   </ul>
                 )}
 
                 {selectedRashi.content?.en?.length > 0 && (
-                  <ul className="list-disc list-inside space-y-1 mt-4">
+                  <ul className="space-y-2 mt-4">
                     {selectedRashi.content.en.map((line, idx) => (
-                      <li key={idx} className="text-lg leading-relaxed font-eng">
-                        {line.replace(/\.\.\./g, "---").replace(/,/g, "]")}
+                      <li key={idx} className="text-lg leading-relaxed font-eng flex items-start">
+                        <span className="text-[#9A283D] mr-3 mt-1 flex-shrink-0 font-bold text-lg min-w-[16px]">●</span>
+                        <span className="flex-1">
+                          {line.replace(/\.\.\./g, "---").replace(/,/g, "]")}
+                        </span>
                       </li>
                     ))}
                   </ul>

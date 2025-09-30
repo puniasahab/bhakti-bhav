@@ -35,7 +35,8 @@ function JaapMala() {
       <PageTitleCard
         titleHi={"tkkp ekyk"}
         titleEn={"Jaap mala"}
-        
+        customEngFontSize={"13px"}
+        customFontSize={"22px"}
       />
 
       <div className="container mx-auto px-4">

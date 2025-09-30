@@ -132,30 +132,36 @@ Check out this amazing wallpaper: ${imageUrl}
       <PageTitleCard
         titleHi={"okyisij"}
         titleEn={"Wallpaper"}
+        customEngFontSize={"14px"}
+        customFontSize={"24px"}
         
       />
 
-      <div className="container mx-auto px-4 mt-4">
-        <div className="flex flex-col space-y-8">
-          <div className="flex-1 flex justify-center items-center p-4">
-            <img
-              src={`${detail.imageUrl}`}
-              alt={detail.godName}
-              className="max-w-[100%] mx-auto mt-4 rounded-lg shadow-lg"
-            />
+      <div className="container mx-auto px-1 mt-4">
+        <div className="flex flex-col">
+          {/* Image Container */}
+          <div className="flex justify-center items-center mb-6">
+            <div className="relative max-w-sm w-full">
+              <img
+                src={`${detail.imageUrl}`}
+                alt={detail.godName}
+                className="w-full h-auto aspect-[3/4] object-cover rounded-2xl shadow-xl border-4 border-white"
+              />
+            </div>
           </div>
 
-          <div className="flex justify-center gap-6 py-4 font-eng">
-            <button
-              onClick={() => setShowModal(true)}
-              className="px-6 py-2 border-2 border-[#9A283D] rounded-xl theme_text"
-            >
+          {/* Action Buttons */}
+          <div className="flex justify-center gap-4 mb-6">
+            {/* <button className="flex-1 max-w-[120px] py-3 px-4 border-2 border-[#9A283D] rounded-xl theme_text font-semibold text-lg hover:bg-[#9A283D] hover:text-white transition-colors">
               Apply
-            </button>
-            <button className="px-6 py-2 border-2 border-[#9A283D] rounded-xl theme_text">
+            </button> */}
+            <button className="flex-1 max-w-[120px] py-3 px-4 border-2 border-[#9A283D] rounded-xl theme_text font-semibold text-lg hover:bg-[#9A283D] hover:text-white transition-colors font-eng">
               Download
             </button>
-            <button className="px-6 py-2 border-2 border-[#9A283D] rounded-xl theme_text" onClick={handleWhatsAppShare.bind(this, detail.imageUrl)}>
+            <button 
+              className="flex-1 max-w-[120px] py-3 px-4 border-2 border-[#9A283D] rounded-xl theme_text font-semibold text-lg hover:bg-[#9A283D] hover:text-white transition-colors font-eng" 
+              onClick={handleWhatsAppShare.bind(this, detail.imageUrl)}
+            >
               Share
             </button>
           </div>

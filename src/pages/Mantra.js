@@ -35,6 +35,8 @@ export default function Mantra() {
       <PageTitleCard
         titleHi={"ea="}
         titleEn={"Mantra"}
+        customEngFontSize={"13px"}
+        customFontSize={"23px"}
         
       />
 

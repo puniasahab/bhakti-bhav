@@ -50,6 +50,8 @@ function AartiDetail() {
       <PageTitleCard
         titleHi={"vkjrh"}
         titleEn={"Aarti"} 
+        customEngFontSize={"14px"}
+        customFontSize={"23px"}
         
       />
       <div className="container mx-auto px-4"> 

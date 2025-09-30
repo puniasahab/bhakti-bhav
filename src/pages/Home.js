@@ -202,13 +202,13 @@ function Home() {
                         </button>
 
                         <div className="p-6 max-h-[80vh] overflow-y-auto">
-                            <div className="grid grid-cols-2 gap-4 p-3 border border-[#9A283D] bg-[rgba(255,250,244,0.6)] font-hindi theme_text rounded-xl">
+                            <div className="grid grid-cols-2 gap-4 px-10 py-3 border border-[#9A283D] bg-[rgba(255,250,244,0.6)] font-hindi theme_text rounded-xl">
                                 {panchangData.map((col, index) => (
-                                    <div key={index} className=" mx-auto text-xl text-center">
+                                    <div key={index} className="text-xl text-left">
                                         {col.items.map((text, i) => {
                                             console.log({ text });
                                             return (
-                                                <p key={i}>{text}</p>
+                                                <p key={i} className="mb-2 leading-relaxed">{text}</p>
                                             )
                                         })}
                                     </div>

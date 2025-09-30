@@ -18,6 +18,19 @@ function JaapMalaDetail() {
   const { language, fontSize, setLanguage, setFontSize } = useContext(LanguageContext);
   const [currentIndex, setCurrentIndex] = useState(1);
 
+  // Function to convert Hindi numerals to English numerals
+  // const convertHindiToEnglishNumerals = (text) => {
+  //   if (!text) return text;
+  //   const hindiNumerals = ['०', '१', '२', '३', '४', '५', '६', '७', '८', '९'];
+  //   const englishNumerals = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+    
+  //   let convertedText = text;
+  //   hindiNumerals.forEach((hindi, index) => {
+  //     convertedText = convertedText.replace(new RegExp(hindi, 'g'), englishNumerals[index]);
+  //   });
+  //   return convertedText;
+  // };
+
   useEffect(() => {
     fetch(`https://api.bhaktibhav.app/frontend/jaapmala/${id}`)
       .then((res) => res.json())
@@ -38,11 +51,20 @@ function JaapMalaDetail() {
 
       <PageTitleCard
         titleHi={detail.title.hi}
-        titleEn={detail.title.en} 
-        
+        titleEn={detail.title.en}
+        customEngFontSize={"12px"}
+        customFontSize={"17px"}
+        isFromJaapMala={true}
       />
 
       <div className="container mx-auto px-4 relative">
+        
+        {/* Count Display */}
+        <div className="text-center mb-4 mt-4">
+          <span className="bg-[rgba(255,250,244,0.8)] px-4 py-2 rounded-full theme_text font-semibold text-sm font-eng">
+            {currentIndex} / {detail?.names?.length || 0}
+          </span>
+        </div>
 
         <Swiper
           pagination={{ clickable: true }}
@@ -54,6 +76,7 @@ function JaapMalaDetail() {
           spaceBetween={20}
           slidesPerView={1}
           className="mySwiper"
+          onSlideChange={(swiper) => setCurrentIndex(swiper.activeIndex + 1)}
         >
           {detail?.names &&
             detail.names.map((item, index) => (

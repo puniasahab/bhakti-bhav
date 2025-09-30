@@ -82,6 +82,8 @@ function VratKathaDetail() {
             <PageTitleCard
                 titleHi={detail.name.hi}
                 titleEn={detail.name.en}
+                customEngFontSize={"14px"}
+                customFontSize={"19px"}
                 
             />
 
