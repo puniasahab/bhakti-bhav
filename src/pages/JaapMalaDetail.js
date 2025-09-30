@@ -10,6 +10,7 @@ import { LanguageContext } from "../contexts/LanguageContext";
 import Loader from "../components/Loader";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import PageTitleCard from "../components/PageTitleCard";
+import PageTitleCardJaapMala from "../components/PageTitleCardJaapMala";
 
 function JaapMalaDetail() {
   const { id } = useParams();
@@ -49,11 +50,11 @@ function JaapMalaDetail() {
     <>
       <Header pageName={{ hi: "tki ekyk", en: "Jaap mala" }} />
 
-      <PageTitleCard
+      <PageTitleCardJaapMala
         titleHi={detail.title.hi}
         titleEn={detail.title.en}
-        customEngFontSize={"12px"}
-        customFontSize={"17px"}
+        customEngFontSize={"13px"}
+        customFontSize={"16px"}
         isFromJaapMala={true}
       />
 

@@ -57,8 +57,8 @@ export default function ChalisaDetail() {
       <PageTitleCard
         titleHi={chalisa.name.hi}
         titleEn={chalisa.name.en}
-        customEngFontSize={'14px'}
-        customFontSize={'20px'}
+        customEngFontSize={'13px'}
+        customFontSize={'18px'}
       />
 
       <div className="container mx-auto px-4 mt-4">
