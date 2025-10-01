@@ -16,6 +16,13 @@ export const isAuthenticated = () => {
     return !!getTokenFromLS();
 }
 
+export const setMobileNoInLS = (mobile) => {
+    localStorage.setItem("mobileNo", mobile);
+}
+
+export const getMobileNoFromLS = () => {
+    return localStorage.getItem("mobileNo");
+}
 // export async function setWallpaper(imagePath) {
 //     await wallpaper.set(imagePath);
 // }

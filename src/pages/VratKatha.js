@@ -1,25 +1,37 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Loader from "../components/Loader";
 import PageTitleCard from "../components/PageTitleCard";
+import { useKatha } from "../contexts/KathaContext";
 
 export default function VratKatha() {
   const [kathas, setKathas] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  const { setCategoryData } = useKatha();
 
   useEffect(() => {
     async function fetchKathas() {
       try {
-        const res = await fetch("https://api.bhaktibhav.app/frontend/all-kathas");
+        /// all-kathas
+        const res = await fetch("https://api.bhaktibhav.app/frontend/CategoryKatha");
         const json = await res.json();
-
-        if (json.status === "success" && Array.isArray(json.data)) {
-          setKathas(json.data);
-        } else {
-          setKathas([]);
-        }
+        console.log("katha data", json)
+        
+        // if (json.status === "success" && Array.isArray(json.data)) {
+          // Flatten all kathas from all categories
+          // const allKathas = [];
+          // json.forEach(category => {
+          //   if (category.kathas && Array.isArray(category.kathas)) {
+          //     allKathas.push(...category.kathas);
+          //   }
+          // });
+          setKathas(json);
+        // } else {
+        //   setKathas([]);
+        // }
       } catch (error) {
         console.error("API Error:", error);
         setKathas([]);
@@ -34,6 +46,16 @@ export default function VratKatha() {
   if (loading) return <Loader message="🙏 Loading भक्ति भाव 🙏" size={200} />;
   if (!kathas.length) return <p className="text-center py-10">❌ No kathas found</p>;
 
+  const handleNavigation = (id, index) => {
+    if(kathas[index]?.kathas?.length > 0) {
+        // Set the category data in context before navigation
+        setCategoryData(kathas[index].kathas, kathas[index].name);
+        navigate(`/vrat-katha/categoryDetails/${id}`);
+    }
+    else {
+      navigate(`/vrat-katha/${id}`);
+    }
+  }
   return (
     <>
       <Header />
@@ -48,11 +70,11 @@ export default function VratKatha() {
 
       <div className="container mx-auto px-4 mt-4">
         <ul className="grid grid-cols-2 lg:grid-cols-4 gap-4 text-center">
-          {kathas.map((katha) => (
+          {kathas.map((katha, index) => (
             <li key={katha._id}>
-              <Link
-                to={`/vrat-katha/${katha._id}`}
-                className="theme_bg bg-white rounded-xl shadow hover:bg-yellow-50 transition block overflow-hidden"
+              <div
+                onClick={() => handleNavigation(katha._id, index)}
+                className="theme_bg bg-white rounded-xl shadow hover:bg-yellow-50 transition block overflow-hidden cursor-pointer"
               >
                 <div className="w-full h-40 flex items-center justify-center overflow-hidden  ">
                   <img
@@ -72,7 +94,7 @@ export default function VratKatha() {
                   )}
 
                 </div>
-              </Link>
+              </div>
             </li>
           ))}
         </ul>

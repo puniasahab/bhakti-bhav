@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { loginApis } from "../api";
+import { setMobileNoInLS } from "../commonFunctions";
 
 function Login() {
     const [mobile, setMobile] = useState("");
@@ -16,26 +18,34 @@ function Login() {
 
         setLoading(true);
 
-        try {
-            const res = await fetch("https://api.bhaktibhav.app/frontend/generate-otp", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ mobile }),
-            });
+        // try {
+        //     const res = await fetch("https://api.bhaktibhav.app/frontend/generate-otp", {
+        //         method: "POST",
+        //         headers: { "Content-Type": "application/json" },
+        //         body: JSON.stringify({ mobile }),
+        //     });
 
-            const data = await res.json();
+        //     const data = await res.json();
 
-            if (data.success) {
-                navigate("/verify-otp", { state: { mobile } });
-            } else {
-                alert(data.message || "Failed to send OTP");
-            }
-        } catch (error) {
-            console.error("Login API Error:", error);
-            alert("Something went wrong!");
-        } finally {
-            setLoading(false);
+        //     if (data.success) {
+        //         navigate("/verify-otp", { state: { mobile } });
+        //     } else {
+        //         alert(data.message || "Failed to send OTP");
+        //     }
+        // } catch (error) {
+        //     console.error("Login API Error:", error);
+        //     alert("Something went wrong!");
+        // } finally {
+        //     setLoading(false);
+        // }
+        const response = await loginApis.generateOtp(mobile);
+        console.log("OTP Response:", response);
+        setLoading(false);
+        if(response.success) {
+            setMobileNoInLS(mobile)
         }
+        
+        navigate("/verify-otp", { state: { mobile } });
     };
     return (
 

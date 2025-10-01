@@ -6,7 +6,8 @@ import userIcon from "../assets/img/hd_user_icon.png";
 import logo from "../assets/img/logo.png";
 import backBtn from "../assets/img/back_icon.svg";
 import { LanguageContext } from "../contexts/LanguageContext";
-import { Download, Eye, Heart } from "lucide-react";
+import { Download, Eye, Heart, Pencil } from "lucide-react";
+import { isAuthenticated } from "../commonFunctions";
 
 function Header({
     showWallpaperHeader = false,
@@ -16,7 +17,9 @@ function Header({
     downloads,
     views,
     likes,
-    pageName
+    pageName,
+    showProfileHeader = false,
+    profileText
 }) {
     const { pathname } = useLocation();
     const navigate = useNavigate();
@@ -26,12 +29,43 @@ function Header({
 
     const isHomeRoute = homeRoutes.includes(pathname);
 
+    const getProfileOrLoginRoute = () => {
+        if(isAuthenticated()) {
+            return "/profile";
+        } else {
+            return "/login";
+        }
+    }
+
     return (
         <header className="px-4 pt-3">
             <div className="container mx-auto hd_bg rounded-xl">
                 <div className="flex justify-between items-center px-4 py-6">
  
-                    {!isHomeRoute && (
+                    {showProfileHeader && (
+                        <>
+                            {/* Back Button */}
+                            <div className="flex items-center">
+                                <button onClick={() => navigate("/")}>
+                                    <img src={backBtn} alt="Back" width="24" height="24" />
+                                </button>
+                            </div>
+
+                            {/* Profile Text */}
+                            <div className="flex-1 flex justify-center">
+                                <span className="font-hindi text-xl theme_text">{profileText}</span>
+                            </div>
+
+                            {/* Edit Icon */}
+                            <div className="flex items-center">
+                                <button className="bg-white rounded-full p-2 shadow-md border border-gray-200 hover:bg-gray-50 transition-colors" onClick={() => navigate("/edit-profile")}>
+                                    <Pencil size={20} className="text-[#9A283D]" style={{background: "transparent !important"}} />
+                                </button>
+                            </div>
+                        </>
+                    )}
+
+                    {!isHomeRoute && !showProfileHeader && (
                         <div className="flex items-center gap-2">
                             <button onClick={() => navigate(-1)}>
                                 <img src={backBtn} alt="Back" width="24" height="24" />
@@ -115,7 +149,7 @@ function Header({
                                 <a href="#">
                                     <img src={bellIcon} alt="Bell" width="22" height="22" />
                                 </a>
-                                <a href="/login">
+                                <a href={getProfileOrLoginRoute()}>
                                     <img src={userIcon} alt="User" width="22" height="20" />
                                 </a>
                             </div>

@@ -2,49 +2,74 @@ import React, { useEffect, useState } from "react";
 import { ChevronRight, Pencil } from "lucide-react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import { profileApis } from "../api";
 
 const Profile = () => {
     const [profile, setProfile] = useState({
-        name: "Vinay Kumar",
-        mobile: "9999999999",
-        email: "LoremIpsum@gmail.com",
-        state: "Delhi",
+        name: "",
+        mobileNumber: "",
+        email: "",
+        state: "",
+        gender: "",
     });
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // ✅ Fetch Profile API here if needed
+        const fetchProfileData = async () => {
+            try {
+                const res = await profileApis.getProfile();
+                console.log("Profile API Response:", res);
+                
+                if (res) {
+                    console.log("Setting profile data:", res);
+                    setProfile({
+                        name: res.name || "",
+                        mobileNumber: res.mobileNumber || "",
+                        email: res.email || "",
+                        state: res.state || "",
+                        gender: res.gender || "",
+                    });
+                }
+            } catch (error) {
+                console.error("Error fetching profile:", error);
+            } finally {
+                setLoading(false);
+            }
+        }
+        fetchProfileData();
     }, []);
 
     return (
         <div className="min-h-screen font-eng">
-            <Header />
+            <Header 
+                showProfileHeader={true}
+                profileText="भक्ति भाव"
+            />
 
-            <div className="flex justify-center mb-6 mt-4">
-                <div className="relative">
-                    <div className="w-28 h-28 rounded-full border flex items-center justify-center text-[#9A283D] font-bold text-lg bg-white">
-                        भक्ति भाव
-                    </div>
-                    <div className="absolute bottom-0 right-0 bg-white rounded-full p-1 shadow">
-                        <Pencil size={18} className="text-[#7A1C2B]" />
-                    </div>
+            {loading ? (
+                <div className="flex justify-center items-center h-64">
+                    <div className="text-[#9A283D] text-lg">Loading profile...</div>
                 </div>
-            </div>
+            ) : (
+                <>
+                    <div className="mx-6 mt-6 bg-[#FCD34D] rounded-xl shadow p-3 flex items-center justify-between cursor-pointer">
+                        <span className="text-[#7A1C2B] font-medium">
+                            Your Premium plan is active
+                        </span>
+                        <ChevronRight className="text-[#7A1C2B]" />
+                    </div>
 
-
-            <div className="mx-6 mt-6 bg-[#FCD34D] rounded-xl shadow p-3 flex items-center justify-between cursor-pointer">
-                <span className="text-[#7A1C2B] font-medium">
-                    Your Premium plan is active
-                </span>
-                <ChevronRight className="text-[#7A1C2B]" />
-            </div>
-
-            <div className="mx-6 mt-6 space-y-4">
-                <InfoCard label="Name" value={profile.name} />
-                <InfoCard label="Mobile number" value={profile.mobile} />
-                <InfoCard label="Email" value={profile.email} />
-                <InfoCard label="State" value={profile.state} />
-            </div>
-            
+                    <div className="mx-6 mt-6 space-y-4">
+                        <InfoCard label="Name" value={profile.name || "Not provided"} />
+                        <InfoCard label="Mobile number" value={profile.mobileNumber || "Not provided"} />
+                        <InfoCard label="Email" value={profile.email || "Not provided"} />
+                        <InfoCard label="State" value={profile.state || "Not provided"} />
+                        {profile.gender && (
+                            <InfoCard label="Gender" value={profile.gender.charAt(0).toUpperCase() + profile.gender.slice(1)} />
+                        )}
+                    </div>
+                </>
+            )}
         </div>
     );
 };

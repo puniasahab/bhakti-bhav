@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { getMobileNoFromLS, setTokenInLS } from "../commonFunctions";
 
 
 function VerifyOtp() {
@@ -7,7 +8,7 @@ function VerifyOtp() {
     const navigate = useNavigate();
     const phone = location.state?.phone || "";
 
-    const [otp, setOtp] = useState(["", "", "", ""]);
+    const [otp, setOtp] = useState(["", "", "", "", "", ""]);
     const [timeLeft, setTimeLeft] = useState(30);
     const [loading, setLoading] = useState(false);
 
@@ -55,8 +56,8 @@ function VerifyOtp() {
 
     const handleVerify = async () => {
         const otpCode = otp.join("");
-        if (otpCode.length !== 4) {
-            alert("Please enter a valid 4-digit OTP");
+        if (otpCode.length !== 6) {
+            alert("Please enter a valid 6-digit OTP");
             return;
         }
 
@@ -66,20 +67,18 @@ function VerifyOtp() {
             const res = await fetch("https://api.bhaktibhav.app/frontend/verify-otp", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ phone, otp: otpCode }),
+                body: JSON.stringify({ mobile: getMobileNoFromLS(), otp: otpCode }),
             });
 
             const data = await res.json();
-
-            if (data.success) {
-                alert("OTP Verified ✅");
+            console.log("data", data)
+            if(data && data?.token?.length > 0) {
+                setTokenInLS(data.token);
                 navigate("/"); // redirect to home/dashboard
-            } else {
-                alert(data.message || "Invalid OTP ❌");
             }
         } catch (error) {
             console.error("Verify API Error:", error);
-            alert("Something went wrong!");
+            // alert("Something went wrong!");
         } finally {
             setLoading(false);
         }
@@ -106,7 +105,7 @@ function VerifyOtp() {
                             We've sent a code to <span className="font-semibold">{phone}</span> 
                         </p>
 
-                        <div className="flex justify-between mt-6 mb-4" onPaste={handlePaste}>
+                        <div className="flex justify-between mt-6 mb-4 gap-2" onPaste={handlePaste}>
                             {otp.map((val, idx) => (
                                 <input
                                     key={idx}
@@ -116,7 +115,7 @@ function VerifyOtp() {
                                     value={val}
                                     onChange={(e) => handleChange(e, idx)}
                                     onKeyDown={(e) => handleKeyDown(e, idx)}
-                                    className="w-12 h-12 text-center text-lg border-b-2 border-[#800000] focus:outline-none focus:border-red-600"
+                                    className="w-10 h-12 text-center text-lg border-b-2 border-[#800000] focus:outline-none focus:border-red-600"
                                 />
                             ))}
                         </div>
