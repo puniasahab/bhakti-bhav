@@ -30,6 +30,7 @@ import EditProfile from "./pages/EditProfile";
 import Profile from "./pages/Profile";
 import Payment from "./pages/Payment";
 import Transactions from "./pages/transactions";
+import PaymentPay from "./pages/PaymentPay";
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -81,6 +82,7 @@ function App() {
         <Route path="/edit-profile" element={<EditProfile />} />
         <Route path="/payment" element={<Payment />} />
         <Route path="/transactions" element={<Transactions />} />
+        <Route path="/paymentPay" element={<PaymentPay />} />
       </Routes>
     </LanguageProvider>
   );
