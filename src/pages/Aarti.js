@@ -50,7 +50,7 @@ export default function Aarti() {
       />
       
       <div className="container mx-auto px-4 mt-6">
-        <ul className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
           {items.map((item, idx) => {
             const imgSrc = item.imagethumb
               ? item.imagethumb.startsWith("http")
@@ -62,26 +62,29 @@ export default function Aarti() {
               <li key={item._id || idx}>
                 <Link
                   to={`/aarti/${item._id || idx}`}
-                  className="theme_bg bg-white rounded-xl shadow p-4 text-center hover:bg-yellow-50 transition flex flex-col"
+                  className="relative block rounded-xl overflow-hidden shadow-lg"
                 >
-                  <div className="w-full h-36 flex items-center justify-center">
+                  <div className="overflow_bg">
                     <img
                       src={imgSrc}
                       alt={item.name?.en || item.name?.hi || "Aarti"}
-                      className="w-auto rounded-md max-h-[100%] md:max-h-[100%]"
+                      className="w-full rounded-md max-h-[150px] md:max-h-[150px] object-cover"
                     />
-                  </div>
-                  <div className="p-2">
-                    <h2 className="md:text-2xl text-lg font-normal theme_text">
-                      {item.name?.hi}
-                    </h2>
-                    <p className="font-eng text-sm text-gray-600">{item.name?.en}</p>
+                    <div className="absolute inset-0 theme_text flex flex-col items-center justify-center text-center px-4 z-10 top-[35%]">
+                      {item.name?.hi && (
+                        <h2 className="text-xl font-bold font-hindi">
+                          {item.name.hi}
+                        </h2>
+                      )}
+                      {item.name?.en && (
+                        <p className="text-sm font-eng">{item.name.en}</p>
+                      )}
+                    </div>
                   </div>
                 </Link>
               </li>
             );
           })}
-
         </ul>
       </div>
 
