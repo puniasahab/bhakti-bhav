@@ -19,7 +19,8 @@ function Header({
     likes,
     pageName,
     showProfileHeader = false,
-    profileText
+    profileText,
+    hideEditIcon = false
 }) {
     const { pathname } = useLocation();
     const navigate = useNavigate();
@@ -44,24 +45,22 @@ function Header({
  
                     {showProfileHeader && (
                         <>
-                            {/* Back Button */}
-                            <div className="flex items-center">
+                            {/* Back Button and Profile Text */}
+                            <div className="flex items-center gap-3">
                                 <button onClick={() => navigate("/")}>
                                     <img src={backBtn} alt="Back" width="24" height="24" />
                                 </button>
-                            </div>
-
-                            {/* Profile Text */}
-                            <div className="flex-1 flex justify-center">
                                 <span className="font-hindi text-xl theme_text">{profileText}</span>
                             </div>
 
-                            {/* Edit Icon */}
-                            <div className="flex items-center">
-                                <button className="bg-white rounded-full p-2 shadow-md border border-gray-200 hover:bg-gray-50 transition-colors" onClick={() => navigate("/edit-profile")}>
-                                    <Pencil size={20} className="text-[#9A283D]" style={{background: "transparent !important"}} />
-                                </button>
-                            </div>
+                            {/* Edit Icon - Only show if not hidden */}
+                            {!hideEditIcon && (
+                                <div className="flex items-center">
+                                    <button className="bg-white rounded-full p-2 shadow-md border border-gray-200 hover:bg-gray-50 transition-colors" onClick={() => navigate("/edit-profile")}>
+                                        <Pencil size={20} className="text-[#9A283D]" style={{background: "transparent !important"}} />
+                                    </button>
+                                </div>
+                            )}
                         </>
                     )}
 

@@ -88,7 +88,11 @@ function EditProfile() {
 
   return (
     <>
-      <Header />
+      <Header 
+        showProfileHeader={true}
+        profileText="भक्ति भाव"
+        hideEditIcon={true}
+      />
       <div className="container mx-auto px-4 mt-4 text-center font-eng">
         {initialLoading ? (
           <div className="flex justify-center items-center h-64">
@@ -96,104 +100,114 @@ function EditProfile() {
           </div>
         ) : (
           <>
-            <div className="flex justify-center mb-6">
+            <div className="flex justify-center mb-6 mt-4">
               <div className="relative">
-                <div className="w-28 h-28 rounded-full border flex items-center justify-center text-[#9A283D] font-bold text-lg bg-white">
-                  भक्ति भाव
+                <div className="w-32 h-32 rounded-full border-2 border-[#9A283D] flex items-center justify-center text-[#9A283D] font-bold text-lg bg-white shadow-lg">
+                  <div className="w-28 h-28 rounded-full bg-gradient-to-br from-[#FFFAF8] to-[#FCD34D] flex items-center justify-center">
+                    <span className="text-[#9A283D] font-hindi text-sm">Profile</span>
+                  </div>
                 </div>
-                <div className="absolute bottom-0 right-0 bg-white rounded-full p-1 shadow">
-                  <Camera className="theme_text" />
+                <div className="absolute bottom-2 right-2 bg-white rounded-full p-2 shadow-lg border border-[#9A283D] hover:bg-[#FFFAF8] transition-colors cursor-pointer">
+                  <Camera size={18} className="text-[#9A283D]" />
                 </div>
               </div>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4 theme_text">
-          <input
-            type="text"
-            name="name"
-            placeholder="Name*"
-            value={formData.name}
-            onChange={handleChange}
-            className="w-full border border-[#9A283D] rounded-lg px-4 py-3 bg-[#FFFAF8] focus:outline-none"
-          />
-          {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
-          
-          <input
-            type="text"
-            name="mobileNumber"
-            placeholder="Mobile number*"
-            value={formData.mobileNumber}
-            onChange={handleChange}
-            className="w-full border border-[#9A283D] rounded-lg px-4 py-3 bg-[#FFFAF8] focus:outline-none"
-          />
-          {errors.mobileNumber && <p className="text-red-500 text-sm">{errors.mobileNumber}</p>}
-          
-          <input
-            type="email"
-            name="email"
-            placeholder="Email*"
-            value={formData.email}
-            onChange={handleChange}
-            className="w-full border border-[#9A283D] rounded-lg px-4 py-3 bg-[#FFFAF8] focus:outline-none"
-          />
-          {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
-          
-          <input
-            type="text"
-            name="state"
-            placeholder="State"
-            value={formData.state}
-            onChange={handleChange}
-            className="w-full border border-[#9A283D] rounded-lg px-4 py-3 bg-[#FFFAF8] focus:outline-none"
-          />
+            <form onSubmit={handleSubmit} className="space-y-4 theme_text max-w-md mx-auto">
+              <div className="space-y-4">
+                <div>
+                  <input
+                    type="text"
+                    name="name"
+                    placeholder="Name*"
+                    value={formData.name}
+                    onChange={handleChange}
+                    className="w-full border-2 border-[#9A283D] rounded-xl px-4 py-3 bg-[#FFFAF8] focus:outline-none focus:border-[#7A1C2B] transition-colors"
+                  />
+                  {errors.name && <p className="text-red-500 text-sm mt-1 text-left">{errors.name}</p>}
+                </div>
+                
+                <div>
+                  <input
+                    type="text"
+                    name="mobileNumber"
+                    placeholder="Mobile number*"
+                    value={formData.mobileNumber}
+                    onChange={handleChange}
+                    className="w-full border-2 border-[#9A283D] rounded-xl px-4 py-3 bg-[#FFFAF8] focus:outline-none focus:border-[#7A1C2B] transition-colors"
+                  />
+                  {errors.mobileNumber && <p className="text-red-500 text-sm mt-1 text-left">{errors.mobileNumber}</p>}
+                </div>
+                
+                <div>
+                  <input
+                    type="email"
+                    name="email"
+                    placeholder="Email*"
+                    value={formData.email}
+                    onChange={handleChange}
+                    className="w-full border-2 border-[#9A283D] rounded-xl px-4 py-3 bg-[#FFFAF8] focus:outline-none focus:border-[#7A1C2B] transition-colors"
+                  />
+                  {errors.email && <p className="text-red-500 text-sm mt-1 text-left">{errors.email}</p>}
+                </div>
+                
+                <input
+                  type="text"
+                  name="state"
+                  placeholder="State"
+                  value={formData.state}
+                  onChange={handleChange}
+                  className="w-full border-2 border-[#9A283D] rounded-xl px-4 py-3 bg-[#FFFAF8] focus:outline-none focus:border-[#7A1C2B] transition-colors"
+                />
 
-          <input
-            type="date"
-            name="dateOfBirth"
-            placeholder="Date of Birth"
-            value={formData.dateOfBirth}
-            onChange={handleChange}
-            className="w-full border border-[#9A283D] rounded-lg px-4 py-3 bg-[#FFFAF8] focus:outline-none"
-          />
+                <input
+                  type="date"
+                  name="dateOfBirth"
+                  placeholder="Date of Birth"
+                  value={formData.dateOfBirth}
+                  onChange={handleChange}
+                  className="w-full border-2 border-[#9A283D] rounded-xl px-4 py-3 bg-[#FFFAF8] focus:outline-none focus:border-[#7A1C2B] transition-colors"
+                />
 
-          <input
-            type="text"
-            name="birthPlace"
-            placeholder="Birth Place"
-            value={formData.birthPlace}
-            onChange={handleChange}
-            className="w-full border border-[#9A283D] rounded-lg px-4 py-3 bg-[#FFFAF8] focus:outline-none"
-          />
+                <input
+                  type="text"
+                  name="birthPlace"
+                  placeholder="Birth Place"
+                  value={formData.birthPlace}
+                  onChange={handleChange}
+                  className="w-full border-2 border-[#9A283D] rounded-xl px-4 py-3 bg-[#FFFAF8] focus:outline-none focus:border-[#7A1C2B] transition-colors"
+                />
 
-          <input
-            type="time"
-            name="timeOfBirth"
-            placeholder="Time of Birth"
-            value={formData.timeOfBirth}
-            onChange={handleChange}
-            className="w-full border border-[#9A283D] rounded-lg px-4 py-3 bg-[#FFFAF8] focus:outline-none"
-          />
+                <input
+                  type="time"
+                  name="timeOfBirth"
+                  placeholder="Time of Birth"
+                  value={formData.timeOfBirth}
+                  onChange={handleChange}
+                  className="w-full border-2 border-[#9A283D] rounded-xl px-4 py-3 bg-[#FFFAF8] focus:outline-none focus:border-[#7A1C2B] transition-colors"
+                />
 
-          <select
-            name="gender"
-            value={formData.gender}
-            onChange={handleChange}
-            className="w-full border border-[#9A283D] rounded-lg px-4 py-3 bg-[#FFFAF8] focus:outline-none"
-          >
-            <option value="">Select Gender (Optional)</option>
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-            <option value="other">Other</option>
-          </select>
+                <select
+                  name="gender"
+                  value={formData.gender}
+                  onChange={handleChange}
+                  className="w-full border-2 border-[#9A283D] rounded-xl px-4 py-3 bg-[#FFFAF8] focus:outline-none focus:border-[#7A1C2B] transition-colors"
+                >
+                  <option value="">Select Gender (Optional)</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-[#9A283D] text-white py-3 rounded-full shadow-md disabled:opacity-50"
-            >
-              {loading ? "Saving..." : "Save Profile"}
-            </button>
-          </form>
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-[#9A283D] text-white py-3 rounded-xl shadow-lg font-medium text-lg disabled:opacity-50 hover:bg-[#7A1C2B] transition-colors mt-6"
+              >
+                {loading ? "Saving..." : "Save Profile"}
+              </button>
+            </form>
         </>
         )}
       </div>

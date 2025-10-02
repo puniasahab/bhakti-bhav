@@ -78,7 +78,11 @@ function VratKathaCategoryDetails({ detail }) {
 
     return (
         <>
-            <Header pageName={{ hi: "dFkk", en: "Katha" }} hindiFontSize="true" />
+            <Header 
+                showProfileHeader={true}
+                profileText="भक्ति भाव"
+                hideEditIcon={true}
+            />
             <PageTitleCard
                 titleHi={detail.name.hi}
                 titleEn={detail.name.en}

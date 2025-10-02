@@ -22,7 +22,7 @@ export default function VratKathaCategoryDetails() {
 
   return (
     <>
-      <Header />
+      <Header hideEditIcon={true} showProfileHeader={true} profileText="भक्ति भाव" />
 
       <PageTitleCard
         titleHi={selectedCategoryName?.hi || "dFkk"}
@@ -32,29 +32,29 @@ export default function VratKathaCategoryDetails() {
       />
 
       <div className="container mx-auto px-4 mt-4">
-        <ul className="grid grid-cols-2 lg:grid-cols-4 gap-4 text-center">
+        <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
           {selectedCategoryKathas.map((katha) => (
             <li key={katha._id}>
               <Link
                 to={`/vrat-katha/${katha._id}`}
-                className="theme_bg bg-white rounded-xl shadow hover:bg-yellow-50 transition block overflow-hidden"
+                className="relative block rounded-xl overflow-hidden shadow-lg"
               >
-                <div className="w-full h-40 flex items-center justify-center overflow-hidden">
+                <div className="overflow_bg">
                   <img
-                    src={`${katha.imagethumb}`}
+                    src={katha.imagethumb || katha.imageUrl}
                     alt={katha.name?.hi || katha.name?.en}
-                    className="w-auto rounded-md max-h-[100%] md:max-h-[100%]"
+                    className="w-full rounded-md max-h-[150px] md:max-h-[150px] object-cover"
                   />
-                </div>
-                <div className="p-2">
-                  {katha.name?.hi && (
-                    <h2 className="md:text-xl text-lg font-semibold truncate font-hindi pt-3">
-                      {katha.name.hi}
-                    </h2>
-                  )}
-                  {katha.name?.en && (
-                    <p className="text-sm truncate font-eng">{katha.name.en}</p>
-                  )}
+                  <div className="absolute inset-0 theme_text flex flex-col items-center justify-center text-center px-4 z-10 top-[35%]">
+                    {katha.name?.hi && (
+                      <h2 className="text-xl font-bold font-hindi">
+                        {katha.name.hi}
+                      </h2>
+                    )}
+                    {katha.name?.en && (
+                      <p className="text-sm font-eng">{katha.name.en}</p>
+                    )}
+                  </div>
                 </div>
               </Link>
             </li>
