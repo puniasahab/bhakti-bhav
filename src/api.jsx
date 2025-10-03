@@ -91,7 +91,7 @@ export const subscriptionApis = {
 
   getPlanById: async (id) => {
     try {
-      const response = await api.get(`subscription-plans/${id}`);
+      const response = await api.get(`${endPoints.getSubscriptionPlansById}/${id}`);
       return response.data;
     } catch (error) {
       console.error(`Error fetching subscription plan with ID ${id}:`, error);
@@ -101,12 +101,12 @@ export const subscriptionApis = {
 }
 
 export const paymentApis = {
-  getSubscriptionPlans: async () => {
+  makePayment: async (data) => {
     try {
-      const response = await api.get(endPoints.getSubscriptionPlans);
+      const response = await api.post(endPoints.makePayment, data);
       return response.data;
     } catch (error) {
-      console.error("Error fetching subscription plans:", error);
+      console.error("Error making payment:", error);
       throw error;
     }
   }

@@ -7,4 +7,6 @@ export const endPoints = {
     getProfile: "profile",
     updateProfile: "profileUpdate",
     getSubscriptionPlans: "subscriptions",
+    getSubscriptionPlansById: "subscriptions",
+    makePayment: 'cashfree/create-order',
 }
