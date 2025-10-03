@@ -85,7 +85,7 @@ function App() {
           <Route path="/edit-profile" element={<EditProfile />} />
           <Route path="/payment" element={<Payment />} />
           <Route path="/transactions" element={<Transactions />} />
-          <Route path="/paymentPay" element={<PaymentPay />} />
+          <Route path="/paymentPage" element={<PaymentPay />} />
           <Route path='/vrat-katha/categoryDetails/:id' element={<VratKathaCategoryDetails />} /> 
         </Routes>
       </KathaProvider>

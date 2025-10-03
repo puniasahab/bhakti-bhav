@@ -28,7 +28,15 @@ export default function VratKatha() {
           //     allKathas.push(...category.kathas);
           //   }
           // });
-          setKathas(json);
+          const newData = [
+            ...json.categories.map(item => ({
+              ...item, isCategory: true,
+            })),
+            ...json.uncategorizedKathas.map(item => ({
+              ...item, isCategory: false,
+            }))
+          ]
+          setKathas(newData);
         // } else {
         //   setKathas([]);
         // }

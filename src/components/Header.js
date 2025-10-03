@@ -38,6 +38,7 @@ function Header({
         }
     }
 
+
     return (
         <header className="px-4 pt-3">
             <div className="container mx-auto hd_bg rounded-xl">
@@ -142,7 +143,7 @@ function Header({
                             </h1>
 
                             <div className="flex items-center md:space-x-6 space-x-4 text-xl ms-auto">
-                                <a href="#">
+                                <a href="/payment">
                                     <img src={rupeesIcon} alt="₹" width="22" height="22" />
                                 </a>
                                 <a href="#">

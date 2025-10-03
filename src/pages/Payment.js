@@ -1,28 +1,27 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import bannerImg from "../assets/img/banner_bg.png";
 import { Check } from "lucide-react";
+import { subscriptionApis } from "../api";
 
 export default function Payment() {
-  
 
-  const plans = [
-    {
-      id: "platinum",
-      title: "IySfVue",
-      subtitle: "Platinum",
-      duration: "365 Days",
-      price: "₹ 251",
-    },
-    {
-      id: "silver",
-      title: "flYoj",
-      subtitle: "Silver",
-      duration: "90 Days",
-      price: "₹ 101",
-    },
-  ];
+  const [plans, setPlans] = useState([]);
+
+  useEffect(() => {
+    const fetchSubscriptionPlans = async () => {
+      try {
+        const response = await subscriptionApis.getSubscriptionPlans();
+        setPlans(response);
+        console.log("Fetched subscription plans:", response);
+      } catch (error) {
+        console.error("Error fetching subscription plans:", error);
+      }
+    };
+
+    fetchSubscriptionPlans();
+  }, []);
 
   const [selectedPlan, setSelectedPlan] = useState(plans[0]?.id || null);
   const items = [
@@ -92,10 +91,10 @@ export default function Payment() {
           ${selectedPlan === plan.id ? "border-[#9A283D] ring-1 ring-[#9A283D]" : "border-[#E9B9C5]"}`}
             >
               <p className="font-hindi theme_text text-[24px] font-bold">
-                {plan.title}{" "}
-                <span className="font-eng text-sm">/{plan.subtitle}</span>
+                {plan.name}{" "}
+                {/* <span className="font-eng text-sm">/{plan.subtitle}</span> */}
               </p>
-              <p className="text-sm font-eng">{plan.duration}</p>
+              <p className="text-sm font-eng">{plan.days}</p>
               <p className="text-[#9A283D] font-bold text-xl mt-1 font-eng">
                 {plan.price}
               </p>

@@ -6,4 +6,5 @@ export const endPoints = {
     verifyOtp: "verify-otp",
     getProfile: "profile",
     updateProfile: "profileUpdate",
+    getSubscriptionPlans: "subscriptions",
 }
