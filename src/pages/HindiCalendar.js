@@ -14,9 +14,10 @@ export default function HindiCalendar() {
       try {
         const res = await fetch("https://api.bhaktibhav.app/frontend/panchang-calendar");
         const json = await res.json();
+        console.log("Calendar data", json);
 
-        if (json.status === "success" && Array.isArray(json.data)) {
-          setMonths(json.data);
+        if (json.status === "success" && json.data && Array.isArray(json.data.data)) {
+          setMonths(json.data.data);
         } else {
           setMonths([]);
         }
@@ -32,12 +33,12 @@ export default function HindiCalendar() {
   }, []);
 
   if (loading) return <Loader message="🙏 Loading भक्ति भाव 🙏" size={200} />;
-  if (!months.length) return <p className="text-center py-10 text-white">❌ No data found</p>;
+  // if (!months.length) return <p className="text-center py-10 text-white">❌ No data found</p>;
 
   const currentMonthNumber = new Date().getMonth() + 1; // JS gives 0–11
   const currentYear = new Date().getFullYear();
 
-  const currentMonth = months.find(
+  const currentMonth = months?.find(
     (m) => m.monthNumber === currentMonthNumber && m.year === currentYear
   );
 
@@ -57,7 +58,8 @@ export default function HindiCalendar() {
         <div className="container mx-auto">
           <ul className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
             {months.map((m, idx) => {
-              const monthData = JSON.parse(m.month);
+              const monthData = m.month;
+              console.log("Month data:", m, "Type:", typeof monthData);
               return (
                 <li key={m._id}>
                   <Link
@@ -74,7 +76,7 @@ export default function HindiCalendar() {
           {currentMonth && (
             <section className="mt-6 px-4">
               <h3 className="theme_text font-semibold mb-3 current_mont text-3xl">
-                {JSON.parse(currentMonth.month).hi}{" "}
+                {currentMonth.month.hi}{" "}
                 <span className="font-eng text-sm">({currentMonth.year})</span>
               </h3>
 

@@ -102,9 +102,9 @@ function Rashifal() {
                   onClick={() => openModal(item)}
                   className="block bg-[#9A283D] shadow-lg rounded-2xl overflow-hidden hover:shadow-2xl hover:rounded-[10px] hover:scale-105 transition-all duration-300 ease-in-out w-full"
                 >
-                  <div className="w-full h-24 flex items-center justify-center">
+                  <div className="w-full h-24 flex items-center justify-center mt-2">
                     <img
-                      src={rashiImages[item.key] || "/img/default.png"}
+                      src={item.imageUrl}
                       alt={item.name.en}
                       className="w-auto rounded-md max-h-[100%]"
                     />

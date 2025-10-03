@@ -10,6 +10,7 @@ function AartiDetail() {
   const { id } = useParams();
   const [detail, setDetail] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef(null);
 
   const { language, setLanguage, fontSize, setFontSize } = useContext(LanguageContext);
@@ -36,7 +37,24 @@ function AartiDetail() {
 
   const handlePlay = () => {
     if (audioRef.current) {
-      audioRef.current.play();
+      if (isPlaying) {
+        // If audio is playing, pause it
+        audioRef.current.pause();
+        setIsPlaying(false);
+      } else {
+        // If audio is not playing, start it
+        setIsPlaying(true);
+        audioRef.current.play();
+        
+        // Add event listeners for when audio ends or has an error
+        audioRef.current.onended = () => {
+          setIsPlaying(false);
+        };
+        
+        audioRef.current.onerror = () => {
+          setIsPlaying(false);
+        };
+      }
     }
   };
 
@@ -81,12 +99,17 @@ function AartiDetail() {
                 onClick={handlePlay}
                 className="bg-[#9A283D] text-white px-6 py-2 rounded-full shadow flex items-center"
               >
-                <span className="audio_icon mr-2"></span> vkjrh lqusa
+                <span className="audio_icon mr-2"></span> 
+                {isPlaying ? "vkjrh jksdsa" : "vkjrh lqusa"}
               </button>
             )}
 
             <audio ref={audioRef} className="hidden">
-              <source src={detail.audioUrl} type="audio/mpeg" />
+              <source src={
+                detail.audioUrl?.startsWith("http")
+                  ? detail.audioUrl
+                  : `https://api.bhaktibhav.app${detail.audioUrl}`
+              } type="audio/mpeg" />
               Your browser does not support the audio element.
             </audio>
           </div>
@@ -99,24 +122,6 @@ function AartiDetail() {
             :  
             <div dangerouslySetInnerHTML={{ __html: detail.description?.en }} />
           }
-        </div>
-
-        <div className="flex justify-center gap-4 my-6">
-          <div className="mt-4">
-            {detail.audioUrl && (
-              <button
-                onClick={handlePlay}
-                className="bg-[#9A283D] text-white px-6 py-2 rounded-full shadow flex items-center"
-              >
-                <span className="audio_icon mr-2"></span> vkjrh lqusa
-              </button>
-            )}
-
-            <audio ref={audioRef} className="hidden">
-              <source src={detail.audioUrl} type="audio/mpeg" />
-              Your browser does not support the audio element.
-            </audio>
-          </div>
         </div>
 
         {/* Text */}
