@@ -8,7 +8,7 @@ function VerifyOtp() {
     const navigate = useNavigate();
     const phone = location.state?.phone || "";
 
-    const [otp, setOtp] = useState(["", "", "", "", "", ""]);
+    const [otp, setOtp] = useState(["", "", "", ""]);
     const [timeLeft, setTimeLeft] = useState(30);
     const [loading, setLoading] = useState(false);
 
@@ -56,8 +56,8 @@ function VerifyOtp() {
 
     const handleVerify = async () => {
         const otpCode = otp.join("");
-        if (otpCode.length !== 6) {
-            alert("Please enter a valid 6-digit OTP");
+        if (otpCode.length !== 4) {
+            alert("Please enter a valid 4-digit OTP");
             return;
         }
 
