@@ -109,6 +109,28 @@ export const paymentApis = {
       console.error("Error making payment:", error);
       throw error;
     }
+  },
+
+  verifyPayments: async (data) => {
+    try {
+      const response = await api.post(endPoints.verifyPayment, data);
+      return response.data;
+
+    }
+    catch(error) {
+      console.log("Error Verifying payment:", error);
+      throw error;
+    }
+  },
+
+  getTransactions: async () => {
+    try {
+      const response = await api.get(endPoints.getTransactions);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching transactions:", error);
+      throw error;
+    } 
   }
 }
 export const loginApis = {

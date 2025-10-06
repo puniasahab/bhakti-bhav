@@ -4,11 +4,13 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Loader from "../components/Loader";
 import PageTitleCard from "../components/PageTitleCard";
+import { useNavigate } from "react-router-dom";
 
 function HindiCalendarDetail() {
   const { id } = useParams();
   const [month, setMonth] = useState(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   const dayData = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
@@ -84,6 +86,7 @@ function HindiCalendarDetail() {
 
               return (
                 <li
+                  onClick={() => navigate(`/vrat-katha/${festival.kathaId}`)}
                   key={festival._id}
                   className="bg-[#9A283D] text-white rounded-lg flex items-center px-4 py-3 shadow-md"
                 >

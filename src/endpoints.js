@@ -9,4 +9,6 @@ export const endPoints = {
     getSubscriptionPlans: "subscriptions",
     getSubscriptionPlansById: "subscriptions",
     makePayment: 'cashfree/create-order',
+    verifyPayment: 'cashfree/verify-payment',
+    getTransactions: 'Usertranctions',
 }
