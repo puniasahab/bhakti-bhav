@@ -4,6 +4,7 @@ import Loader from "../components/Loader";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import PageTitleCard from "../components/PageTitleCard";
+import { wallpaperApis } from "../api";
 
 function WallpaperDetail() {
   const { id } = useParams();
@@ -11,6 +12,56 @@ function WallpaperDetail() {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [method, setMethod] = useState("");
+
+
+  const downloadWallpaper = async (id) => {
+    try {
+      // Fetch the wallpaper data from API
+      const response = await wallpaperApis.downloadWallpaper(id);
+      console.log("Download response:", response);
+      
+      if (!response.status || response.code !== 200) {
+        throw new Error("Failed to fetch wallpaper data");
+      }
+
+      // Get the image URL from the response
+      const imageUrl = response.data.imageUrl;
+      if (!imageUrl) {
+        throw new Error("Image URL not found in response");
+      }
+
+      // Fetch the actual image as a blob
+      const imageResponse = await fetch(imageUrl);
+      if (!imageResponse.ok) {
+        throw new Error("Failed to fetch image from URL");
+      }
+      
+      const blob = await imageResponse.blob();
+
+      // Extract filename from URL or use a default name
+      const urlParts = imageUrl.split('/');
+      const fileName = urlParts[urlParts.length - 1] || `bhakti-bhav-wallpaper-${response.data.godName}.png`;
+
+      // Create a temporary object URL for the blob
+      const url = window.URL.createObjectURL(blob);
+
+      // Create a temporary link element
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click(); // trigger the download
+      a.remove();
+
+      // Revoke the object URL to free memory
+      window.URL.revokeObjectURL(url);
+      
+      console.log("Download completed successfully");
+    } catch (error) {
+      console.error("Error downloading image:", error);
+      alert("Unable to download image. Please try again.");
+    }
+  }
 
   useEffect(() => {
     if (!id) return;
@@ -155,7 +206,7 @@ Check out this amazing wallpaper: ${imageUrl}
             {/* <button className="flex-1 max-w-[120px] py-3 px-4 border-2 border-[#9A283D] rounded-xl theme_text font-semibold text-lg hover:bg-[#9A283D] hover:text-white transition-colors">
               Apply
             </button> */}
-            <button className="flex-1 max-w-[120px] py-3 px-4 border-2 border-[#9A283D] rounded-xl theme_text font-semibold text-lg hover:bg-[#9A283D] hover:text-white transition-colors font-eng">
+            <button className="flex-1 max-w-[120px] py-3 px-4 border-2 border-[#9A283D] rounded-xl theme_text font-semibold text-lg hover:bg-[#9A283D] hover:text-white transition-colors font-eng" onClick = {() => downloadWallpaper(detail._id)}>
               Download
             </button>
             <button 

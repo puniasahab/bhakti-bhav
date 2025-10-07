@@ -28,10 +28,10 @@ api.interceptors.request.use(
 
 
 export const wallpaperApis = {
-  downloadWallpaper: async()=>{
+  downloadWallpaper: async (id) => {
     try {
-      const respose = await api.get(endPoints.downloadWallpaper);
-      return respose.data;
+      const response = await api.get(`${endPoints.downloadWallpaper}/${id}`);
+      return response.data;
     }
     catch(error) {
       console.error("Error downloading wallpaper:", error);
