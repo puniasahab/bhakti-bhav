@@ -45,6 +45,44 @@ export default function ChalisaDetail() {
     fetchChalisa();
   }, [id]);
 
+  // Cleanup effect to stop audio when component unmounts or page changes
+  useEffect(() => {
+    const cleanup = () => {
+      console.log("Chalisa cleanup running...");
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+        // Clear all event listeners
+        audioRef.current.onloadedmetadata = null;
+        audioRef.current.ontimeupdate = null;
+        audioRef.current.onended = null;
+        audioRef.current.onpause = null;
+        audioRef.current.onplay = null;
+        audioRef.current.onerror = null;
+        audioRef.current = null;
+      }
+      // Reset all audio-related states
+      setCurrentAudio(null);
+      setShowAudioPlayer(false);
+      setIsPlaying(false);
+      setCurrentTime(0);
+      setDuration(0);
+    };
+
+    // Add beforeunload event listener
+    const handleBeforeUnload = () => {
+      cleanup();
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    // Return cleanup function
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      cleanup();
+    };
+  }, []);
+
   const handlePlay = () => {
     const url = chalisa.audioUrl;
     if (!url) return;

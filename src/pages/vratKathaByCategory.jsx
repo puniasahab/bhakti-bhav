@@ -49,6 +49,43 @@ function VratKathaCategoryDetails({ detail }) {
     //         });
     // }, [id]);
 
+    // Cleanup effect to stop audio when component unmounts or page changes
+    useEffect(() => {
+        const cleanup = () => {
+            console.log("VratKathaCategory cleanup running...");
+            if (audioRef.current) {
+                audioRef.current.pause();
+                audioRef.current.currentTime = 0;
+                // Clear all event listeners
+                audioRef.current.onloadedmetadata = null;
+                audioRef.current.ontimeupdate = null;
+                audioRef.current.onended = null;
+                audioRef.current.onpause = null;
+                audioRef.current.onplay = null;
+                audioRef.current = null;
+            }
+            // Reset all audio-related states
+            setCurrentAudio(null);
+            setShowAudioPlayer(false);
+            setIsPlaying(false);
+            setCurrentTime(0);
+            setDuration(0);
+        };
+
+        // Add beforeunload event listener
+        const handleBeforeUnload = () => {
+            cleanup();
+        };
+
+        window.addEventListener('beforeunload', handleBeforeUnload);
+
+        // Return cleanup function
+        return () => {
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+            cleanup();
+        };
+    }, []);
+
     const redirectToAartiPage = (artiId) => {
         if (!artiId) {
             // alert("No Arti ID available for this Katha.");
@@ -177,14 +214,22 @@ function VratKathaCategoryDetails({ detail }) {
     if (loading) return <Loader message="🙏 Loading भक्ति भाव 🙏" size={200} />;
     if (!detail) return <p className="text-center py-10 theme_text">❌ No data found!</p>;
 
-    const jsonFile = {
+   const jsonFile = {
     "share": {
-      "hi": "इस आरती को साझा करें",
-      "en": "Share this Aarti"
+      "hi": "'ks;j djsa",
+      "en": "Share"
     },
     "listen": {
-      "hi": "आरती सुनें",
-      "en": "Listen to Aarti"
+      "hi": "dFkk lqusa",
+      "en": "Listen"
+    },
+    "pause": {
+      "hi": "can djsa" ,
+      "en": "Pause"
+    },
+    "aarti": {
+        "hi": "vkjrh",
+        "en": "Aarti"
     }
   }
 
@@ -230,8 +275,8 @@ function VratKathaCategoryDetails({ detail }) {
                 <div className="flex justify-center gap-4">
                     <div className="mt-4">
 
-                        <button className="bg-[#9A283D] text-white px-6 py-2 rounded-full shadow flex items-center font-hindi">
-                            <img src="../img/share_icon.png" alt="" className="w-[15px] h-[15px] mr-2" /> 'ks;j djsa
+                        <button className={`bg-[#9A283D] text-white px-6 py-2 rounded-full shadow flex items-center ${language === "hi" ? "font-hindi" : "font-eng"}`}>
+                            <img src="../img/share_icon.png" alt="" className="w-[15px] h-[15px] mr-2" /> {language === "hi" ? jsonFile.share.hi : jsonFile.share.en}
                         </button>
                     </div>
 
@@ -241,7 +286,7 @@ function VratKathaCategoryDetails({ detail }) {
                             onClick={() => handlePlay(detail.audioUrl)}
                             disabled={!detail.audioUrl}
                             className={`px-6 py-2 flex items-center justify-center rounded-full 
-                             transition font-hindi ${!detail.audioUrl
+                             transition ${language === "hi" ? "font-hindi" : "font-eng"} ${!detail.audioUrl
                                     ? "bg-[#9A283D]/50 text-white cursor-not-allowed"
                                     : showAudioPlayer
                                         ? "bg-red-600 text-white"
@@ -250,11 +295,11 @@ function VratKathaCategoryDetails({ detail }) {
                         >
                             {showAudioPlayer ? (
                                 <>
-                                    <span className="audio_pause_icon mr-2"></span> can djsa
+                                    <span className="audio_pause_icon mr-2"></span> {language === "hi" ? jsonFile.pause.hi : jsonFile.pause.en}
                                 </>
                             ) : (
                                 <>
-                                    <span className="audio_icon mr-2"></span> dFkk lqusa
+                                    <span className="audio_icon mr-2"></span> {language === "hi" ? jsonFile.listen.hi : jsonFile.listen.en}
                                 </>
                             )}
                         </button>
@@ -321,8 +366,12 @@ function VratKathaCategoryDetails({ detail }) {
                 )}
 
                 <div className="text-center my-8 text-xl">
-                    <p className={`${language === "hi"  ? " font-hindi" : "hidden"} text-[#9A283D] ${fontSize}`}>{detail.mantra?.hi}</p>
-                    <p className={`${language === "en" ? " font-eng" : "hidden"} text-[#9A283D] ${fontSize}`}>{detail.mantra?.hi}</p>
+                    <p className={`${language === "hi" ? " font-hindi" : "hidden"} text-[#9A283D] ${fontSize}`}>
+                        {detail.mantra?.hi?.replace(/\\"/g, '"')}
+                    </p>
+                    <p className={`${language === "en" ? " font-eng" : "hidden"} text-[#9A283D] ${fontSize}`}>
+                        {detail.mantra?.hi?.replace(/\\"/g, '"')}
+                    </p>
                 </div>
 
                 <div className="mb-4">
@@ -420,9 +469,9 @@ function VratKathaCategoryDetails({ detail }) {
 
                 <div className="mt-4 w-full text-center">
                     <a href={redirectToAartiPage(detail.artiId)}
-                        className="bg-[#9A283D] text-white px-6 py-2 rounded-full shadow inline-flex items-center"
+                        className={`bg-[#9A283D] text-white px-6 py-2 rounded-full shadow inline-flex items-center ${language === "hi" ? "font-hindi" : "font-eng"}`}
                     >
-                        <span className="audio_icon mr-2"></span> vkjrh
+                        <span className="audio_icon mr-2"></span> {language === "hi" ? jsonFile.aarti.hi : jsonFile.aarti.en}
                     </a>
                 </div>
             </div>

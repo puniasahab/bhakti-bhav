@@ -27,6 +27,18 @@ api.interceptors.request.use(
 );
 
 
+export const wallpaperApis = {
+  downloadWallpaper: async()=>{
+    try {
+      const respose = await api.get(endPoints.downloadWallpaper);
+      return respose.data;
+    }
+    catch(error) {
+      console.error("Error downloading wallpaper:", error);
+      throw error;
+    }
+  }
+}
 export const mantraApis = {
   getAllMantras: async () => {
     try {

@@ -38,6 +38,44 @@ function AartiDetail() {
       });
   }, [id]);
 
+  // Cleanup effect to stop audio when component unmounts or page changes
+  useEffect(() => {
+    const cleanup = () => {
+      console.log("Aarti cleanup running...");
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+        // Clear all event listeners
+        audioRef.current.onloadedmetadata = null;
+        audioRef.current.ontimeupdate = null;
+        audioRef.current.onended = null;
+        audioRef.current.onpause = null;
+        audioRef.current.onplay = null;
+        audioRef.current.onerror = null;
+        audioRef.current = null;
+      }
+      // Reset all audio-related states
+      setCurrentAudio(null);
+      setShowAudioPlayer(false);
+      setIsPlaying(false);
+      setCurrentTime(0);
+      setDuration(0);
+    };
+
+    // Add beforeunload event listener
+    const handleBeforeUnload = () => {
+      cleanup();
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    // Return cleanup function
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      cleanup();
+    };
+  }, []);
+
 
   const handlePlay = () => {
     const url = detail.audioUrl?.startsWith("http")
@@ -180,7 +218,7 @@ function AartiDetail() {
       "en": "Share"
     },
     "listen": {
-      "hi": "pkyhlk lqusa",
+      "hi": "vkjrh lqusa",
       "en": "Listen"
     },
     "pause": {
@@ -188,6 +226,22 @@ function AartiDetail() {
       "en": "Pause"
     }
   }
+  const shareText = `🌸 ${detail.name?.en || "Aarti"} 🌸\n\n${detail.text?.hi || ""}\n\nListen here: ${window.location.href}`;
+  const handleNativeShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `${detail.name?.en || "Aarti"}`,
+          text: shareText,
+          url: window.location.href,
+        });
+      } catch (err) {
+        console.error("Share failed:", err);
+      }
+    } else {
+      alert("Sharing is not supported on this browser.");
+    }
+  };
 
   return (
     <>
@@ -215,7 +269,9 @@ function AartiDetail() {
         <div className="flex justify-center gap-4 my-6">
           <div className="mt-4">
 
-            <button className={`bg-[#9A283D] text-white px-6 py-2 rounded-full shadow flex items-center ${language === "hi" ? "font-hindi" : "font-eng"}`}>
+            <button className={`bg-[#9A283D] text-white px-6 py-2 rounded-full shadow flex items-center ${language === "hi" ? "font-hindi" : "font-eng"}`}
+            onClick={handleNativeShare}
+            >
               <img src="../img/share_icon.png" alt="" className="w-[15px] h-[15px] mr-2" /> {language === "hi" ? jsonFile.share.hi : jsonFile.share.en}
             </button>
           </div>

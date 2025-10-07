@@ -19,7 +19,7 @@ export default function PaymentDrop() {
   let cashfree;
   let initializeSDK = async () => {
     cashfree = await load({
-      mode: 'sandbox',
+      mode: 'production', // Use 'sandbox' for testing and 'production' for live transactions
     })
   }
   initializeSDK();

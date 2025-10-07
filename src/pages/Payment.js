@@ -6,6 +6,7 @@ import { Check } from "lucide-react";
 import { paymentApis, subscriptionApis, profileApis } from "../api";
 import { useNavigate } from "react-router-dom";
 import { usePayment } from "../contexts/PaymentContext";
+import { getTokenFromLS } from "../commonFunctions";
 
 export default function Payment() {
 
@@ -126,7 +127,12 @@ export default function Payment() {
     if(profile.email === '' || profile.email == null || profile.email === undefined) {
       setTimeout(() => {
         alert("Please update your email in profile section to proceed with the payment.");
-        navigate("/edit-profile");
+        if(getTokenFromLS()) {
+          navigate("/edit-profile");
+        }
+        else {
+          navigate("/login");
+        }
       }, 2000);
     }
     console.log({ planId: planDetails[0]._id, amount: planDetails[0].price, name: profile.name, email: profile.email, phone: profile.mobileNumber }
