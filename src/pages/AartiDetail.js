@@ -174,6 +174,21 @@ function AartiDetail() {
   if (!detail)
     return <p className="text-center py-10 theme_text">❌ No data found!</p>;
 
+  const jsonFile = {
+    "share": {
+      "hi": "'ks;j djsa",
+      "en": "Share"
+    },
+    "listen": {
+      "hi": "pkyhlk lqusa",
+      "en": "Listen"
+    },
+    "pause": {
+      "hi": "can djsa" ,
+      "en": "Pause"
+    }
+  }
+
   return (
     <>
       <Header pageName={{ hi: "vkjrh", en: "Aarti" }} hindiFontSize="true" />
@@ -200,8 +215,8 @@ function AartiDetail() {
         <div className="flex justify-center gap-4 my-6">
           <div className="mt-4">
 
-            <button className="bg-[#9A283D] text-white px-6 py-2 rounded-full shadow flex items-center font-hindi">
-              <img src="../img/share_icon.png" alt="" className="w-[15px] h-[15px] mr-2" /> 'ks;j djsa
+            <button className={`bg-[#9A283D] text-white px-6 py-2 rounded-full shadow flex items-center ${language === "hi" ? "font-hindi" : "font-eng"}`}>
+              <img src="../img/share_icon.png" alt="" className="w-[15px] h-[15px] mr-2" /> {language === "hi" ? jsonFile.share.hi : jsonFile.share.en}
             </button>
           </div>
 
@@ -209,17 +224,17 @@ function AartiDetail() {
             {detail.audioUrl && (
               <button
                 onClick={handlePlay}
-                className={`px-6 py-2 rounded-full shadow flex items-center font-hindi ${
+                className={`px-6 py-2 rounded-full shadow flex items-center ${language === "hi" ? "font-hindi" : "font-eng"} ${
                   showAudioPlayer ? "bg-red-600 text-white" : "bg-[#9A283D] text-white"
                 }`}
               >
                 {showAudioPlayer ? (
                   <>
-                    <span className="audio_pause_icon mr-2"></span> can djsa
+                    <span className="audio_pause_icon mr-2"></span> {language === "hi" ? jsonFile.pause.hi : jsonFile.pause.en}
                   </>
                 ) : (
                   <>
-                    <span className="audio_icon mr-2"></span> vkjrh lqusa
+                    <span className="audio_icon mr-2"></span> {language === "hi" ? jsonFile.listen.hi : jsonFile.listen.en}
                   </>
                 )}
               </button>

@@ -177,6 +177,17 @@ function VratKathaCategoryDetails({ detail }) {
     if (loading) return <Loader message="🙏 Loading भक्ति भाव 🙏" size={200} />;
     if (!detail) return <p className="text-center py-10 theme_text">❌ No data found!</p>;
 
+    const jsonFile = {
+    "share": {
+      "hi": "इस आरती को साझा करें",
+      "en": "Share this Aarti"
+    },
+    "listen": {
+      "hi": "आरती सुनें",
+      "en": "Listen to Aarti"
+    }
+  }
+
     return (
         <>
             <Header 

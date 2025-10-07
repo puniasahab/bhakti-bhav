@@ -60,7 +60,7 @@ function VratKathaDetail() {
 
     const handlePlay = (url) => {
         if (!url) return;
-        
+
         // If audio player is already showing for this audio
         if (currentAudio === url && showAudioPlayer) {
             // Hide the audio player and stop audio
@@ -78,7 +78,7 @@ function VratKathaDetail() {
             if (audioRef.current) {
                 audioRef.current.pause();
             }
-            
+
             audioRef.current = new Audio(url);
             setCurrentAudio(url);
             setShowAudioPlayer(true);
@@ -115,7 +115,7 @@ function VratKathaDetail() {
 
     const handlePlayerPlayPause = () => {
         if (!audioRef.current) return;
-        
+
         if (isPlaying) {
             audioRef.current.pause();
             setIsPlaying(false);
@@ -155,6 +155,17 @@ function VratKathaDetail() {
     if (loading) return <Loader message="🙏 Loading भक्ति भाव 🙏" size={200} />;
     if (!detail) return <p className="text-center py-10 theme_text">❌ No data found!</p>;
 
+    const jsonFile = {
+        "share": {
+
+            "hi": "इस आरती को साझा करें",
+            "en": "Share this Aarti"
+        },
+        "listen": {
+            "hi": "आरती सुनें",
+            "en": "Listen to Aarti"
+        }
+    }
     return (
         <>
             <Header pageName={{ hi: "dFkk", en: "Katha" }} hindiFontSize="true" />
@@ -163,7 +174,7 @@ function VratKathaDetail() {
                 titleEn={detail.name.en}
                 customEngFontSize={"13px"}
                 customFontSize={"18px"}
-                
+
             />
 
             <div className="container mx-auto px-4 pb-6 theme_text">
@@ -235,7 +246,7 @@ function VratKathaDetail() {
                         <div className="bg-white border-2 border-[#9A283D] rounded-xl p-4 shadow-lg" style={{ width: '100%', maxWidth: '400px' }}>
                             <div className="flex items-center justify-between mb-3">
                                 <h3 className="font-hindi text-[#9A283D] font-semibold text-sm">dFkk प्लेयर</h3>
-                                <button 
+                                <button
                                     onClick={handleCloseAudioPlayer}
                                     className="text-[#9A283D] hover:text-red-600 transition-colors duration-200"
                                 >
@@ -244,23 +255,23 @@ function VratKathaDetail() {
                                     </svg>
                                 </button>
                             </div>
-                            
+
                             <div className="flex items-center gap-3">
-                                <button 
+                                <button
                                     onClick={handlePlayerPlayPause}
                                     className="bg-[#9A283D] text-white rounded-full p-3 hover:bg-[#7A1F2D] transition-colors duration-200 flex-shrink-0"
                                 >
                                     {isPlaying ? (
                                         <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                                            <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>
+                                            <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
                                         </svg>
                                     ) : (
                                         <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                                            <path d="M8 5v14l11-7z"/>
+                                            <path d="M8 5v14l11-7z" />
                                         </svg>
                                     )}
                                 </button>
-                                
+
                                 <div className="flex-1">
                                     <input
                                         type="range"
@@ -284,7 +295,7 @@ function VratKathaDetail() {
                 )}
 
                 <div className="text-center my-8 text-xl">
-                    <p className={`${language === "hi"  ? " font-hindi" : "hidden"} text-[#9A283D] ${fontSize}`}>{detail.mantra?.hi}</p>
+                    <p className={`${language === "hi" ? " font-hindi" : "hidden"} text-[#9A283D] ${fontSize}`}>{detail.mantra?.hi}</p>
                     <p className={`${language === "en" ? " font-eng" : "hidden"} text-[#9A283D] ${fontSize}`}>{detail.mantra?.hi}</p>
                 </div>
 
@@ -376,8 +387,8 @@ function VratKathaDetail() {
 
                     </h2>
                     {language === "hi"
-                        ? <div className = {`font-hindi text-[rgba(0,0,0,0.7)] ${fontSize}`} dangerouslySetInnerHTML={{ __html: detail.pujaMahatva?.hi.replace(/,/g, "]").replace(/\(/g, "¼").replace(/\)/g, "½").replace(/\:/g, "%") }} />
-                        : <div className = {`font-eng text-[rgba(0,0,0,0.7)] ${fontSize}`} dangerouslySetInnerHTML={{ __html: detail.pujaMahatva?.en }} />
+                        ? <div className={`font-hindi text-[rgba(0,0,0,0.7)] ${fontSize}`} dangerouslySetInnerHTML={{ __html: detail.pujaMahatva?.hi.replace(/,/g, "]").replace(/\(/g, "¼").replace(/\)/g, "½").replace(/\:/g, "%") }} />
+                        : <div className={`font-eng text-[rgba(0,0,0,0.7)] ${fontSize}`} dangerouslySetInnerHTML={{ __html: detail.pujaMahatva?.en }} />
                     }
                 </div>
 
@@ -389,7 +400,7 @@ function VratKathaDetail() {
                     </a>
                 </div>
             </div>
-            
+
         </>
     );
 }

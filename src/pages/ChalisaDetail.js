@@ -166,6 +166,21 @@ export default function ChalisaDetail() {
   if (!chalisa)
     return <p className="text-center py-10">❌ No chalisa found</p>;
 
+  const jsonFile = {
+    "share": {
+      "hi": "'ks;j djsa",
+      "en": "Share"
+    },
+    "listen": {
+      "hi": "pkyhlk lqusa",
+      "en": "Listen"
+    },
+    "pause": {
+      "hi": "can djsa" ,
+      "en": "Pause"
+    }
+  }
+
   return (
     <>
       <Header pageName={{ hi: "pkyhlk", en: "Chalisa" }} hindiFontSize="true" />
@@ -197,8 +212,8 @@ export default function ChalisaDetail() {
         <div className="flex justify-center gap-4 my-6">
           <div className="mt-4">
 
-            <button className="bg-[#9A283D] text-white px-6 py-2 rounded-full shadow flex items-center font-hindi">
-              <img src="../img/share_icon.png" alt="" className="w-[15px] h-[15px] mr-2" /> 'ks;j djsa
+            <button className={`bg-[#9A283D] text-white px-6 py-2 rounded-full shadow flex items-center ${language === "hi" ? "font-hindi" : "font-eng"}`}>
+              <img src="../img/share_icon.png" alt="" className="w-[15px] h-[15px] mr-2" /> {language === "hi" ? jsonFile.share.hi : jsonFile.share.en}
             </button>
           </div>
 
@@ -206,17 +221,17 @@ export default function ChalisaDetail() {
             {chalisa.audioUrl && (
               <button
                 onClick={handlePlay}
-                className={`px-6 py-2 rounded-full shadow flex items-center font-hindi ${
+                className={`px-6 py-2 rounded-full shadow flex items-center ${language === "hi" ? "font-hindi" : "font-eng"} ${
                   showAudioPlayer ? "bg-red-600 text-white" : "bg-[#9A283D] text-white"
                 }`}
               >
                 {showAudioPlayer ? (
                   <>
-                    <span className="audio_pause_icon mr-2"></span> can djsa
+                    <span className="audio_pause_icon mr-2"></span> {language === "hi" ? jsonFile.pause.hi : jsonFile.pause.en}
                   </>
                 ) : (
                   <>
-                    <span className="audio_icon mr-2"></span> pkyhlk lqusa
+                    <span className="audio_icon mr-2"></span> {language === "hi" ? jsonFile.listen.hi : jsonFile.listen.en}
                   </>
                 )}
               </button>
@@ -231,7 +246,7 @@ export default function ChalisaDetail() {
 
         {/* Audio Player Preview */}
         {showAudioPlayer && (
-          <div className="flex justify-center mt-6">
+          <div className="flex justify-center mt-6 mb-6">
             <div className="bg-white border-2 border-[#9A283D] rounded-xl p-4 shadow-lg" style={{ width: '100%', maxWidth: '400px' }}>
               <div className="flex items-center justify-between mb-3">
                 <h3 className="font-hindi text-[#9A283D] font-semibold text-sm">pkyhlk प्लेयर</h3>
