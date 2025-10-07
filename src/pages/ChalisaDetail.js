@@ -219,6 +219,23 @@ export default function ChalisaDetail() {
     }
   }
 
+
+  const shareText = `🌸 ${chalisa.name?.en || "Chalisa"} 🌸\n\n${chalisa.text?.en|| ""}\n\nListen here: ${window.location.href}`;
+  const handleNativeShare = async () => {
+    if(navigator.share) {
+      try {
+        await navigator.share({
+          title: chalisa.name?.en || "Chalisa",
+          text: shareText,
+          url: window.location.href,
+        })
+      } catch (error) {
+        console.error("Error sharing:", error);
+      }
+    } else {
+      alert("Sharing is not supported on this browser.");
+    }
+  };
   return (
     <>
       <Header pageName={{ hi: "pkyhlk", en: "Chalisa" }} hindiFontSize="true" />

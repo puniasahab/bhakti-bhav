@@ -193,24 +193,41 @@ function VratKathaDetail() {
     if (loading) return <Loader message="🙏 Loading भक्ति भाव 🙏" size={200} />;
     if (!detail) return <p className="text-center py-10 theme_text">❌ No data found!</p>;
 
-   const jsonFile = {
-    "share": {
-      "hi": "'ks;j djsa",
-      "en": "Share"
-    },
-    "listen": {
-      "hi": "dFkk lqusa",
-      "en": "Listen"
-    },
-    "pause": {
-      "hi": "can djsa" ,
-      "en": "Pause"
-    },
-    "aarti": {
-        "hi": "vkjrh",
-        "en": "Aarti"
+    const jsonFile = {
+        "share": {
+            "hi": "'ks;j djsa",
+            "en": "Share"
+        },
+        "listen": {
+            "hi": "dFkk lqusa",
+            "en": "Listen"
+        },
+        "pause": {
+            "hi": "can djsa",
+            "en": "Pause"
+        },
+        "aarti": {
+            "hi": "vkjrh",
+            "en": "Aarti"
+        }
     }
-  }
+
+    const shareText = `🌸 ${detail.name?.en || "Katha"} 🌸\n\n${detail.text?.en || ""}\n\nListen here: ${window.location.href}`;
+    const handleNativeShare = async () => {
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: detail.name?.en || "Katha",
+                    text: shareText,
+                    url: window.location.href,
+                })
+            } catch (error) {
+                console.error("Error sharing:", error);
+            }
+        } else {
+            alert("Sharing is not supported on this browser.");
+        }
+    };
     return (
         <>
             <Header pageName={{ hi: "dFkk", en: "Katha" }} hindiFontSize="true" />
@@ -249,7 +266,7 @@ function VratKathaDetail() {
                 <div className="flex justify-center gap-4">
                     <div className="mt-4">
 
-                        <button className={`bg-[#9A283D] text-white px-6 py-2 rounded-full shadow flex items-center ${language === "hi" ? "font-hindi" : "font-eng"}`}>
+                        <button className={`bg-[#9A283D] text-white px-6 py-2 rounded-full shadow flex items-center ${language === "hi" ? "font-hindi" : "font-eng"}`} onClick={handleNativeShare}>
                             <img src="../img/share_icon.png" alt="" className="w-[15px] h-[15px] mr-2" /> {language === "hi" ? jsonFile.share.hi : jsonFile.share.en}
                         </button>
                     </div>

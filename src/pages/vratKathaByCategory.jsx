@@ -97,7 +97,7 @@ function VratKathaCategoryDetails({ detail }) {
 
     const handlePlay = (url) => {
         if (!url) return;
-        
+
         // If audio player is already showing for this audio
         if (currentAudio === url && showAudioPlayer) {
             // Hide the audio player and stop audio
@@ -127,7 +127,7 @@ function VratKathaCategoryDetails({ detail }) {
                 audioRef.current.onpause = null;
                 audioRef.current.onplay = null;
             }
-            
+
             audioRef.current = new Audio(url);
             setCurrentAudio(url);
             setShowAudioPlayer(true);
@@ -168,7 +168,7 @@ function VratKathaCategoryDetails({ detail }) {
 
     const handlePlayerPlayPause = () => {
         if (!audioRef.current) return;
-        
+
         if (isPlaying) {
             audioRef.current.pause();
             setIsPlaying(false);
@@ -214,28 +214,46 @@ function VratKathaCategoryDetails({ detail }) {
     if (loading) return <Loader message="🙏 Loading भक्ति भाव 🙏" size={200} />;
     if (!detail) return <p className="text-center py-10 theme_text">❌ No data found!</p>;
 
-   const jsonFile = {
-    "share": {
-      "hi": "'ks;j djsa",
-      "en": "Share"
-    },
-    "listen": {
-      "hi": "dFkk lqusa",
-      "en": "Listen"
-    },
-    "pause": {
-      "hi": "can djsa" ,
-      "en": "Pause"
-    },
-    "aarti": {
-        "hi": "vkjrh",
-        "en": "Aarti"
+    const jsonFile = {
+        "share": {
+            "hi": "'ks;j djsa",
+            "en": "Share"
+        },
+        "listen": {
+            "hi": "dFkk lqusa",
+            "en": "Listen"
+        },
+        "pause": {
+            "hi": "can djsa",
+            "en": "Pause"
+        },
+        "aarti": {
+            "hi": "vkjrh",
+            "en": "Aarti"
+        }
     }
-  }
+
+
+    const shareText = `🌸 ${detail.name?.en || "Katha"} 🌸\n\n${detail.text?.en || ""}\n\nListen here: ${window.location.href}`;
+    const handleNativeShare = async () => {
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: detail.name?.en || "Katha",
+                    text: shareText,
+                    url: window.location.href,
+                })
+            } catch (error) {
+                console.error("Error sharing:", error);
+            }
+        } else {
+            alert("Sharing is not supported on this browser.");
+        }
+    };
 
     return (
         <>
-            <Header 
+            <Header
                 showProfileHeader={true}
                 profileText="भक्ति भाव"
                 hideEditIcon={true}
@@ -245,7 +263,7 @@ function VratKathaCategoryDetails({ detail }) {
                 titleEn={detail.name.en}
                 customEngFontSize={"13px"}
                 customFontSize={"18px"}
-                
+
             />
 
             <div className="container mx-auto px-4 pb-6 theme_text">
@@ -275,7 +293,7 @@ function VratKathaCategoryDetails({ detail }) {
                 <div className="flex justify-center gap-4">
                     <div className="mt-4">
 
-                        <button className={`bg-[#9A283D] text-white px-6 py-2 rounded-full shadow flex items-center ${language === "hi" ? "font-hindi" : "font-eng"}`}>
+                        <button className={`bg-[#9A283D] text-white px-6 py-2 rounded-full shadow flex items-center ${language === "hi" ? "font-hindi" : "font-eng"}`} onClick={handleNativeShare}>
                             <img src="../img/share_icon.png" alt="" className="w-[15px] h-[15px] mr-2" /> {language === "hi" ? jsonFile.share.hi : jsonFile.share.en}
                         </button>
                     </div>
@@ -317,7 +335,7 @@ function VratKathaCategoryDetails({ detail }) {
                         <div className="bg-white border-2 border-[#9A283D] rounded-xl p-4 shadow-lg" style={{ width: '100%', maxWidth: '400px' }}>
                             <div className="flex items-center justify-between mb-3">
                                 <h3 className="font-hindi text-[#9A283D] font-semibold text-sm">dFkk प्लेयर</h3>
-                                <button 
+                                <button
                                     onClick={handleCloseAudioPlayer}
                                     className="text-[#9A283D] hover:text-red-600 transition-colors duration-200"
                                 >
@@ -326,23 +344,23 @@ function VratKathaCategoryDetails({ detail }) {
                                     </svg>
                                 </button>
                             </div>
-                            
+
                             <div className="flex items-center gap-3">
-                                <button 
+                                <button
                                     onClick={handlePlayerPlayPause}
                                     className="bg-[#9A283D] text-white rounded-full p-3 hover:bg-[#7A1F2D] transition-colors duration-200 flex-shrink-0"
                                 >
                                     {isPlaying ? (
                                         <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                                            <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>
+                                            <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
                                         </svg>
                                     ) : (
                                         <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                                            <path d="M8 5v14l11-7z"/>
+                                            <path d="M8 5v14l11-7z" />
                                         </svg>
                                     )}
                                 </button>
-                                
+
                                 <div className="flex-1">
                                     <input
                                         type="range"
@@ -462,8 +480,8 @@ function VratKathaCategoryDetails({ detail }) {
 
                     </h2>
                     {language === "hi"
-                        ? <div className = {`font-hindi text-[rgba(0,0,0,0.7)] ${fontSize}`} dangerouslySetInnerHTML={{ __html: detail.pujaMahatva?.hi.replace(/,/g, "]").replace(/\(/g, "¼").replace(/\)/g, "½").replace(/\:/g, "%") }} />
-                        : <div className = {`font-eng text-[rgba(0,0,0,0.7)] ${fontSize}`} dangerouslySetInnerHTML={{ __html: detail.pujaMahatva?.en }} />
+                        ? <div className={`font-hindi text-[rgba(0,0,0,0.7)] ${fontSize}`} dangerouslySetInnerHTML={{ __html: detail.pujaMahatva?.hi.replace(/,/g, "]").replace(/\(/g, "¼").replace(/\)/g, "½").replace(/\:/g, "%") }} />
+                        : <div className={`font-eng text-[rgba(0,0,0,0.7)] ${fontSize}`} dangerouslySetInnerHTML={{ __html: detail.pujaMahatva?.en }} />
                     }
                 </div>
 
@@ -475,7 +493,7 @@ function VratKathaCategoryDetails({ detail }) {
                     </a>
                 </div>
             </div>
-            
+
         </>
     );
 }
