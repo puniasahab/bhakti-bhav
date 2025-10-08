@@ -358,10 +358,10 @@ function VratKathaDetail() {
 
                 <div className="text-center my-8 text-xl">
                     <p className={`${language === "hi" ? " font-hindi" : "hidden"} text-[#9A283D] ${fontSize}`}>
-                        {detail.mantra?.hi?.replace(/\\"/g, '"')}
+                        {detail.mantra?.hi?.replace(/"/g, '')}
                     </p>
                     <p className={`${language === "en" ? " font-eng" : "hidden"} text-[#9A283D] ${fontSize}`}>
-                        {detail.mantra?.hi?.replace(/\\"/g, '"')}
+                        {detail.mantra?.hi?.replace(/"/g, '')}
                     </p>
                 </div>
 

@@ -134,7 +134,7 @@ function Rashifal() {
               <div className="mb-4 text-center flex flex-col items-center">
                 <div className="bg-[#9A283D] rounded-lg flex items-center justify-center  mb-4">
                   <img
-                    src={selectedRashi.image}
+                    src={selectedRashi.imageUrl}
                     alt={selectedRashi.name?.en}
                     className="h-32 w-auto rounded-md mx-auto"
                   />
