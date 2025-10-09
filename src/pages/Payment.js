@@ -50,10 +50,10 @@ export default function Payment() {
     const fetchSubscriptionPlans = async () => {
       try {
         const response = await subscriptionApis.getSubscriptionPlans();
-        setPlans(response);
+        setPlans(response.plans.sort((a, b) => b.price - a.price));
         // Set the first plan as selected by default
-        if (response && response.length > 0) {
-          setSelectedPlan(response[0]._id || response[0].id);
+        if (response && response.plans.length > 0) {
+          setSelectedPlan(response.plans[0]._id || response.plans[0].id);
         }
         console.log("Fetched subscription plans:", response);
       } catch (error) {
@@ -165,7 +165,7 @@ export default function Payment() {
         </div>
 
         <div className="container mx-auto px-4 mt-6 space-y-4">
-          {plans?.map((plan, index) => (
+          {plans && plans.length > 0  ? plans?.map((plan, index) => (
             <div
               key={plan._id || plan.id}
               onClick={() => setSelectedPlan(plan._id || plan.id)}
@@ -227,7 +227,7 @@ export default function Payment() {
                 </div>
               )}
             </div>
-          ))}
+          )) : (<div>No plans available at the moment.</div>)}
         </div>
 
         <div className="mx-auto px-4 mt-6 flex flex-col space-y-3 font-eng justify-between">
