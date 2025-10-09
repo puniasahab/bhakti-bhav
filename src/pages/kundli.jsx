@@ -7,6 +7,7 @@ import kundaliBanner from "../assets/img/kundali_banner.png";
 import { useNavigate } from "react-router-dom";
 
 function Kundli() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
     mobileNumber: "",
