@@ -18,6 +18,10 @@ export const getSubscriptionStatusFromLS = () => {
     return status === 'true';
 } 
 
+export const removeSubscriptionStatusFromLS = () => {
+    localStorage.removeItem('isSubscribed');
+}
+
 export const removeTokenFromLS = () => {
     localStorage.removeItem('authToken');
 }
@@ -32,6 +36,10 @@ export const setMobileNoInLS = (mobile) => {
 
 export const getMobileNoFromLS = () => {
     return localStorage.getItem("mobileNo");
+}
+
+export const removeMobileNoFromLS = () => {
+    localStorage.removeItem("mobileNo");
 }
 // export async function setWallpaper(imagePath) {
 //     await wallpaper.set(imagePath);

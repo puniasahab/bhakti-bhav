@@ -228,6 +228,8 @@ function VratKathaDetail() {
             alert("Sharing is not supported on this browser.");
         }
     };
+
+
     return (
         <>
             <Header pageName={{ hi: "dFkk", en: "Katha" }} hindiFontSize="true" />

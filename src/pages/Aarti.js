@@ -78,7 +78,7 @@ export default function Aarti() {
             return (
               <li key={item._id || idx}>
                 <Link
-                  to={handleNavigate(item._id)}
+                  to={handleNavigate(item._id, item.accessType)}
                   className="relative block rounded-xl overflow-hidden shadow-lg"
                 >
                   <div className={`overflow_bg`}>

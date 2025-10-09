@@ -165,7 +165,7 @@ export default function Payment() {
         </div>
 
         <div className="container mx-auto px-4 mt-6 space-y-4">
-          {plans.map((plan, index) => (
+          {plans?.map((plan, index) => (
             <div
               key={plan._id || plan.id}
               onClick={() => setSelectedPlan(plan._id || plan.id)}

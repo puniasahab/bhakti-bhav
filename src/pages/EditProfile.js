@@ -3,6 +3,7 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { Camera } from "lucide-react";
 import { profileApis } from "../api";
+import { getTokenFromLS } from "../commonFunctions";
 // import kundaliBanner from "../assets/img/kundali_banner.png";
 import { useNavigate } from "react-router-dom";
 
@@ -17,11 +18,14 @@ function EditProfile() {
     birthPlace: "",
     timeOfBirth: "",
     gender: "",
+    imageUrl: "",
   });
 
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [imageFile, setImageFile] = useState(null);
 
   // Fetch existing profile data on component mount
   useEffect(() => {
@@ -40,7 +44,16 @@ function EditProfile() {
             birthPlace: response.birthPlace || "",
             timeOfBirth: response.timeOfBirth || "",
             gender: response.gender || "",
+            imageUrl: response.imageUrl || "",
           });
+          
+          // Set image preview if imageUrl exists
+          if (response.imageUrl) {
+            const imageUrl = response.imageUrl.startsWith("http") 
+              ? response.imageUrl 
+              : `https://api.bhaktibhav.app${response.imageUrl}`;
+            setImagePreview(imageUrl);
+          }
         }
       } catch (error) {
         console.error("Error fetching profile data:", error);
@@ -71,12 +84,48 @@ function EditProfile() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImageFile(file);
+      // Create preview URL
+      const previewUrl = URL.createObjectURL(file);
+      setImagePreview(previewUrl);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (validate()) {
       setLoading(true);
       try {
-        const response = await profileApis.updateProfile(formData);
+        // Create FormData to handle both text fields and image file
+        const submitFormData = new FormData();
+        
+        // Append all text fields
+        submitFormData.append('name', formData.name);
+        submitFormData.append('mobileNumber', formData.mobileNumber);
+        submitFormData.append('email', formData.email);
+        submitFormData.append('state', formData.state);
+        submitFormData.append('dateOfBirth', formData.dateOfBirth);
+        submitFormData.append('birthPlace', formData.birthPlace);
+        submitFormData.append('timeOfBirth', formData.timeOfBirth);
+        submitFormData.append('gender', formData.gender);
+        
+        // Append image file if selected, otherwise append existing imageUrl
+        if (imageFile) {
+          console.log("ImageFile", imageFile);
+          submitFormData.append('imageUrl', imageFile);
+        } else if (formData.imageUrl) {
+          submitFormData.append('imageUrl', formData.imageUrl);
+        }
+        
+        console.log("Form data being sent:");
+        for (let [key, value] of submitFormData.entries()) {
+          console.log(key, value);
+        }
+        
+        const response = await profileApis.updateProfile(submitFormData);
         console.log("Profile updated successfully:", response);
         navigate("/")
         // alert("Profile saved successfully!");
@@ -93,8 +142,10 @@ function EditProfile() {
     <>
       <Header 
         showProfileHeader={true}
-        profileText="भक्ति भाव"
+        profileText="Edit Profile"
         hideEditIcon={true}
+        showEnglishText={true}
+        showVerticalLogout={true}
       />
       <div className="container mx-auto px-4 mt-4 text-center font-eng">
         {initialLoading ? (
@@ -105,14 +156,32 @@ function EditProfile() {
           <>
             <div className="flex justify-center mb-6 mt-4">
               <div className="relative">
-                <div className="w-32 h-32 rounded-full border-2 border-[#9A283D] flex items-center justify-center text-[#9A283D] font-bold text-lg bg-white shadow-lg">
-                  <div className="w-28 h-28 rounded-full bg-gradient-to-br from-[#FFFAF8] to-[#FCD34D] flex items-center justify-center">
-                    <span className="text-[#9A283D] font-eng text-sm">Profile Picture</span>
-                  </div>
+                <div className="w-32 h-32 rounded-full border-2 border-[#9A283D] flex items-center justify-center text-[#9A283D] font-bold text-lg bg-white shadow-lg overflow-hidden">
+                  {imagePreview ? (
+                    <img 
+                      src={imagePreview} 
+                      alt="Profile" 
+                      className="w-full h-full object-cover rounded-full"
+                    />
+                  ) : (
+                    <div className="w-28 h-28 rounded-full bg-gradient-to-br from-[#FFFAF8] to-[#FCD34D] flex items-center justify-center">
+                      <span className="text-[#9A283D] font-eng text-sm">Profile Picture</span>
+                    </div>
+                  )}
                 </div>
-                <div className="absolute bottom-2 right-2 bg-white rounded-full p-2 shadow-lg border border-[#9A283D] hover:bg-[#FFFAF8] transition-colors cursor-pointer">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="hidden"
+                  id="profile-image-input"
+                />
+                <label
+                  htmlFor="profile-image-input"
+                  className="absolute bottom-2 right-2 bg-white rounded-full p-2 shadow-lg border border-[#9A283D] hover:bg-[#FFFAF8] transition-colors cursor-pointer"
+                >
                   <Camera size={18} className="text-[#9A283D]" />
-                </div>
+                </label>
               </div>
             </div>
 

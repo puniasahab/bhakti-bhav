@@ -5,7 +5,7 @@ import Footer from "../components/Footer";
 import Loader from "../components/Loader";
 import PageTitleCard from "../components/PageTitleCard";
 import { useKatha } from "../contexts/KathaContext";
-import { getTokenFromLS } from "../commonFunctions";
+import { getSubscriptionStatusFromLS, getTokenFromLS } from "../commonFunctions";
 // import { useNavigate } from "react-router-dom";
 
 export default function VratKatha() {
@@ -69,36 +69,52 @@ export default function VratKatha() {
   }
 
   const handleNavigate = (id, index, accessType) => {
-    if (kathas[index]?.kathas?.length > 0) {
-      if (kathas[index]?.kathas?.length > 0) {
-        // Set the category data in context before navigation
+    const isActiveSubscription = getSubscriptionStatusFromLS();
+    console.log("get Subscription Status From LS", isActiveSubscription);
+    console.log("Type of subscription status:", typeof isActiveSubscription);
+    if (isActiveSubscription) {
+      console.log("Inside subscription true");
+      if (kathas[index]?.kathas?.length > 0 || kathas[index]?.isCategory) {
         setCategoryData(kathas[index].kathas, kathas[index].name);
         navigate(`/vrat-katha/categoryDetails/${id}`);
       }
-      // Update this route as needed
-    }
-
-    else if(kathas[index]?.kathas?.length === 0) {
-       if(kathas[index]?.accessType === "free") {
+      else {
         navigate(`/vrat-katha/${id}`);
-       }
-       else {
-        if(getTokenFromLS()) {
-          navigate("/payment");
-        }
-        else {
-          navigate("/login");
-        }
-       }
+      }
     }
     else {
-      if (getTokenFromLS()) {
-        return "/payment";
+      if (kathas[index]?.kathas?.length > 0 || kathas[index]?.isCategory) {
+        if (kathas[index]?.kathas?.length > 0) {
+          // Set the category data in context before navigation
+          setCategoryData(kathas[index].kathas, kathas[index].name);
+          navigate(`/vrat-katha/categoryDetails/${id}`);
+        }
+        // Update this route as needed
+      }
+
+      else if (!kathas[index]?.isCategory) {
+        if (kathas[index]?.accessType === "free") {
+          navigate(`/vrat-katha/${id}`);
+        }
+        else {
+          if (getTokenFromLS()) {
+            navigate("/payment");
+          }
+          else {
+            navigate("/login");
+          }
+        }
       }
       else {
-        return "/login";
+        if (getTokenFromLS()) {
+          return "/payment";
+        }
+        else {
+          return "/login";
+        }
       }
     }
+
   }
   return (
     <>
@@ -125,17 +141,17 @@ export default function VratKatha() {
 
                     src={`${katha.imagethumb}`}
                     alt={katha.name?.hi || katha.name?.en}
-                    className={`w-auto rounded-md max-h-[100%] md:max-h-[100%] ${katha.accessType === "paid" ? "blur-sm" : ""}`}
+                    className={`w-auto rounded-md max-h-[100%] md:max-h-[100%] ${getSubscriptionStatusFromLS() ? "" : katha.accessType === "paid" ? "blur-sm" : ""}`}
                   />
                 </div>
                 <div className="p-2">
                   {katha.name?.hi && (
-                    <h2 className="md:text-xl text-lg font-semibold truncate font-hindi pt-3">
+                    <h2 className={`md:text-xl text-lg font-semibold truncate font-hindi pt-3 ${getSubscriptionStatusFromLS() ? "" : katha.accessType === "paid" ? "blur-sm" : ""}`}>
                       {katha.name.hi}
                     </h2>
                   )}
                   {katha.name?.en && (
-                    <p className="text-sm truncate font-eng">{katha.name.en}</p>
+                    <p className={`text-sm truncate font-eng ${getSubscriptionStatusFromLS() ? "" : katha.accessType === "paid" ? "blur-sm" : ""}`}>{katha.name.en}</p>
                   )}
 
                 </div>

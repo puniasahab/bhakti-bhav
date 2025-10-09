@@ -247,10 +247,10 @@ function AartiDetail() {
     <>
       <Header pageName={{ hi: "vkjrh", en: "Aarti" }} hindiFontSize="true" />
       <PageTitleCard
-        titleHi={"vkjrh"}
-        titleEn={"Aarti"} 
-        customEngFontSize={"14px"}
-        customFontSize={"23px"}
+        titleHi={detail.name.hi}
+        titleEn={detail.name.en} 
+        customEngFontSize={"13px"}
+        customFontSize={"19px"}
         
       />
       <div className="container mx-auto px-4"> 

@@ -3,8 +3,10 @@ import { ChevronRight, Pencil } from "lucide-react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { profileApis } from "../api";
+import { useNavigate } from "react-router-dom";
 
 const Profile = () => {
+    const navigate = useNavigate();
     const [profile, setProfile] = useState({
         name: "",
         mobileNumber: "",
@@ -19,7 +21,7 @@ const Profile = () => {
             try {
                 const res = await profileApis.getProfile();
                 console.log("Profile API Response:", res);
-                
+
                 if (res) {
                     console.log("Setting profile data:", res);
                     setProfile({
@@ -41,9 +43,11 @@ const Profile = () => {
 
     return (
         <div className="min-h-screen font-eng">
-            <Header 
+            <Header
                 showProfileHeader={true}
-                profileText="भक्ति भाव"
+                profileText="My Profile"
+                showEnglishText={true}
+                // hindiFontSizes={true}
             />
 
             {loading ? (
@@ -52,7 +56,7 @@ const Profile = () => {
                 </div>
             ) : (
                 <>
-                    <div className="mx-6 mt-6 bg-gradient-to-r from-[#F59E0B] to-[#FCD34D] rounded-xl shadow-lg p-4 flex items-center justify-between cursor-pointer border border-[#F59E0B]">
+                    <div className="mx-6 mt-6 bg-gradient-to-r from-[#F59E0B] to-[#FCD34D] rounded-xl shadow-lg p-4 flex items-center justify-between cursor-pointer border border-[#F59E0B]" onClick={() => navigate("/transactions")}>
                         <span className="text-[#7A1C2B] font-semibold text-base">
                             Your Premium plan is active
                         </span>

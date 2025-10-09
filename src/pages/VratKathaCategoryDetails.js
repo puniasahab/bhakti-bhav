@@ -4,6 +4,7 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import PageTitleCard from "../components/PageTitleCard";
 import { useKatha } from "../contexts/KathaContext";
+import { getSubscriptionStatusFromLS, getTokenFromLS } from "../commonFunctions";
 
 export default function VratKathaCategoryDetails() {
   const { selectedCategoryKathas, selectedCategoryName } = useKatha();
@@ -20,6 +21,25 @@ export default function VratKathaCategoryDetails() {
     return <div>Loading...</div>;
   }
 
+
+  const handleNavigation = (id, accessType) => {
+    if(getSubscriptionStatusFromLS()) {
+      return `/vrat-katha/${id}`;
+    }
+    else {
+      if(accessType === "free") {
+        return `/vrat-katha/${id}`;
+      }
+      else {
+        if(getTokenFromLS()) {
+          return "/payment";
+        }
+        else {
+          return "/login";
+        }
+      }
+    }
+  }
   return (
     <>
       <Header hideEditIcon={true} showProfileHeader={true} profileText="भक्ति भाव" />
@@ -36,16 +56,16 @@ export default function VratKathaCategoryDetails() {
           {selectedCategoryKathas.map((katha) => (
             <li key={katha._id}>
               <Link
-                to={`/vrat-katha/${katha._id}`}
+                to={handleNavigation(katha._id, katha.accessType)}
                 className="relative block rounded-xl overflow-hidden shadow-lg"
               >
                 <div className="overflow_bg">
                   <img
                     src={katha.imagethumb || katha.imageUrl}
                     alt={katha.name?.hi || katha.name?.en}
-                    className="w-full rounded-md max-h-[150px] md:max-h-[150px] object-cover"
+                    className={`w-full rounded-md max-h-[150px] md:max-h-[150px] object-cover ${getSubscriptionStatusFromLS() ? "" : katha.accessType === "paid" ? "blur-sm" : ""}`}
                   />
-                  <div className="absolute inset-0 theme_text flex flex-col items-center justify-center text-center px-4 z-10 top-[35%]">
+                  <div className={`absolute inset-0 theme_text flex flex-col items-center justify-center text-center px-4 z-10 top-[35%] ${getSubscriptionStatusFromLS() ? "" : katha.accessType === "paid" ? "blur-sm" : ""}`}>
                     {katha.name?.hi && (
                       <h2 className="text-xl font-bold font-hindi">
                         {katha.name.hi}

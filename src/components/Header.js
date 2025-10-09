@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import rupeesIcon from "../assets/img/rupees_icon.png";
 import bellIcon from "../assets/img/bell.png";
@@ -6,8 +6,8 @@ import userIcon from "../assets/img/hd_user_icon.png";
 import logo from "../assets/img/logo.png";
 import backBtn from "../assets/img/back_icon.svg";
 import { LanguageContext } from "../contexts/LanguageContext";
-import { Download, Eye, Heart, Pencil } from "lucide-react";
-import { isAuthenticated } from "../commonFunctions";
+import { Download, Eye, Heart, Pencil, MoreVertical, LogOut } from "lucide-react";
+import { getTokenFromLS, removeMobileNoFromLS, removeSubscriptionStatusFromLS, removeTokenFromLS } from "../commonFunctions";
 
 function Header({
     showWallpaperHeader = false,
@@ -20,23 +20,50 @@ function Header({
     pageName,
     showProfileHeader = false,
     profileText,
-    hideEditIcon = false
+    hideEditIcon = false,
+    showEnglishText = false,
+    showVerticalLogout = false
 }) {
     const { pathname } = useLocation();
     const navigate = useNavigate();
     const { language, setLanguage, fontSize, setFontSize } = useContext(LanguageContext);
+    const [showDropdown, setShowDropdown] = useState(false);
+    const dropdownRef = useRef(null);
  
     const homeRoutes = ["/", "/home", "/Rashifal", "/payment", "/hindi-calendar", "/vrat-katha", "/chalisa", "/aarti", '/jaap-mala', "/mantra", "/wallpaper", "/termsAndConditions", "/aboutUs", "/privacyPolicy"];
 
     const isHomeRoute = homeRoutes.includes(pathname);
 
+    // Close dropdown when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setShowDropdown(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
+
     const getProfileOrLoginRoute = () => {
-        if(isAuthenticated()) {
+        if(getTokenFromLS()) {
             return "/profile";
         } else {
             return "/login";
         }
     }
+
+    const handleLogout = () => {
+        removeTokenFromLS();
+        removeSubscriptionStatusFromLS();
+        removeMobileNoFromLS();
+
+        setShowDropdown(false);
+        navigate("/login");
+    };
 
 
     return (
@@ -51,17 +78,40 @@ function Header({
                                 <button onClick={() => navigate("/")}>
                                     <img src={backBtn} alt="Back" width="24" height="24" />
                                 </button>
-                                <span className="font-hindi text-xl theme_text">{profileText}</span>
+                                <span className={`${showEnglishText ? "font-eng": "font-hindi"} text-xl theme_text`}>{profileText}</span>
                             </div>
 
-                            {/* Edit Icon - Only show if not hidden */}
-                            {!hideEditIcon && (
-                                <div className="flex items-center">
+                            {/* Three Dots Menu */}
+                            <div className="flex items-center gap-3">
+                                {/* Edit Icon - Only show if not hidden */}
+                                {!hideEditIcon && (
                                     <button className="bg-white rounded-full p-2 shadow-md border border-gray-200 hover:bg-gray-50 transition-colors" onClick={() => navigate("/edit-profile")}>
                                         <Pencil size={20} className="text-[#9A283D]" style={{background: "transparent !important"}} />
                                     </button>
-                                </div>
-                            )}
+                                )}
+                                
+                                {/* Three Dots Menu */}
+                               {showVerticalLogout && <div className="relative" ref={dropdownRef}>
+                                    <button 
+                                        className="bg-white rounded-full p-2 shadow-md border border-gray-200 hover:bg-gray-50 transition-colors"
+                                        onClick={() => setShowDropdown(!showDropdown)}
+                                    >
+                                        <MoreVertical size={20} className="text-[#9A283D]" />
+                                    </button>
+                                    
+                                    {showDropdown && (
+                                        <div className="absolute right-0 top-12 bg-white rounded-lg shadow-lg border border-gray-200 py-2 min-w-[120px] z-50">
+                                            <button
+                                                onClick={handleLogout}
+                                                className="w-full px-4 py-2 text-left hover:bg-gray-50 transition-colors flex items-center gap-2 text-[#9A283D] font-eng"
+                                            >
+                                                <LogOut size={16} />
+                                                Logout
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>}
+                            </div>
                         </>
                     )}
 
@@ -143,7 +193,7 @@ function Header({
                             </h1>
 
                             <div className="flex items-center md:space-x-6 space-x-4 text-xl ms-auto">
-                                <a href="/payment">
+                                <a href={getTokenFromLS() ? "/payment" : "/login"}>
                                     <img src={rupeesIcon} alt="₹" width="22" height="22" />
                                 </a>
                                 <a href="#">

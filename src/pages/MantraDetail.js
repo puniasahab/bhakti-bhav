@@ -63,10 +63,10 @@ export default function MantraDetail() {
     <div className="min-h-screen">
       <Header pageName={{ hi: "ea=", en: "Mantra" }} fontSizeOption="true" />
       <PageTitleCard
-        titleHi={"ea="}
-        titleEn={"Mantra"} 
+        titleHi={detail.name.hi}
+        titleEn={detail.name.en} 
         customEngFontSize={"13px"}
-        customFontSize={"23px"}
+        customFontSize={"19px"}
         
       /> 
 
