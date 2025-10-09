@@ -8,6 +8,8 @@ import { Pagination, Autoplay } from "swiper/modules";
 
 import "swiper/css";
 import "swiper/css/pagination";
+import { profileApis } from "../api";
+import { setSubscriptionStatusInLS } from "../commonFunctions";
 
 function Home() {
 
@@ -56,6 +58,25 @@ function Home() {
 
         fetchPanchang();
     }, [isOpen]);
+
+
+    useEffect(() => {
+        
+        const fetchProfileData = async () => {
+            try {
+                const resp = await await profileApis.getProfile();
+                if (resp) {
+
+                    setSubscriptionStatusInLS(resp.hasActivePlan)
+                    // Handle successful response
+                    console.log("Profile data:", resp);
+                }
+            } catch (error) {
+                console.error("Error fetching profile data:", error);
+            }
+        }
+        fetchProfileData();
+    }, [])
 
 
     return (

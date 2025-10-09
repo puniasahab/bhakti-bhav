@@ -8,6 +8,16 @@ export const getTokenFromLS = () => {
     return localStorage.getItem('authToken');
 }
 
+
+export const setSubscriptionStatusInLS = (status) => {
+    localStorage.setItem('isSubscribed', status);
+}
+
+export const getSubscriptionStatusFromLS = () => {
+    const status = localStorage.getItem('isSubscribed');
+    return status === 'true';
+} 
+
 export const removeTokenFromLS = () => {
     localStorage.removeItem('authToken');
 }

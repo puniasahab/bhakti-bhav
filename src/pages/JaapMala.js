@@ -4,6 +4,7 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Loader from "../components/Loader";
 import PageTitleCard from "../components/PageTitleCard";
+import { getTokenFromLS, getSubscriptionStatusFromLS } from "../commonFunctions";
 
 function JaapMala() {
   const [data, setData] = useState([]);
@@ -28,7 +29,26 @@ function JaapMala() {
   }, []);
 
   if (loading) return <Loader message="🙏 Loading भक्ति भाव 🙏" size={200} />;
-
+  const handleNavigate = (id, accessType) => {
+    const subscriptionStatus = getSubscriptionStatusFromLS();
+    console.log("get Subscription Status From LS", subscriptionStatus);
+    console.log("Type of subscription status:", typeof subscriptionStatus);
+    
+    if (subscriptionStatus) {
+        return `/jaapmala/${id}`;
+      
+    } else {
+      if (accessType === "free") {
+        return `/jaapmala/${id}`;
+      } else {
+        if (getTokenFromLS())
+          return `/payment`;
+        else {
+          return "/login";
+        }
+      }
+    }
+  }
   return (
     <>
       <Header pageName={{ hi: "tkkp ekyk", en: "Jaap mala" }} />
@@ -45,10 +65,10 @@ function JaapMala() {
           {data.map((item) => (
             <li key={item._id}>
               <Link
-                to={`/jaapmala/${item._id}`}
+                to={handleNavigate(item._id, item.accessType)}
                 className="relative block rounded-xl overflow-hidden shadow-lg  "
               >
-                <div className="overflow_bg">
+                <div className={`overflow_bg`}>
 
                   <img
 
@@ -58,9 +78,9 @@ function JaapMala() {
                         : `https://api.bhaktibhav.app${item.imageUrl}`
                     }
                     alt={item.title.en}
-                    className="w-full rounded-md max-h-[150px] md:max-h-[150px] object-cover"
+                    className={`w-full rounded-md max-h-[150px] md:max-h-[150px] object-cover ${getSubscriptionStatusFromLS() ? "" : item.accessType === "paid" ? "blur-sm" : ""}`}
                   />
-                  <div className="absolute inset-0 theme_text flex flex-col items-center justify-center text-center px-4 z-10 top-[35%]">
+                  <div className={`absolute inset-0 theme_text flex flex-col items-center justify-center text-center px-4 z-10 top-[35%] ${getSubscriptionStatusFromLS() ? "" : item.accessType === "paid" ? "blur-sm" : ""}`}>
                     <h2 className="text-xl font-bold">{item.title.hi}</h2>
                     <p className="text-sm font-eng">{item.title.en}</p>
                   </div>
@@ -70,7 +90,7 @@ function JaapMala() {
           ))}
         </ul>
       </div>
-      
+
     </>
   );
 }

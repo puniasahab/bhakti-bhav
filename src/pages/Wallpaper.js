@@ -4,6 +4,7 @@ import { Download, Eye, Heart, Lock } from "lucide-react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Loader from "../components/Loader";
+import { getTokenFromLS, getSubscriptionStatusFromLS } from "../commonFunctions";
 
 export default function Wallpaper() {
   const [wallpapers, setWallpapers] = useState([]);
@@ -51,6 +52,25 @@ export default function Wallpaper() {
       : `https://api.bhaktibhav.app${wp.imageUrl}`;
   };
 
+
+  const handleNavigate = (id, accessType) => {
+    if (getSubscriptionStatusFromLS()) {
+      return `/wallpaper/${id}`;
+    }
+    else {
+      if (accessType === "free") {
+        return `/wallpaper/${id}`;
+      } else {
+        if (getTokenFromLS()) {
+          return "/payment";
+        }
+        else {
+          return "/login";
+        }
+      }
+    }
+  }
+
   return (
     <>
       <Header />
@@ -74,13 +94,13 @@ export default function Wallpaper() {
         <ul className="grid grid-cols-2 gap-3">
           {filteredWallpapers.map((wp) => (
             <li key={wp._id}>
-              <Link to={`/wallpaper/${wp._id}`} className="block">
+              <Link to={handleNavigate(wp._id, wp.accessType)} className="block">
                 <div className="relative rounded-2xl overflow-hidden shadow-lg bg-white">
                   <div className="w-full aspect-[3/4] overflow-hidden">
                     <img
                       src={getImageUrl(wp)}
                       alt={wp.godName}
-                      className="w-full h-full object-cover"
+                      className={`w-full h-full object-cover ${getSubscriptionStatusFromLS() ? "" : wp.accessType === "paid" ? "blur" : ""}`}
                     />
                   </div>
 
@@ -91,15 +111,15 @@ export default function Wallpaper() {
                   )} */}
 
                   <div className="absolute bottom-2 left-2 right-2 flex justify-center gap-2">
-                    <div className="flex items-center gap-1 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full shadow-sm text-xs font-eng">
+                    <div className={`flex items-center gap-1 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full shadow-sm text-xs font-eng ${getSubscriptionStatusFromLS() ? "" : wp.accessType === "paid" ? "blur" : ""}`}>
                       <Download size={12} className="text-[#9A283D]" />
                       <span className="text-gray-700">{wp.downloads}</span>
                     </div>
-                    <div className="flex items-center gap-1 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full shadow-sm text-xs font-eng">
+                    <div className={`flex items-center gap-1 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full shadow-sm text-xs font-eng ${getSubscriptionStatusFromLS() ? "" : wp.accessType === "paid" ? "blur" : ""}`}>
                       <Eye size={12} className="text-[#9A283D]" />
                       <span className="text-gray-700">{wp.views}</span>
                     </div>
-                    <div className="flex items-center gap-1 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full shadow-sm text-xs font-eng">
+                    <div className={`flex items-center gap-1 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full shadow-sm text-xs font-eng ${getSubscriptionStatusFromLS() ? "" : wp.accessType === "paid" ? "blur" : ""}`}>
                       <Heart size={12} className="text-[#9A283D]" />
                       <span className="text-gray-700">{wp.likes}</span>
                     </div>

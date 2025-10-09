@@ -34,6 +34,7 @@ import Payment from "./pages/Payment";
 import Transactions from "./pages/transactions";
 import PaymentPage from "./pages/PaymentPage";
 import VratKathaCategoryDetails from "./pages/VratKathaCategoryDetails";
+import Kundli from "./pages/kundli";
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -89,6 +90,7 @@ function App() {
             <Route path="/transactions" element={<Transactions />} />
             <Route path="/paymentPage" element={<PaymentPage />} />
             <Route path='/vrat-katha/categoryDetails/:id' element={<VratKathaCategoryDetails />} />
+            <Route path="kundli" element = {<Kundli />} />
           </Routes>
         </PaymentProvider>
       </KathaProvider>

@@ -103,10 +103,6 @@ export default function Payment() {
       hi: "शांति एवं सकारात्मकता के लिए दैनिक मंत्र",
     },
     {
-      en: "Personalized Rashifal based on your zodiac",
-      hi: "आध्यात्मिक प्रेरणा देने वाले भक्ति भाव से भरपूर वॉलपेपर",
-    },
-    {
       en: "Daily Panchang with auspicious timings",
       hi: "शुभ मुहूर्त सहित दैनिक पंचांग",
     },
@@ -164,7 +160,7 @@ export default function Payment() {
         </div>
 
         <div className="text-center mt-4">
-          <p className="font-hindi theme_text">हो जायें प्रभु की भक्ति में लीन!</p>
+          <p className="font-hindi theme_text" style={{fontSize: '21px'}}>हो जायें प्रभु की भक्ति में लीन!</p>
           <p className="theme_text font-eng">Ho jaye prabhu ki bhakti me lein</p>
         </div>
 

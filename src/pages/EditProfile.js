@@ -3,9 +3,11 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { Camera } from "lucide-react";
 import { profileApis } from "../api";
-import kundaliBanner from "../assets/img/kundali_banner.png";
+// import kundaliBanner from "../assets/img/kundali_banner.png";
+import { useNavigate } from "react-router-dom";
 
 function EditProfile() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
     mobileNumber: "",
@@ -76,7 +78,8 @@ function EditProfile() {
       try {
         const response = await profileApis.updateProfile(formData);
         console.log("Profile updated successfully:", response);
-        alert("Profile saved successfully!");
+        navigate("/")
+        // alert("Profile saved successfully!");
       } catch (error) {
         console.error("Error updating profile:", error);
         alert("Error saving profile. Please try again.");
@@ -104,7 +107,7 @@ function EditProfile() {
               <div className="relative">
                 <div className="w-32 h-32 rounded-full border-2 border-[#9A283D] flex items-center justify-center text-[#9A283D] font-bold text-lg bg-white shadow-lg">
                   <div className="w-28 h-28 rounded-full bg-gradient-to-br from-[#FFFAF8] to-[#FCD34D] flex items-center justify-center">
-                    <span className="text-[#9A283D] font-hindi text-sm">Profile</span>
+                    <span className="text-[#9A283D] font-eng text-sm">Profile Picture</span>
                   </div>
                 </div>
                 <div className="absolute bottom-2 right-2 bg-white rounded-full p-2 shadow-lg border border-[#9A283D] hover:bg-[#FFFAF8] transition-colors cursor-pointer">
@@ -196,7 +199,7 @@ function EditProfile() {
                   <option value="West Bengal">West Bengal</option>
                 </select>
 
-                <input
+                {/* <input
                   type="date"
                   name="dateOfBirth"
                   placeholder="Date of Birth"
@@ -233,13 +236,14 @@ function EditProfile() {
                   <option value="male">Male</option>
                   <option value="female">Female</option>
                   <option value="other">Other</option>
-                </select>
+                </select> */}
               </div>
 
               <button
                 type="submit"
                 disabled={loading}
                 className="w-full bg-[#9A283D] text-white py-3 rounded-xl shadow-lg font-medium text-lg disabled:opacity-50 hover:bg-[#7A1C2B] transition-colors mt-6"
+                style={{marginTop: '40px', width: '80%'}}
               >
                 {loading ? "Saving..." : "Save Profile"}
               </button>

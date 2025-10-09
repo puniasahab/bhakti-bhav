@@ -4,6 +4,7 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Loader from "../components/Loader";
 import PageTitleCard from "../components/PageTitleCard";
+import { getTokenFromLS, getSubscriptionStatusFromLS } from "../commonFunctions";
 
 export default function Aarti() {
   const [items, setItems] = useState([]);
@@ -37,6 +38,22 @@ export default function Aarti() {
   if (!items.length)
     return <p className="text-center py-10 theme_text">❌ No items found</p>;
 
+  const handleNavigate = (id, accessType) => {
+    if (getSubscriptionStatusFromLS()) {
+      return `/aarti/${id}`;
+    } else {
+      if (accessType === "free") {
+        return `/aarti/${id}`;
+      } else {
+        if (getTokenFromLS()) {
+          return "/payment";
+        } else {
+          return "/login";
+        }
+      }
+    }
+
+  }
   return (
     <>
 
@@ -44,11 +61,11 @@ export default function Aarti() {
 
       <PageTitleCard
         titleHi={"vkjrh"}
-        titleEn={"Aarti"}  
+        titleEn={"Aarti"}
         customEngFontSize={"14px"}
         customFontSize={"23px"}
       />
-      
+
       <div className="container mx-auto px-4 mt-6">
         <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
           {items.map((item, idx) => {
@@ -61,16 +78,16 @@ export default function Aarti() {
             return (
               <li key={item._id || idx}>
                 <Link
-                  to={`/aarti/${item._id || idx}`}
+                  to={handleNavigate(item._id)}
                   className="relative block rounded-xl overflow-hidden shadow-lg"
                 >
-                  <div className="overflow_bg">
+                  <div className={`overflow_bg`}>
                     <img
                       src={imgSrc}
                       alt={item.name?.en || item.name?.hi || "Aarti"}
-                      className="w-full rounded-md max-h-[150px] md:max-h-[150px] object-cover"
+                      className={`w-full rounded-md max-h-[150px] md:max-h-[150px] object-cover ${getSubscriptionStatusFromLS() ? "" : item.accessType === "paid" ? "blur" : ""}`}
                     />
-                    <div className="absolute inset-0 theme_text flex flex-col items-center justify-center text-center px-4 z-10 top-[35%]">
+                    <div className={`absolute inset-0 theme_text flex flex-col items-center justify-center text-center px-4 z-10 top-[35%] ${getSubscriptionStatusFromLS() ? "" : item.accessType === "paid" ? "blur-sm" : ""}`}>
                       {item.name?.hi && (
                         <h2 className="text-xl font-bold font-hindi">
                           {item.name.hi}
@@ -88,7 +105,7 @@ export default function Aarti() {
         </ul>
       </div>
 
-      
+
     </>
   );
 }

@@ -52,11 +52,11 @@ const Profile = () => {
                 </div>
             ) : (
                 <>
-                    <div className="mx-6 mt-6 bg-[#FCD34D] rounded-xl shadow p-3 flex items-center justify-between cursor-pointer">
-                        <span className="text-[#7A1C2B] font-medium">
+                    <div className="mx-6 mt-6 bg-gradient-to-r from-[#F59E0B] to-[#FCD34D] rounded-xl shadow-lg p-4 flex items-center justify-between cursor-pointer border border-[#F59E0B]">
+                        <span className="text-[#7A1C2B] font-semibold text-base">
                             Your Premium plan is active
                         </span>
-                        <ChevronRight className="text-[#7A1C2B]" />
+                        <ChevronRight className="text-[#7A1C2B] w-5 h-5" />
                     </div>
 
                     <div className="mx-6 mt-6 space-y-4">
@@ -64,9 +64,9 @@ const Profile = () => {
                         <InfoCard label="Mobile number" value={profile.mobileNumber || "Not provided"} />
                         <InfoCard label="Email" value={profile.email || "Not provided"} />
                         <InfoCard label="State" value={profile.state || "Not provided"} />
-                        {profile.gender && (
+                        {/* {profile.gender && (
                             <InfoCard label="Gender" value={profile.gender.charAt(0).toUpperCase() + profile.gender.slice(1)} />
-                        )}
+                        )} */}
                     </div>
                 </>
             )}

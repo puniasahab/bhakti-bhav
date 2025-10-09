@@ -34,33 +34,38 @@ const Transactions = () => {
   const fetchTransactions = async () => {
     try {
       setLoading(true);
-      // Replace with actual API call
       const response = await paymentApis.getTransactions();
-      console.log(response.orders, "Response Data");
-      if (response) {
+      console.log(response, "Response Data");
+      if (response && response.orders) {
         // Transform the API data to match our component structure
         const transformedTransactions = response.orders.map(order => ({
           id: order._id,
           orderId: order.orderId,
-          transactionId: order.paymentResponse?.[0]?.cf_payment_id || order.paymentResponse?.cf_order_id || 'N/A',
-          planName: getPlanName(order.planId, order.amount),
+          transactionId: Array.isArray(order.paymentResponse) 
+            ? order.paymentResponse[0]?.cf_payment_id || 'N/A'
+            : order.paymentResponse?.cf_order_id || 'N/A',
+          planName: order.planName || getPlanName(order.planId, order.amount),
           duration: getPlanDuration(order.amount),
           amount: order.amount,
           status: order.status.toLowerCase(),
           paymentMethod: getPaymentMethod(order.paymentResponse),
-          customerName: response.data.name || 'User',
-          customerEmail: response.data.email || 'N/A',
-          customerPhone: response.data.mobileNumber || 'N/A',
+          customerName: response.name || 'User',
+          customerEmail: response.email || 'N/A',
+          customerPhone: response.mobileNumber || 'N/A',
           createdAt: order.createdAt,
-          expiryDate: getExpiryDate(order.createdAt, order.amount),
-          gatewayResponse: order.paymentResponse?.[0]?.payment_message || 'Transaction processed'
+          expiryDate: Array.isArray(order.paymentResponse) 
+            ? order.paymentResponse[0]?.order_expiry_time || null
+            : order.paymentResponse?.order_expiry_time || null,
+          gatewayResponse: Array.isArray(order.paymentResponse) 
+            ? order.paymentResponse[0]?.payment_message || 'Transaction processed'
+            : 'Order created'
         }));
         setTransactions(transformedTransactions);
       }
     } catch (error) {
       console.error('Error fetching transactions:', error);
-      // Mock data for demo purposes
-      setTransactions(mockTransactions);
+      // Fallback to empty array on error
+      setTransactions([]);
     } finally {
       setLoading(false);
     }
@@ -68,25 +73,32 @@ const Transactions = () => {
 
   const fetchUserProfile = async () => {
     try {
-      // Replace with actual API call
       const response = await paymentApis.getTransactions();
-      if (response && response.data) {
+      if (response) {
         setUserProfile({
-          name: response.data.name || 'User',
-          email: response.data.email || 'N/A',
-          phone: response.data.mobileNumber || 'N/A',
-          createdAt: response.data.createdAt || new Date().toISOString(),
-          hasActivePlan: response.data.hasActivePlan || false,
-          currentActivePlans: response.data.currentActivePlans || []
+          name: response.name || 'User',
+          email: response.email || 'N/A',
+          phone: response.mobileNumber || 'N/A',
+          createdAt: response.createdAt || new Date().toISOString(),
+          hasActivePlan: response.hasActivePlan || false,
+          currentActivePlans: response.currentActivePlans || []
         });
       }
     } catch (error) {
       console.error('Error fetching user profile:', error);
-      setUserProfile(mockUserProfile);
+      setUserProfile({
+        name: "User",
+        email: "N/A",
+        phone: "N/A",
+        createdAt: new Date().toISOString(),
+        hasActivePlan: false,
+        currentActivePlans: []
+      });
     }
   };
 
   const handleTransactionClick = (transaction) => {
+    console.log("Transactions Details", transaction);
     setSelectedTransaction(transaction);
     setShowDetails(true);
   };
@@ -121,16 +133,27 @@ const Transactions = () => {
     });
   };
 
+  const formatDateOnly = (dateString) => {
+    if (!dateString) return 'N/A';
+    return new Date(dateString).toLocaleDateString('en-IN', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  };
+
   const isExpired = (expiryDate) => {
+    if (!expiryDate) return false;
     return new Date(expiryDate) < new Date();
   };
 
   // Helper functions for data transformation
   const getPlanName = (planId, amount) => {
+    // Use planName from API if available, otherwise fallback to amount mapping
     const planMapping = {
-      1: 'Basic Plan',
-      499: 'Premium Monthly Plan', 
-      799: 'Premium Plus Plan',
+      1: 'Single Day Plan',
+      499: 'Platinum Plan', 
+      799: 'Silver Plan',
       2999: 'Premium Yearly Plan'
     };
     return planMapping[amount] || `Plan - ₹${amount}`;
@@ -139,7 +162,7 @@ const Transactions = () => {
   const getPlanDuration = (amount) => {
     const durationMapping = {
       1: '1 Day',
-      499: '1 Month',
+      499: '5 Years',  // Based on your API data showing long expiry dates
       799: '3 Months', 
       2999: '1 Year'
     };
@@ -150,39 +173,19 @@ const Transactions = () => {
     if (Array.isArray(paymentResponse) && paymentResponse[0]) {
       const method = paymentResponse[0].payment_group || paymentResponse[0].payment_method;
       if (typeof method === 'object' && method.upi) return 'UPI';
+      if (method === 'upi') return 'UPI';
       return method?.toUpperCase() || 'Online Payment';
     }
     return 'Online Payment';
-  };
-
-  const getExpiryDate = (createdAt, amount) => {
-    const date = new Date(createdAt);
-    switch (amount) {
-      case 1:
-        date.setDate(date.getDate() + 1);
-        break;
-      case 499:
-        date.setMonth(date.getMonth() + 1);
-        break;
-      case 799:
-        date.setMonth(date.getMonth() + 3);
-        break;
-      case 2999:
-        date.setFullYear(date.getFullYear() + 1);
-        break;
-      default:
-        date.setMonth(date.getMonth() + 1);
-    }
-    return date.toISOString();
   };
 
   if (loading) return <Loader message="🙏 Loading भक्ति भाव 🙏" size={200} />;
 
   return (
     <>
-      <Header pageName={{ hi: "लेन-देन", en: "Transactions" }} />
+      <Header profileText={"My Transactions"} showProfileHeader={true} />
       <PageTitleCard
-        titleHi={"लेन-देन"}
+        titleHi={""}
         titleEn={"Transaction History"} 
         customEngFontSize={"14px"}
         customFontSize={"21px"}
@@ -264,44 +267,35 @@ const Transactions = () => {
                 <div
                   key={transaction.id}
                   onClick={() => handleTransactionClick(transaction)}
-                  className="p-6 hover:bg-gray-50 cursor-pointer transition-colors"
+                  className="p-4 hover:bg-gray-50 cursor-pointer transition-colors border-l-4 border-gray-200 mt-2 mb-2"
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
                       <div className="flex items-center justify-between mb-2">
-                        <h3 className="font-semibold text-gray-900 font-eng">{transaction.planName}</h3>
-                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(transaction.status)}`}>
-                          {transaction.status.toUpperCase()}
-                        </span>
+                        <div className="flex items-center space-x-2">
+                          <span className="text-sm text-gray-600 font-eng">Txn Id :</span>
+                          <span className="text-sm font-medium text-blue-600 font-eng">{transaction.transactionId}</span>
+                        </div>
+                        <div className={`px-3 py-1 rounded-full text-xs font-medium ${
+                          transaction.planName === 'Platinum Plan' || transaction.planName === 'Platinum' 
+                            ? 'bg-gray-200 text-gray-800' 
+                            : 'bg-yellow-200 text-yellow-800'
+                        } font-eng`}>
+                          {transaction.planName === 'Platinum Plan' || transaction.planName === 'Platinum' ? 'Platinum' : 'Gold'}
+                        </div>
                       </div>
                       
                       <div className="flex items-center justify-between text-sm text-gray-600">
                         <div className="font-eng">
-                          <span className="font-medium">Amount:</span> ₹{transaction.amount}
+                          <span className="font-medium">Valid till:</span> 
+                          <span className={`ml-1 ${isExpired(transaction.expiryDate) ? 'text-red-600' : 'text-gray-800'}`}>
+                            {formatDateOnly(transaction.expiryDate)}
+                          </span>
                         </div>
-                        <div className="font-eng">
-                          <span className="font-medium">Date:</span> {formatDate(transaction.createdAt)}
+                        <div className="text-lg font-bold text-[#9A283D] font-eng">
+                          ₹{transaction.amount}
                         </div>
                       </div>
-                      
-                      <div className="flex items-center justify-between text-sm text-gray-600 mt-1">
-                        <div className="font-eng">
-                          <span className="font-medium">Order ID:</span> {transaction.orderId}
-                        </div>
-                        {transaction.expiryDate && (
-                          <div className={`font-eng ${isExpired(transaction.expiryDate) ? 'text-red-600' : 'text-green-600'}`}>
-                            <span className="font-medium">
-                              {isExpired(transaction.expiryDate) ? 'Expired:' : 'Expires:'} 
-                            </span> {formatDate(transaction.expiryDate)}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    
-                    <div className="ml-4 text-gray-400">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
                     </div>
                   </div>
                 </div>
@@ -347,7 +341,7 @@ const Transactions = () => {
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 font-eng">Status</label>
-                      <span className={`mt-1 inline-block px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(selectedTransaction.status)}`}>
+                      <span className={`mt-1 inline-block px-3 py-1 rounded-full font-eng text-xs font-medium ${getStatusColor(selectedTransaction.status)}`}>
                         {selectedTransaction.status.toUpperCase()}
                       </span>
                     </div>
@@ -382,7 +376,7 @@ const Transactions = () => {
                         </p>
                       </div>
                     )}
-                    {selectedTransaction.status === 'success' && (
+                    {selectedTransaction.status === 'SUCCESS' && (
                       <div>
                         <label className="block text-sm font-medium text-gray-700 font-eng">Gateway Response</label>
                         <p className="mt-1 text-sm text-gray-900 font-eng">{selectedTransaction.gatewayResponse}</p>
@@ -425,7 +419,7 @@ const Transactions = () => {
                 >
                   Close
                 </button>
-                {selectedTransaction.status === 'success' && (
+                {selectedTransaction.status === 'SUCCESS' && (
                   <button
                     onClick={() => window.print()}
                     className="px-4 py-2 bg-[#9A283D] text-white rounded-md hover:bg-[#7A1F2D] transition font-eng"
@@ -441,64 +435,5 @@ const Transactions = () => {
     </>
   );
 };
-
-// Mock data for demo purposes
-const mockUserProfile = {
-  name: "New User",
-  email: "user@example.com",
-  phone: "+91 9876543210",
-  createdAt: "2024-01-15T08:30:00Z"
-};
-
-const mockTransactions = [
-  {
-    id: "1",
-    orderId: "ORD_1759494903800_6f6de323",
-    transactionId: "TXN_CF_123456789",
-    planName: "Premium Monthly Plan",
-    duration: "1 Month",
-    amount: 499,
-    status: "success",
-    paymentMethod: "Credit Card",
-    customerName: "New User",
-    customerEmail: "user@example.com",
-    customerPhone: "+91 9876543210",
-    createdAt: "2024-10-01T10:30:00Z",
-    expiryDate: "2024-11-01T10:30:00Z",
-    gatewayResponse: "Payment Successful"
-  },
-  {
-    id: "2",
-    orderId: "ORD_1759394903800_5e5cd212",
-    transactionId: "TXN_CF_987654321",
-    planName: "Premium Yearly Plan",
-    duration: "1 Year",
-    amount: 2999,
-    status: "success",
-    paymentMethod: "UPI",
-    customerName: "New User",
-    customerEmail: "user@example.com",
-    customerPhone: "+91 9876543210",
-    createdAt: "2024-09-15T14:20:00Z",
-    expiryDate: "2025-09-15T14:20:00Z",
-    gatewayResponse: "Payment Successful"
-  },
-  {
-    id: "3",
-    orderId: "ORD_1759294903800_4d4bc101",
-    transactionId: "TXN_CF_456789123",
-    planName: "Basic Monthly Plan",
-    duration: "1 Month",
-    amount: 199,
-    status: "failed",
-    paymentMethod: "Debit Card",
-    customerName: "New User",
-    customerEmail: "user@example.com",
-    customerPhone: "+91 9876543210",
-    createdAt: "2024-08-20T09:15:00Z",
-    expiryDate: null,
-    gatewayResponse: "Insufficient Funds"
-  }
-];
 
 export default Transactions;
