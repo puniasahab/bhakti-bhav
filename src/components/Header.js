@@ -62,7 +62,7 @@ function Header({
         removeMobileNoFromLS();
 
         setShowDropdown(false);
-        navigate("/login");
+        navigate("/");
     };
 
 

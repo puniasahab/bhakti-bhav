@@ -168,6 +168,19 @@ export const loginApis = {
 }
 
 
+export const pujaKareApis = {
+  getPujaKareItems: async () => {
+    try {
+      const response = await api.get(endPoints.pujaKarein);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching Puja Kare items:", error);
+      throw error;
+    }
+  }
+}
+
+
 export const profileApis = {
   getProfile: async () => {
     try {

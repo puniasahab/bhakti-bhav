@@ -5,6 +5,7 @@ import Footer from "../components/Footer";
 import Loader from "../components/Loader";
 import PageTitleCard from "../components/PageTitleCard";
 import { useNavigate } from "react-router-dom";
+import { getSubscriptionStatusFromLS, getTokenFromLS } from "../commonFunctions";
 
 function HindiCalendarDetail() {
   const { id } = useParams();
@@ -48,6 +49,26 @@ function HindiCalendarDetail() {
     console.warn("⚠️ Could not parse month name", e);
   }
 
+
+  const handleNavigate = (id, accessType) => {
+    if(getSubscriptionStatusFromLS()) {
+      return `/vrat-katha/${id}`;
+    }
+    else {
+      if(accessType === "free") {
+        return `/vrat-katha/${id}`;
+      }
+      else {
+        if(getTokenFromLS()) {
+          return "/payment";
+        }
+        else {
+          return "/login";
+        }
+      }
+    }
+  }
+
   return (
     <>
       <Header pageName={{ hi: "fgUnh dySaMj", en: "Hindi Calender" }} />
@@ -86,9 +107,9 @@ function HindiCalendarDetail() {
 
               return (
                 <li
-                  onClick={() => navigate(`/vrat-katha/${festival.kathaId}`)}
+                  onClick={() => navigate(handleNavigate(festival.kathaId, festival.accessType))}
                   key={festival._id}
-                  className="bg-[#9A283D] text-white rounded-lg flex items-center px-4 py-3 shadow-md"
+                  className={`bg-[#9A283D] text-white rounded-lg flex items-center px-4 py-3 shadow-md ${getSubscriptionStatusFromLS() ? "" : festival.accessType === "paid" ? "blur" : ""}`}
                 >
                   <div className="flex items-center text-sm font-medium w-1/2">
                     <div className="text-lg font-bold font-eng mr-2">{day}</div>

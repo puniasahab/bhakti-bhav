@@ -26,7 +26,6 @@ function Home() {
                 const data = await res.json();
 
                 if (data?.success && data.data) {
-
                     const formatted = [
                         {
                             side: "left",
@@ -94,13 +93,13 @@ function Home() {
                         >
                             <SwiperSlide>
                                 <div
-                                    className="h-[20vh] md:h-[60vh] bg-[url('/img/banner-3.jpg')] bg-cover bg-center flex items-center justify-center"
+                                    className="h-[20vh] md:h-[60vh] bg-[url('/img/banner-3.jpeg')] bg-cover bg-center flex items-center justify-center"
                                 ></div>
                             </SwiperSlide>
 
                             <SwiperSlide>
                                 <div
-                                    className="h-[20vh] md:h-[60vh] bg-[url('/img/banner-1.jpg')] bg-cover bg-center flex items-center justify-center"
+                                    className="h-[20vh] md:h-[60vh] bg-[url('/img/banner-5.jpeg')] bg-cover bg-center flex items-center justify-center"
                                 ></div>
                             </SwiperSlide>
                         </Swiper>

@@ -4,6 +4,7 @@ import Footer from "../components/Footer";
 import { Link } from "react-router-dom";
 import Loader from "../components/Loader";
 import PageTitleCard from "../components/PageTitleCard";
+import { pujaKareApis } from "../api";
 
 export default function PujaKare() {
   const [items, setItems] = useState([]);
@@ -12,9 +13,10 @@ export default function PujaKare() {
   useEffect(() => {
     async function fetchItems() {
       try {
-        const res = await fetch("https://api.bhaktibhav.app/frontend/puja-kare");
-        const json = await res.json();
-        setItems(json.data || []);
+        const res = await pujaKareApis.getPujaKareItems();
+        console.log("Puja Kare API Response:", res);
+        // const json = await res.json();
+        setItems(res || []);
       } catch (error) {
         console.error("API Error:", error);
       } finally {
@@ -33,17 +35,17 @@ export default function PujaKare() {
        <Header pageName={{ hi: "iwtk djs", en: "Puja kare" }} />
        
       <PageTitleCard
-        titleHi={items.title.hi}
-        titleEn={items.title.en}
+        titleHi={items.name?.hi}
+        titleEn={items.name?.en}
         
       /> 
 
       <div className="mt-4 container mx-auto px-4">
         <ul className="grid grid-cols-2 lg:grid-cols-4 gap-3 text-center">
           {items.map((item) => (
-            <li key={item.id}>
+            <li key={item._id}>
               <Link
-                to={`/puja-kare/${item.id}`}
+                to={`/puja-kare/${item._id}`}
                 className="theme_bg bg-white rounded-xl shadow md:p-6 p-3 text-center hover:bg-yellow-50 transition w-auto flex flex-col"
               >
                 <div className="w-full h-36 flex items-center justify-center">
@@ -54,7 +56,7 @@ export default function PujaKare() {
                   />
                 </div>
                 <div className="p-2">
-                  <h2 className="md:text-lg text-lg font-semibold truncate font-hindi pt-2">{item.title}</h2>
+                  <h2 className="md:text-lg text-lg font-semibold truncate font-hindi pt-2">{item.name?.hi}</h2>
                 </div>
               </Link>
             </li>
