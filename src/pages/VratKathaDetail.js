@@ -209,6 +209,20 @@ function VratKathaDetail() {
         "aarti": {
             "hi": "vkjrh",
             "en": "Aarti"
+        },
+        "timings": {
+            "start": {
+                "hi": "प्रारंभ",
+                "en": "Start"
+            },
+            "end": {
+                "hi": "समाप्त",
+                "en": "End"
+            }
+        },
+        "player": {
+            "hi": "कथा प्लेयर",
+            "en": "Katha Player"
         }
     }
 
@@ -255,11 +269,11 @@ function VratKathaDetail() {
                 <div className="flex justify-center mt-4">
                     <div className="bg-[rgba(255,250,244,0.6)] shadow rounded-lg px-6 py-3 md:flex-row gap-4 text-center border border-[#9A283D]">
                         <div className="flex justify-center items-center">
-                            <p className="font-semibold text-black text-sm">प्रारंभ %</p>
+                            <p className={`font-semibold text-black text-sm ${language === "hi" ? "font-hindi" : "font-eng"}`}>{language === "hi" ? `${jsonFile.timings.start.hi} %` : `${jsonFile.timings.start.en} :`}</p>
                             <p className="text-sm text-black font-eng ml-2">{new Date(detail.time?.start).toLocaleString()}</p>
                         </div>
                         <div className="flex justify-center items-center">
-                            <p className="font-semibold text-black text-sm">समाप्त %</p>
+                            <p className={`font-semibold text-black text-sm ${language === "hi" ? "font-hindi" : "font-eng"}`}>{language === "hi" ? `${jsonFile.timings.end.hi} %` : `${jsonFile.timings.end.en} :`}</p>
                             <p className="text-sm text-black font-eng ml-2">{new Date(detail.time?.end).toLocaleString()}</p>
                         </div>
                     </div>
@@ -309,7 +323,7 @@ function VratKathaDetail() {
                     <div className="flex justify-center mt-6">
                         <div className="bg-white border-2 border-[#9A283D] rounded-xl p-4 shadow-lg" style={{ width: '100%', maxWidth: '400px' }}>
                             <div className="flex items-center justify-between mb-3">
-                                <h3 className="font-hindi text-[#9A283D] font-semibold text-sm">dFkk प्लेयर</h3>
+                                <h3 className={`font-hindi text-[#9A283D] font-semibold text-sm ${language === 'hi' ? 'font-hindi' : 'font-eng'}`}>{language === 'hi' ? jsonFile.player.hi : jsonFile.player.en}</h3>
                                 <button
                                     onClick={handleCloseAudioPlayer}
                                     className="text-[#9A283D] hover:text-red-600 transition-colors duration-200"

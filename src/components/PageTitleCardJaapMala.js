@@ -28,18 +28,20 @@ const PageTitleCardJaapMala = ({
   }
   return (
     <div className="flex justify-center items-center mb-3">
-      <p
-        className={`mb-0 w-auto py-1 px-4 bg-[rgba(255,250,244,0.6)] rounded-b-xl mx-auto theme_text font-bold shadow-md font-eng ${!customFontSize ? textSize : ''}`}
-        style={customFontSize ? { fontSize: customFontSize } : {}}
-      >
-        {language === "hi" ? getData(titleHi) : titleEn}
-        <span 
-          className={`font-eng ml-2 ${!customEngFontSize ? engTextSize : ''}`}
+      <div className="w-auto py-1 px-4 bg-[rgba(255,250,244,0.6)] rounded-b-xl mx-auto theme_text font-bold shadow-md text-center">
+        <div 
+          className={`mb-0 font-eng ${!customFontSize ? textSize : ''}`}
+          style={customFontSize ? { fontSize: customFontSize } : {}}
+        >
+          {language === "hi" ? getData(titleHi) : titleEn}
+        </div>
+        <div 
+          className={`font-eng ${!customEngFontSize ? engTextSize : ''}`}
           style={customEngFontSize ? { fontSize: customEngFontSize } : {}}
         >
           ({language === "hi" ? titleEn : titleHi})
-        </span>
-      </p>
+        </div>
+      </div>
     </div>
   );
 };

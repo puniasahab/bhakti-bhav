@@ -54,7 +54,7 @@ function JaapMalaDetail() {
         titleHi={detail.title.hi}
         titleEn={detail.title.en}
         customEngFontSize={"13px"}
-        customFontSize={"16px"}
+        customFontSize={"15px"}
         isFromJaapMala={true}
       />
 

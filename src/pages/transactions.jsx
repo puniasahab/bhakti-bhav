@@ -183,12 +183,15 @@ const Transactions = () => {
 
   return (
     <>
-      <Header profileText={"My Transactions"} showProfileHeader={true} />
+      <Header profileText={"My Transactions"} showProfileHeader={true} showEnglishText={true} hideEditIcon={true}/>
       <PageTitleCard
         titleHi={""}
         titleEn={"Transaction History"} 
         customEngFontSize={"14px"}
         customFontSize={"21px"}
+        
+        // fontEnglish={true}
+        
       />
 
       <div className="container mx-auto px-4 py-6">
@@ -206,7 +209,7 @@ const Transactions = () => {
         )}
 
         {/* User Profile Summary */}
-        {userProfile && (
+        {/* {userProfile && (
           <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold text-[#9A283D] font-eng">Account Summary</h2>
@@ -241,7 +244,7 @@ const Transactions = () => {
               )}
             </div>
           </div>
-        )}
+        )} */}
 
         {/* Transactions List */}
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">

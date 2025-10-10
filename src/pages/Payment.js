@@ -227,14 +227,24 @@ export default function Payment() {
                 </div>
               )}
             </div>
-          )) : (<div>No plans available at the moment.</div>)}
+          )) : (
+            <div className="text-center py-12">
+              <div className="text-gray-400 text-6xl mb-4">📋</div>
+              <div className="font-eng text-lg font-semibold text-gray-600 mb-2">
+                You have no plans available at the moment.
+              </div>
+              <p className="font-eng text-sm text-gray-500">
+                Please check back later for subscription plans.
+              </p>
+            </div>
+          )}
         </div>
 
         <div className="mx-auto px-4 mt-6 flex flex-col space-y-3 font-eng justify-between">
           <button className="bg-[#9A283D] text-white py-3 rounded-xl shadow " onClick={() => makePayment(selectedPlan)}>
             Get Started
           </button>
-          <button className="border border-[#9A283D] text-[#9A283D] py-3 rounded-xl shadow">
+          <button className="border border-[#9A283D] text-[#9A283D] py-3 rounded-xl shadow" onClick={() => navigate("/")}>
             Skip
           </button>
         </div>

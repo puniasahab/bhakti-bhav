@@ -100,7 +100,11 @@ export default function MantraDetail() {
                   className={`theme_text text-[21px] font-semibold font-hindi ${fontSize}
                   }`}
                 >
-                  {item.text?.hi}
+                  {item.text?.hi
+                    .replace(/:/g, "ः")         // Replace colon with visarga
+                    .replace(/ँ/g, "ं")          // Normalize chandrabindu if misencoded
+                    .replace(/\u200D|\u200C/g, "") // Remove zero-width joiners
+                    .normalize("NFC")}
                 </p>
 
                 <div className="mt-8 mb-2 w-full flex items-center justify-center">

@@ -49,14 +49,20 @@ function JaapMala() {
       }
     }
   }
+
+  function toHindiDigits(str) {
+  const map = { '0': '०', '1': '१', '2': '२', '3': '३', '4': '४', '5': '५', '6': '६', '7': '७', '8': '८', '9': '९' };
+  return str.replace(/\d/g, d => map[d]);
+}
+
   return (
     <>
       <Header pageName={{ hi: "tkkp ekyk", en: "Jaap mala" }} />
       <PageTitleCard
-        titleHi={"tkkp ekyk"}
+        titleHi={"tki ekyk"}
         titleEn={"Jaap mala"}
         customEngFontSize={"13px"}
-        customFontSize={"22px"}
+        customFontSize={"21px"}
       />
 
       <div className="container mx-auto px-4">
@@ -81,7 +87,9 @@ function JaapMala() {
                     className={`w-full rounded-md max-h-[150px] md:max-h-[150px] object-cover ${getSubscriptionStatusFromLS() ? "" : item.accessType === "paid" ? "blur-sm" : ""}`}
                   />
                   <div className={`absolute inset-0 theme_text flex flex-col items-center justify-center text-center px-4 z-10 top-[35%] ${getSubscriptionStatusFromLS() ? "" : item.accessType === "paid" ? "blur-sm" : ""}`}>
-                    <h2 className="text-xl font-bold">{item.title.hi}</h2>
+                    <h2 className="text-xl font-bold" 
+                    // style={{fontFamily: "KrutiDev"}}>
+                      >{item.title.hi}</h2>
                     <p className="text-sm font-eng">{item.title.en}</p>
                   </div>
                 </div>

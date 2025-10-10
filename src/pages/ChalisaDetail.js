@@ -216,6 +216,10 @@ export default function ChalisaDetail() {
     "pause": {
       "hi": "can djsa" ,
       "en": "Pause"
+    },
+    "player": {
+      "hi": "चालीसा प्लेयर",
+      "en": "Chalisa Player"
     }
   }
 
@@ -304,7 +308,7 @@ export default function ChalisaDetail() {
           <div className="flex justify-center mt-6 mb-6">
             <div className="bg-white border-2 border-[#9A283D] rounded-xl p-4 shadow-lg" style={{ width: '100%', maxWidth: '400px' }}>
               <div className="flex items-center justify-between mb-3">
-                <h3 className="font-hindi text-[#9A283D] font-semibold text-sm">pkyhlk प्लेयर</h3>
+                <h3 className={`font-hindi text-[#9A283D] font-semibold text-sm ${language === 'hi' ? 'font-hindi' : 'font-eng'}`}>{language === 'hi' ? jsonFile.player.hi : jsonFile.player.en}</h3>
                 <button 
                   onClick={handleCloseAudioPlayer}
                   className="text-[#9A283D] hover:text-red-600 transition-colors duration-200"

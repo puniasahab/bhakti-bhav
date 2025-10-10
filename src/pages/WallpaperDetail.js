@@ -18,48 +18,34 @@ function WallpaperDetail() {
     try {
       // Fetch the wallpaper data from API
       const response = await wallpaperApis.downloadWallpaper(id);
-      console.log("Download response:", response);
+      console.log(response, "Response");
+      // console.log("Download response:", response);
       
-      if (!response.status || response.code !== 200) {
-        throw new Error("Failed to fetch wallpaper data");
-      }
+      // if (!response.status || response.code !== 200) {
+      //   throw new Error("Failed to fetch wallpaper data");
+      // }
 
-      // Get the image URL from the response
-      const imageUrl = response.data.imageUrl;
-      if (!imageUrl) {
-        throw new Error("Image URL not found in response");
-      }
+      // // Get the image URL from the response
+      // const imageUrl = response;
+      // if (!imageUrl) {
+      //   throw new Error("Image URL not found in response");
+      // }
 
-      // Fetch the actual image as a blob
-      const imageResponse = await fetch(imageUrl);
-      if (!imageResponse.ok) {
-        throw new Error("Failed to fetch image from URL");
-      }
+      // // Fetch the actual image as a blob
+      // const imageResponse = await fetch(imageUrl);
+      // if (!imageResponse.ok) {
+      //   throw new Error("Failed to fetch image from URL");
+      // }
       
-      const blob = await imageResponse.blob();
-
-      // Extract filename from URL or use a default name
-      const urlParts = imageUrl.split('/');
-      const fileName = urlParts[urlParts.length - 1] || `bhakti-bhav-wallpaper-${response.data.godName}.png`;
-
-      // Create a temporary object URL for the blob
-      const url = window.URL.createObjectURL(blob);
-
-      // Create a temporary link element
       const a = document.createElement("a");
-      a.href = url;
-      a.download = fileName;
-      document.body.appendChild(a);
-      a.click(); // trigger the download
-      a.remove();
-
-      // Revoke the object URL to free memory
-      window.URL.revokeObjectURL(url);
+  a.href = response;
+  a.download = "downloaded_image.png";
+  a.click();
       
-      console.log("Download completed successfully");
+      // console.log("Download completed successfully");
     } catch (error) {
       console.error("Error downloading image:", error);
-      alert("Unable to download image. Please try again.");
+      // alert("Unable to download image. Please try again.");
     }
   }
 

@@ -5,6 +5,7 @@ const PageTitleCard = ({
   titleHi, 
   titleEn, 
   language = "hi", 
+  fontEnglish = false,
   textSize = "text-xl", 
   engTextSize = "text-xs",
   customFontSize, // Font size in pixels for main title
@@ -32,7 +33,7 @@ const PageTitleCard = ({
         className={`mb-0 w-auto py-1 px-4 bg-[rgba(255,250,244,0.6)] rounded-b-xl mx-auto theme_text font-bold shadow-md text-center ${!customFontSize ? textSize : ''}`}
         style={customFontSize ? { fontSize: customFontSize } : {}}
       >
-        <div>
+        <div className={`${fontEnglish ? 'font-eng' : ''}`}>
           {language === "hi" ? getData(titleHi) : titleEn}
         </div>
         <div 
