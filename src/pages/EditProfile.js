@@ -106,31 +106,41 @@ function EditProfile() {
         submitFormData.append('name', formData.name);
         submitFormData.append('mobileNumber', formData.mobileNumber);
         submitFormData.append('email', formData.email);
-        submitFormData.append('state', formData.state);
-        submitFormData.append('dateOfBirth', formData.dateOfBirth);
-        submitFormData.append('birthPlace', formData.birthPlace);
-        submitFormData.append('timeOfBirth', formData.timeOfBirth);
-        submitFormData.append('gender', formData.gender);
+        submitFormData.append('state', formData.state || '');
+        submitFormData.append('dateOfBirth', formData.dateOfBirth || '');
+        submitFormData.append('birthPlace', formData.birthPlace || '');
+        submitFormData.append('timeOfBirth', formData.timeOfBirth || '');
+        submitFormData.append('gender', formData.gender || '');
         
-        // Append image file if selected, otherwise append existing imageUrl
+        // Append image file if selected
         if (imageFile) {
-          console.log("ImageFile", imageFile);
-          submitFormData.append('imageUrl', imageFile);
-        } else if (formData.imageUrl) {
-          submitFormData.append('imageUrl', formData.imageUrl);
+          console.log("Adding new image file:", imageFile.name, imageFile.type, imageFile.size);
+          submitFormData.append('imageUrl', imageFile, imageFile.name);
         }
         
-        console.log("Form data being sent:");
+        console.log("FormData contents:");
         for (let [key, value] of submitFormData.entries()) {
-          console.log(key, value);
+          if (value instanceof File) {
+            console.log(`${key}:`, {
+              name: value.name,
+              type: value.type,
+              size: value.size,
+              lastModified: value.lastModified
+            });
+          } else {
+            console.log(`${key}:`, value);
+          }
         }
         
+        console.log("Sending FormData to API...");
         const response = await profileApis.updateProfile(submitFormData);
         console.log("Profile updated successfully:", response);
-        navigate("/")
-        // alert("Profile saved successfully!");
+        
+        alert("Profile saved successfully!");
+        navigate("/");
       } catch (error) {
         console.error("Error updating profile:", error);
+        console.error("Error details:", error.response?.data || error.message);
         alert("Error saving profile. Please try again.");
       } finally {
         setLoading(false);

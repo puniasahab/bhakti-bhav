@@ -13,6 +13,7 @@ const Profile = () => {
         email: "",
         state: "",
         gender: "",
+        imageUrl: "",
     });
     const [loading, setLoading] = useState(true);
 
@@ -30,6 +31,7 @@ const Profile = () => {
                         email: res.email || "",
                         state: res.state || "",
                         gender: res.gender || "",
+                        imageUrl: res.imageUrl || "",
                     });
                 }
             } catch (error) {
@@ -56,11 +58,34 @@ const Profile = () => {
                 </div>
             ) : (
                 <>
+                    {/* Profile Image Section */}
+                   
+
                     <div className="mx-6 mt-6 bg-gradient-to-r from-[#F59E0B] to-[#FCD34D] rounded-xl shadow-lg p-4 flex items-center justify-between cursor-pointer border border-[#F59E0B]" onClick={() => navigate("/transactions")}>
                         <span className="text-[#7A1C2B] font-semibold text-base">
                             Your Premium plan is active
                         </span>
                         <ChevronRight className="text-[#7A1C2B] w-5 h-5" />
+                    </div>
+                     <div className="flex justify-center mb-6 mt-4">
+                        <div className="relative">
+                            <div className="w-32 h-32 rounded-full border-2 border-[#9A283D] flex items-center justify-center text-[#9A283D] font-bold text-lg bg-white shadow-lg overflow-hidden">
+                                {profile.imageUrl ? (
+                                    <img 
+                                        src={profile.imageUrl.startsWith("http") 
+                                            ? profile.imageUrl 
+                                            : `https://api.bhaktibhav.app${profile.imageUrl}`
+                                        } 
+                                        alt="Profile" 
+                                        className="w-full h-full object-cover rounded-full"
+                                    />
+                                ) : (
+                                    <div className="w-28 h-28 rounded-full bg-gradient-to-br from-[#FFFAF8] to-[#FCD34D] flex items-center justify-center">
+                                        <span className="text-[#9A283D] font-eng text-sm">Profile Picture</span>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
                     </div>
 
                     <div className="mx-6 mt-6 space-y-4">

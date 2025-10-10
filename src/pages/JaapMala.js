@@ -55,6 +55,34 @@ function JaapMala() {
   return str.replace(/\d/g, d => map[d]);
 }
 
+
+const HindiWithEnglishNumbers = ( text ) => {
+  // Split text by numbers while keeping numbers in result
+  const parts = text.split(/(\d+)/);
+
+  return (
+    <h2 className="text-xl font-bold">
+      {parts.map((part, index) => {
+        if (/^\d+$/.test(part)) {
+          // Numbers only
+          return (
+            <span key={index} className="font-eng">
+              {part}
+            </span>
+          );
+        } else {
+          // Hindi or other text
+          return (
+            <span key={index} className="font-hindi">
+              {part}
+            </span>
+          );
+        }
+      })}
+    </h2>
+  );
+};
+
   return (
     <>
       <Header pageName={{ hi: "tkkp ekyk", en: "Jaap mala" }} />
@@ -87,9 +115,10 @@ function JaapMala() {
                     className={`w-full rounded-md max-h-[150px] md:max-h-[150px] object-cover ${getSubscriptionStatusFromLS() ? "" : item.accessType === "paid" ? "blur-sm" : ""}`}
                   />
                   <div className={`absolute inset-0 theme_text flex flex-col items-center justify-center text-center px-4 z-10 top-[35%] ${getSubscriptionStatusFromLS() ? "" : item.accessType === "paid" ? "blur-sm" : ""}`}>
-                    <h2 className="text-xl font-bold" 
+                    {/* <h2 className="text-xl font-bold" 
                     // style={{fontFamily: "KrutiDev"}}>
-                      >{item.title.hi}</h2>
+                      >{item.title.hi}</h2> */}
+                      {HindiWithEnglishNumbers(item.title.hi)}
                     <p className="text-sm font-eng">{item.title.en}</p>
                   </div>
                 </div>

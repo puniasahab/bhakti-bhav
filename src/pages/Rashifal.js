@@ -82,7 +82,21 @@ function Rashifal() {
   };
 
   if (loading) return <Loader message="🙏 Loading भक्ति भाव 🙏" size={200} />;
-
+function normalizeHindiText(text) {
+  return text
+    .replace(/[‚،﹐，]/g, ",")
+    .replace(/[।﹒｡]/g, "।")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+function normalizeEnglishText(text) {
+  return text
+    .replace(/[‚،﹐，]/g, ",")
+    .replace(/[।﹒｡]/g, ".")
+    .replace(/\.([A-Z])/g, "$1")
+    .replace(/\s+/g, " ")
+    .trim();
+}
   return (
     <>
       <Header pageName={{ hi: "jkf'kQy", en: "Rashifal" }} />
@@ -153,7 +167,7 @@ function Rashifal() {
                       <li key={idx} className="text-lg leading-relaxed flex items-start">
                         <span className="text-[#9A283D] mr-3 mt-1 flex-shrink-0 font-bold text-lg min-w-[16px]">●</span>
                         <span className="flex-1 text-md">
-                          {line.replace(/\.\.\./g, "---").replace(/,/g, "]")}
+                          {normalizeHindiText(line).replace(/\.\.\./g, "---").replace(/,/g, "]")}
                         </span>
                       </li>
                     ))}
@@ -166,7 +180,7 @@ function Rashifal() {
                       <li key={idx} className="text-lg leading-relaxed font-eng flex items-start">
                         <span className="text-[#9A283D] mr-3 mt-1 flex-shrink-0 font-bold text-lg min-w-[16px]">●</span>
                         <span className="flex-1">
-                          {line.replace(/\.\.\./g, "---").replace(/,/g, "]")}
+                          {normalizeEnglishText(line).replace(/\.\.\./g, "---").replace(/,/g, ",")}
                         </span>
                       </li>
                     ))}

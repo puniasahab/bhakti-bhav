@@ -180,7 +180,17 @@ export const profileApis = {
   },
   updateProfile: async (data) => {
     try {
-      const response = await api.put(endPoints.updateProfile, data);
+      // Create a custom config for FormData requests
+      const config = {};
+      
+      // If data is FormData, don't set Content-Type header - let browser set it
+      if (data instanceof FormData) {
+        config.headers = {
+          'Content-Type': 'multipart/form-data'
+        };
+      }
+      
+      const response = await api.put(endPoints.updateProfile, data, config);
       return response.data;
     } catch (error) {
       console.error("Error updating profile:", error);

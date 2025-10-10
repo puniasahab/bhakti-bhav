@@ -23,6 +23,34 @@ const PageTitleCardJaapMala = ({
     return convertedText;
   };
 
+
+  const HindiWithEnglishNumbers = ( text ) => {
+  // Split text by numbers while keeping numbers in result
+  const parts = text.split(/(\d+)/);
+
+  return (
+    <h2 className="text-lg font-bold">
+      {parts.map((part, index) => {
+        if (/^\d+$/.test(part)) {
+          // Numbers only
+          return (
+            <span key={index} className="font-eng">
+              {part}
+            </span>
+          );
+        } else {
+          // Hindi or other text
+          return (
+            <span key={index} className="font-hindi">
+              {part}
+            </span>
+          );
+        }
+      })}
+    </h2>
+  );
+};
+
   const getData = (text) => {
     return isFromJaapMala ? convertHindiToEnglishNumerals(text) : text;
   }
@@ -33,7 +61,7 @@ const PageTitleCardJaapMala = ({
           className={`mb-0 font-eng ${!customFontSize ? textSize : ''}`}
           style={customFontSize ? { fontSize: customFontSize } : {}}
         >
-          {language === "hi" ? getData(titleHi) : titleEn}
+          {language === "hi" ? HindiWithEnglishNumbers(titleHi) : titleEn}
         </div>
         <div 
           className={`font-eng ${!customEngFontSize ? engTextSize : ''}`}
