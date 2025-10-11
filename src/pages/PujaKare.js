@@ -5,18 +5,22 @@ import { Link } from "react-router-dom";
 import Loader from "../components/Loader";
 import PageTitleCard from "../components/PageTitleCard";
 import { pujaKareApis } from "../api";
+import { usePujaKare } from "../contexts/PujaKareContext";
 
 export default function PujaKare() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { updatePujaKareItems } = usePujaKare();
 
   useEffect(() => {
     async function fetchItems() {
       try {
         const res = await pujaKareApis.getPujaKareItems();
-        console.log("Puja Kare API Response:", res);
-        // const json = await res.json();
-        setItems(res || []);
+        console.log("Puja Kare API Response:", res.data);
+        const itemsData = res.data || [];
+        setItems(itemsData);
+        // Update context with the fetched data
+        updatePujaKareItems(itemsData);
       } catch (error) {
         console.error("API Error:", error);
       } finally {
@@ -35,10 +39,9 @@ export default function PujaKare() {
        <Header pageName={{ hi: "iwtk djs", en: "Puja kare" }} />
        
       <PageTitleCard
-        titleHi={items.name?.hi}
-        titleEn={items.name?.en}
-        
-      /> 
+        titleHi={"iwtk djs"}
+        titleEn={"Puja kare"}
+      />
 
       <div className="mt-4 container mx-auto px-4">
         <ul className="grid grid-cols-2 lg:grid-cols-4 gap-3 text-center">
@@ -50,13 +53,14 @@ export default function PujaKare() {
               >
                 <div className="w-full h-36 flex items-center justify-center">
                   <img
-                    src={item.image || "/img/default.png"}
+                    src={item.randomWallpaper.imagethumb || "/img/default.png"}
                     alt={item.title}
                     className="w-auto rounded-md max-h-[100%] md:max-h-[100%]"
                   />
                 </div>
                 <div className="p-2">
                   <h2 className="md:text-lg text-lg font-semibold truncate font-hindi pt-2">{item.name?.hi}</h2>
+                  <p className="md:text-lg text-md truncate font-eng">({item.name?.en})</p>
                 </div>
               </Link>
             </li>

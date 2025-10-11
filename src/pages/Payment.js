@@ -161,7 +161,7 @@ export default function Payment() {
 
         <div className="text-center mt-4">
           <p className="font-hindi theme_text" style={{fontSize: '21px'}}>हो जायें प्रभु की भक्ति में लीन!</p>
-          <p className="theme_text font-eng">Ho jaye prabhu ki bhakti me lein</p>
+          <p className="theme_text font-eng">Ho jaye prabhu ki bhakti me leen</p>
         </div>
 
         <div className="container mx-auto px-4 mt-6 space-y-4">

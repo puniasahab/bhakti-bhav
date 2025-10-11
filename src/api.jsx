@@ -177,6 +177,16 @@ export const pujaKareApis = {
       console.error("Error fetching Puja Kare items:", error);
       throw error;
     }
+  },
+  
+  getPujaKareItemById: async (id) => {
+    try {
+      const response = await api.get(`${endPoints.pujaKarein}/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error(`Error fetching Puja Kare item with ID ${id}:`, error);
+      throw error;
+    }
   }
 }
 

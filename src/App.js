@@ -25,6 +25,7 @@ import VerifyOtp from "./pages/VerifyOtp";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import { KathaProvider } from "./contexts/KathaContext";
 import { PaymentProvider } from "./contexts/PaymentContext";
+import { PujaKareProvider } from "./contexts/PujaKareContext";
 import TermsAndConditions from "./pages/TermsPolicy";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import AboutUs from "./pages/AboutUs";
@@ -59,7 +60,8 @@ function App() {
     <LanguageProvider>
       <KathaProvider>
         <PaymentProvider>
-          <Routes>
+          <PujaKareProvider>
+            <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/vrat-katha" element={<VratKatha />} />
             <Route path="/vrat-katha/:id" element={<VratKathaDetail />} />
@@ -92,6 +94,7 @@ function App() {
             <Route path='/vrat-katha/categoryDetails/:id' element={<VratKathaCategoryDetails />} />
             <Route path="kundli" element = {<Kundli />} />
           </Routes>
+          </PujaKareProvider>
         </PaymentProvider>
       </KathaProvider>
     </LanguageProvider>

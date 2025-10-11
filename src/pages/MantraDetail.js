@@ -11,7 +11,8 @@ export default function MantraDetail() {
   const [loading, setLoading] = useState(true);
   const { language, fontSize } = useContext(LanguageContext);
   const [currentAudio, setCurrentAudio] = useState(null);
-  const audioRef = useRef(null);
+  const [currentAudioInstance, setCurrentAudioInstance] = useState(null);
+  const [loopStates, setLoopStates] = useState({});
 
   useEffect(() => {
     async function fetchMantras() {
@@ -29,30 +30,64 @@ export default function MantraDetail() {
     fetchMantras();
   }, [id]);
 
-  const handlePlay = (url) => {
+  const handlePlay = (url, mantraId) => {
     if (!url) return; // no audio available
-    if (currentAudio === url) {
-      audioRef.current.pause();
+    
+    // If the same audio is playing, pause it
+    if (currentAudio === url && currentAudioInstance) {
+      currentAudioInstance.pause();
       setCurrentAudio(null);
-    } else {
-      if (audioRef.current) {
-        audioRef.current.pause();
-      }
-      audioRef.current = new Audio(url);
-      audioRef.current.play();
+      setCurrentAudioInstance(null);
+      return;
+    }
+    
+    // Stop any currently playing audio
+    if (currentAudioInstance) {
+      currentAudioInstance.pause();
+      currentAudioInstance.currentTime = 0;
+    }
+    
+    // Create and play new audio
+    const newAudio = new Audio(url);
+    newAudio.loop = loopStates[mantraId] || false;
+    
+    newAudio.play().then(() => {
       setCurrentAudio(url);
+      setCurrentAudioInstance(newAudio);
+    }).catch(err => {
+      console.error("Audio play failed:", err);
+    });
 
-      audioRef.current.onended = () => {
+    newAudio.onended = () => {
+      if (!newAudio.loop) {
         setCurrentAudio(null);
-      };
+        setCurrentAudioInstance(null);
+      }
+    };
+  };
+
+  const toggleLoop = (mantraId, audioUrl) => {
+    if (!audioUrl) return;
+    
+    const newLoopState = !loopStates[mantraId];
+    setLoopStates(prev => ({
+      ...prev,
+      [mantraId]: newLoopState
+    }));
+    
+    // If this is the currently playing audio, update its loop property
+    if (currentAudio === audioUrl && currentAudioInstance) {
+      currentAudioInstance.loop = newLoopState;
     }
   };
 
-  const replayAudio = () => {
-    if (audioRef.current) {
-      audioRef.current.currentTime = 0;
-      audioRef.current.play();
-      setCurrentAudio(audioRef.current.src);
+  const replayAudio = (audioUrl, mantraId) => {
+    if (currentAudio === audioUrl && currentAudioInstance) {
+      currentAudioInstance.currentTime = 0;
+      currentAudioInstance.play();
+    } else {
+      // If not currently playing, start playing
+      handlePlay(audioUrl, mantraId);
     }
   };
 
@@ -109,7 +144,7 @@ export default function MantraDetail() {
 
                 <div className="mt-8 mb-2 w-full flex items-center justify-center">
                   <button
-                    onClick={() => handlePlay(item.audioUrl?.hi)}
+                    onClick={() => handlePlay(item.audioUrl?.hi, item._id || index)}
                     disabled={!item.audioUrl?.hi}
                     className={`p-2 flex items-center justify-center rounded-full 
                     transition font-hindi 
@@ -128,29 +163,24 @@ export default function MantraDetail() {
                   </button>
 
                   <button
-                    onClick={() => {
-                      if (audioRef.current) {
-                        audioRef.current.loop = !audioRef.current.loop;
-                      }
-                    }}
+                    onClick={() => toggleLoop(item._id || index, item.audioUrl?.hi)}
                     disabled={!item.audioUrl?.hi}
                     className={`ml-3 p-2 flex items-center justify-center rounded-full transition font-hindi 
                     ${!item.audioUrl?.hi
                         ? "bg-[#9A283D]/50 text-gray-500 cursor-not-allowed"
-                        : audioRef.current?.loop
+                        : loopStates[item._id || index]
                           ? "bg-green-600 text-white"
                           : "bg_theme text-white"
                       }`}
                   >
-                    <span className="audio_repeat_icon" onClick={replayAudio}></span>
+                    <span 
+                      className="audio_repeat_icon" 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        replayAudio(item.audioUrl?.hi, item._id || index);
+                      }}
+                    ></span>
                   </button>
-
-                  {item.audioUrl?.hi && (
-                    <audio ref={audioRef} className="hidden">
-                      <source src={item.audioUrl.hi} type="audio/mpeg" />
-                      Your browser does not support the audio element.
-                    </audio>
-                  )}
                 </div>
               </div>
             ))}
