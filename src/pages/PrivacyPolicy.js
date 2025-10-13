@@ -57,7 +57,7 @@ const PrivacyPolicy = () => {
                     <li><strong>You</strong> means the individual accessing or using the Service, or the company, or other legal entity on behalf of which such individual is accessing or using the Service, as applicable.</li>
                   </ul>
                 </section>
-
+{/* 
                 <section>
                   <h2 className="text-xl md:text-2xl font-bold mb-4 theme_text">Collecting and Using Your Personal Data</h2>
                   
@@ -166,7 +166,7 @@ const PrivacyPolicy = () => {
                   <p className="text-gray-700">
                     You are advised to review this Privacy Policy periodically for any changes. Changes to this Privacy Policy are effective when they are posted on this page.
                   </p>
-                </section>
+                </section> */}
               </div>
 
               {/* Back to Home Button */}
