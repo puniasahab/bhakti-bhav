@@ -233,7 +233,7 @@ export default function PujaKareDetail() {
 
         <main className="px-4 relative">
           <div className="container mx-auto mt-4">
-            <img src={item.randomWallpaper.imageUrl} alt="" width="350" height="420" className="max-w-full h-auto mx-auto" />
+            <img src={item.imageUrl} alt="" width="350" height="420" className="max-w-full h-auto mx-auto" />
 
             <div className="grid grid-cols-4 gap-6 p-3 mt-6 md:mt-3">
               <button onClick={mala}

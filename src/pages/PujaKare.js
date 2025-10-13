@@ -6,6 +6,8 @@ import Loader from "../components/Loader";
 import PageTitleCard from "../components/PageTitleCard";
 import { pujaKareApis } from "../api";
 import { usePujaKare } from "../contexts/PujaKareContext";
+import { type } from "@testing-library/user-event/dist/type";
+import { parse } from "postcss";
 
 export default function PujaKare() {
   const [items, setItems] = useState([]);
@@ -17,7 +19,7 @@ export default function PujaKare() {
       try {
         const res = await pujaKareApis.getPujaKareItems();
         console.log("Puja Kare API Response:", res.data);
-        const itemsData = res.data || [];
+        const itemsData = res || [];
         setItems(itemsData);
         // Update context with the fetched data
         updatePujaKareItems(itemsData);
@@ -36,8 +38,8 @@ export default function PujaKare() {
 
   return (
     <>
-       <Header pageName={{ hi: "iwtk djs", en: "Puja kare" }} />
-       
+      <Header pageName={{ hi: "iwtk djs", en: "Puja kare" }} />
+
       <PageTitleCard
         titleHi={"iwtk djs"}
         titleEn={"Puja kare"}
@@ -45,30 +47,42 @@ export default function PujaKare() {
 
       <div className="mt-4 container mx-auto px-4">
         <ul className="grid grid-cols-2 lg:grid-cols-4 gap-3 text-center">
-          {items.map((item) => (
-            <li key={item._id}>
-              <Link
-                to={`/puja-kare/${item._id}`}
-                className="theme_bg bg-white rounded-xl shadow md:p-6 p-3 text-center hover:bg-yellow-50 transition w-auto flex flex-col"
-              >
-                <div className="w-full h-36 flex items-center justify-center">
-                  <img
-                    src={item.randomWallpaper.imagethumb || "/img/default.png"}
-                    alt={item.title}
-                    className="w-auto rounded-md max-h-[100%] md:max-h-[100%]"
-                  />
-                </div>
-                <div className="p-2">
-                  <h2 className="md:text-lg text-lg font-semibold truncate font-hindi pt-2">{item.name?.hi}</h2>
-                  <p className="md:text-lg text-md truncate font-eng">({item.name?.en})</p>
-                </div>
-              </Link>
-            </li>
-          ))}
+          {items.map((item) => {
+            let parsedName = { hi: "", en: "" };
+            if (typeof item.name === 'string') {
+              parsedName = item.name ? JSON.parse(item.name) : { hi: "", en: "" };
+
+            }
+            else {
+              parsedName = item.name;
+            }
+            return (
+
+
+              <li key={item._id}>
+                <Link
+                  to={`/puja-kare/${item._id}`}
+                  className="theme_bg bg-white rounded-xl shadow md:p-6 p-3 text-center hover:bg-yellow-50 transition w-auto flex flex-col"
+                >
+                  <div className="w-full h-36 flex items-center justify-center">
+                    <img
+                      src={item.imagethumb || "/img/default.png"}
+                      alt={item.title}
+                      className="w-auto rounded-md max-h-[100%] md:max-h-[100%]"
+                    />
+                  </div>
+                  <div className="p-2">
+                    <h2 className="md:text-lg text-lg font-semibold truncate font-hindi pt-2">{parsedName.hi}</h2>
+                    <p className="md:text-md text-md truncate font-eng">({parsedName.en})</p>
+                  </div>
+                </Link>
+              </li>
+            )
+          })}
         </ul>
       </div>
 
-      
+
     </>
   );
 }

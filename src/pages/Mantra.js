@@ -78,7 +78,7 @@ export default function Mantra() {
                 </div>
                 <div className="p-2">
                   <h2 className={`md:text-lg text-lg font-semibold truncate font-hindi mt-1 ${getSubscriptionStatusFromLS() ? "" : item.accessType === "paid" ? "blur" : ""}`}>{item.name.hi}</h2>
-                  <h2 className={`md:text-lg text-sm font-semibold truncate font-eng ${getSubscriptionStatusFromLS() ? "" : item.accessType === "paid" ? "blur-sm" : ""}`}>({item.name.en})</h2>
+                  <p className={`md:text-md text-sm font-semibold truncate font-eng ${getSubscriptionStatusFromLS() ? "" : item.accessType === "paid" ? "blur-sm" : ""}`}>({item.name.en})</p>
 
                 </div>
               </Link>

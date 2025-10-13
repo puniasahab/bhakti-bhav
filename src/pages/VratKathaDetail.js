@@ -6,6 +6,8 @@ import Loader from "../components/Loader";
 import { LanguageContext } from "../contexts/LanguageContext";
 import PageTitleCard from "../components/PageTitleCard";
 
+import { useLocation } from "react-router-dom";
+
 function VratKathaDetail() {
     const { id } = useParams();
     const [detail, setDetail] = useState(null);
@@ -17,6 +19,7 @@ function VratKathaDetail() {
     const [isPlaying, setIsPlaying] = useState(false);
     const [currentTime, setCurrentTime] = useState(0);
     const [duration, setDuration] = useState(0);
+    const location = useLocation();
 
     useEffect(() => {
         if (!id) return;
@@ -244,9 +247,16 @@ function VratKathaDetail() {
     };
 
 
+    // useEffect(() => {
+    //     if (audioRef.current) {
+    //         audioRef.current.pause();
+    //         audioRef.current.currentTime = 0;
+    //     }
+    // }, [location])
+
     return (
         <>
-            <Header pageName={{ hi: "dFkk", en: "Katha" }} hindiFontSize="true" />
+            <Header pageName={{ hi: "ozr dFkk", en: "Vrat Katha" }} hindiFontSize="true" />
             <PageTitleCard
                 titleHi={detail.name.hi}
                 titleEn={detail.name.en}

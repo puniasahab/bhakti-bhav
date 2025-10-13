@@ -4,11 +4,13 @@ import Footer from "../components/Footer";
 import { Link } from "react-router-dom";
 import Loader from "../components/Loader";
 import PageTitleCard from "../components/PageTitleCard";
+import {getTokenFromLS, getSubscriptionStatusFromLS } from "../commonFunctions";
+import { useNavigate } from "react-router-dom";
 
 export default function HindiCalendar() {
   const [months, setMonths] = useState([]);
   const [loading, setLoading] = useState(true);
-
+  const navigate = useNavigate();
   useEffect(() => {
     async function fetchCalendar() {
       try {
@@ -42,6 +44,28 @@ export default function HindiCalendar() {
     (m) => m.monthNumber === currentMonthNumber && m.year === currentYear
   );
 
+
+  const handleNavigate = (id, accessType) => {
+      if(getSubscriptionStatusFromLS()) {
+        return `/vrat-katha/${id}`;
+      }
+      else {
+        if(accessType === "free") {
+          return `/vrat-katha/${id}`;
+        }
+        else {
+          if(getTokenFromLS()) {
+            return "/payment";
+          }
+          else {
+            return "/login";
+          }
+        }
+      }
+    }
+
+
+
   return (
     <div className="bg-[url('../img/home_bg.png')] bg-cover bg-top bg-no-repeat min-h-screen w-full text-white font-kruti">
       <Header />
@@ -64,7 +88,7 @@ export default function HindiCalendar() {
                 <li key={m._id}>
                   <Link
                     to={`/hindi-calendar/${m._id || idx}`}
-                    className="theme_bg bg-white rounded-full shadow md:p-4 p-3 text-center hover:bg-yellow-50 transition flex flex-col"
+                    className={`theme_bg bg-white rounded-full shadow md:p-4 p-3 text-center hover:bg-yellow-50 transition flex flex-col`}
                   >
                     {monthData.hi} <span className="font-eng">({monthData.en})</span>
                   </Link>
@@ -84,15 +108,17 @@ export default function HindiCalendar() {
                 {currentMonth.festivals.map((festival) => {
                   const dateObj = new Date(festival.date);
                   const day = dateObj.getDate().toString().padStart(2, "0");
- 
+
                   const weekdayHi = dateObj.toLocaleDateString("hi-IN", { weekday: "long" });
                   const weekdayEn = dateObj.toLocaleDateString("en-US", { weekday: "long" });
 
                   return (
                     <li
                       key={festival._id}
-                      className="bg-[#9A283D] text-white rounded-lg flex items-center px-4 py-3 shadow-md"
-                    > 
+                      onClick={
+                        () => navigate(handleNavigate(festival.kathaId, festival.accessType))}
+                      className={`bg-[#9A283D] text-white rounded-lg flex items-center px-4 py-3 shadow-md  ${getSubscriptionStatusFromLS() ? "" : festival.accessType === "paid" ? "blur-sm" : ""}`}
+                    >
                       <div className="flex items-center text-sm font-medium w-1/2">
                         <div className="text-lg font-bold font-eng mr-2">{day}</div>
                         <div>
@@ -100,16 +126,16 @@ export default function HindiCalendar() {
                           <p className="font-eng text-sm">({weekdayEn})</p>
                         </div>
                       </div>
- 
+
                       <div className="w-px h-10 bg-white/50 mx-3"></div>
- 
+
                       <div className="flex flex-col w-[70%]">
                         <span className="text-lg font-hindi">{festival.name.hi}</span>
                         <span className="text-sm font-eng">
                           {festival.name.en}
                         </span>
                       </div>
- 
+
                       <div className="ml-3">
                         <span className="text-3xl font-eng">›</span>
                       </div>
@@ -125,7 +151,7 @@ export default function HindiCalendar() {
         </div>
       </div>
 
-      
+
     </div>
   );
 }

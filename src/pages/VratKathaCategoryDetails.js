@@ -23,15 +23,15 @@ export default function VratKathaCategoryDetails() {
 
 
   const handleNavigation = (id, accessType) => {
-    if(getSubscriptionStatusFromLS()) {
+    if (getSubscriptionStatusFromLS()) {
       return `/vrat-katha/${id}`;
     }
     else {
-      if(accessType === "free") {
+      if (accessType === "free") {
         return `/vrat-katha/${id}`;
       }
       else {
-        if(getTokenFromLS()) {
+        if (getTokenFromLS()) {
           return "/payment";
         }
         else {
@@ -40,6 +40,8 @@ export default function VratKathaCategoryDetails() {
       }
     }
   }
+
+
   return (
     <>
       <Header hideEditIcon={true} showProfileHeader={true} profileText="भक्ति भाव" />
@@ -53,7 +55,11 @@ export default function VratKathaCategoryDetails() {
 
       <div className="container mx-auto px-4 mt-4">
         <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-          {selectedCategoryKathas.map((katha) => (
+          {selectedCategoryKathas.sort((a, b) => {
+            if (a.accessType === "free" && b.accessType === "paid") return -1;
+            if (a.accessType === "paid" && b.accessType === "free") return 1;
+            return 0;
+          }).map((katha) => (
             <li key={katha._id}>
               <Link
                 to={handleNavigation(katha._id, katha.accessType)}

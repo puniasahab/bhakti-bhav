@@ -138,7 +138,7 @@ function Home() {
                         className="theme_bg bg-white rounded-xl shadow md:p-6 p-3 text-center hover:bg-yellow-50 transition w-auto flex">
                         <div className="mx-auto flex flex-col items-center space-y-3 md:space-y-0">
                             <img src="./img/icon_3.png" alt="" width="36" height="36" className="md:mr-3" />
-                            <p className="md:text-2xl text-lg font-normal leading-[20px]"> dFkk <br /><span className="font-eng text-xs">(Katha)</span></p>
+                            <p className="md:text-2xl text-lg font-normal leading-[20px]">ozr dFkk <br /><span className="font-eng text-xs">(Vrat Katha)</span></p>
 
                         </div>
 

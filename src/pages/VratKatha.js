@@ -39,6 +39,84 @@ export default function VratKatha() {
             ...item, isCategory: false,
           }))
         ]
+
+        newData.map((item) => {
+          if (item.isCategory) {
+            const allKathasPaid = item.kathas.every(katha => katha.accessType === "paid");
+            if (allKathasPaid) {
+              item.accessType = "paid";
+            }
+            else {
+              item.accessType = "free";
+            }
+          }
+
+        })
+
+        newData.sort((a, b) => {
+          if(a.accessType === "free" && b.accessType === "paid") {
+            return -1;
+          }
+          else if(a.accessType === "paid" && b.accessType === "free") {
+            return 1;
+          }
+          else {
+            return 0;
+          }
+        });
+
+        // newData.sort((a, b) => {
+        //   if (a.isCategory && !b.isCategory) {
+        //     const allKathasPaid = a.kathas.every(katha => katha.accessType === "paid");
+        //     if (allKathasPaid && b.accessType === "paid") {
+        //       return 0;
+        //     }
+        //     else if (allKathasPaid && b.accessType === "free") {
+        //       return 1;
+        //     }
+        //     else {
+        //       return -1;
+        //     }
+        //   }
+        //   if (!a.isCategory && b.isCategory) {
+        //     const allKathasPaid = b.kathas.every(katha => katha.accessType === "paid");
+        //     if (allKathasPaid && a.accessType === "paid") {
+        //       return 0;
+        //     }
+        //     else if (allKathasPaid && a.accessType === "free") {
+        //       return 1;
+        //     }
+        //     else {
+        //       return -1;
+        //     }
+
+        //   }
+        //   if (!a.isCategory && !b.isCategory) {
+        //     if (a.accessType === "free" && b.accessType === "paid") {
+        //       return -1;
+        //     }
+        //     else if (a.accessType === "paid" && b.accessType === "free") {
+        //       return 1;
+        //     }
+        //     else {
+        //       return 0;
+        //     }
+        //   }
+
+        //   if (a.isCategory && b.isCategory) {
+        //     const allKathasPaidA = a.kathas.every(katha => katha.accessType === "paid");
+        //     const allKathasPaidB = b.kathas.every(katha => katha.accessType === "paid");
+        //     if ((allKathasPaidA && allKathasPaidB) || (!allKathasPaidA && !allKathasPaidB)) {
+        //       return 0;
+        //     }
+        //     else if (!allKathasPaidA && !allKathasPaidB) {
+        //       return 1;
+        //     }
+        //     else {
+        //       return -1;
+        //     }
+        //   }
+        // })
         setKathas(newData);
         // } else {
         //   setKathas([]);
@@ -57,16 +135,16 @@ export default function VratKatha() {
   if (loading) return <Loader message="🙏 Loading भक्ति भाव 🙏" size={200} />;
   if (!kathas.length) return <p className="text-center py-10">❌ No kathas found</p>;
 
-  const handleNavigation = (id, index) => {
-    if (kathas[index]?.kathas?.length > 0) {
-      // Set the category data in context before navigation
-      setCategoryData(kathas[index].kathas, kathas[index].name);
-      navigate(`/vrat-katha/categoryDetails/${id}`);
-    }
-    else {
-      navigate(`/vrat-katha/${id}`);
-    }
-  }
+  // const handleNavigation = (id, index) => {
+  //   if (kathas[index]?.kathas?.length > 0) {
+  //     // Set the category data in context before navigation
+  //     setCategoryData(kathas[index].kathas, kathas[index].name);
+  //     navigate(`/vrat-katha/categoryDetails/${id}`);
+  //   }
+  //   else {
+  //     navigate(`/vrat-katha/${id}`);
+  //   }
+  // }
 
   const handleNavigate = (id, index, accessType) => {
     const isActiveSubscription = getSubscriptionStatusFromLS();
@@ -116,12 +194,27 @@ export default function VratKatha() {
     }
 
   }
+
+  const getPaidLogic = (katha) => {
+    if (katha.isCategory) {
+      const allKathasPaid = katha.kathas.every(katha => katha.accessType === "paid");
+      if (allKathasPaid) {
+        return "blur-sm";
+      }
+      else {
+        return "";
+      }
+    }
+    else {
+      return katha.accessType === "paid" ? "blur-sm" : "";
+    }
+  }
   return (
     <>
       <Header />
 
       <PageTitleCard
-        titleHi={"dFkk"}
+        titleHi={"ozr dFkk"}
         titleEn={"Katha"}
         customEngFontSize={"14px"}
         customFontSize={"24px"}
@@ -141,17 +234,17 @@ export default function VratKatha() {
 
                     src={`${katha.imagethumb}`}
                     alt={katha.name?.hi || katha.name?.en}
-                    className={`w-auto rounded-md max-h-[100%] md:max-h-[100%] ${getSubscriptionStatusFromLS() ? "" : katha.accessType === "paid" ? "blur-sm" : ""}`}
+                    className={`w-auto rounded-md max-h-[100%] md:max-h-[100%] ${getSubscriptionStatusFromLS() ? "" : getPaidLogic(katha)}`}
                   />
                 </div>
                 <div className="p-2">
                   {katha.name?.hi && (
-                    <h2 className={`md:text-xl text-lg font-semibold truncate font-hindi pt-3 ${getSubscriptionStatusFromLS() ? "" : katha.accessType === "paid" ? "blur-sm" : ""}`}>
+                    <h2 className={`md:text-xl text-lg font-semibold truncate font-hindi pt-3 ${getSubscriptionStatusFromLS() ? "" : getPaidLogic(katha)}`}>
                       {katha.name.hi}
                     </h2>
                   )}
                   {katha.name?.en && (
-                    <p className={`text-sm truncate font-eng ${getSubscriptionStatusFromLS() ? "" : katha.accessType === "paid" ? "blur-sm" : ""}`}>{katha.name.en}</p>
+                    <p className={`text-sm truncate font-eng ${getSubscriptionStatusFromLS() ? "" : getPaidLogic(katha)}`}>{katha.name.en}</p>
                   )}
 
                 </div>
