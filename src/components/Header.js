@@ -75,7 +75,7 @@ function Header({
                         <>
                             {/* Back Button and Profile Text */}
                             <div className="flex items-center gap-3">
-                                <button onClick={() => navigate("/")}>
+                                <button onClick={() => {navigate("/");}}>
                                     <img src={backBtn} alt="Back" width="24" height="24" />
                                 </button>
                                 <span className={`${showEnglishText ? "font-eng": "font-hindi"} text-xl theme_text`}>{profileText}</span>
@@ -85,7 +85,7 @@ function Header({
                             <div className="flex items-center gap-3">
                                 {/* Edit Icon - Only show if not hidden */}
                                 {!hideEditIcon && (
-                                    <button className="bg-white rounded-full p-2 shadow-md border border-gray-200 hover:bg-gray-50 transition-colors" onClick={() => navigate("/edit-profile")}>
+                                    <button className="bg-white rounded-full p-2 shadow-md border border-gray-200 hover:bg-gray-50 transition-colors" onClick={() => {navigate("/edit-profile");}}>
                                         <Pencil size={20} className="text-[#9A283D]" style={{background: "transparent !important"}} />
                                     </button>
                                 )}
@@ -117,7 +117,12 @@ function Header({
 
                     {!isHomeRoute && !showProfileHeader && (
                         <div className="flex items-center gap-2">
-                            <button onClick={() => navigate(-1)}>
+                            <button onClick={() => {
+                                navigate(-1);
+                                setTimeout(() => {
+                                    window.location.reload();
+                                }, 50);
+                            }}>
                                 <img src={backBtn} alt="Back" width="24" height="24" />
                             </button>
  

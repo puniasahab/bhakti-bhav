@@ -165,3 +165,19 @@
     animation: shankh-pulse 4s ease-out forwards;
     z-index: 5;
   }
+
+   .img_wrapper {
+    position: relative;
+    width: 100%;
+    height: calc(100vh - 29em);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    overflow: hidden;
+}
+
+.img_wrapper img {
+  min-width: 360px;
+  max-width: 360px; 
+  object-fit: fit;  
+}

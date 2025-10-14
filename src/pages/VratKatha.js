@@ -215,7 +215,7 @@ export default function VratKatha() {
 
       <PageTitleCard
         titleHi={"ozr dFkk"}
-        titleEn={"Katha"}
+        titleEn={"Vrat Katha"}
         customEngFontSize={"14px"}
         customFontSize={"24px"}
 

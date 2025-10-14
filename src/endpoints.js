@@ -11,6 +11,6 @@ export const endPoints = {
     makePayment: 'cashfree/create-order',
     verifyPayment: 'cashfree/verify-payment',
     getTransactions: 'Usertranctions',
-    downloadWallpaper: 'download',
+    downloadWallpaper: 'wallpaper',
     pujaKarein: 'puja-kare',
 }
