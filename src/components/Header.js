@@ -29,7 +29,7 @@ function Header({
     const { language, setLanguage, fontSize, setFontSize } = useContext(LanguageContext);
     const [showDropdown, setShowDropdown] = useState(false);
     const dropdownRef = useRef(null);
- 
+
     const homeRoutes = ["/", "/home", "/Rashifal", "/payment", "/hindi-calendar", "/vrat-katha", "/chalisa", "/aarti", '/jaap-mala', "/mantra", "/wallpaper", "/termsAndConditions", "/aboutUs", "/privacyPolicy"];
 
     const isHomeRoute = homeRoutes.includes(pathname);
@@ -49,7 +49,7 @@ function Header({
     }, []);
 
     const getProfileOrLoginRoute = () => {
-        if(getTokenFromLS()) {
+        if (getTokenFromLS()) {
             return "/profile";
         } else {
             return "/login";
@@ -70,35 +70,35 @@ function Header({
         <header className="px-4 pt-3">
             <div className="container mx-auto hd_bg rounded-xl">
                 <div className="flex justify-between items-center px-4 py-6">
- 
+
                     {showProfileHeader && (
                         <>
                             {/* Back Button and Profile Text */}
                             <div className="flex items-center gap-3">
-                                <button onClick={() => {navigate("/");}}>
+                                <button onClick={() => { navigate("/"); }}>
                                     <img src={backBtn} alt="Back" width="24" height="24" />
                                 </button>
-                                <span className={`${showEnglishText ? "font-eng": "font-hindi"} text-xl theme_text`}>{profileText}</span>
+                                <span className={`${showEnglishText ? "font-eng" : "font-hindi"} text-xl theme_text`}>{profileText}</span>
                             </div>
 
                             {/* Three Dots Menu */}
                             <div className="flex items-center gap-3">
                                 {/* Edit Icon - Only show if not hidden */}
                                 {!hideEditIcon && (
-                                    <button className="bg-white rounded-full p-2 shadow-md border border-gray-200 hover:bg-gray-50 transition-colors" onClick={() => {navigate("/edit-profile");}}>
-                                        <Pencil size={20} className="text-[#9A283D]" style={{background: "transparent !important"}} />
+                                    <button className="bg-white rounded-full p-2 shadow-md border border-gray-200 hover:bg-gray-50 transition-colors" onClick={() => { navigate("/edit-profile"); }}>
+                                        <Pencil size={20} className="text-[#9A283D]" style={{ background: "transparent !important" }} />
                                     </button>
                                 )}
-                                
+
                                 {/* Three Dots Menu */}
-                               {showVerticalLogout && <div className="relative" ref={dropdownRef}>
-                                    <button 
+                                {showVerticalLogout && <div className="relative" ref={dropdownRef}>
+                                    <button
                                         className="bg-white rounded-full p-2 shadow-md border border-gray-200 hover:bg-gray-50 transition-colors"
                                         onClick={() => setShowDropdown(!showDropdown)}
                                     >
                                         <MoreVertical size={20} className="text-[#9A283D]" />
                                     </button>
-                                    
+
                                     {showDropdown && (
                                         <div className="absolute right-0 top-12 bg-white rounded-lg shadow-lg border border-gray-200 py-2 min-w-[120px] z-50">
                                             <button
@@ -119,13 +119,13 @@ function Header({
                         <div className="flex items-center gap-2">
                             <button onClick={() => {
                                 navigate(-1);
-                                setTimeout(() => {
-                                    window.location.reload();
-                                }, 50);
+                                // setTimeout(() => {
+                                //     window.location.reload();
+                                // }, 50);
                             }}>
                                 <img src={backBtn} alt="Back" width="24" height="24" />
                             </button>
- 
+
                             {pageName && (
                                 <div className="flex flex-row theme_text items-center">
                                     <span className="font-hindi text-xl">{pageName.hi}</span>
@@ -134,8 +134,8 @@ function Header({
                             )}
                         </div>
                     )}
- 
- 
+
+
                     {showWallpaperHeader && (
                         <div className="flex items-center gap-4 text-sm font-eng theme_text ml-auto">
                             <div className="flex items-center gap-1 text-lg">
@@ -151,7 +151,7 @@ function Header({
                     )}
 
                     {hindiFontSize && (
-                         <div className="flex space-x-2 theme_text text-lg font-eng ml-auto">
+                        <div className="flex space-x-2 theme_text text-lg font-eng ml-auto">
                             <button
                                 onClick={() => setLanguage(language === "hi" ? "en" : "hi")}
                                 className="px-2 border-[#9A283D] border rounded-lg"
@@ -173,7 +173,7 @@ function Header({
                         </div>
                     )}
                     {fontSizeOption && (
-                         <div className="flex space-x-2 theme_text text-lg font-eng ml-auto">
+                        <div className="flex space-x-2 theme_text text-lg font-eng ml-auto">
                             <button
                                 onClick={() => setFontSize("text-base")}
                                 className="px-2 border-[#9A283D] border rounded-lg"
@@ -188,7 +188,7 @@ function Header({
                             </button>
                         </div>
                     )}
- 
+
                     {isHomeRoute && (
                         <>
                             <h1 className="text-lg font-bold">
@@ -210,7 +210,7 @@ function Header({
                             </div>
                         </>
                     )}
- 
+
                 </div>
             </div>
         </header>

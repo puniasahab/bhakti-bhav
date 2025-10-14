@@ -4,6 +4,7 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Loader from "../components/Loader";
 import { LanguageContext } from "../contexts/LanguageContext";
+import { useAudio } from "../contexts/AudioContext";
 import PageTitleCard from "../components/PageTitleCard";
 
 import { useLocation } from "react-router-dom";
@@ -13,12 +14,7 @@ function VratKathaDetail() {
     const [detail, setDetail] = useState(null);
     const [loading, setLoading] = useState(true);
     const { language, setLanguage, fontSize, setFontSize } = useContext(LanguageContext);
-    const audioRef = useRef(null);
-    const [currentAudio, setCurrentAudio] = useState(null);
-    const [showAudioPlayer, setShowAudioPlayer] = useState(false);
-    const [isPlaying, setIsPlaying] = useState(false);
-    const [currentTime, setCurrentTime] = useState(0);
-    const [duration, setDuration] = useState(0);
+    const { play, pause, stop, isPlaying, currentTrack } = useAudio();
     const location = useLocation();
 
     useEffect(() => {
@@ -52,44 +48,6 @@ function VratKathaDetail() {
             });
     }, [id]);
 
-    // Cleanup effect to stop audio when component unmounts or page changes
-    useEffect(() => {
-        const cleanup = () => {
-            console.log("VratKatha cleanup running...");
-            if (audioRef.current) {
-                audioRef.current.pause();
-                audioRef.current.currentTime = 0;
-                // Clear all event listeners
-                audioRef.current.onloadedmetadata = null;
-                audioRef.current.ontimeupdate = null;
-                audioRef.current.onended = null;
-                audioRef.current.onpause = null;
-                audioRef.current.onplay = null;
-                audioRef.current.onerror = null;
-                audioRef.current = null;
-            }
-            // Reset all audio-related states
-            setCurrentAudio(null);
-            setShowAudioPlayer(false);
-            setIsPlaying(false);
-            setCurrentTime(0);
-            setDuration(0);
-        };
-
-        // Add beforeunload event listener
-        const handleBeforeUnload = () => {
-            cleanup();
-        };
-
-        window.addEventListener('beforeunload', handleBeforeUnload);
-
-        // Return cleanup function
-        return () => {
-            window.removeEventListener('beforeunload', handleBeforeUnload);
-            cleanup();
-        };
-    }, []);
-
     const redirectToAartiPage = (artiId) => {
         if (!artiId) {
             // alert("No Arti ID available for this Katha.");
@@ -102,95 +60,14 @@ function VratKathaDetail() {
     const handlePlay = (url) => {
         if (!url) return;
 
-        // If audio player is already showing for this audio
-        if (currentAudio === url && showAudioPlayer) {
-            // Hide the audio player and stop audio
-            if (audioRef.current) {
-                audioRef.current.pause();
-                audioRef.current = null;
-            }
-            setShowAudioPlayer(false);
-            setCurrentAudio(null);
-            setIsPlaying(false);
-            setCurrentTime(0);
-            setDuration(0);
+        // Check if this katha is currently playing
+        if (currentTrack === url && isPlaying) {
+            pause();
         } else {
-            // Show audio player and start playing
-            if (audioRef.current) {
-                audioRef.current.pause();
-            }
-
-            audioRef.current = new Audio(url);
-            setCurrentAudio(url);
-            setShowAudioPlayer(true);
-            setIsPlaying(true);
-            audioRef.current.play();
-
-            // Audio event listeners
-            audioRef.current.onloadedmetadata = () => {
-                setDuration(audioRef.current.duration);
-            };
-
-            audioRef.current.ontimeupdate = () => {
-                setCurrentTime(audioRef.current?.currentTime);
-            };
-
-            audioRef.current.onended = () => {
-                // Auto-hide when audio completes
-                setCurrentAudio(null);
-                setShowAudioPlayer(false);
-                setIsPlaying(false);
-                setCurrentTime(0);
-                setDuration(0);
-            };
-
-            audioRef.current.onpause = () => {
-                setIsPlaying(false);
-            };
-
-            audioRef.current.onplay = () => {
-                setIsPlaying(true);
-            };
+            // Store katha name for the global player
+            localStorage.setItem('currentTrackName', detail.name?.hi || detail.name?.en || 'कथा');
+            play(url);
         }
-    };
-
-    const handlePlayerPlayPause = () => {
-        if (!audioRef.current) return;
-
-        if (isPlaying) {
-            audioRef.current.pause();
-            setIsPlaying(false);
-        } else {
-            audioRef.current.play();
-            setIsPlaying(true);
-        }
-    };
-
-    const handleCloseAudioPlayer = () => {
-        if (audioRef.current) {
-            audioRef.current.pause();
-            audioRef.current = null;
-        }
-        setCurrentAudio(null);
-        setShowAudioPlayer(false);
-        setIsPlaying(false);
-        setCurrentTime(0);
-        setDuration(0);
-    };
-
-    const handleSeek = (e) => {
-        if (audioRef.current) {
-            const seekTime = (e.target.value / 100) * duration;
-            audioRef.current.currentTime = seekTime;
-            setCurrentTime(seekTime);
-        }
-    };
-
-    const formatTime = (time) => {
-        if (isNaN(time)) return "0:00";
-        const minutes = Math.floor(time / 60);
-        const seconds = Math.floor(time % 60);
-        return `${minutes}:${seconds.toString().padStart(2, '0')}`;
     };
 
     if (loading) return <Loader message="🙏 Loading भक्ति भाव 🙏" size={200} />;
@@ -265,7 +142,7 @@ function VratKathaDetail() {
 
             />
 
-            <div className="container mx-auto px-4 pb-6 theme_text">
+            <div className="container mx-auto px-4 pb-24 theme_text">
                 {detail.imageUrl && (
                     <div className="flex justify-center mt-4">
                         <img
@@ -305,12 +182,12 @@ function VratKathaDetail() {
                             className={`px-6 py-2 flex items-center justify-center rounded-full 
                              transition ${language === "hi" ? "font-hindi" : "font-eng"} ${!detail.audioUrl
                                     ? "bg-[#9A283D]/50 text-white cursor-not-allowed"
-                                    : showAudioPlayer
+                                    : (isPlaying && currentTrack === detail.audioUrl)
                                         ? "bg-red-600 text-white"
                                         : "bg_theme text-white"
                                 }`}
                         >
-                            {showAudioPlayer ? (
+                            {(isPlaying && currentTrack === detail.audioUrl) ? (
                                 <>
                                     <span className="audio_pause_icon mr-2"></span> {language === "hi" ? jsonFile.pause.hi : jsonFile.pause.en}
                                 </>
@@ -321,67 +198,8 @@ function VratKathaDetail() {
                             )}
                         </button>
 
-                        <audio ref={audioRef} className="hidden">
-                            <source src={detail.audioUrl} type="audio/mpeg" />
-                            Your browser does not support the audio element.
-                        </audio>
                     </div>
                 </div>
-
-                {/* Audio Player Preview */}
-                {showAudioPlayer && (
-                    <div className="flex justify-center mt-6">
-                        <div className="bg-white border-2 border-[#9A283D] rounded-xl p-4 shadow-lg" style={{ width: '100%', maxWidth: '400px' }}>
-                            <div className="flex items-center justify-between mb-3">
-                                <h3 className={`font-hindi text-[#9A283D] font-semibold text-sm ${language === 'hi' ? 'font-hindi' : 'font-eng'}`}>{language === 'hi' ? jsonFile.player.hi : jsonFile.player.en}</h3>
-                                <button
-                                    onClick={handleCloseAudioPlayer}
-                                    className="text-[#9A283D] hover:text-red-600 transition-colors duration-200"
-                                >
-                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
-                                </button>
-                            </div>
-
-                            <div className="flex items-center gap-3">
-                                <button
-                                    onClick={handlePlayerPlayPause}
-                                    className="bg-[#9A283D] text-white rounded-full p-3 hover:bg-[#7A1F2D] transition-colors duration-200 flex-shrink-0"
-                                >
-                                    {isPlaying ? (
-                                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                                            <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
-                                        </svg>
-                                    ) : (
-                                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                                            <path d="M8 5v14l11-7z" />
-                                        </svg>
-                                    )}
-                                </button>
-
-                                <div className="flex-1">
-                                    <input
-                                        type="range"
-                                        min="0"
-                                        max="100"
-                                        value={duration ? (currentTime / duration) * 100 : 0}
-                                        onChange={handleSeek}
-                                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                                        style={{
-                                            background: `linear-gradient(to right, #9A283D 0%, #9A283D ${duration ? (currentTime / duration) * 100 : 0}%, #e5e7eb ${duration ? (currentTime / duration) * 100 : 0}%, #e5e7eb 100%)`
-                                        }}
-                                    />
-                                    <div className="flex justify-between text-xs text-gray-500 mt-2 font-eng">
-                                        <span>{formatTime(currentTime)}</span>
-                                        <span>{formatTime(duration)}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                )}
-
                 <div className="text-center my-8 text-xl">
                     <p className={`${language === "hi" ? " font-hindi" : "hidden"} text-[#9A283D] ${fontSize}`}>
                         {detail.mantra?.hi?.replace(/"/g, '')}
