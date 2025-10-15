@@ -72,7 +72,7 @@ const GlobalAudioPlayer = () => {
     };
 
     return (
-        <div className="fixed bottom-10 left-8 right-8 bg-white border-t-2 border-[#9A283D] hd_bg shadow-lg rounded-lg py-3 px-4 z-50">
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-[#9A283D] hd_bg shadow-lg py-3 px-4 z-50">
             {/* Top row - Track name and controls */}
             <div className="flex justify-between items-center mb-2">
                 <div className="flex items-center flex-1">
