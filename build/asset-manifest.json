@@ -1,11 +1,12 @@
 {
   "files": {
-    "main.css": "/static/css/main.d3f1ed89.css",
-    "main.js": "/static/js/main.75696b0c.js",
+    "main.css": "/static/css/main.653e97f5.css",
+    "main.js": "/static/js/main.32a9894e.js",
     "static/js/977.5164d1e2.chunk.js": "/static/js/977.5164d1e2.chunk.js",
     "static/js/455.85aa9246.chunk.js": "/static/js/455.85aa9246.chunk.js",
     "static/media/repeat_bg.png": "/static/media/repeat_bg.8dd1983cdffb3ac0324e.png",
     "static/media/jaapMala_bgs.png": "/static/media/jaapMala_bgs.ee5726354a96ee5ed2da.png",
+    "static/media/bell_ring.png": "/static/media/bell_ring.1eaeff18fc37a8f7bdb6.png",
     "static/media/Poppins-Regular.ttf": "/static/media/Poppins-Regular.35d26b781dc5fda684cc.ttf",
     "static/media/Poppins-SemiBold.ttf": "/static/media/Poppins-SemiBold.ac8d04b620e54be9b0f0.ttf",
     "static/media/Poppins-Bold.ttf": "/static/media/Poppins-Bold.cdb29a5d7ccf57ff05a3.ttf",
@@ -15,13 +16,13 @@
     "index.html": "/index.html",
     "static/media/index.cjs": "/static/media/index.f6d03137e8c9dd0de04c.cjs",
     "static/media/back_icon.svg": "/static/media/back_icon.7e7814d35251d606ef1805bb74b76d9f.svg",
-    "main.d3f1ed89.css.map": "/static/css/main.d3f1ed89.css.map",
-    "main.75696b0c.js.map": "/static/js/main.75696b0c.js.map",
+    "main.653e97f5.css.map": "/static/css/main.653e97f5.css.map",
+    "main.32a9894e.js.map": "/static/js/main.32a9894e.js.map",
     "977.5164d1e2.chunk.js.map": "/static/js/977.5164d1e2.chunk.js.map",
     "455.85aa9246.chunk.js.map": "/static/js/455.85aa9246.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.d3f1ed89.css",
-    "static/js/main.75696b0c.js"
+    "static/css/main.653e97f5.css",
+    "static/js/main.32a9894e.js"
   ]
 }
