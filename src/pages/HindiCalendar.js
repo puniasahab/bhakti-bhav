@@ -4,7 +4,7 @@ import Footer from "../components/Footer";
 import { Link } from "react-router-dom";
 import Loader from "../components/Loader";
 import PageTitleCard from "../components/PageTitleCard";
-import {getTokenFromLS, getSubscriptionStatusFromLS } from "../commonFunctions";
+import { getTokenFromLS, getSubscriptionStatusFromLS } from "../commonFunctions";
 import { useNavigate } from "react-router-dom";
 
 export default function HindiCalendar() {
@@ -46,23 +46,37 @@ export default function HindiCalendar() {
 
 
   const handleNavigate = (id, accessType) => {
-      if(getSubscriptionStatusFromLS()) {
+    if (getSubscriptionStatusFromLS()) {
+      if (id) {
+
         return `/vrat-katha/${id}`;
       }
       else {
-        if(accessType === "free") {
+        alert("No Kath available for this festival");
+        return "/hindi-calendar";
+      }
+    }
+    else {
+      if (accessType === "free") {
+        if (id) {
+
           return `/vrat-katha/${id}`;
         }
         else {
-          if(getTokenFromLS()) {
-            return "/payment";
-          }
-          else {
-            return "/login";
-          }
+          alert("No Kath available for this festival");
+          return "/hindi-calendar";
+        }
+      }
+      else {
+        if (getTokenFromLS()) {
+          return "/payment";
+        }
+        else {
+          return "/login";
         }
       }
     }
+  }
 
 
 

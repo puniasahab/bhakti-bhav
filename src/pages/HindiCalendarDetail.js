@@ -50,13 +50,26 @@ function HindiCalendarDetail() {
   }
 
 
-  const handleNavigate = (id, accessType) => {
+  const handleNavigate = (kathaId, accessType) => {
     if(getSubscriptionStatusFromLS()) {
-      return `/vrat-katha/${id}`;
+      if(kathaId) {
+      return `/vrat-katha/${kathaId}`;
+      }
+      else {
+        alert("No Kath available for this festival");
+        return `/hindi-calendar/${id}`;
+      }
     }
     else {
       if(accessType === "free") {
-        return `/vrat-katha/${id}`;
+        if(kathaId) {
+          return `/vrat-katha/${kathaId}`;
+
+        }
+        else {
+          alert("No Kath available for this festival");
+          return `/hindi-calendar/${id}`;
+        }
       }
       else {
         if(getTokenFromLS()) {

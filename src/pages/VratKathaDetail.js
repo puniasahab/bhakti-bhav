@@ -297,8 +297,8 @@ function VratKathaDetail() {
 
                     </h2>
                     {language === "hi"
-                        ? <div className={`font-hindi text-[rgba(0,0,0,0.7)] ${fontSize}`} dangerouslySetInnerHTML={{ __html: detail.pujaMahatva?.hi.replace(/,/g, "]").replace(/\(/g, "¼").replace(/\)/g, "½").replace(/\:/g, "%") }} />
-                        : <div className={`font-eng text-[rgba(0,0,0,0.7)] ${fontSize}`} dangerouslySetInnerHTML={{ __html: detail.pujaMahatva?.en }} />
+                        ? <div className={`font-hindi text-[rgba(0,0,0,0.7)] ${fontSize} overflow-x-hidden  w-[100%]`} dangerouslySetInnerHTML={{ __html: detail.pujaMahatva?.hi.replace(/,/g, "]").replace(/\(/g, "¼").replace(/\)/g, "½").replace(/\:/g, "%") }} />
+                        : <div className={`font-eng text-[rgba(0,0,0,0.7)] ${fontSize} overflow-x-hidden w-[90%]`} dangerouslySetInnerHTML={{ __html: detail.pujaMahatva?.en }} />
                     }
                 </div>
 
