@@ -181,3 +181,24 @@
   max-width: 360px; 
   object-fit: fit;  
 }
+
+
+
+.bell_bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 10%;
+  height: 375px;
+  background: url('../../public/img/bell_ring.png') no-repeat center top;
+  background-size: 125%; 
+  z-index: 1;
+}
+
+@media screen and (max-width: 768px) {
+  .bell_bg {
+    width: 30%;
+    height: 375px;
+    background-size: 100%; 
+  }
+}

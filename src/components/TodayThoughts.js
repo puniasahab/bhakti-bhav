@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import Loader from "./Loader";
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import "../pages/style.css";
 
 function TodayThoughts() {
   const [thoughtData, setThoughtData] = useState(null);
@@ -37,63 +38,60 @@ function TodayThoughts() {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
     
-    // Set canvas size to match the reference image aspect ratio
+    // Set canvas size to match mobile aspect ratio
     canvas.width = 400;
     canvas.height = 700;
     
-    // Background - cream/white gradient like in the image
-    const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-    gradient.addColorStop(0, '#FFFEF7');
-    gradient.addColorStop(0.5, '#FFF8F0');
-    gradient.addColorStop(1, '#FFF5E6');
-    ctx.fillStyle = gradient;
+    // Create a gradient background similar to the home_bg.png
+    const bgGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    bgGradient.addColorStop(0, '#2D1B69'); // Dark purple at top
+    bgGradient.addColorStop(0.3, '#4A148C'); // Medium purple
+    bgGradient.addColorStop(0.7, '#6A1B9A'); // Lighter purple
+    bgGradient.addColorStop(1, '#8E24AA'); // Light purple at bottom
+    ctx.fillStyle = bgGradient;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     
-    // Light border frame
-    ctx.strokeStyle = '#E8D5B7';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
+    // Add decorative bell elements at top left (simplified)
+    ctx.fillStyle = '#FFD700'; // Golden color for bells
     
-    // Decorative bell chain at top left (simplified representation)
-    ctx.fillStyle = '#B8860B'; // Golden color for bells
-    
-    // Bell chain elements
-    for (let i = 0; i < 4; i++) {
-      const x = 30;
-      const y = 30 + (i * 25);
+    // Bell chain decoration at top left
+    for (let i = 0; i < 3; i++) {
+      const x = 30 + (i * 15);
+      const y = 30 + (i * 10);
       
-      // Bell shape
+      // Small bell shapes
       ctx.beginPath();
-      ctx.arc(x, y, 8, 0, 2 * Math.PI);
+      ctx.arc(x, y, 6, 0, 2 * Math.PI);
       ctx.fill();
       
-      // Bell connecting chain
-      if (i < 3) {
-        ctx.fillRect(x - 1, y + 8, 2, 15);
+      // Small connecting elements
+      if (i < 2) {
+        ctx.fillRect(x + 6, y - 1, 10, 2);
       }
     }
     
-    // Main title "भक्ति भाव" - matching the image style
-    ctx.fillStyle = '#8B4513'; // Brown color like in image
-    ctx.font = 'bold 36px serif';
+    // Logo area - using text since we can't load images in canvas easily
+    ctx.fillStyle = 'white';
+    ctx.font = 'bold 28px serif';
     ctx.textAlign = 'center';
     ctx.fillText('भक्ति भाव', canvas.width / 2, 150);
     
-    // Decorative line under title
-    ctx.fillStyle = '#8B4513';
-    ctx.font = '18px serif';
-    ctx.fillText('~~~ आज का सुविचार ~~~', canvas.width / 2, 190);
-    
-    // Main thought text area - centered and properly formatted
-    ctx.fillStyle = '#2C3E50'; // Dark text for readability
+    // Decorative subtitle
+    ctx.fillStyle = 'white';
     ctx.font = '20px serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('~~~ आज का सुविचार ~~~', canvas.width / 2, 320);
+    
+    // Main thought text area
+    ctx.fillStyle = 'white';
+    ctx.font = 'bold 24px serif';
     ctx.textAlign = 'center';
     
     // Word wrap for the thought with proper spacing
     const words = thoughtData.thought.hi.split(' ');
     let line = '';
-    let y = 280;
-    const maxWidth = canvas.width - 80; // More padding for better appearance
+    let y = 380;
+    const maxWidth = canvas.width - 60; // Padding for better appearance
     const lineHeight = 35;
     
     for (let i = 0; i < words.length; i++) {
@@ -111,65 +109,69 @@ function TodayThoughts() {
     }
     ctx.fillText(line.trim(), canvas.width / 2, y);
     
-    // Author name with proper styling
-    ctx.font = 'italic 18px serif';
-    ctx.fillStyle = '#5D4037';
-    ctx.fillText(`– ${thoughtData.author.hi}`, canvas.width / 2, y + 60);
+    // Author name
+    ctx.font = '18px serif';
+    ctx.fillStyle = 'white';
+    ctx.fillText(`– ${thoughtData.author.hi}`, canvas.width / 2, y + 50);
     
-    // Bottom branding section - matching the yellow box in image
-    const brandingY = canvas.height - 90;
-    const brandingHeight = 60;
+    // Bottom branding section - matching the HTML design
+    const brandingY = canvas.height - 80;
     
-    // Yellow background for branding
-    ctx.fillStyle = '#FFD54F';
-    const borderRadius = 10;
-    const rectX = 50;
-    const rectY = brandingY;
-    const rectWidth = canvas.width - 100;
+    // Yellow background box for logo
+    ctx.fillStyle = '#FFD65A';
+    const logoBoxWidth = 60;
+    const logoBoxHeight = 40;
+    const logoBoxX = (canvas.width / 2) - 80;
+    const logoBoxY = brandingY;
     
-    // Rounded rectangle for branding background
+    // Rounded rectangle for logo background
+    const borderRadius = 6;
     ctx.beginPath();
-    ctx.moveTo(rectX + borderRadius, rectY);
-    ctx.lineTo(rectX + rectWidth - borderRadius, rectY);
-    ctx.quadraticCurveTo(rectX + rectWidth, rectY, rectX + rectWidth, rectY + borderRadius);
-    ctx.lineTo(rectX + rectWidth, rectY + brandingHeight - borderRadius);
-    ctx.quadraticCurveTo(rectX + rectWidth, rectY + brandingHeight, rectX + rectWidth - borderRadius, rectY + brandingHeight);
-    ctx.lineTo(rectX + borderRadius, rectY + brandingHeight);
-    ctx.quadraticCurveTo(rectX, rectY + brandingHeight, rectX, rectY + brandingHeight - borderRadius);
-    ctx.lineTo(rectX, rectY + borderRadius);
-    ctx.quadraticCurveTo(rectX, rectY, rectX + borderRadius, rectY);
+    ctx.moveTo(logoBoxX + borderRadius, logoBoxY);
+    ctx.lineTo(logoBoxX + logoBoxWidth - borderRadius, logoBoxY);
+    ctx.quadraticCurveTo(logoBoxX + logoBoxWidth, logoBoxY, logoBoxX + logoBoxWidth, logoBoxY + borderRadius);
+    ctx.lineTo(logoBoxX + logoBoxWidth, logoBoxY + logoBoxHeight - borderRadius);
+    ctx.quadraticCurveTo(logoBoxX + logoBoxWidth, logoBoxY + logoBoxHeight, logoBoxX + logoBoxWidth - borderRadius, logoBoxY + logoBoxHeight);
+    ctx.lineTo(logoBoxX + borderRadius, logoBoxY + logoBoxHeight);
+    ctx.quadraticCurveTo(logoBoxX, logoBoxY + logoBoxHeight, logoBoxX, logoBoxY + logoBoxHeight - borderRadius);
+    ctx.lineTo(logoBoxX, logoBoxY + borderRadius);
+    ctx.quadraticCurveTo(logoBoxX, logoBoxY, logoBoxX + borderRadius, logoBoxY);
     ctx.closePath();
     ctx.fill();
     
-    // Branding text
-    ctx.fillStyle = '#8B4513';
-    ctx.font = 'bold 14px sans-serif';
+    // Logo text inside yellow box
+    ctx.fillStyle = '#6d0019';
+    ctx.font = 'bold 12px serif';
     ctx.textAlign = 'center';
-    ctx.fillText('भक्ति', canvas.width / 2 - 20, brandingY + 25);
-    ctx.fillText('भाव', canvas.width / 2 + 20, brandingY + 25);
+    ctx.fillText('भक्ति', logoBoxX + (logoBoxWidth / 2), logoBoxY + 16);
+    ctx.fillText('भाव', logoBoxX + (logoBoxWidth / 2), logoBoxY + 30);
     
-    ctx.font = '12px sans-serif';
-    ctx.fillText('Shared from', canvas.width / 2, brandingY + 40);
-    ctx.fillText('Bhakti Bhav App', canvas.width / 2, brandingY + 52);
+    // Branding text next to logo
+    ctx.fillStyle = '#6d0019';
+    ctx.font = '14px sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText('Shared from', logoBoxX + logoBoxWidth + 10, brandingY + 15);
     
-    // Decorative corners (simple ornamental design)
-    ctx.strokeStyle = '#D4AF37';
+    ctx.font = 'bold 14px sans-serif';
+    ctx.fillText('Bhakti Bhav App', logoBoxX + logoBoxWidth + 10, brandingY + 32);
+    
+    // Add some decorative elements at corners
+    ctx.strokeStyle = '#FFD700';
     ctx.lineWidth = 2;
     
-    // Top left corner decoration
+    // Top decorative corners
     ctx.beginPath();
-    ctx.moveTo(25, 40);
-    ctx.lineTo(40, 25);
-    ctx.moveTo(25, 25);
-    ctx.lineTo(40, 40);
+    ctx.moveTo(15, 35);
+    ctx.lineTo(35, 15);
+    ctx.moveTo(15, 15);
+    ctx.lineTo(35, 35);
     ctx.stroke();
     
-    // Top right corner decoration
     ctx.beginPath();
-    ctx.moveTo(canvas.width - 25, 40);
-    ctx.lineTo(canvas.width - 40, 25);
-    ctx.moveTo(canvas.width - 25, 25);
-    ctx.lineTo(canvas.width - 40, 40);
+    ctx.moveTo(canvas.width - 15, 35);
+    ctx.lineTo(canvas.width - 35, 15);
+    ctx.moveTo(canvas.width - 15, 15);
+    ctx.lineTo(canvas.width - 35, 35);
     ctx.stroke();
     
     return canvas;
