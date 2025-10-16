@@ -1,6 +1,7 @@
 import { useEffect, useState, useContext, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { LanguageContext } from "../contexts/LanguageContext";
+import { useAudio } from "../contexts/AudioContext";
 import Header from "../components/Header";
 import Loader from "../components/Loader";
 import PageTitleCard from "../components/PageTitleCard";
@@ -10,8 +11,7 @@ export default function MantraDetail() {
   const [detail, setDetail] = useState(null); // store object, not array
   const [loading, setLoading] = useState(true);
   const { language, fontSize } = useContext(LanguageContext);
-  const [currentAudio, setCurrentAudio] = useState(null);
-  const [currentAudioInstance, setCurrentAudioInstance] = useState(null);
+  const { play, pause, isPlaying, currentTrack, audioRef } = useAudio();
   const [loopStates, setLoopStates] = useState({});
 
   useEffect(() => {
@@ -34,36 +34,18 @@ export default function MantraDetail() {
     if (!url) return; // no audio available
     
     // If the same audio is playing, pause it
-    if (currentAudio === url && currentAudioInstance) {
-      currentAudioInstance.pause();
-      setCurrentAudio(null);
-      setCurrentAudioInstance(null);
+    if (currentTrack === url && isPlaying) {
+      pause();
       return;
     }
     
-    // Stop any currently playing audio
-    if (currentAudioInstance) {
-      currentAudioInstance.pause();
-      currentAudioInstance.currentTime = 0;
+    // Play the new audio using global audio context
+    play(url);
+    
+    // Set loop state if enabled for this mantra
+    if (audioRef.current && loopStates[mantraId]) {
+      audioRef.current.loop = true;
     }
-    
-    // Create and play new audio
-    const newAudio = new Audio(url);
-    newAudio.loop = loopStates[mantraId] || false;
-    
-    newAudio.play().then(() => {
-      setCurrentAudio(url);
-      setCurrentAudioInstance(newAudio);
-    }).catch(err => {
-      console.error("Audio play failed:", err);
-    });
-
-    newAudio.onended = () => {
-      if (!newAudio.loop) {
-        setCurrentAudio(null);
-        setCurrentAudioInstance(null);
-      }
-    };
   };
 
   const toggleLoop = (mantraId, audioUrl) => {
@@ -75,16 +57,18 @@ export default function MantraDetail() {
       [mantraId]: newLoopState
     }));
     
-    // If this is the currently playing audio, update its loop property
-    if (currentAudio === audioUrl && currentAudioInstance) {
-      currentAudioInstance.loop = newLoopState;
+    // If this is the currently playing audio, update its loop property immediately
+    if (currentTrack === audioUrl && audioRef.current) {
+      audioRef.current.loop = newLoopState;
     }
   };
 
   const replayAudio = (audioUrl, mantraId) => {
-    if (currentAudio === audioUrl && currentAudioInstance) {
-      currentAudioInstance.currentTime = 0;
-      currentAudioInstance.play();
+    if (currentTrack === audioUrl && audioRef.current) {
+      audioRef.current.currentTime = 0;
+      if (!isPlaying) {
+        play(audioUrl);
+      }
     } else {
       // If not currently playing, start playing
       handlePlay(audioUrl, mantraId);
@@ -150,12 +134,12 @@ export default function MantraDetail() {
                     transition font-hindi 
                     ${!item.audioUrl?.hi
                         ? "bg-[#9A283D]/50 text-gray-500 cursor-not-allowed"
-                        : currentAudio === item.audioUrl?.hi
+                        : currentTrack === item.audioUrl?.hi && isPlaying
                           ? "bg_theme text-white"
                           : "bg_theme text-white"
                       }`}
                   >
-                    {currentAudio === item.audioUrl?.hi ? (
+                    {currentTrack === item.audioUrl?.hi && isPlaying ? (
                       <span className="audio_pause_icon"></span>
                     ) : (
                       <span className="audio_icon"></span>
@@ -173,13 +157,19 @@ export default function MantraDetail() {
                           : "bg_theme text-white"
                       }`}
                   >
-                    <span 
-                      className="audio_repeat_icon" 
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        replayAudio(item.audioUrl?.hi, item._id || index);
-                      }}
-                    ></span>
+                    <span className="audio_repeat_icon"></span>
+                  </button>
+
+                  <button
+                    onClick={() => replayAudio(item.audioUrl?.hi, item._id || index)}
+                    disabled={!item.audioUrl?.hi}
+                    className={`ml-3 p-2 flex items-center justify-center rounded-full transition font-hindi 
+                    ${!item.audioUrl?.hi
+                        ? "bg-[#9A283D]/50 text-gray-500 cursor-not-allowed"
+                        : "bg_theme text-white"
+                      }`}
+                  >
+                    <span className="audio_restart_icon">↻</span>
                   </button>
                 </div>
               </div>

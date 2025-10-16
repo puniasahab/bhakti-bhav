@@ -37,6 +37,16 @@ export const wallpaperApis = {
       console.error("Error downloading wallpaper:", error);
       throw error;
     }
+  },
+  getBanners: async () => {
+    try {
+      const response = await api.get(endPoints.banner);
+      return response.data;
+    }
+    catch(error) {
+      console.error("Error fetching banners:", error);
+      throw error;
+    }
   }
 }
 export const mantraApis = {

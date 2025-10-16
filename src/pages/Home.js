@@ -8,7 +8,7 @@ import { Pagination, Autoplay } from "swiper/modules";
 
 import "swiper/css";
 import "swiper/css/pagination";
-import { profileApis } from "../api";
+import { profileApis, wallpaperApis } from "../api";
 import { setSubscriptionStatusInLS } from "../commonFunctions";
 
 function Home() {
@@ -56,6 +56,8 @@ function Home() {
         };
 
         fetchPanchang();
+
+        
     }, [isOpen]);
 
 
@@ -75,6 +77,17 @@ function Home() {
             }
         }
         fetchProfileData();
+
+        const fetchBanners = async () => {
+            try {
+                const banners = await wallpaperApis.getBanners();
+                console.log("Banners:", banners);
+            } catch (error) {
+                console.error("Error fetching banners:", error);
+            }
+        };
+
+        fetchBanners();
     }, [])
 
 

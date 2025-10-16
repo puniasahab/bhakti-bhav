@@ -15,69 +15,126 @@ function WallpaperDetail() {
 
 
   const downloadWallpaper = async (id) => {
-   try {
-    console.log("Starting download for ID:", id);
-    
-    // Get the image data directly from the download API
-    const downloadWallpaperApiResponse = await wallpaperApis.downloadWallpaper(id);
-    console.log("Download API response:", downloadWallpaperApiResponse);
-    
-    // Check if API response is successful and has data
-    if (downloadWallpaperApiResponse.status === "success" && downloadWallpaperApiResponse.data && downloadWallpaperApiResponse.data.imageUrl) {
-      const imageUrl = downloadWallpaperApiResponse.data.imageUrl;
-      const godName = downloadWallpaperApiResponse.data.godName || 'wallpaper';
-      
-      console.log("Downloading image from:", imageUrl);
-      
-      // Fetch the image
-      const response = await fetch(imageUrl);
-      if (!response.ok) {
-        throw new Error(`Failed to fetch image: ${response.status} ${response.statusText}`);
-      }
-      
-      // Get the image blob
-      const blob = await response.blob();
-      
-      // Get the file extension from the URL or default to .png
-      const urlParts = imageUrl.split('.');
-      const extension = urlParts.length > 1 ? urlParts[urlParts.length - 1].toLowerCase() : 'png';
-      
-      // Create download link
-      const downloadUrl = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = downloadUrl;
-      link.download = `bhakti-bhav-${godName}-wallpaper.${extension}`;
-      
-      // Trigger download
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      
-      // Clean up the URL object
-      window.URL.revokeObjectURL(downloadUrl);
-      
-      console.log("Download completed successfully!");
-    } else {
-      throw new Error("Invalid API response or missing image URL");
-    }
-  }
-   catch (err) {
-    console.error("Download error details:", err);
-    console.error("Error stack:", err.stack);
-    
-    // Fallback: try to open image in new tab for manual download
     try {
-      if (detail && detail.imageUrl) {
-        window.open(detail.imageUrl, '_blank');
-        alert("Please right-click on the image and select 'Save image as...' to download.");
+      console.log("Starting download for ID:", id);
+      
+      // Get the image data directly from the download API
+      const downloadWallpaperApiResponse = await wallpaperApis.downloadWallpaper(id);
+      console.log("Download API response:", downloadWallpaperApiResponse);
+      
+      // Check if API response is successful and has data
+      if (downloadWallpaperApiResponse.status === "success" && downloadWallpaperApiResponse.data && downloadWallpaperApiResponse.data.imageUrl) {
+        const imageUrl = downloadWallpaperApiResponse.data.imageUrl;
+        const godName = downloadWallpaperApiResponse.data.godName || 'wallpaper';
+        
+        console.log("Downloading image from:", imageUrl);
+        
+        // Fetch the image with proper headers
+        const response = await fetch(imageUrl, {
+          method: 'GET',
+          headers: {
+            'Accept': 'image/*',
+          },
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch image: ${response.status} ${response.statusText}`);
+        }
+        
+        // Get the image blob
+        const blob = await response.blob();
+        
+        // Ensure we have a valid blob
+        if (!blob || blob.size === 0) {
+          throw new Error('Downloaded image is empty or invalid');
+        }
+        
+        // Get the file extension from the URL or Content-Type
+        let extension = 'jpg'; // Default extension
+        const contentType = response.headers.get('content-type');
+        if (contentType) {
+          if (contentType.includes('png')) extension = 'png';
+          else if (contentType.includes('jpeg') || contentType.includes('jpg')) extension = 'jpg';
+          else if (contentType.includes('webp')) extension = 'webp';
+        } else {
+          // Fallback: get extension from URL
+          const urlParts = imageUrl.split('.');
+          if (urlParts.length > 1) {
+            extension = urlParts[urlParts.length - 1].toLowerCase().split('?')[0];
+          }
+        }
+        
+        // Create download link
+        const downloadUrl = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = downloadUrl;
+        link.download = `bhakti-bhav-${godName.replace(/\s+/g, '-')}-wallpaper.${extension}`;
+        link.style.display = 'none';
+        
+        // Trigger download
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        // Clean up the URL object after a short delay
+        setTimeout(() => {
+          window.URL.revokeObjectURL(downloadUrl);
+        }, 100);
+        
+        console.log("Download completed successfully!");
+        alert("Wallpaper downloaded successfully!");
+        
       } else {
-        alert("Unable to download image. Image URL not available.");
+        throw new Error("Invalid API response or missing image URL");
       }
-    } catch (fallbackErr) {
-      console.error("Fallback also failed:", fallbackErr);
-      alert("Download failed. Please try refreshing the page and try again.");
+    } catch (err) {
+      console.error("Download error details:", err);
+      console.error("Error stack:", err.stack);
+      
+      // Try alternative download method using the detail.imageUrl
+      try {
+        if (detail && detail.imageUrl) {
+          console.log("Trying alternative download method with detail.imageUrl:", detail.imageUrl);
+          
+          const response = await fetch(detail.imageUrl, {
+            method: 'GET',
+            headers: {
+              'Accept': 'image/*',
+            },
+          });
+          
+          if (response.ok) {
+            const blob = await response.blob();
+            if (blob && blob.size > 0) {
+              const downloadUrl = window.URL.createObjectURL(blob);
+              const link = document.createElement('a');
+              link.href = downloadUrl;
+              link.download = `bhakti-bhav-${detail.godName?.replace(/\s+/g, '-') || 'wallpaper'}-wallpaper.jpg`;
+              link.style.display = 'none';
+              
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+              
+              setTimeout(() => {
+                window.URL.revokeObjectURL(downloadUrl);
+              }, 100);
+              
+              console.log("Alternative download completed successfully!");
+              alert("Wallpaper downloaded successfully!");
+              return;
+            }
+          }
+        }
+        
+        // If all download methods fail, show appropriate error
+        alert("Download failed. Please check your internet connection and try again.");
+        
+      } catch (fallbackErr) {
+        console.error("Alternative download also failed:", fallbackErr);
+        alert("Download failed. Please check your internet connection and try again.");
+      }
     }
-  }
   }
 
   useEffect(() => {

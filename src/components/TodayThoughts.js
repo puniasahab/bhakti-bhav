@@ -42,80 +42,89 @@ function TodayThoughts() {
     canvas.width = 400;
     canvas.height = 700;
     
-    // Create a gradient background similar to the home_bg.png
+    // Create background matching home_bg.png - light cream/white gradient
     const bgGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-    bgGradient.addColorStop(0, '#2D1B69'); // Dark purple at top
-    bgGradient.addColorStop(0.3, '#4A148C'); // Medium purple
-    bgGradient.addColorStop(0.7, '#6A1B9A'); // Lighter purple
-    bgGradient.addColorStop(1, '#8E24AA'); // Light purple at bottom
+    bgGradient.addColorStop(0, '#FFF8F0'); // Light cream at top
+    bgGradient.addColorStop(0.3, '#FFFEF7'); // White-cream
+    bgGradient.addColorStop(0.7, '#FFF5E6'); // Light cream
+    bgGradient.addColorStop(1, '#F5F5F5'); // Very light grey at bottom
     ctx.fillStyle = bgGradient;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     
-    // Bell background area - matching .bell_bg CSS styling
-    // Position: absolute top: 0, left: 0, width: 30% (mobile), height: 375px
-    const bellAreaWidth = canvas.width * 0.3; // 30% width for mobile
-    const bellAreaHeight = 375 * (canvas.height / 700); // Scale proportionally
-    
-    // Create bell chain decoration to simulate bell_ring.png
-    ctx.fillStyle = '#FFD700'; // Golden color for bells
-    
-    // Bell chain decoration at top left (more elaborate to match bell_ring.png)
-    const bellCount = 6;
-    const startX = 20;
-    const startY = 20;
-    
-    for (let i = 0; i < bellCount; i++) {
-      const x = startX + (i % 2) * 15; // Alternating pattern
-      const y = startY + (i * 25);
+    // Load and draw the bell image
+    try {
+      const bellImage = new Image();
+      bellImage.crossOrigin = 'anonymous'; // Handle CORS if needed
       
-      // Bell shapes with more detail
+      await new Promise((resolve, reject) => {
+        bellImage.onload = resolve;
+        bellImage.onerror = reject;
+        bellImage.src = './img/bell_ring.png'; // Path to your bell image
+      });
+      
+      // Position the bell image at top-left matching .bell_bg CSS styling
+      // Width: 30% of canvas (mobile), positioned at top-left
+      const bellAreaWidth = canvas.width * 0.3; // 30% width for mobile
+      const bellAreaHeight = 375 * (canvas.height / 700); // Scale proportionally
+      
+      // Draw the bell image at the correct position and size
+      ctx.drawImage(
+        bellImage, 
+        0, // x position (left edge)
+        0, // y position (top edge)
+        bellAreaWidth, // width (30% of canvas)
+        bellAreaHeight // height (scaled proportionally)
+      );
+      
+    } catch (error) {
+      console.warn('Bell image failed to load, falling back to drawn bell:', error);
+      
+      // Fallback: Draw a simple bell if image fails to load
+      ctx.fillStyle = '#D4AF37';
+      const bellX = 40;
+      const bellY = 50;
+      
+      // Simple bell shape
       ctx.beginPath();
-      ctx.arc(x, y, 8, 0, 2 * Math.PI);
+      ctx.arc(bellX, bellY, 16, Math.PI, 0, false);
       ctx.fill();
       
-      // Bell top cap
-      ctx.fillRect(x - 4, y - 10, 8, 4);
-      
-      // Connecting chain
-      if (i < bellCount - 1) {
-        ctx.fillRect(x - 1, y + 8, 2, 15);
-      }
-      
-      // Add some bell details
-      ctx.fillStyle = '#B8860B'; // Darker gold for details
       ctx.beginPath();
-      ctx.arc(x, y + 3, 2, 0, 2 * Math.PI);
+      ctx.moveTo(bellX - 16, bellY);
+      ctx.lineTo(bellX - 20, bellY + 25);
+      ctx.lineTo(bellX + 20, bellY + 25);
+      ctx.lineTo(bellX + 16, bellY);
+      ctx.closePath();
       ctx.fill();
-      ctx.fillStyle = '#FFD700'; // Back to main color
     }
     
-    // Logo area - positioned like in HTML (mt-[120px] equivalent)
-    ctx.fillStyle = 'white';
-    ctx.font = 'bold 32px serif';
+    // Logo area - matching mt-[120px] from HTML
+    ctx.fillStyle = '#9A283D'; // Theme color for logo text
+    ctx.font = 'bold 28px serif';
     ctx.textAlign = 'center';
     const logoY = 120 * (canvas.height / 700); // Scale proportionally
     ctx.fillText('भक्ति भाव', canvas.width / 2, logoY);
     
-    // Content area - positioned like HTML (mt-[150px] equivalent)
-    const contentStartY = 150 * (canvas.height / 700);
+    // Content area - matching mt-[150px] px-6 from HTML
+    const contentStartY = 270 * (canvas.height / 700); // Adjusted for better spacing
     
-    // Decorative subtitle - matching HTML "~~~ आज का सुविचार ~~~"
-    ctx.fillStyle = 'white';
-    ctx.font = 'bold 22px serif';
+    // Subtitle - matching "~~~ आज का सुविचार ~~~"
+    ctx.fillStyle = '#9A283D';
+    ctx.font = 'bold 20px serif';
     ctx.textAlign = 'center';
-    ctx.fillText('~~~ आज का सुविचार ~~~', canvas.width / 2, contentStartY + 50);
+    ctx.fillText('~~~ आज का सुविचार ~~~', canvas.width / 2, contentStartY);
     
-    // Main thought text area - matching HTML text-3xl md:text-2xl leading-relaxed font-semibold
-    ctx.fillStyle = 'white';
-    ctx.font = 'bold 26px serif';
+    // Main thought text - matching text-3xl leading-relaxed font-semibold
+    ctx.fillStyle = '#2C3E50'; // Dark color for main text
+    ctx.font = 'bold 24px serif';
     ctx.textAlign = 'center';
     
-    // Word wrap for the thought with proper spacing (leading-relaxed equivalent)
+    // Word wrap for the thought with proper spacing
     const words = thoughtData.thought.hi.split(' ');
     let line = '';
-    let y = contentStartY + 120;
+    let y = contentStartY + 60;
     const maxWidth = canvas.width - 80; // px-6 equivalent padding
-    const lineHeight = 40; // leading-relaxed equivalent
+    const lineHeight = 35; // leading-relaxed equivalent
     
     for (let i = 0; i < words.length; i++) {
       const testLine = line + words[i] + ' ';
@@ -132,23 +141,23 @@ function TodayThoughts() {
     }
     ctx.fillText(line.trim(), canvas.width / 2, y);
     
-    // Author name - matching HTML mt-4 text-base md:text-lg font-medium
-    ctx.font = '20px serif';
-    ctx.fillStyle = 'white';
-    ctx.fillText(`– ${thoughtData.author.hi}`, canvas.width / 2, y + 60);
+    // Author name - matching mt-4 text-base font-medium
+    ctx.font = '18px serif';
+    ctx.fillStyle = '#5D4037'; // Darker color for author
+    ctx.fillText(`– ${thoughtData.author.hi}`, canvas.width / 2, y + 50);
     
-    // Bottom branding section - matching HTML mt-auto mb-6 styling
+    // Bottom branding section - matching mt-auto mb-6
     const brandingY = canvas.height - 80; // mb-6 equivalent
     
-    // Yellow background box for logo - matching bg-[#FFD65A] text-[#6d0019] px-2 py-1 rounded-md
+    // Yellow background box for logo - matching bg-[#FFD65A] text-[#6d0019]
     ctx.fillStyle = '#FFD65A';
-    const logoBoxWidth = 80;
-    const logoBoxHeight = 50;
-    const logoBoxX = (canvas.width / 2) - 100;
+    const logoBoxWidth = 70;
+    const logoBoxHeight = 45;
+    const logoBoxX = (canvas.width / 2) - 90;
     const logoBoxY = brandingY;
     
-    // Rounded rectangle for logo background (rounded-md equivalent)
-    const borderRadius = 8;
+    // Rounded rectangle for logo background (rounded-md)
+    const borderRadius = 6;
     ctx.beginPath();
     ctx.moveTo(logoBoxX + borderRadius, logoBoxY);
     ctx.lineTo(logoBoxX + logoBoxWidth - borderRadius, logoBoxY);
@@ -162,44 +171,25 @@ function TodayThoughts() {
     ctx.closePath();
     ctx.fill();
     
-    // Logo text inside yellow box - matching text-[#6d0019] font-semibold
+    // Small logo icon placeholder inside yellow box
     ctx.fillStyle = '#6d0019';
-    ctx.font = 'bold 16px serif';
+    ctx.font = 'bold 20px serif';
     ctx.textAlign = 'center';
-    ctx.fillText('भक्ति', logoBoxX + (logoBoxWidth / 2), logoBoxY + 20);
-    ctx.fillText('भाव', logoBoxX + (logoBoxWidth / 2), logoBoxY + 38);
+    ctx.fillText('भक्ति भाव', logoBoxX + (logoBoxWidth / 2), logoBoxY + 30 + 8);
     
     // Branding text next to logo - matching text-[#6d0019]/90
     ctx.fillStyle = 'rgba(109, 0, 25, 0.9)';
-    ctx.font = '16px sans-serif';
+    ctx.font = '14px sans-serif';
     ctx.textAlign = 'left';
-    ctx.fillText('Shared from', logoBoxX + logoBoxWidth + 15, brandingY + 20);
+    ctx.fillText('Shared from', logoBoxX + logoBoxWidth + 10, brandingY + 15);
     
-    ctx.font = 'bold 16px sans-serif';
-    ctx.fillText('Bhakti Bhav App', logoBoxX + logoBoxWidth + 15, brandingY + 38);
+    ctx.font = 'bold 14px sans-serif';
+    ctx.fillText('Bhakti Bhav App', logoBoxX + logoBoxWidth + 10, brandingY + 32);
     
-    // Add decorative elements matching the spiritual theme
-    ctx.strokeStyle = '#FFD700';
+    // Add subtle decorative border
+    ctx.strokeStyle = '#E8D5B7';
     ctx.lineWidth = 2;
-    
-    // Decorative corners with more spiritual design
-    const cornerSize = 25;
-    
-    // Top left corner decoration
-    ctx.beginPath();
-    ctx.moveTo(15, cornerSize + 15);
-    ctx.lineTo(cornerSize + 15, 15);
-    ctx.moveTo(15, 15);
-    ctx.lineTo(cornerSize + 15, cornerSize + 15);
-    ctx.stroke();
-    
-    // Top right corner decoration
-    ctx.beginPath();
-    ctx.moveTo(canvas.width - 15, cornerSize + 15);
-    ctx.lineTo(canvas.width - cornerSize - 15, 15);
-    ctx.moveTo(canvas.width - 15, 15);
-    ctx.lineTo(canvas.width - cornerSize - 15, cornerSize + 15);
-    ctx.stroke();
+    ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
     
     return canvas;
   };

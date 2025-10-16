@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { getMobileNoFromLS, setTokenInLS } from "../commonFunctions";
+import { loginApis } from "../api";
 
 
 function VerifyOtp() {
@@ -11,6 +12,18 @@ function VerifyOtp() {
     const [otp, setOtp] = useState(["", "", "", ""]);
     const [timeLeft, setTimeLeft] = useState(30);
     const [loading, setLoading] = useState(false);
+
+
+    const generateOtp = async () => {
+        try {
+            const mobile = getMobileNoFromLS();
+            const response = await loginApis.generateOtp(mobile);
+            console.log("OTP Response:", response);
+        }
+        catch (error) {
+            console.error("Error generating OTP:", error);
+        }
+    }
 
     useEffect(() => {
         if (timeLeft <= 0) return;
@@ -49,7 +62,7 @@ function VerifyOtp() {
         });
 
         setOtp(newOtp);
- 
+
         const lastIndex = Math.min(pasteData.length - 1, otp.length - 1);
         document.getElementById(`otp-${lastIndex}`).focus();
     };
@@ -72,7 +85,7 @@ function VerifyOtp() {
 
             const data = await res.json();
             console.log("data", data)
-            if(data && data?.token?.length > 0) {
+            if (data && data?.token?.length > 0) {
                 setTokenInLS(data.token);
                 navigate("/"); // redirect to home/dashboard
             }
@@ -102,7 +115,7 @@ function VerifyOtp() {
                     <div className="w-full bg-[rgba(255,250,244,0.6)] rounded-xl shadow-md p-6 border-[#9A283D] border-[0.2px]">
                         <h2 className="md:text-xl text-3xl font-semibold mb-4 theme_text font-eng">Verify OTP</h2>
                         <p className="text-gray-700 mt-2 text-xl">
-                            We've sent a code to <span className="font-semibold">{phone}</span> 
+                            We've sent a code to <span className="font-semibold">{phone}</span>
                         </p>
 
                         <div className="flex justify-between mt-6 mb-4 gap-2" onPaste={handlePaste}>
@@ -123,7 +136,7 @@ function VerifyOtp() {
                         <div className="flex justify-between items-center text-sm text-gray-600">
                             <button
                                 disabled={timeLeft > 0}
-                                onClick={() => setTimeLeft(30)}
+                                onClick={() => { setTimeLeft(30); generateOtp(); }}
                                 className={`${timeLeft > 0 ? "text-gray-400" : "text-[#800000] underline"
                                     }`}
                             >
