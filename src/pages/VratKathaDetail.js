@@ -136,13 +136,13 @@ function VratKathaDetail() {
                 bellImage.src = './img/bell_ring.png';
             });
             
-            const bellAreaWidth = canvas.width * 0.19;
-            const bellAreaHeight = 240 * (canvas.height / 700);
+            const bellAreaWidth = canvas.width * 0.25;
+            const bellAreaHeight = 300 * (canvas.height / 700);
             
             ctx.drawImage(
                 bellImage, 
-                18, 
-                12, 
+                5, 
+                5, 
                 bellAreaWidth, 
                 bellAreaHeight
             );
@@ -151,14 +151,14 @@ function VratKathaDetail() {
             console.warn('Bell image failed to load');
         }
         
-        // Logo area
+        // Logo "भक्ति भाव" at top center
         ctx.fillStyle = '#9A283D';
-        ctx.font = 'bold 28px serif';
+        ctx.font = 'bold 24px serif';
         ctx.textAlign = 'center';
-        const logoY = 120 * (canvas.height / 700);
+        const logoY = 60;
         ctx.fillText('भक्ति भाव', canvas.width / 2, logoY);
         
-        // Main deity image (if available)
+        // Main deity image (if available) - positioned like in reference image
         if (detail.imageUrl) {
             try {
                 const deityImage = new Image();
@@ -167,16 +167,27 @@ function VratKathaDetail() {
                 await new Promise((resolve, reject) => {
                     deityImage.onload = resolve;
                     deityImage.onerror = reject;
-                    deityImage.src = detail.imageUrl;
+                    // Fix image URL - add base URL if needed
+                    deityImage.src = detail.imageUrl.startsWith('http') 
+                        ? detail.imageUrl 
+                        : `https://api.bhaktibhav.app${detail.imageUrl}`;
                 });
                 
-                // Draw deity image in center
+                // Draw deity image in center (circular like in reference)
                 const imgSize = 120;
                 const imgX = (canvas.width - imgSize) / 2;
-                const imgY = 180;
+                const imgY = 100;
                 
-                // Create circular clip for deity image
+                // Create circular clip with golden border
                 ctx.save();
+                
+                // Golden border
+                ctx.fillStyle = '#D4AF37';
+                ctx.beginPath();
+                ctx.arc(imgX + imgSize/2, imgY + imgSize/2, (imgSize/2) + 3, 0, 2 * Math.PI);
+                ctx.fill();
+                
+                // Clip for image
                 ctx.beginPath();
                 ctx.arc(imgX + imgSize/2, imgY + imgSize/2, imgSize/2, 0, 2 * Math.PI);
                 ctx.clip();
@@ -184,107 +195,103 @@ function VratKathaDetail() {
                 ctx.restore();
                 
             } catch (error) {
-                console.warn('Deity image failed to load');
+                console.warn('Deity image failed to load:', error);
+                // Fallback - draw a golden circle with ॐ symbol
+                const imgSize = 120;
+                const imgX = (canvas.width - imgSize) / 2;
+                const imgY = 100;
+                
+                ctx.fillStyle = '#D4AF37';
+                ctx.beginPath();
+                ctx.arc(imgX + imgSize/2, imgY + imgSize/2, imgSize/2, 0, 2 * Math.PI);
+                ctx.fill();
+                
+                ctx.fillStyle = '#9A283D';
+                ctx.font = 'bold 40px serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('ॐ', imgX + imgSize/2, imgY + imgSize/2 + 15);
             }
         }
         
-        // Katha title
+        // Katha title - positioned below deity image
         ctx.fillStyle = '#9A283D';
-        ctx.font = 'bold 22px serif';
+        ctx.font = 'bold 18px serif';
         ctx.textAlign = 'center';
-        const titleY = 330;
+        const titleY = 250;
         
-        // Word wrap for katha name
-        const kathaName = detail.name?.hi || detail.name?.en || "व्रत कथा";
-        const words = kathaName.split(' ');
-        let line = '';
-        let y = titleY;
-        const maxWidth = canvas.width - 60;
-        const lineHeight = 30;
+        // Main title with proper text wrapping
+        const kathaName = detail.name?.hi || "व्रत कथा";
+        ctx.fillText(kathaName, canvas.width / 2, titleY);
         
-        for (let i = 0; i < words.length; i++) {
-            const testLine = line + words[i] + ' ';
-            const metrics = ctx.measureText(testLine);
+        // English subtitle in parentheses (like reference image)
+        const englishName = detail.name?.en || "Putarda Ekadashi";
+        if (englishName) {
+            ctx.fillStyle = '#2C3E50';
+            ctx.font = '14px sans-serif';
+            ctx.fillText(`(${englishName})`, canvas.width / 2, titleY + 25);
+        }
+        
+        // Timing information boxes - matching reference image layout
+        if (detail.time?.start && detail.time?.end) {
+            const timingY = titleY + 65;
+            const boxWidth = 130;
+            const boxHeight = 30;
+            const boxSpacing = 20;
             
-            if (metrics.width > maxWidth && i > 0) {
-                ctx.fillText(line.trim(), canvas.width / 2, y);
-                line = words[i] + ' ';
-                y += lineHeight;
-            } else {
-                line = testLine;
-            }
+            // Format times to match reference (12:22 PM format)
+            const startTime = new Date(detail.time.start).toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
+            });
+            const endTime = new Date(detail.time.end).toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
+            });
+            
+            // Calculate positions for centered boxes
+            const totalWidth = (boxWidth * 2) + boxSpacing;
+            const startBoxX = (canvas.width - totalWidth) / 2;
+            const endBoxX = startBoxX + boxWidth + boxSpacing;
+            
+            // Start time box
+            ctx.fillStyle = 'rgba(255,255,255,0.9)';
+            ctx.fillRect(startBoxX, timingY - 15, boxWidth, boxHeight);
+            ctx.strokeStyle = '#9A283D';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(startBoxX, timingY - 15, boxWidth, boxHeight);
+            
+            // End time box
+            ctx.fillStyle = 'rgba(255,255,255,0.9)';
+            ctx.fillRect(endBoxX, timingY - 15, boxWidth, boxHeight);
+            ctx.strokeRect(endBoxX, timingY - 15, boxWidth, boxHeight);
+            
+            // Time text
+            ctx.fillStyle = '#9A283D';
+            ctx.font = 'bold 11px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(`प्रारंभ: ${startTime}`, startBoxX + boxWidth/2, timingY - 5);
+            ctx.fillText(`समाप्त: ${endTime}`, endBoxX + boxWidth/2, timingY - 5);
         }
-        ctx.fillText(line.trim(), canvas.width / 2, y);
         
-        // Subtitle - Putarda Ekadashi style
-        ctx.fillStyle = '#2C3E50';
-        ctx.font = '18px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText('(Putarda Ekadashi)', canvas.width / 2, y + 35);
-        
-        // Timing information
-        ctx.fillStyle = '#9A283D';
+        // "Click here to read" text - matching reference position
+        ctx.fillStyle = '#6A1B9A';
         ctx.font = '14px sans-serif';
         ctx.textAlign = 'center';
+        ctx.fillText('Click here to read', canvas.width / 2, titleY + 120);
         
-        const timingY = y + 70;
-        const startTime = new Date(detail.time?.start).toLocaleTimeString('hi-IN', {
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: true
-        });
-        const endTime = new Date(detail.time?.end).toLocaleTimeString('hi-IN', {
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: true
-        });
-        
-        // Timing boxes
-        ctx.fillStyle = 'rgba(255,250,244,0.8)';
-        ctx.fillRect(50, timingY - 15, 120, 25);
-        ctx.fillRect(230, timingY - 15, 120, 25);
-        
-        ctx.strokeStyle = '#9A283D';
-        ctx.lineWidth = 1;
-        ctx.strokeRect(50, timingY - 15, 120, 25);
-        ctx.strokeRect(230, timingY - 15, 120, 25);
-        
-        ctx.fillStyle = '#9A283D';
-        ctx.font = '12px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText(`प्रारंभ: ${startTime}`, 110, timingY);
-        ctx.fillText(`समाप्त: ${endTime}`, 290, timingY);
-        
-        // "Click here to read" text
-        ctx.fillStyle = '#6A1B9A';
-        ctx.font = '16px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText('Click here to read', canvas.width / 2, timingY + 50);
-        
-        // Page URL
-        const pageUrl = window.location.href;
-        ctx.fillStyle = '#2C3E50';
-        ctx.font = '12px sans-serif';
-        ctx.textAlign = 'center';
-        
-        // Truncate URL if too long
-        let displayUrl = pageUrl;
-        if (pageUrl.length > 50) {
-            displayUrl = pageUrl.substring(0, 47) + '...';
-        }
-        ctx.fillText(displayUrl, canvas.width / 2, timingY + 75);
-        
-        // Bottom branding section
-        const brandingY = canvas.height - 80;
+        // Bottom branding section - matching reference image
+        const brandingY = canvas.height - 120;
         
         // Yellow background box for logo
         ctx.fillStyle = '#FFD65A';
-        const logoBoxWidth = 98;
-        const logoBoxHeight = 58.5;
-        const logoBoxX = (canvas.width / 2) - 120;
+        const logoBoxWidth = 80;
+        const logoBoxHeight = 50;
+        const logoBoxX = 50;
         const logoBoxY = brandingY;
         
-        // Rounded rectangle
+        // Rounded rectangle for logo background
         const borderRadius = 6;
         ctx.beginPath();
         ctx.moveTo(logoBoxX + borderRadius, logoBoxY);
@@ -301,30 +308,39 @@ function VratKathaDetail() {
         
         // Logo text inside yellow box
         ctx.fillStyle = '#6d0019';
-        ctx.font = 'bold 16px serif';
+        ctx.font = 'bold 14px serif';
         ctx.textAlign = 'center';
-        ctx.fillText('भक्ति', logoBoxX + (logoBoxWidth / 2), logoBoxY + 22);
-        ctx.fillText('भाव', logoBoxX + (logoBoxWidth / 2), logoBoxY + 40);
+        ctx.fillText('भक्ति', logoBoxX + (logoBoxWidth / 2), logoBoxY + 18);
+        ctx.fillText('भाव', logoBoxX + (logoBoxWidth / 2), logoBoxY + 34);
         
-        // Branding text
+        // Branding text next to logo
         ctx.fillStyle = 'rgba(109, 0, 25, 0.9)';
-        ctx.font = '14px sans-serif';
+        ctx.font = '12px sans-serif';
         ctx.textAlign = 'left';
-        ctx.fillText('Shared from', logoBoxX + logoBoxWidth + 10, brandingY + 15);
+        const textX = logoBoxX + logoBoxWidth + 15;
+        ctx.fillText('Shared from', textX, brandingY + 15);
         
-        ctx.font = 'bold 14px sans-serif';
-        ctx.fillText('Bhakti Bhav App', logoBoxX + logoBoxWidth + 10, brandingY + 32);
+        ctx.font = 'bold 12px sans-serif';
+        ctx.fillText('Bhakti Bhav App', textX, brandingY + 30);
         
-        // App store buttons (simplified text representation)
+        // App store buttons - positioned like in reference
+        const buttonY = brandingY + 40;
+        const buttonWidth = 50;
+        const buttonHeight = 15;
+        
+        // Google Play button
         ctx.fillStyle = '#000000';
-        ctx.fillRect(logoBoxX + logoBoxWidth + 10, brandingY + 40, 60, 15);
-        ctx.fillRect(logoBoxX + logoBoxWidth + 80, brandingY + 40, 60, 15);
-        
+        ctx.fillRect(textX, buttonY, buttonWidth, buttonHeight);
         ctx.fillStyle = '#FFFFFF';
-        ctx.font = '8px sans-serif';
+        ctx.font = '7px sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText('Play Store', logoBoxX + logoBoxWidth + 40, brandingY + 50);
-        ctx.fillText('App Store', logoBoxX + logoBoxWidth + 110, brandingY + 50);
+        ctx.fillText('Google Play', textX + buttonWidth/2, buttonY + 10);
+        
+        // App Store button
+        ctx.fillStyle = '#000000';
+        ctx.fillRect(textX + buttonWidth + 10, buttonY, buttonWidth, buttonHeight);
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillText('App Store', textX + buttonWidth + 10 + buttonWidth/2, buttonY + 10);
         
         // Decorative border
         ctx.strokeStyle = '#E8D5B7';
