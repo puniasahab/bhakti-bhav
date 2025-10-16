@@ -63,16 +63,16 @@ function TodayThoughts() {
       });
       
       // Position the bell image at top-left matching .bell_bg CSS styling
-      // Width: 30% of canvas (mobile), positioned at top-left
-      const bellAreaWidth = canvas.width * 0.3; // 30% width for mobile
-      const bellAreaHeight = 375 * (canvas.height / 700); // Scale proportionally
+      // Width: 25% of canvas (reduced from 30%), positioned at top-left
+      const bellAreaWidth = canvas.width * 0.19; // Reduced to 25% width for better fit
+      const bellAreaHeight = 240 * (canvas.height / 700); // Reduced height (was 375px)
       
       // Draw the bell image at the correct position and size
       ctx.drawImage(
         bellImage, 
-        0, // x position (left edge)
-        0, // y position (top edge)
-        bellAreaWidth, // width (30% of canvas)
+        18, // x position (shifted right from 8 to 18)
+        12, // y position (small margin from top edge)
+        bellAreaWidth, // width (25% of canvas)
         bellAreaHeight // height (scaled proportionally)
       );
       
@@ -151,8 +151,8 @@ function TodayThoughts() {
     
     // Yellow background box for logo - matching bg-[#FFD65A] text-[#6d0019]
     ctx.fillStyle = '#FFD65A';
-    const logoBoxWidth = 70;
-    const logoBoxHeight = 45;
+    const logoBoxWidth = 98; // Increased by 40% (70 * 1.4 = 98)
+    const logoBoxHeight = 58.5; // Increased by 30% (45 * 1.3 = 58.5)
     const logoBoxX = (canvas.width / 2) - 90;
     const logoBoxY = brandingY;
     

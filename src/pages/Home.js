@@ -234,8 +234,8 @@ function Home() {
                             ✕
                         </button>
 
-                        <div className="p-6 max-h-[80vh] overflow-y-auto">
-                            <div className="grid grid-cols-2 gap-4 px-10 py-3 border border-[#9A283D] bg-[rgba(255,250,244,0.6)] font-hindi theme_text rounded-xl">
+                        <div className="p-6 max-h-[80vh] overflow-y-auto" style={{ paddingRight: '16px', paddingLeft: '6px' }}>
+                            <div className="grid grid-cols-2 gap-4 px-5 py-3 border border-[#9A283D] bg-[rgba(255,250,244,0.6)] font-hindi theme_text rounded-xl">
                                 {panchangData.map((col, index) => (
                                     <div key={index} className="text-xl text-left">
                                         {col.items.map((text, i) => {

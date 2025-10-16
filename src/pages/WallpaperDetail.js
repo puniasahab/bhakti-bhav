@@ -82,7 +82,7 @@ function WallpaperDetail() {
         }, 100);
         
         console.log("Download completed successfully!");
-        alert("Wallpaper downloaded successfully!");
+        // alert("Wallpaper downloaded successfully!");
         
       } else {
         throw new Error("Invalid API response or missing image URL");
@@ -121,7 +121,7 @@ function WallpaperDetail() {
               }, 100);
               
               console.log("Alternative download completed successfully!");
-              alert("Wallpaper downloaded successfully!");
+              // alert("Wallpaper downloaded successfully!");
               return;
             }
           }

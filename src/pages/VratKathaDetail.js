@@ -107,14 +107,268 @@ function VratKathaDetail() {
     }
 
     const shareText = `🌸 ${detail.name?.en || "Katha"} 🌸\n\n${detail.text?.en || ""}\n\nListen here: ${window.location.href}`;
+    
+    const generateShareTemplate = async () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Set canvas size to match mobile aspect ratio
+        canvas.width = 400;
+        canvas.height = 700;
+        
+        // Create background matching home_bg.png - light cream/white gradient
+        const bgGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+        bgGradient.addColorStop(0, '#FFF8F0'); // Light cream at top
+        bgGradient.addColorStop(0.3, '#FFFEF7'); // White-cream
+        bgGradient.addColorStop(0.7, '#FFF5E6'); // Light cream
+        bgGradient.addColorStop(1, '#F5F5F5'); // Very light grey at bottom
+        ctx.fillStyle = bgGradient;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Load and draw the bell image
+        try {
+            const bellImage = new Image();
+            bellImage.crossOrigin = 'anonymous';
+            
+            await new Promise((resolve, reject) => {
+                bellImage.onload = resolve;
+                bellImage.onerror = reject;
+                bellImage.src = './img/bell_ring.png';
+            });
+            
+            const bellAreaWidth = canvas.width * 0.19;
+            const bellAreaHeight = 240 * (canvas.height / 700);
+            
+            ctx.drawImage(
+                bellImage, 
+                18, 
+                12, 
+                bellAreaWidth, 
+                bellAreaHeight
+            );
+            
+        } catch (error) {
+            console.warn('Bell image failed to load');
+        }
+        
+        // Logo area
+        ctx.fillStyle = '#9A283D';
+        ctx.font = 'bold 28px serif';
+        ctx.textAlign = 'center';
+        const logoY = 120 * (canvas.height / 700);
+        ctx.fillText('भक्ति भाव', canvas.width / 2, logoY);
+        
+        // Main deity image (if available)
+        if (detail.imageUrl) {
+            try {
+                const deityImage = new Image();
+                deityImage.crossOrigin = 'anonymous';
+                
+                await new Promise((resolve, reject) => {
+                    deityImage.onload = resolve;
+                    deityImage.onerror = reject;
+                    deityImage.src = detail.imageUrl;
+                });
+                
+                // Draw deity image in center
+                const imgSize = 120;
+                const imgX = (canvas.width - imgSize) / 2;
+                const imgY = 180;
+                
+                // Create circular clip for deity image
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(imgX + imgSize/2, imgY + imgSize/2, imgSize/2, 0, 2 * Math.PI);
+                ctx.clip();
+                ctx.drawImage(deityImage, imgX, imgY, imgSize, imgSize);
+                ctx.restore();
+                
+            } catch (error) {
+                console.warn('Deity image failed to load');
+            }
+        }
+        
+        // Katha title
+        ctx.fillStyle = '#9A283D';
+        ctx.font = 'bold 22px serif';
+        ctx.textAlign = 'center';
+        const titleY = 330;
+        
+        // Word wrap for katha name
+        const kathaName = detail.name?.hi || detail.name?.en || "व्रत कथा";
+        const words = kathaName.split(' ');
+        let line = '';
+        let y = titleY;
+        const maxWidth = canvas.width - 60;
+        const lineHeight = 30;
+        
+        for (let i = 0; i < words.length; i++) {
+            const testLine = line + words[i] + ' ';
+            const metrics = ctx.measureText(testLine);
+            
+            if (metrics.width > maxWidth && i > 0) {
+                ctx.fillText(line.trim(), canvas.width / 2, y);
+                line = words[i] + ' ';
+                y += lineHeight;
+            } else {
+                line = testLine;
+            }
+        }
+        ctx.fillText(line.trim(), canvas.width / 2, y);
+        
+        // Subtitle - Putarda Ekadashi style
+        ctx.fillStyle = '#2C3E50';
+        ctx.font = '18px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('(Putarda Ekadashi)', canvas.width / 2, y + 35);
+        
+        // Timing information
+        ctx.fillStyle = '#9A283D';
+        ctx.font = '14px sans-serif';
+        ctx.textAlign = 'center';
+        
+        const timingY = y + 70;
+        const startTime = new Date(detail.time?.start).toLocaleTimeString('hi-IN', {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
+        });
+        const endTime = new Date(detail.time?.end).toLocaleTimeString('hi-IN', {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
+        });
+        
+        // Timing boxes
+        ctx.fillStyle = 'rgba(255,250,244,0.8)';
+        ctx.fillRect(50, timingY - 15, 120, 25);
+        ctx.fillRect(230, timingY - 15, 120, 25);
+        
+        ctx.strokeStyle = '#9A283D';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(50, timingY - 15, 120, 25);
+        ctx.strokeRect(230, timingY - 15, 120, 25);
+        
+        ctx.fillStyle = '#9A283D';
+        ctx.font = '12px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(`प्रारंभ: ${startTime}`, 110, timingY);
+        ctx.fillText(`समाप्त: ${endTime}`, 290, timingY);
+        
+        // "Click here to read" text
+        ctx.fillStyle = '#6A1B9A';
+        ctx.font = '16px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('Click here to read', canvas.width / 2, timingY + 50);
+        
+        // Page URL
+        const pageUrl = window.location.href;
+        ctx.fillStyle = '#2C3E50';
+        ctx.font = '12px sans-serif';
+        ctx.textAlign = 'center';
+        
+        // Truncate URL if too long
+        let displayUrl = pageUrl;
+        if (pageUrl.length > 50) {
+            displayUrl = pageUrl.substring(0, 47) + '...';
+        }
+        ctx.fillText(displayUrl, canvas.width / 2, timingY + 75);
+        
+        // Bottom branding section
+        const brandingY = canvas.height - 80;
+        
+        // Yellow background box for logo
+        ctx.fillStyle = '#FFD65A';
+        const logoBoxWidth = 98;
+        const logoBoxHeight = 58.5;
+        const logoBoxX = (canvas.width / 2) - 120;
+        const logoBoxY = brandingY;
+        
+        // Rounded rectangle
+        const borderRadius = 6;
+        ctx.beginPath();
+        ctx.moveTo(logoBoxX + borderRadius, logoBoxY);
+        ctx.lineTo(logoBoxX + logoBoxWidth - borderRadius, logoBoxY);
+        ctx.quadraticCurveTo(logoBoxX + logoBoxWidth, logoBoxY, logoBoxX + logoBoxWidth, logoBoxY + borderRadius);
+        ctx.lineTo(logoBoxX + logoBoxWidth, logoBoxY + logoBoxHeight - borderRadius);
+        ctx.quadraticCurveTo(logoBoxX + logoBoxWidth, logoBoxY + logoBoxHeight, logoBoxX + logoBoxWidth - borderRadius, logoBoxY + logoBoxHeight);
+        ctx.lineTo(logoBoxX + borderRadius, logoBoxY + logoBoxHeight);
+        ctx.quadraticCurveTo(logoBoxX, logoBoxY + logoBoxHeight, logoBoxX, logoBoxY + logoBoxHeight - borderRadius);
+        ctx.lineTo(logoBoxX, logoBoxY + borderRadius);
+        ctx.quadraticCurveTo(logoBoxX, logoBoxY, logoBoxX + borderRadius, logoBoxY);
+        ctx.closePath();
+        ctx.fill();
+        
+        // Logo text inside yellow box
+        ctx.fillStyle = '#6d0019';
+        ctx.font = 'bold 16px serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('भक्ति', logoBoxX + (logoBoxWidth / 2), logoBoxY + 22);
+        ctx.fillText('भाव', logoBoxX + (logoBoxWidth / 2), logoBoxY + 40);
+        
+        // Branding text
+        ctx.fillStyle = 'rgba(109, 0, 25, 0.9)';
+        ctx.font = '14px sans-serif';
+        ctx.textAlign = 'left';
+        ctx.fillText('Shared from', logoBoxX + logoBoxWidth + 10, brandingY + 15);
+        
+        ctx.font = 'bold 14px sans-serif';
+        ctx.fillText('Bhakti Bhav App', logoBoxX + logoBoxWidth + 10, brandingY + 32);
+        
+        // App store buttons (simplified text representation)
+        ctx.fillStyle = '#000000';
+        ctx.fillRect(logoBoxX + logoBoxWidth + 10, brandingY + 40, 60, 15);
+        ctx.fillRect(logoBoxX + logoBoxWidth + 80, brandingY + 40, 60, 15);
+        
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = '8px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('Play Store', logoBoxX + logoBoxWidth + 40, brandingY + 50);
+        ctx.fillText('App Store', logoBoxX + logoBoxWidth + 110, brandingY + 50);
+        
+        // Decorative border
+        ctx.strokeStyle = '#E8D5B7';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
+        
+        return canvas;
+    };
+    
     const handleNativeShare = async () => {
         if (navigator.share) {
             try {
-                await navigator.share({
-                    title: detail.name?.en || "Katha",
-                    text: shareText,
-                    url: window.location.href,
-                })
+                const canvas = await generateShareTemplate();
+                
+                // Convert canvas to blob
+                canvas.toBlob(async (blob) => {
+                    if (navigator.canShare && navigator.canShare({ files: [] })) {
+                        const file = new File([blob], 'bhakti-bhav-vrat-katha.png', { type: 'image/png' });
+                        
+                        const shareData = {
+                            title: detail.name?.hi || "व्रत कथा",
+                            text: shareText,
+                            files: [file]
+                        };
+                        
+                        if (navigator.canShare(shareData)) {
+                            await navigator.share(shareData);
+                        } else {
+                            // Fallback to text share
+                            await navigator.share({
+                                title: detail.name?.hi || "व्रत कथा",
+                                text: shareText,
+                                url: window.location.href
+                            });
+                        }
+                    } else {
+                        // Fallback to text share
+                        await navigator.share({
+                            title: detail.name?.hi || "व्रत कथा",
+                            text: shareText,
+                            url: window.location.href
+                        });
+                    }
+                }, 'image/png');
             } catch (error) {
                 console.error("Error sharing:", error);
             }

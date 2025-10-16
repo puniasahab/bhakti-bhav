@@ -88,7 +88,7 @@ export default function PujaKareDetail() {
       flower.style.animationDelay = (Math.random() * 3) + 's';
       flower.style.fontSize = (20 + Math.random() * 20) + 'px';
       container.appendChild(flower);
-      setTimeout(() => flower.remove(), 6000);
+      setTimeout(() => flower.remove(), 10000);
     }
   };
 
@@ -104,7 +104,7 @@ export default function PujaKareDetail() {
     diya.style.width = "80px";
     diya.style.zIndex = "50";
     container.appendChild(diya);
-    setTimeout(() => diya.remove(), 4000);
+    setTimeout(() => diya.remove(), 20000);
   };
 
   const pujaThaali = () => {
@@ -129,7 +129,7 @@ export default function PujaKareDetail() {
     thaali.style.zIndex = "50";
     container.appendChild(thaali);
     setTimeout(() => thaali.classList.add("animate-thaali-move"), 100);
-    setTimeout(() => thaali.remove(), 4000);
+    setTimeout(() => thaali.remove(), 20000);
   };
 
   const bell = () => {
@@ -153,22 +153,40 @@ export default function PujaKareDetail() {
     ring.style.width = "80px";
     ring.style.zIndex = "50";
     container.appendChild(ring);
-    setTimeout(() => ring.remove(), 4000);
+    setTimeout(() => ring.remove(), 20000);
   };
 
   const mala = () => {
     const container = containerRef.current;
     if (!container) return;
 
+    // Get container dimensions for responsive positioning
+    const containerRect = container.getBoundingClientRect();
+    const containerWidth = containerRect.width;
+    const containerHeight = containerRect.height;
+
     const ring = document.createElement("img");
     ring.src = "/img/flower-mala.png";
     ring.className = "absolute animate-fade puja-ring";
-    ring.style.right = "32%";
-    ring.style.top = "25%";
-    ring.style.width = "150px";
+    
+    // Calculate responsive positioning for center-neck area
+    // Position mala at center horizontally and around neck area (25-30% from top)
+    const leftPercentage = 70; // Center horizontally
+    const topPercentage = 10; // Neck area positioning
+    const malaWidth = Math.min(150, containerWidth * 0.4); // Responsive width, max 150px
+    
+    // Center the mala by adjusting for its width
+    const leftPosition = leftPercentage - (malaWidth / containerWidth * 100 / 2);
+    console.log(leftPosition, topPercentage, malaWidth, "Something is useful");
+    
+    ring.style.left = `${leftPosition}%`;
+    ring.style.top = `${topPercentage}%`;
+    ring.style.width = `${malaWidth}px`;
+    ring.style.transform = "translateX(-50%)"; // Additional centering
     ring.style.zIndex = "50";
+    
     container.appendChild(ring);
-    setTimeout(() => ring.remove(), 4000);
+    setTimeout(() => ring.remove(), 20000);
   };
 
   const nariyal = () => {
@@ -183,7 +201,7 @@ export default function PujaKareDetail() {
     nariyal.style.width = "100px";
     nariyal.style.zIndex = "50";
     container.appendChild(nariyal);
-    setTimeout(() => nariyal.remove(), 4000);
+    setTimeout(() => nariyal.remove(), 20000);
   };
 
   const kalash = () => {
@@ -198,7 +216,7 @@ export default function PujaKareDetail() {
     kalash.style.width = "125px";
     kalash.style.zIndex = "50";
     container.appendChild(kalash);
-    setTimeout(() => kalash.remove(), 4000);
+    setTimeout(() => kalash.remove(), 20000);
   };
 
   const shankhAnimation = () => {
@@ -217,7 +235,7 @@ export default function PujaKareDetail() {
     const pulse = document.createElement('div');
     pulse.classList.add('pulse');
     container.appendChild(pulse);
-    setTimeout(() => pulse.remove(), 14000);
+    setTimeout(() => pulse.remove(), 10000);
   };
 
   return (
@@ -233,7 +251,7 @@ export default function PujaKareDetail() {
 
         <main className="px-4 relative">
           <div className="container mx-auto mt-4">
-            <div className="image_wrapper mb-[80px]">
+            <div className="image_wrapper mb-[150px]">
               <img src={item.imageUrl} alt="" width="350" height="420" className="max-w-full h-auto mx-auto mb-8" />
             </div>
             <div className="relative w-full justify-center">
