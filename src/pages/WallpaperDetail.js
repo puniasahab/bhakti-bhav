@@ -84,17 +84,28 @@ function WallpaperDetail() {
     }
   }
   const handleWhatsAppShare = (imageUrl) => {
-    // First try Web Share API for better image sharing support
+    // First try Web Share API for better image sharing support with preview
     if (navigator.share && navigator.canShare && navigator.canShare({ files: [] })) {
-      // Try to fetch and share the image as a file
+      // Try to fetch and share the image as a file with preview
       fetch(imageUrl)
         .then(response => response.blob())
         .then(blob => {
-          const file = new File([blob], 'bhakti-bhav-wallpaper.jpg', { type: 'image/jpeg' });
+          const godName = detail.godName || 'Divine Wallpaper';
+          const file = new File([blob], `${godName}-bhakti-bhav-wallpaper.jpg`, { type: 'image/jpeg' });
+          
           const shareData = {
-            title: '🙏 Beautiful wallpaper from Bhakti Bhav! 🙏',
-            text: '📱 Please download Bhakti Bhav app from Play Store for more spiritual wallpapers, mantras, and devotional content!\n\n🔗 https://play.google.com/store/apps/details?id=com.bhaktibhav',
-            files: [file]
+            title: `🙏 ${godName} - Beautiful wallpaper from Bhakti Bhav! 🙏`,
+            text: `🌟 ${godName} Wallpaper from Bhakti Bhav 🌟
+
+�️ Wallpaper Link: ${imageUrl}
+
+📱 Download Bhakti Bhav app from Play Store for more spiritual wallpapers, mantras, and devotional content!
+
+🔗 https://play.google.com/store/apps/details?id=com.bhaktibhav
+
+🙏 Har Har Mahadev 🙏`,
+            files: [file],
+            url: imageUrl
           };
 
           if (navigator.canShare(shareData)) {
@@ -104,13 +115,19 @@ function WallpaperDetail() {
           }
         })
         .catch(() => {
-          // Fallback to WhatsApp URL with optimized message
-          const message = `🙏 Beautiful wallpaper from Bhakti Bhav! 🙏
+          // Fallback to WhatsApp URL with optimized message including god name and image link
+          const godName = detail.godName || 'Divine Wallpaper';
+          const message = `🙏 ${godName} - Beautiful wallpaper from Bhakti Bhav! 🙏
 
-Check out this amazing wallpaper: ${imageUrl}
+🌟 ${godName} Wallpaper 🌟
 
-📱 Download Bhakti Bhav app from Play Store for more spiritual content!
-🔗 https://play.google.com/store/apps/details?id=com.bhaktibhav`;
+🖼️ View/Download Wallpaper: ${imageUrl}
+
+📱 Download Bhakti Bhav app from Play Store for more spiritual wallpapers, mantras, and devotional content!
+
+🔗 App Link: https://play.google.com/store/apps/details?id=com.bhaktibhav
+
+🙏 Har Har Mahadev 🙏`;
 
           const whatsappUrl = `whatsapp://send?text=${encodeURIComponent(message)}`;
           const whatsappWebUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
@@ -128,12 +145,18 @@ Check out this amazing wallpaper: ${imageUrl}
         });
     } else {
       // Fallback for browsers without Web Share API
-      const message = `🙏 Beautiful wallpaper from Bhakti Bhav! 🙏
+      const godName = detail.godName || 'Divine Wallpaper';
+      const message = `🙏 ${godName} - Beautiful wallpaper from Bhakti Bhav! 🙏
 
-Check out this amazing wallpaper: ${imageUrl}
+🌟 ${godName} Wallpaper 🌟
 
-📱 Download Bhakti Bhav app from Play Store for more spiritual content!
-🔗 https://play.google.com/store/apps/details?id=com.bhaktibhav`;
+🖼️ View/Download Wallpaper: ${imageUrl}
+
+📱 Download Bhakti Bhav app from Play Store for more spiritual wallpapers, mantras, and devotional content!
+
+🔗 App Link: https://play.google.com/store/apps/details?id=com.bhaktibhav
+
+🙏 Har Har Mahadev 🙏`;
 
       const whatsappUrl = `whatsapp://send?text=${encodeURIComponent(message)}`;
       const whatsappWebUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
@@ -189,7 +212,9 @@ Check out this amazing wallpaper: ${imageUrl}
               Apply
             </button> */}
             <button className="flex-1 max-w-[120px] py-3 px-4 border-2 border-[#9A283D] rounded-xl theme_text font-semibold text-lg hover:bg-[#9A283D] hover:text-white transition-colors font-eng" onClick={() => downloadWallpaper(detail._id)}>
-              Download
+              <a href={`https://api.bhaktibhav.app/frontend/download/${detail._id}`} download>
+                Download
+              </a>
             </button>
             <button
               className="flex-1 max-w-[120px] py-3 px-4 border-2 border-[#9A283D] rounded-xl theme_text font-semibold text-lg hover:bg-[#9A283D] hover:text-white transition-colors font-eng"
