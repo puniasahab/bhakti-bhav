@@ -351,45 +351,98 @@ function VratKathaDetail() {
     };
 
     const handleNativeShare = async () => {
-        if (navigator.share) {
+        const kathaName = detail.name?.hi || detail.name?.en || "व्रत कथा";
+        const currentUrl = window.location.href;
+        
+        // Create share message matching the reference image format
+        const shareMessage = `🙏 ${kathaName} - Beautiful वत कथा from Bhakti Bhav! 🙏
+
+${currentUrl}
+
+📱 Download Bhakti Bhav app from Play Store for more spiritual कथा, mantras, and devotional content!
+
+🔗 https://play.google.com/store/apps/details?id=com.bhaktibhav
+
+🙏 Har Har Mahadev 🙏`;
+
+        // First try Web Share API with image
+        if (navigator.share && navigator.canShare) {
             try {
                 const canvas = await generateShareTemplate();
 
-                // Convert canvas to blob
                 canvas.toBlob(async (blob) => {
-                    if (navigator.canShare && navigator.canShare({ files: [] })) {
-                        const file = new File([blob], 'bhakti-bhav-vrat-katha.png', { type: 'image/png' });
+                    try {
+                        // Try sharing with image file first
+                        if (navigator.canShare && navigator.canShare({ files: [] })) {
+                            const file = new File([blob], `${kathaName.replace(/\s+/g, '-')}-bhakti-bhav-katha.png`, { type: 'image/png' });
 
-                        const shareData = {
-                            title: detail.name?.hi || "व्रत कथा",
-                            text: shareText,
-                            files: [file]
-                        };
+                            const shareDataWithImage = {
+                                title: `🙏 ${kathaName} - व्रत कथा from Bhakti Bhav! 🙏`,
+                                text: shareMessage,
+                                files: [file]
+                            };
 
-                        if (navigator.canShare(shareData)) {
-                            await navigator.share(shareData);
-                        } else {
-                            // Fallback to text share
-                            await navigator.share({
-                                title: detail.name?.hi || "व्रत कथा",
-                                text: shareText,
-                                url: window.location.href
-                            });
+                            if (navigator.canShare(shareDataWithImage)) {
+                                await navigator.share(shareDataWithImage);
+                                return;
+                            }
                         }
-                    } else {
-                        // Fallback to text share
+
+                        // Fallback to text + URL sharing
                         await navigator.share({
-                            title: detail.name?.hi || "व्रत कथा",
-                            text: shareText,
-                            url: window.location.href
+                            title: `🙏 ${kathaName} - व्रत कथा from Bhakti Bhav! 🙏`,
+                            text: shareMessage,
+                            url: currentUrl
                         });
+
+                    } catch (shareError) {
+                        console.log('Native share failed, trying WhatsApp direct');
+                        // Fallback to WhatsApp direct
+                        shareToWhatsApp(shareMessage);
                     }
                 }, 'image/png');
+
             } catch (error) {
-                console.error("Error sharing:", error);
+                console.log('Canvas generation failed, using text share');
+                // Fallback to text share
+                try {
+                    await navigator.share({
+                        title: `🙏 ${kathaName} - व्रत कथा from Bhakti Bhav! 🙏`,
+                        text: shareMessage,
+                        url: currentUrl
+                    });
+                } catch (textShareError) {
+                    shareToWhatsApp(shareMessage);
+                }
             }
         } else {
-            alert("Sharing is not supported on this browser.");
+            // Browser doesn't support Web Share API, use WhatsApp direct
+            shareToWhatsApp(shareMessage);
+        }
+    };
+
+    const shareToWhatsApp = (message) => {
+        const whatsappMessage = encodeURIComponent(message);
+        const whatsappWebUrl = `https://wa.me/?text=${whatsappMessage}`;
+        const whatsappAppUrl = `whatsapp://send?text=${whatsappMessage}`;
+
+        // Try WhatsApp app first, then web version
+        try {
+            if (/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+                window.location.href = whatsappAppUrl;
+                setTimeout(() => {
+                    window.open(whatsappWebUrl, '_blank');
+                }, 1000);
+            } else {
+                window.open(whatsappWebUrl, '_blank');
+            }
+        } catch (error) {
+            // Final fallback - copy to clipboard
+            navigator.clipboard.writeText(message).then(() => {
+                alert('Share message copied to clipboard!');
+            }).catch(() => {
+                alert('Please share manually: ' + message);
+            });
         }
     };
 
@@ -439,7 +492,7 @@ function VratKathaDetail() {
                 <div className="flex justify-center gap-4">
                     <div className="mt-4">
 
-                        <button className={`bg-[#9A283D] text-white px-6 py-2 rounded-full shadow flex items-center ${language === "hi" ? "font-hindi" : "font-eng"}`} onClick={() => { generateShareTemplate() }}>
+                        <button className={`bg-[#9A283D] text-white px-6 py-2 rounded-full shadow flex items-center ${language === "hi" ? "font-hindi" : "font-eng"}`} onClick={() => { handleNativeShare() }}>
                             <img src="../img/share_icon.png" alt="" className="w-[15px] h-[15px] mr-2" /> {language === "hi" ? jsonFile.share.hi : jsonFile.share.en}
                         </button>
                     </div>
