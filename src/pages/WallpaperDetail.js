@@ -5,6 +5,7 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import PageTitleCard from "../components/PageTitleCard";
 import { wallpaperApis } from "../api";
+import axios from "axios";
 
 function WallpaperDetail() {
   const { id } = useParams();
@@ -16,80 +17,32 @@ function WallpaperDetail() {
 
   const downloadWallpaper = async (id) => {
     try {
-      console.log("Starting download for ID:", id);
-      
-      // Get the image data directly from the download API
-      const downloadWallpaperApiResponse = await wallpaperApis.downloadWallpaper(id);
-      console.log("Download API response:", downloadWallpaperApiResponse);
-      
-      // Check if API response is successful and has data
-      if (downloadWallpaperApiResponse.status === "success" && downloadWallpaperApiResponse.data && downloadWallpaperApiResponse.data.imageUrl) {
-        const imageUrl = downloadWallpaperApiResponse.data.imageUrl;
-        const godName = downloadWallpaperApiResponse.data.godName || 'wallpaper';
-        
-        console.log("Downloading image from:", imageUrl);
-        
-        // Fetch the image with proper headers
-        const response = await fetch(imageUrl, {
-          method: 'GET',
-          headers: {
-            'Accept': 'image/*',
-          },
-        });
-        
-        if (!response.ok) {
-          throw new Error(`Failed to fetch image: ${response.status} ${response.statusText}`);
-        }
-        
-        // Get the image blob
-        const blob = await response.blob();
-        
-        // Ensure we have a valid blob
-        if (!blob || blob.size === 0) {
-          throw new Error('Downloaded image is empty or invalid');
-        }
-        
-        // Get the file extension from the URL or Content-Type
-        let extension = 'jpg'; // Default extension
-        const contentType = response.headers.get('content-type');
-        if (contentType) {
-          if (contentType.includes('png')) extension = 'png';
-          else if (contentType.includes('jpeg') || contentType.includes('jpg')) extension = 'jpg';
-          else if (contentType.includes('webp')) extension = 'webp';
-        } else {
-          // Fallback: get extension from URL
-          const urlParts = imageUrl.split('.');
-          if (urlParts.length > 1) {
-            extension = urlParts[urlParts.length - 1].toLowerCase().split('?')[0];
-          }
-        }
-        
-        // Create download link
-        const downloadUrl = window.URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = downloadUrl;
-        link.download = `bhakti-bhav-${godName.replace(/\s+/g, '-')}-wallpaper.${extension}`;
-        link.style.display = 'none';
-        
-        // Trigger download
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        
-        // Clean up the URL object after a short delay
-        setTimeout(() => {
-          window.URL.revokeObjectURL(downloadUrl);
-        }, 100);
-        
-        console.log("Download completed successfully!");
-        
-      } else {
-        throw new Error("Invalid API response or missing image URL");
+      const response = await axios.get(`http://api.bhaktibhav.app/frontend/download/${id}`, {
+        responseType: 'blob', // important
+      });
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+
+      // Extract filename from response headers if sent, fallback to default
+      const contentDisposition = response.headers['content-disposition'];
+      let fileName = 'download.jpg';
+      if (contentDisposition) {
+        const match = contentDisposition.match(/filename="?(.+)"?/);
+        if (match) fileName = match[1];
       }
-    } catch (err) {
-      console.error("Download error details:", err);
-      alert("Download failed. Please check your internet connection and try again.");
+
+      link.setAttribute('download', fileName);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Download failed', error);
     }
+
+
   }
 
   useEffect(() => {
