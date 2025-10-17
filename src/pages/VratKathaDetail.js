@@ -107,15 +107,15 @@ function VratKathaDetail() {
     }
 
     const shareText = `🌸 ${detail.name?.en || "Katha"} 🌸\n\n${detail.text?.en || ""}\n\nListen here: ${window.location.href}`;
-    
+
     const generateShareTemplate = async () => {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
-        
+
         // Set canvas size to match mobile aspect ratio
         canvas.width = 400;
         canvas.height = 700;
-        
+
         // Create background matching home_bg.png - light cream/white gradient
         const bgGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
         bgGradient.addColorStop(0, '#FFF8F0'); // Light cream at top
@@ -124,105 +124,105 @@ function VratKathaDetail() {
         bgGradient.addColorStop(1, '#F5F5F5'); // Very light grey at bottom
         ctx.fillStyle = bgGradient;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
+
         // Load and draw the bell image
         try {
             const bellImage = new Image();
             bellImage.crossOrigin = 'anonymous';
-            
+
             await new Promise((resolve, reject) => {
                 bellImage.onload = resolve;
                 bellImage.onerror = reject;
                 bellImage.src = './img/bell_ring.png';
             });
-            
+
             const bellAreaWidth = canvas.width * 0.25;
             const bellAreaHeight = 300 * (canvas.height / 700);
-            
+
             ctx.drawImage(
-                bellImage, 
-                5, 
-                5, 
-                bellAreaWidth, 
+                bellImage,
+                5,
+                5,
+                bellAreaWidth,
                 bellAreaHeight
             );
-            
+
         } catch (error) {
             console.warn('Bell image failed to load');
         }
-        
+
         // Logo "भक्ति भाव" at top center
         ctx.fillStyle = '#9A283D';
         ctx.font = 'bold 24px serif';
         ctx.textAlign = 'center';
         const logoY = 60;
         ctx.fillText('भक्ति भाव', canvas.width / 2, logoY);
-        
+
         // Main deity image (if available) - positioned like in reference image
         if (detail.imageUrl) {
             try {
                 const deityImage = new Image();
                 deityImage.crossOrigin = 'anonymous';
-                
+
                 await new Promise((resolve, reject) => {
                     deityImage.onload = resolve;
                     deityImage.onerror = reject;
                     // Fix image URL - add base URL if needed
-                    deityImage.src = detail.imageUrl.startsWith('http') 
-                        ? detail.imageUrl 
+                    deityImage.src = detail.imageUrl.startsWith('http')
+                        ? detail.imageUrl
                         : `https://api.bhaktibhav.app${detail.imageUrl}`;
                 });
-                
+
                 // Draw deity image in center (circular like in reference)
                 const imgSize = 120;
                 const imgX = (canvas.width - imgSize) / 2;
                 const imgY = 100;
-                
+
                 // Create circular clip with golden border
                 ctx.save();
-                
+
                 // Golden border
                 ctx.fillStyle = '#D4AF37';
                 ctx.beginPath();
-                ctx.arc(imgX + imgSize/2, imgY + imgSize/2, (imgSize/2) + 3, 0, 2 * Math.PI);
+                ctx.arc(imgX + imgSize / 2, imgY + imgSize / 2, (imgSize / 2) + 3, 0, 2 * Math.PI);
                 ctx.fill();
-                
+
                 // Clip for image
                 ctx.beginPath();
-                ctx.arc(imgX + imgSize/2, imgY + imgSize/2, imgSize/2, 0, 2 * Math.PI);
+                ctx.arc(imgX + imgSize / 2, imgY + imgSize / 2, imgSize / 2, 0, 2 * Math.PI);
                 ctx.clip();
                 ctx.drawImage(deityImage, imgX, imgY, imgSize, imgSize);
                 ctx.restore();
-                
+
             } catch (error) {
                 console.warn('Deity image failed to load:', error);
                 // Fallback - draw a golden circle with ॐ symbol
                 const imgSize = 120;
                 const imgX = (canvas.width - imgSize) / 2;
                 const imgY = 100;
-                
+
                 ctx.fillStyle = '#D4AF37';
                 ctx.beginPath();
-                ctx.arc(imgX + imgSize/2, imgY + imgSize/2, imgSize/2, 0, 2 * Math.PI);
+                ctx.arc(imgX + imgSize / 2, imgY + imgSize / 2, imgSize / 2, 0, 2 * Math.PI);
                 ctx.fill();
-                
+
                 ctx.fillStyle = '#9A283D';
                 ctx.font = 'bold 40px serif';
                 ctx.textAlign = 'center';
-                ctx.fillText('ॐ', imgX + imgSize/2, imgY + imgSize/2 + 15);
+                ctx.fillText('ॐ', imgX + imgSize / 2, imgY + imgSize / 2 + 15);
             }
         }
-        
+
         // Katha title - positioned below deity image
         ctx.fillStyle = '#9A283D';
         ctx.font = 'bold 18px serif';
         ctx.textAlign = 'center';
         const titleY = 250;
-        
+
         // Main title with proper text wrapping
         const kathaName = detail.name?.hi || "व्रत कथा";
         ctx.fillText(kathaName, canvas.width / 2, titleY);
-        
+
         // English subtitle in parentheses (like reference image)
         const englishName = detail.name?.en || "Putarda Ekadashi";
         if (englishName) {
@@ -230,14 +230,14 @@ function VratKathaDetail() {
             ctx.font = '14px sans-serif';
             ctx.fillText(`(${englishName})`, canvas.width / 2, titleY + 25);
         }
-        
+
         // Timing information boxes - matching reference image layout
         if (detail.time?.start && detail.time?.end) {
             const timingY = titleY + 65;
             const boxWidth = 130;
             const boxHeight = 30;
             const boxSpacing = 20;
-            
+
             // Format times to match reference (12:22 PM format)
             const startTime = new Date(detail.time.start).toLocaleTimeString('en-US', {
                 hour: '2-digit',
@@ -249,48 +249,48 @@ function VratKathaDetail() {
                 minute: '2-digit',
                 hour12: true
             });
-            
+
             // Calculate positions for centered boxes
             const totalWidth = (boxWidth * 2) + boxSpacing;
             const startBoxX = (canvas.width - totalWidth) / 2;
             const endBoxX = startBoxX + boxWidth + boxSpacing;
-            
+
             // Start time box
             ctx.fillStyle = 'rgba(255,255,255,0.9)';
             ctx.fillRect(startBoxX, timingY - 15, boxWidth, boxHeight);
             ctx.strokeStyle = '#9A283D';
             ctx.lineWidth = 1;
             ctx.strokeRect(startBoxX, timingY - 15, boxWidth, boxHeight);
-            
+
             // End time box
             ctx.fillStyle = 'rgba(255,255,255,0.9)';
             ctx.fillRect(endBoxX, timingY - 15, boxWidth, boxHeight);
             ctx.strokeRect(endBoxX, timingY - 15, boxWidth, boxHeight);
-            
+
             // Time text
             ctx.fillStyle = '#9A283D';
             ctx.font = 'bold 11px sans-serif';
             ctx.textAlign = 'center';
-            ctx.fillText(`प्रारंभ: ${startTime}`, startBoxX + boxWidth/2, timingY - 5);
-            ctx.fillText(`समाप्त: ${endTime}`, endBoxX + boxWidth/2, timingY - 5);
+            ctx.fillText(`प्रारंभ: ${startTime}`, startBoxX + boxWidth / 2, timingY - 5);
+            ctx.fillText(`समाप्त: ${endTime}`, endBoxX + boxWidth / 2, timingY - 5);
         }
-        
+
         // "Click here to read" text - matching reference position
         ctx.fillStyle = '#6A1B9A';
         ctx.font = '14px sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText('Click here to read', canvas.width / 2, titleY + 120);
-        
+
         // Bottom branding section - matching reference image
         const brandingY = canvas.height - 120;
-        
+
         // Yellow background box for logo
         ctx.fillStyle = '#FFD65A';
         const logoBoxWidth = 80;
         const logoBoxHeight = 50;
         const logoBoxX = 50;
         const logoBoxY = brandingY;
-        
+
         // Rounded rectangle for logo background
         const borderRadius = 6;
         ctx.beginPath();
@@ -305,67 +305,67 @@ function VratKathaDetail() {
         ctx.quadraticCurveTo(logoBoxX, logoBoxY, logoBoxX + borderRadius, logoBoxY);
         ctx.closePath();
         ctx.fill();
-        
+
         // Logo text inside yellow box
         ctx.fillStyle = '#6d0019';
         ctx.font = 'bold 14px serif';
         ctx.textAlign = 'center';
         ctx.fillText('भक्ति', logoBoxX + (logoBoxWidth / 2), logoBoxY + 18);
         ctx.fillText('भाव', logoBoxX + (logoBoxWidth / 2), logoBoxY + 34);
-        
+
         // Branding text next to logo
         ctx.fillStyle = 'rgba(109, 0, 25, 0.9)';
         ctx.font = '12px sans-serif';
         ctx.textAlign = 'left';
         const textX = logoBoxX + logoBoxWidth + 15;
         ctx.fillText('Shared from', textX, brandingY + 15);
-        
+
         ctx.font = 'bold 12px sans-serif';
         ctx.fillText('Bhakti Bhav App', textX, brandingY + 30);
-        
+
         // App store buttons - positioned like in reference
         const buttonY = brandingY + 40;
         const buttonWidth = 50;
         const buttonHeight = 15;
-        
+
         // Google Play button
         ctx.fillStyle = '#000000';
         ctx.fillRect(textX, buttonY, buttonWidth, buttonHeight);
         ctx.fillStyle = '#FFFFFF';
         ctx.font = '7px sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText('Google Play', textX + buttonWidth/2, buttonY + 10);
-        
+        ctx.fillText('Google Play', textX + buttonWidth / 2, buttonY + 10);
+
         // App Store button
         ctx.fillStyle = '#000000';
         ctx.fillRect(textX + buttonWidth + 10, buttonY, buttonWidth, buttonHeight);
         ctx.fillStyle = '#FFFFFF';
-        ctx.fillText('App Store', textX + buttonWidth + 10 + buttonWidth/2, buttonY + 10);
-        
+        ctx.fillText('App Store', textX + buttonWidth + 10 + buttonWidth / 2, buttonY + 10);
+
         // Decorative border
         ctx.strokeStyle = '#E8D5B7';
         ctx.lineWidth = 2;
         ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
-        
+
         return canvas;
     };
-    
+
     const handleNativeShare = async () => {
         if (navigator.share) {
             try {
                 const canvas = await generateShareTemplate();
-                
+
                 // Convert canvas to blob
                 canvas.toBlob(async (blob) => {
                     if (navigator.canShare && navigator.canShare({ files: [] })) {
                         const file = new File([blob], 'bhakti-bhav-vrat-katha.png', { type: 'image/png' });
-                        
+
                         const shareData = {
                             title: detail.name?.hi || "व्रत कथा",
                             text: shareText,
                             files: [file]
                         };
-                        
+
                         if (navigator.canShare(shareData)) {
                             await navigator.share(shareData);
                         } else {
@@ -439,7 +439,7 @@ function VratKathaDetail() {
                 <div className="flex justify-center gap-4">
                     <div className="mt-4">
 
-                        <button className={`bg-[#9A283D] text-white px-6 py-2 rounded-full shadow flex items-center ${language === "hi" ? "font-hindi" : "font-eng"}`} onClick={generateShareTemplate}>
+                        <button className={`bg-[#9A283D] text-white px-6 py-2 rounded-full shadow flex items-center ${language === "hi" ? "font-hindi" : "font-eng"}`} onClick={() => { generateShareTemplate() }}>
                             <img src="../img/share_icon.png" alt="" className="w-[15px] h-[15px] mr-2" /> {language === "hi" ? jsonFile.share.hi : jsonFile.share.en}
                         </button>
                     </div>

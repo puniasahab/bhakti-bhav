@@ -82,58 +82,13 @@ function WallpaperDetail() {
         }, 100);
         
         console.log("Download completed successfully!");
-        // alert("Wallpaper downloaded successfully!");
         
       } else {
         throw new Error("Invalid API response or missing image URL");
       }
     } catch (err) {
       console.error("Download error details:", err);
-      console.error("Error stack:", err.stack);
-      
-      // Try alternative download method using the detail.imageUrl
-      try {
-        if (detail && detail.imageUrl) {
-          console.log("Trying alternative download method with detail.imageUrl:", detail.imageUrl);
-          
-          const response = await fetch(detail.imageUrl, {
-            method: 'GET',
-            headers: {
-              'Accept': 'image/*',
-            },
-          });
-          
-          if (response.ok) {
-            const blob = await response.blob();
-            if (blob && blob.size > 0) {
-              const downloadUrl = window.URL.createObjectURL(blob);
-              const link = document.createElement('a');
-              link.href = downloadUrl;
-              link.download = `bhakti-bhav-${detail.godName?.replace(/\s+/g, '-') || 'wallpaper'}-wallpaper.jpg`;
-              link.style.display = 'none';
-              
-              document.body.appendChild(link);
-              link.click();
-              document.body.removeChild(link);
-              
-              setTimeout(() => {
-                window.URL.revokeObjectURL(downloadUrl);
-              }, 100);
-              
-              console.log("Alternative download completed successfully!");
-              // alert("Wallpaper downloaded successfully!");
-              return;
-            }
-          }
-        }
-        
-        // If all download methods fail, show appropriate error
-        alert("Download failed. Please check your internet connection and try again.");
-        
-      } catch (fallbackErr) {
-        console.error("Alternative download also failed:", fallbackErr);
-        alert("Download failed. Please check your internet connection and try again.");
-      }
+      alert("Download failed. Please check your internet connection and try again.");
     }
   }
 

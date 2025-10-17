@@ -100,7 +100,7 @@ export default function PujaKareDetail() {
     diya.src = "/img/diya.gif";
     diya.className = "absolute animate-fade puja-ring";
     diya.style.left = "5%";
-    diya.style.top = "58%";
+    diya.style.top = "52%";
     diya.style.width = "80px";
     diya.style.zIndex = "50";
     container.appendChild(diya);
@@ -197,7 +197,7 @@ export default function PujaKareDetail() {
     nariyal.src = "/img/nariyal.png";
     nariyal.className = "absolute animate-fade puja-nariyal";
     nariyal.style.right = "5%";
-    nariyal.style.top = "55%";
+    nariyal.style.top = "50%";
     nariyal.style.width = "100px";
     nariyal.style.zIndex = "50";
     container.appendChild(nariyal);
@@ -212,7 +212,7 @@ export default function PujaKareDetail() {
     kalash.src = "/img/kalash.png";
     kalash.className = "absolute animate-fade puja-kalash";
     kalash.style.right = "36%";
-    kalash.style.top = "55%";
+    kalash.style.top = "45%";
     kalash.style.width = "125px";
     kalash.style.zIndex = "50";
     container.appendChild(kalash);
