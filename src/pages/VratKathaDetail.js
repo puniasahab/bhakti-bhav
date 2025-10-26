@@ -125,7 +125,7 @@ function VratKathaDetail() {
         ctx.fillStyle = bgGradient;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Load and draw the bell image
+        // Load and draw the bell image at top-left
         try {
             const bellImage = new Image();
             bellImage.crossOrigin = 'anonymous';
@@ -133,16 +133,16 @@ function VratKathaDetail() {
             await new Promise((resolve, reject) => {
                 bellImage.onload = resolve;
                 bellImage.onerror = reject;
-                bellImage.src = './img/bell_ring.png';
+                bellImage.src = './img/bell.png';
             });
 
-            const bellAreaWidth = canvas.width * 0.25;
-            const bellAreaHeight = 300 * (canvas.height / 700);
+            const bellAreaWidth = canvas.width * 0.19;
+            const bellAreaHeight = 240 * (canvas.height / 700);
 
             ctx.drawImage(
                 bellImage,
-                5,
-                5,
+                18, // x position
+                12, // y position
                 bellAreaWidth,
                 bellAreaHeight
             );
@@ -151,14 +151,14 @@ function VratKathaDetail() {
             console.warn('Bell image failed to load');
         }
 
-        // Logo "भक्ति भाव" at top center
+        // "भक्ति भाव" logo at top center
         ctx.fillStyle = '#9A283D';
         ctx.font = 'bold 24px serif';
         ctx.textAlign = 'center';
         const logoY = 60;
         ctx.fillText('भक्ति भाव', canvas.width / 2, logoY);
 
-        // Main deity image (if available) - positioned like in reference image
+        // Main deity image (if available) - circular with golden border
         if (detail.imageUrl) {
             try {
                 const deityImage = new Image();
@@ -167,27 +167,24 @@ function VratKathaDetail() {
                 await new Promise((resolve, reject) => {
                     deityImage.onload = resolve;
                     deityImage.onerror = reject;
-                    // Fix image URL - add base URL if needed
                     deityImage.src = detail.imageUrl.startsWith('http')
                         ? detail.imageUrl
                         : `https://api.bhaktibhav.app${detail.imageUrl}`;
                 });
 
-                // Draw deity image in center (circular like in reference)
+                // Draw deity image in center (circular like reference)
                 const imgSize = 120;
                 const imgX = (canvas.width - imgSize) / 2;
                 const imgY = 100;
 
-                // Create circular clip with golden border
-                ctx.save();
-
                 // Golden border
+                ctx.save();
                 ctx.fillStyle = '#D4AF37';
                 ctx.beginPath();
                 ctx.arc(imgX + imgSize / 2, imgY + imgSize / 2, (imgSize / 2) + 3, 0, 2 * Math.PI);
                 ctx.fill();
 
-                // Clip for image
+                // Clip for circular image
                 ctx.beginPath();
                 ctx.arc(imgX + imgSize / 2, imgY + imgSize / 2, imgSize / 2, 0, 2 * Math.PI);
                 ctx.clip();
@@ -196,7 +193,7 @@ function VratKathaDetail() {
 
             } catch (error) {
                 console.warn('Deity image failed to load:', error);
-                // Fallback - draw a golden circle with ॐ symbol
+                // Fallback - golden circle with ॐ
                 const imgSize = 120;
                 const imgX = (canvas.width - imgSize) / 2;
                 const imgY = 100;
@@ -213,32 +210,31 @@ function VratKathaDetail() {
             }
         }
 
-        // Katha title - positioned below deity image
+        // Katha title below deity image
         ctx.fillStyle = '#9A283D';
         ctx.font = 'bold 18px serif';
         ctx.textAlign = 'center';
         const titleY = 250;
 
-        // Main title with proper text wrapping
         const kathaName = detail.name?.hi || "व्रत कथा";
         ctx.fillText(kathaName, canvas.width / 2, titleY);
 
-        // English subtitle in parentheses (like reference image)
-        const englishName = detail.name?.en || "Putarda Ekadashi";
+        // English subtitle in parentheses
+        const englishName = detail.name?.en || "";
         if (englishName) {
             ctx.fillStyle = '#2C3E50';
             ctx.font = '14px sans-serif';
             ctx.fillText(`(${englishName})`, canvas.width / 2, titleY + 25);
         }
 
-        // Timing information boxes - matching reference image layout
+        // Timing information boxes
         if (detail.time?.start && detail.time?.end) {
             const timingY = titleY + 65;
             const boxWidth = 130;
             const boxHeight = 30;
             const boxSpacing = 20;
 
-            // Format times to match reference (12:22 PM format)
+            // Format times to 12-hour format
             const startTime = new Date(detail.time.start).toLocaleTimeString('en-US', {
                 hour: '2-digit',
                 minute: '2-digit',
@@ -275,13 +271,19 @@ function VratKathaDetail() {
             ctx.fillText(`समाप्त: ${endTime}`, endBoxX + boxWidth / 2, timingY - 5);
         }
 
-        // "Click here to read" text - matching reference position
+        // "Click here to read" text
         ctx.fillStyle = '#6A1B9A';
         ctx.font = '14px sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText('Click here to read', canvas.width / 2, titleY + 120);
 
-        // Bottom branding section - matching reference image
+        // Website URL below the template content
+        const currentUrl = window.location.href;
+        ctx.fillStyle = '#2C3E50';
+        ctx.font = '12px sans-serif';
+        ctx.fillText(currentUrl, canvas.width / 2, titleY + 140);
+
+        // Bottom branding section
         const brandingY = canvas.height - 120;
 
         // Yellow background box for logo
@@ -323,7 +325,7 @@ function VratKathaDetail() {
         ctx.font = 'bold 12px sans-serif';
         ctx.fillText('Bhakti Bhav App', textX, brandingY + 30);
 
-        // App store buttons - positioned like in reference
+        // App store buttons
         const buttonY = brandingY + 40;
         const buttonWidth = 50;
         const buttonHeight = 15;
@@ -354,10 +356,10 @@ function VratKathaDetail() {
         const kathaName = detail.name?.hi || detail.name?.en || "व्रत कथा";
         const currentUrl = window.location.href;
         
-        // Create share message matching the reference image format
-        const shareMessage = `🙏 ${kathaName} - Beautiful वत कथा from Bhakti Bhav! 🙏
+        // Create share message with website URL
+        const shareMessage = `🙏 ${kathaName} - Beautiful व्रत कथा from Bhakti Bhav! 🙏
 
-${currentUrl}
+📖 Read the complete कथा here: ${currentUrl}
 
 📱 Download Bhakti Bhav app from Play Store for more spiritual कथा, mantras, and devotional content!
 
