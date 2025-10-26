@@ -367,87 +367,49 @@ function VratKathaDetail() {
 
 🙏 Har Har Mahadev 🙏`;
 
-        // First try Web Share API with image
-        if (navigator.share && navigator.canShare) {
-            try {
-                const canvas = await generateShareTemplate();
-
-                canvas.toBlob(async (blob) => {
-                    try {
-                        // Try sharing with image file first
-                        if (navigator.canShare && navigator.canShare({ files: [] })) {
-                            const file = new File([blob], `${kathaName.replace(/\s+/g, '-')}-bhakti-bhav-katha.png`, { type: 'image/png' });
-
-                            const shareDataWithImage = {
+        try {
+            const canvas = await generateShareTemplate();
+            
+            // Convert canvas to blob and share directly
+            canvas.toBlob(async (blob) => {
+                if (navigator.share && navigator.canShare) {
+                    const file = new File([blob], `${kathaName.replace(/\s+/g, '-')}-bhakti-bhav-katha.png`, { type: 'image/png' });
+                    
+                    const shareData = {
+                        title: `🙏 ${kathaName} - व्रत कथा from Bhakti Bhav! 🙏`,
+                        text: shareMessage,
+                        files: [file]
+                    };
+                    
+                    if (navigator.canShare(shareData)) {
+                        try {
+                            await navigator.share(shareData);
+                        } catch (err) {
+                            console.error("Share failed:", err);
+                            // Fallback to text share
+                            await navigator.share({
                                 title: `🙏 ${kathaName} - व्रत कथा from Bhakti Bhav! 🙏`,
                                 text: shareMessage,
-                                files: [file]
-                            };
-
-                            if (navigator.canShare(shareDataWithImage)) {
-                                await navigator.share(shareDataWithImage);
-                                return;
-                            }
+                                url: currentUrl
+                            });
                         }
-
-                        // Fallback to text + URL sharing
+                    } else {
+                        // Fallback to text share
                         await navigator.share({
                             title: `🙏 ${kathaName} - व्रत कथा from Bhakti Bhav! 🙏`,
                             text: shareMessage,
                             url: currentUrl
                         });
-
-                    } catch (shareError) {
-                        console.log('Native share failed, trying WhatsApp direct');
-                        // Fallback to WhatsApp direct
-                        shareToWhatsApp(shareMessage);
                     }
-                }, 'image/png');
-
-            } catch (error) {
-                console.log('Canvas generation failed, using text share');
-                // Fallback to text share
-                try {
-                    await navigator.share({
-                        title: `🙏 ${kathaName} - व्रत कथा from Bhakti Bhav! 🙏`,
-                        text: shareMessage,
-                        url: currentUrl
-                    });
-                } catch (textShareError) {
-                    shareToWhatsApp(shareMessage);
+                } else {
+                    alert("Sharing is not supported on this browser.");
                 }
-            }
-        } else {
-            // Browser doesn't support Web Share API, use WhatsApp direct
-            shareToWhatsApp(shareMessage);
+            }, 'image/png');
+        } catch (err) {
+            console.error("Share failed:", err);
+            alert("Share failed. Please try again.");
         }
     };
-
-    const shareToWhatsApp = (message) => {
-        const whatsappMessage = encodeURIComponent(message);
-        const whatsappWebUrl = `https://wa.me/?text=${whatsappMessage}`;
-        const whatsappAppUrl = `whatsapp://send?text=${whatsappMessage}`;
-
-        // Try WhatsApp app first, then web version
-        try {
-            if (/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-                window.location.href = whatsappAppUrl;
-                setTimeout(() => {
-                    window.open(whatsappWebUrl, '_blank');
-                }, 1000);
-            } else {
-                window.open(whatsappWebUrl, '_blank');
-            }
-        } catch (error) {
-            // Final fallback - copy to clipboard
-            navigator.clipboard.writeText(message).then(() => {
-                alert('Share message copied to clipboard!');
-            }).catch(() => {
-                alert('Please share manually: ' + message);
-            });
-        }
-    };
-
 
     // useEffect(() => {
     //     if (audioRef.current) {
