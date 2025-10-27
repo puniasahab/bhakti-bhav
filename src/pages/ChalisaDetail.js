@@ -489,7 +489,7 @@ export default function ChalisaDetail() {
           </div>
         </div>
 
-        <div className={`theme_text text-center text-base leading-loose ${fontSize} ${language === "hi" ? "font-hindi" : "font-eng"}`}>
+        <div className={`theme_text text-center leading-loose ${fontSize} ${language === "hi" ? "font-hindi" : "font-eng"}`}>
           {language === "hi"
             ?
             <div dangerouslySetInnerHTML={{ __html: chalisa.text.hi.replace(/,/g, "]").replace(/\(/g, "¼").replace(/\)/g, "½").replace(/\:/g, "%") }} />

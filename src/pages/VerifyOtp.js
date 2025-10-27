@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { data, useLocation, useNavigate } from "react-router-dom";
 import { getMobileNoFromLS, setTokenInLS } from "../commonFunctions";
 import { loginApis } from "../api";
 
@@ -84,14 +84,20 @@ function VerifyOtp() {
             });
 
             const data = await res.json();
-            console.log("data", data)
+            console.log("data", data);
+            
+            if (res.status === 400) {
+                alert(data.message || "OTP verification failed");
+                return;
+            }
+            
             if (data && data?.token?.length > 0) {
                 setTokenInLS(data.token);
                 navigate("/"); // redirect to home/dashboard
             }
         } catch (error) {
             console.error("Verify API Error:", error);
-            // alert("Something went wrong!");
+            alert("Network error occurred. Please try again.");
         } finally {
             setLoading(false);
         }
