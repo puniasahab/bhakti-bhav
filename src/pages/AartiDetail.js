@@ -100,7 +100,7 @@ function AartiDetail() {
       await new Promise((resolve, reject) => {
         bellImage.onload = resolve;
         bellImage.onerror = reject;
-        bellImage.src = './img/bell_ring.png'; // Main bell image path
+        bellImage.src = '../img/bell_ring.png'; // Main bell image path
       });
       
       // Bell positioning to match reference image exactly
@@ -126,7 +126,7 @@ function AartiDetail() {
         await new Promise((resolve, reject) => {
           bellImageAlt.onload = resolve;
           bellImageAlt.onerror = reject;
-          bellImageAlt.src = './img/bell_ring.png'; // Alternative path
+          bellImageAlt.src = '../img/bell_ring.png'; // Alternative path
         });
         
         const bellAreaWidth = canvas.width * 0.25;

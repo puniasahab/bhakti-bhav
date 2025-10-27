@@ -136,7 +136,7 @@ function VratKathaDetail() {
                     resolve();
                 };
                 bellImage.onerror = reject;
-                bellImage.src = '/img/bell_ring.png'; // Try absolute path first
+                bellImage.src = '../img/bell_ring.png'; // Try absolute path first
             });
 
             // Bell positioning to match reference image exactly
@@ -166,7 +166,7 @@ function VratKathaDetail() {
                         resolve();
                     };
                     bellImageAlt.onerror = reject;
-                    bellImageAlt.src = './img/bell_ring.png'; // Relative path
+                    bellImageAlt.src = '../img/bell_ring.png'; // Relative path
                 });
 
                 const bellAreaWidth = canvas.width * 0.25;

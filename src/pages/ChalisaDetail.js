@@ -108,7 +108,7 @@ export default function ChalisaDetail() {
           resolve();
         };
         bellImage.onerror = reject;
-        bellImage.src = "./img/bell_ring.png"; // Primary absolute path
+        bellImage.src = "../img/bell_ring.png"; // Primary absolute path
       });
 
       console.log('Bell image drawn successfully', bellImage);
@@ -139,7 +139,7 @@ export default function ChalisaDetail() {
             resolve();
           };
           bellImageAlt.onerror = reject;
-          bellImageAlt.src = './img/bell_ring.png'; // Secondary relative path
+          bellImageAlt.src = '../img/bell_ring.png'; // Secondary relative path
         });
         
         console.log('Alternative bell image drawn successfully', bellImageAlt);
@@ -489,6 +489,7 @@ export default function ChalisaDetail() {
           </div>
         </div>
 
+        
         <div className={`theme_text text-center leading-loose ${fontSize} ${language === "hi" ? "font-hindi" : "font-eng"}`}>
           {language === "hi"
             ?
