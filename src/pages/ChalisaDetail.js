@@ -352,17 +352,7 @@ export default function ChalisaDetail() {
     ctx.lineWidth = 2;
     ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
     // Website link text
-    ctx.fillStyle = '#2C3E50';
-    ctx.font = '11px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText(window.location.href, canvas.width / 2, canvas.height - 35);
-
-    // App download link text
-    ctx.fillStyle = '#9A283D';
-    ctx.font = 'bold 11px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('Get App: play.google.com/store/apps/details?id=com.bhakti_bhav', canvas.width / 2, canvas.height - 20);
-
+   
     return canvas;
   };
 
@@ -377,7 +367,7 @@ export default function ChalisaDetail() {
 📖 Read the complete चालीसा here:
 ${currentUrl}
 
-📱 Download Bhakti Bhav app from Play Store:
+📱 Download Bhakti Bhav app from Google Play Store:
 ${playStoreUrl}
 
 🙏 Har Har Mahadev 🙏`;
@@ -390,31 +380,83 @@ ${playStoreUrl}
         if (navigator.share && navigator.canShare) {
           const file = new File([blob], `${chalisaName.replace(/\s+/g, '-')}-bhakti-bhav-chalisa.png`, { type: 'image/png' });
 
+          // Try sharing with both image and text
           const shareData = {
             title: `🙏 ${chalisaName} - चालीसा from Bhakti Bhav! 🙏`,
             text: shareMessage,
             files: [file]
           };
 
+          // Check if we can share files with text
           if (navigator.canShare(shareData)) {
             try {
               await navigator.share(shareData);
+              console.log("Shared successfully via native share with image and text");
             } catch (err) {
-              console.error("Share failed:", err);
-              // Fallback to text share
-              await navigator.share({
-                title: `🙏 ${chalisaName} - चालीसा from Bhakti Bhav! 🙏`,
-                text: shareMessage,
-                url: currentUrl
-              });
+              console.error("Share with image failed:", err);
+              // If sharing with files fails, try sharing image and text separately
+              try {
+                // First share the image
+                const imageShareData = {
+                  title: `🙏 ${chalisaName} - चालीसा from Bhakti Bhav! 🙏`,
+                  files: [file]
+                };
+                await navigator.share(imageShareData);
+                
+                // Then share the text with links
+                setTimeout(async () => {
+                  await navigator.share({
+                    title: `🙏 ${chalisaName} - चालीसा from Bhakti Bhav! 🙏`,
+                    text: shareMessage
+                  });
+                }, 1000);
+              } catch (secondErr) {
+                console.error("Sequential share failed:", secondErr);
+                // Final fallback to text only
+                await navigator.share({
+                  title: `🙏 ${chalisaName} - चालीसा from Bhakti Bhav! 🙏`,
+                  text: shareMessage
+                });
+              }
             }
           } else {
-            // Fallback to text share
-            await navigator.share({
-              title: `🙏 ${chalisaName} - चालीसा from Bhakti Bhav! 🙏`,
-              text: shareMessage,
-              url: currentUrl
-            });
+            console.log("Cannot share files with text, trying alternative approach");
+            // If can't share files with text, try image first then text
+            try {
+              // Share image first
+              const imageShareData = {
+                title: `🙏 ${chalisaName} - चालीसा Image`,
+                files: [file]
+              };
+              if (navigator.canShare(imageShareData)) {
+                await navigator.share(imageShareData);
+                
+                // Then immediately share text with links
+                setTimeout(async () => {
+                  try {
+                    await navigator.share({
+                      title: `🙏 ${chalisaName} - चालीसा from Bhakti Bhav! 🙏`,
+                      text: shareMessage
+                    });
+                  } catch (textErr) {
+                    console.error("Text share failed:", textErr);
+                  }
+                }, 500);
+              } else {
+                // If can't share files at all, just share text with links
+                await navigator.share({
+                  title: `🙏 ${chalisaName} - चालीसा from Bhakti Bhav! 🙏`,
+                  text: shareMessage
+                });
+              }
+            } catch (altErr) {
+              console.error("Alternative share approach failed:", altErr);
+              // Final fallback - text only
+              await navigator.share({
+                title: `🙏 ${chalisaName} - चालीसा from Bhakti Bhav! 🙏`,
+                text: shareMessage
+              });
+            }
           }
         } else {
           // For browsers that don't support native sharing, copy to clipboard
