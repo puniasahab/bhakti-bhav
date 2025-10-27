@@ -375,93 +375,88 @@ ${playStoreUrl}
     try {
       const canvas = await generateShareTemplate();
 
-      // Convert canvas to blob for sharing
+      // Convert canvas to blob and share directly with text below
       canvas.toBlob(async (blob) => {
-        if (navigator.share) {
+        if (navigator.share && navigator.canShare) {
           const file = new File([blob], `${chalisaName.replace(/\s+/g, '-')}-bhakti-bhav-chalisa.png`, { type: 'image/png' });
 
-          // Always share image and text together - no checks, no fallbacks
+          // Try sharing with both image and text
           const shareData = {
             title: `🙏 ${chalisaName} - चालीसा from Bhakti Bhav! 🙏`,
             text: shareMessage,
             files: [file]
           };
 
+          // Sequential sharing: Image first, then text after 500ms
           try {
-            await navigator.share(shareData);
-            console.log("Successfully shared image with text content below");
-          } catch (err) {
-            console.log("Native share failed, trying alternative approach:", err);
-            
-            // Alternative: Share as data URL with text (works on more platforms)
-            const dataUrl = canvas.toDataURL('image/png');
-            const shareDataUrl = {
-              title: `🙏 ${chalisaName} - चालीसा from Bhakti Bhav! 🙏`,
-              text: `${shareMessage}\n\n[Image: ${dataUrl}]`,
-              url: currentUrl
+            // First: Share the image
+            const imageOnlyData = {
+              title: `🙏 ${chalisaName} - चालीसा Image`,
+              files: [file]
             };
             
+            await navigator.share(imageOnlyData);
+            console.log("Image shared successfully");
+            
+            // Second: Share the text after 500ms delay
+            setTimeout(async () => {
+              try {
+                const textOnlyData = {
+                  title: `🙏 ${chalisaName} - चालीसा Links & Info`,
+                  text: shareMessage
+                };
+                await navigator.share(textOnlyData);
+                console.log("Text content shared successfully after image");
+              } catch (textErr) {
+                console.error("Text share failed:", textErr);
+                console.log("Text that would have been shared:", shareMessage);
+              }
+            }, 500);
+            
+          } catch (imageErr) {
+            console.error("Image share failed, trying combined approach:", imageErr);
+            
+            // Fallback: Try combined sharing if sequential fails
             try {
-              await navigator.share(shareDataUrl);
-              console.log("Successfully shared with data URL and text");
-            } catch (urlErr) {
-              console.log("Data URL share failed, forcing text with URL:", urlErr);
+              await navigator.share(shareData);
+              console.log("Combined share succeeded as fallback");
+            } catch (combinedErr) {
+              console.error("Combined share also failed:", combinedErr);
               
-              // Force share text with image download link
-              await navigator.share({
-                title: `🙏 ${chalisaName} - चालीसा from Bhakti Bhav! 🙏`,
-                text: shareMessage,
-                url: currentUrl
-              });
-              
-              // Trigger image download simultaneously
-              const link = document.createElement('a');
-              link.download = `${chalisaName.replace(/\s+/g, '-')}-bhakti-bhav-chalisa.png`;
-              link.href = dataUrl;
-              link.click();
-              
-              console.log("Shared text with URL and downloaded image");
+              // Final fallback: Text only
+              try {
+                await navigator.share({
+                  title: `🙏 ${chalisaName} - चालीसा from Bhakti Bhav! 🙏`,
+                  text: shareMessage
+                });
+                console.log("Text-only share succeeded as final fallback");
+              } catch (textOnlyErr) {
+                console.error("All sharing methods failed:", textOnlyErr);
+              }
             }
           }
-
         } else {
-          // For browsers without Web Share API - use data URLs
-          console.log("Web Share API not supported, using data URL approach");
+          // For browsers that don't support native sharing
+          console.log("Native sharing not supported");
           
-          const dataUrl = canvas.toDataURL('image/png');
+          // Create a download link for the image
+          const link = document.createElement('a');
+          link.download = `${chalisaName.replace(/\s+/g, '-')}-bhakti-bhav-chalisa.png`;
+          link.href = canvas.toDataURL();
+          link.click();
           
-          // Create a shareable link with both image and text
-          const shareableContent = `${shareMessage}\n\nImage: ${dataUrl}`;
-          
-          // Try to use any available sharing mechanism
-          if (window.AndroidInterface && window.AndroidInterface.shareContent) {
-            // Android WebView sharing
-            window.AndroidInterface.shareContent(shareableContent);
-          } else if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.share) {
-            // iOS WebView sharing
-            window.webkit.messageHandlers.share.postMessage({
-              text: shareMessage,
-              image: dataUrl
-            });
-          } else {
-            // Fallback: Create mailto link with image as attachment
-            const mailtoLink = `mailto:?subject=${encodeURIComponent(`🙏 ${chalisaName} - चालीसा from Bhakti Bhav! 🙏`)}&body=${encodeURIComponent(shareMessage)}`;
-            
-            // Open email client
-            window.open(mailtoLink);
-            
-            // Also download the image
-            const link = document.createElement('a');
-            link.download = `${chalisaName.replace(/\s+/g, '-')}-bhakti-bhav-chalisa.png`;
-            link.href = dataUrl;
-            link.click();
-            
-            console.log("Opened email client with text and downloaded image");
+          // Copy text content to clipboard and show to user
+          try {
+            await navigator.clipboard.writeText(shareMessage);
+            alert(`Image downloaded! Text content copied to clipboard:\n\n${shareMessage}\n\nYou can now paste this text when sharing the image manually.`);
+          } catch (clipErr) {
+            // If clipboard fails, show text for manual copying
+            alert(`Image downloaded! Please copy this text to share along with the image:\n\n${shareMessage}`);
           }
         }
       }, 'image/png');
     } catch (err) {
-      console.error("Share generation failed:", err);
+      console.error("Share failed:", err);
       alert("Share failed. Please try again.");
     }
   };
