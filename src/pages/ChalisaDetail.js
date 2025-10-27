@@ -360,173 +360,60 @@ export default function ChalisaDetail() {
     const currentUrl = window.location.href;
     const playStoreUrl = 'https://play.google.com/store/apps/details?id=com.bhakti_bhav';
     
-    // Create share message with website URL and download link
+    // Create share message with website URL and download link that appears below the image
     const shareMessage = `🙏 ${chalisaName} - Beautiful चालीसा from Bhakti Bhav! 🙏
 
-📖 Read the complete चालीसा here: ${currentUrl}
+📖 Read the complete चालीसा here:
+${currentUrl}
 
-📱 Download Bhakti Bhav app from Play Store for more spiritual चालीसा, mantras, and devotional content!
-
-🔗 ${playStoreUrl}
+📱 Download Bhakti Bhav app from Play Store:
+${playStoreUrl}
 
 🙏 Har Har Mahadev 🙏`;
 
     try {
       const canvas = await generateShareTemplate();
       
-      // Create a modal or display div to show the image with clickable links
-      const modalDiv = document.createElement('div');
-      modalDiv.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.8);
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        z-index: 9999;
-        padding: 20px;
-        box-sizing: border-box;
-      `;
-      
-      // Create container for image and links
-      const contentDiv = document.createElement('div');
-      contentDiv.style.cssText = `
-        background: white;
-        border-radius: 15px;
-        padding: 20px;
-        max-width: 90%;
-        max-height: 90%;
-        overflow-y: auto;
-        text-align: center;
-      `;
-      
-      // Add canvas image
-      const img = document.createElement('img');
-      img.src = canvas.toDataURL();
-      img.style.cssText = `
-        max-width: 100%;
-        height: auto;
-        border-radius: 10px;
-        margin-bottom: 20px;
-      `;
-      
-      // Create links section
-      const linksDiv = document.createElement('div');
-      linksDiv.style.cssText = `
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-        margin-top: 15px;
-      `;
-      
-      // Read on website link
-      const websiteDiv = document.createElement('div');
-      websiteDiv.innerHTML = `
-        <p style="margin: 0 0 5px 0; font-weight: bold; color: #2C3E50;">📖 Read on website:</p>
-        <a href="${currentUrl}" target="_blank" style="color: #0066CC; text-decoration: none; word-break: break-all; font-size: 14px;">${currentUrl}</a>
-      `;
-      
-      // Download app link
-      const downloadDiv = document.createElement('div');
-      downloadDiv.innerHTML = `
-        <p style="margin: 0 0 5px 0; font-weight: bold; color: #2C3E50;">📱 Download App:</p>
-        <a href="${playStoreUrl}" target="_blank" style="color: #0066CC; text-decoration: none; word-break: break-all; font-size: 14px;">${playStoreUrl}</a>
-      `;
-      
-      // Close button
-      const closeBtn = document.createElement('button');
-      closeBtn.textContent = '✕ Close';
-      closeBtn.style.cssText = `
-        background: #9A283D;
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 25px;
-        cursor: pointer;
-        margin-top: 15px;
-        font-size: 14px;
-      `;
-      closeBtn.onclick = () => document.body.removeChild(modalDiv);
-      
-      // Share button for native sharing
-      const shareBtn = document.createElement('button');
-      shareBtn.textContent = '📤 Share Image';
-      shareBtn.style.cssText = `
-        background: #4CAF50;
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 25px;
-        cursor: pointer;
-        margin: 15px 10px 0 10px;
-        font-size: 14px;
-      `;
-      
-      shareBtn.onclick = async () => {
-        // Try native sharing with image
-        canvas.toBlob(async (blob) => {
-          if (navigator.share && navigator.canShare) {
-            const file = new File([blob], `${chalisaName.replace(/\s+/g, '-')}-bhakti-bhav-chalisa.png`, { type: 'image/png' });
-            
-            const shareData = {
-              title: `🙏 ${chalisaName} - चालीसा from Bhakti Bhav! 🙏`,
-              text: shareMessage,
-              files: [file]
-            };
-            
-            if (navigator.canShare(shareData)) {
-              try {
-                await navigator.share(shareData);
-                document.body.removeChild(modalDiv);
-              } catch (err) {
-                console.error("Share failed:", err);
-                // Fallback to text share
-                await navigator.share({
-                  title: `🙏 ${chalisaName} - चालीसा from Bhakti Bhav! 🙏`,
-                  text: shareMessage,
-                  url: currentUrl
-                });
-                document.body.removeChild(modalDiv);
-              }
-            } else {
+      // Convert canvas to blob and share directly with text below
+      canvas.toBlob(async (blob) => {
+        if (navigator.share && navigator.canShare) {
+          const file = new File([blob], `${chalisaName.replace(/\s+/g, '-')}-bhakti-bhav-chalisa.png`, { type: 'image/png' });
+          
+          const shareData = {
+            title: `🙏 ${chalisaName} - चालीसा from Bhakti Bhav! 🙏`,
+            text: shareMessage,
+            files: [file]
+          };
+          
+          if (navigator.canShare(shareData)) {
+            try {
+              await navigator.share(shareData);
+            } catch (err) {
+              console.error("Share failed:", err);
               // Fallback to text share
               await navigator.share({
                 title: `🙏 ${chalisaName} - चालीसा from Bhakti Bhav! 🙏`,
                 text: shareMessage,
                 url: currentUrl
               });
-              document.body.removeChild(modalDiv);
             }
           } else {
-            alert("Sharing is not supported on this browser.");
+            // Fallback to text share
+            await navigator.share({
+              title: `🙏 ${chalisaName} - चालीसा from Bhakti Bhav! 🙏`,
+              text: shareMessage,
+              url: currentUrl
+            });
           }
-        }, 'image/png');
-      };
-      
-      // Assemble the modal
-      linksDiv.appendChild(websiteDiv);
-      linksDiv.appendChild(downloadDiv);
-      
-      contentDiv.appendChild(img);
-      contentDiv.appendChild(linksDiv);
-      contentDiv.appendChild(shareBtn);
-      contentDiv.appendChild(closeBtn);
-      
-      modalDiv.appendChild(contentDiv);
-      
-      // Close modal when clicking outside
-      modalDiv.onclick = (e) => {
-        if (e.target === modalDiv) {
-          document.body.removeChild(modalDiv);
+        } else {
+          // For browsers that don't support native sharing, copy to clipboard
+          navigator.clipboard.writeText(shareMessage).then(() => {
+            alert("Share content copied to clipboard!");
+          }).catch(() => {
+            alert("Sharing is not supported on this browser.");
+          });
         }
-      };
-      
-      document.body.appendChild(modalDiv);
-      
+      }, 'image/png');
     } catch (err) {
       console.error("Share failed:", err);
       alert("Share failed. Please try again.");
