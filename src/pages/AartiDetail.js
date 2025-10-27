@@ -46,7 +46,7 @@ function AartiDetail() {
       pause();
     } else {
       // Store aarti name for the global player
-      localStorage.setItem('currentTrackName', detail.name?.hi || detail.name?.en || 'आरती');
+      localStorage.setItem('currentTrackName', `${detail.name?.hi || detail.name?.en} आरती`);
       play(url);
     }
   };
@@ -100,7 +100,7 @@ function AartiDetail() {
       await new Promise((resolve, reject) => {
         bellImage.onload = resolve;
         bellImage.onerror = reject;
-        bellImage.src = './img/bell.png'; // Main bell image path
+        bellImage.src = './img/bell_ring.png'; // Main bell image path
       });
       
       // Bell positioning to match reference image exactly

@@ -65,7 +65,7 @@ function VratKathaDetail() {
             pause();
         } else {
             // Store katha name for the global player
-            localStorage.setItem('currentTrackName', detail.name?.hi || detail.name?.en || 'कथा');
+            localStorage.setItem('currentTrackName', `${detail.name?.hi || detail.name?.en} कथा`);
             play(url);
         }
     };
@@ -133,7 +133,7 @@ function VratKathaDetail() {
             await new Promise((resolve, reject) => {
                 bellImage.onload = resolve;
                 bellImage.onerror = reject;
-                bellImage.src = './img/bell.png'; // Main bell image path
+                bellImage.src = './img/bell_ring.png'; // Main bell image path
             });
 
             // Bell positioning to match reference image exactly

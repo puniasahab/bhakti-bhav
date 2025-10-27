@@ -41,7 +41,8 @@ export default function MantraDetail() {
     
     // Play the new audio using global audio context
     play(url);
-    
+    localStorage.setItem('currentTrackName', `${detail.name?.hi} मंत्र`);
+
     // Set loop state if enabled for this mantra
     if (audioRef.current && loopStates[mantraId]) {
       audioRef.current.loop = true;

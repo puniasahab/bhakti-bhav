@@ -49,7 +49,7 @@ export default function ChalisaDetail() {
       pause();
     } else {
       // Store chalisa name in localStorage or you could modify the AudioContext to accept metadata
-      localStorage.setItem('currentTrackName', chalisa.name?.hi || chalisa.name?.en || 'चालीसा');
+      localStorage.setItem('currentTrackName', `${chalisa.name?.hi || chalisa.name?.en}`);
       play(url);
     }
   };
@@ -105,7 +105,7 @@ export default function ChalisaDetail() {
       await new Promise((resolve, reject) => {
         bellImage.onload = resolve;
         bellImage.onerror = reject;
-        bellImage.src = './img/bell.png'; // Main bell image path
+        bellImage.src = './img/bell_ring.png'; // Main bell image path
       });
       
       // Bell positioning to match reference image exactly
