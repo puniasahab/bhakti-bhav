@@ -131,9 +131,12 @@ function VratKathaDetail() {
             bellImage.crossOrigin = 'anonymous';
 
             await new Promise((resolve, reject) => {
-                bellImage.onload = resolve;
+                bellImage.onload = () => {
+                    console.log('Bell image loaded successfully from main path');
+                    resolve();
+                };
                 bellImage.onerror = reject;
-                bellImage.src = './img/bell_ring.png'; // Main bell image path
+                bellImage.src = '/img/bell_ring.png'; // Try absolute path first
             });
 
             // Bell positioning to match reference image exactly
@@ -147,9 +150,10 @@ function VratKathaDetail() {
                 bellAreaWidth,
                 bellAreaHeight
             );
+            console.log('Bell image drawn successfully', bellImage);
 
         } catch (error) {
-            console.warn('Bell image failed to load, trying alternative paths');
+            console.warn('Bell image failed to load from main path, trying alternative paths');
             
             // Try alternative bell image paths
             try {
@@ -157,43 +161,73 @@ function VratKathaDetail() {
                 bellImageAlt.crossOrigin = 'anonymous';
                 
                 await new Promise((resolve, reject) => {
-                    bellImageAlt.onload = resolve;
+                    bellImageAlt.onload = () => {
+                        console.log('Bell image loaded successfully from alternative path');
+                        resolve();
+                    };
                     bellImageAlt.onerror = reject;
-                    bellImageAlt.src = './img/bell_ring.png'; // Alternative path
+                    bellImageAlt.src = './img/bell_ring.png'; // Relative path
                 });
-                
+
                 const bellAreaWidth = canvas.width * 0.25;
                 const bellAreaHeight = 180;
                 
                 ctx.drawImage(bellImageAlt, 10, 8, bellAreaWidth, bellAreaHeight);
+                console.log('Alternative bell image drawn successfully', bellImageAlt);
                 
             } catch (altError) {
-                console.warn('Alternative bell image also failed, drawing fallback');
+                console.warn('Alternative bell image also failed, trying bell_ring.png');
                 
-                // Fallback: Draw a simple bell shape
-                ctx.fillStyle = '#D4AF37'; // Golden color
-                const bellX = 35;
-                const bellY = 50;
-                const bellSize = 20;
-                
-                // Simple bell shape
-                ctx.beginPath();
-                ctx.arc(bellX, bellY, bellSize, Math.PI, 0, false);
-                ctx.fill();
-                
-                ctx.beginPath();
-                ctx.moveTo(bellX - bellSize, bellY);
-                ctx.lineTo(bellX - bellSize - 5, bellY + 30);
-                ctx.lineTo(bellX + bellSize + 5, bellY + 30);
-                ctx.lineTo(bellX + bellSize, bellY);
-                ctx.closePath();
-                ctx.fill();
-                
-                // Bell clapper
-                ctx.fillStyle = '#8B4513';
-                ctx.beginPath();
-                ctx.arc(bellX, bellY + 25, 3, 0, 2 * Math.PI);
-                ctx.fill();
+                // Try bell_ring.png as third option
+                try {
+                    const bellImageRing = new Image();
+                    bellImageRing.crossOrigin = 'anonymous';
+                    
+                    await new Promise((resolve, reject) => {
+                        bellImageRing.onload = () => {
+                            console.log('Bell ring image loaded successfully');
+                            resolve();
+                        };
+                        bellImageRing.onerror = reject;
+                        bellImageRing.src = '/img/bell_ring.png'; // Alternative bell image
+                    });
+                    
+                    const bellAreaWidth = canvas.width * 0.25;
+                    const bellAreaHeight = 180;
+                    
+                    ctx.drawImage(bellImageRing, 10, 8, bellAreaWidth, bellAreaHeight);
+                    console.log('Bell ring image drawn successfully', bellImageRing);
+                    
+                } catch (ringError) {
+                    console.warn('All bell images failed to load, drawing fallback bell shape');
+                    
+                    // Fallback: Draw a simple bell shape
+                    ctx.fillStyle = '#D4AF37'; // Golden color
+                    const bellX = 35;
+                    const bellY = 50;
+                    const bellSize = 20;
+                    
+                    // Simple bell shape
+                    ctx.beginPath();
+                    ctx.arc(bellX, bellY, bellSize, Math.PI, 0, false);
+                    ctx.fill();
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(bellX - bellSize, bellY);
+                    ctx.lineTo(bellX - bellSize - 5, bellY + 30);
+                    ctx.lineTo(bellX + bellSize + 5, bellY + 30);
+                    ctx.lineTo(bellX + bellSize, bellY);
+                    ctx.closePath();
+                    ctx.fill();
+                    
+                    // Bell clapper
+                    ctx.fillStyle = '#8B4513';
+                    ctx.beginPath();
+                    ctx.arc(bellX, bellY + 25, 3, 0, 2 * Math.PI);
+                    ctx.fill();
+                    
+                    console.log('Fallback bell shape drawn successfully');
+                }
             }
         }
 
