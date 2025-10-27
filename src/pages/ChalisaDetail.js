@@ -103,10 +103,15 @@ export default function ChalisaDetail() {
       bellImage.crossOrigin = 'anonymous';
       
       await new Promise((resolve, reject) => {
-        bellImage.onload = resolve;
+        bellImage.onload = () => {
+          console.log('Bell image loaded successfully from main path');
+          resolve();
+        };
         bellImage.onerror = reject;
-        bellImage.src = './img/bell_ring.png'; // Main bell image path
+        bellImage.src = "./img/bell_ring.png"; // Primary absolute path
       });
+
+      console.log('Bell image drawn successfully', bellImage);
       
       // Bell positioning to match reference image exactly
       const bellAreaWidth = canvas.width * 0.25; // 25% width for proper proportion
@@ -121,7 +126,7 @@ export default function ChalisaDetail() {
       );
       
     } catch (error) {
-      console.warn('Bell image failed to load, trying alternative paths');
+      console.warn('Primary bell image failed to load, trying alternative paths');
       
       // Try alternative bell image paths
       try {
@@ -129,43 +134,73 @@ export default function ChalisaDetail() {
         bellImageAlt.crossOrigin = 'anonymous';
         
         await new Promise((resolve, reject) => {
-          bellImageAlt.onload = resolve;
+          bellImageAlt.onload = () => {
+            console.log('Alternative bell image loaded successfully from secondary path');
+            resolve();
+          };
           bellImageAlt.onerror = reject;
-          bellImageAlt.src = './img/bell_ring.png'; // Alternative path
+          bellImageAlt.src = './img/bell_ring.png'; // Secondary relative path
         });
         
+        console.log('Alternative bell image drawn successfully', bellImageAlt);
         const bellAreaWidth = canvas.width * 0.25;
         const bellAreaHeight = 180;
         
         ctx.drawImage(bellImageAlt, 10, 8, bellAreaWidth, bellAreaHeight);
         
       } catch (altError) {
-        console.warn('Alternative bell image also failed, drawing fallback');
+        console.warn('Secondary bell image also failed, trying tertiary path');
         
-        // Fallback: Draw a simple bell shape
-        ctx.fillStyle = '#D4AF37'; // Golden color
-        const bellX = 35;
-        const bellY = 50;
-        const bellSize = 20;
-        
-        // Simple bell shape
-        ctx.beginPath();
-        ctx.arc(bellX, bellY, bellSize, Math.PI, 0, false);
-        ctx.fill();
-        
-        ctx.beginPath();
-        ctx.moveTo(bellX - bellSize, bellY);
-        ctx.lineTo(bellX - bellSize - 5, bellY + 30);
-        ctx.lineTo(bellX + bellSize + 5, bellY + 30);
-        ctx.lineTo(bellX + bellSize, bellY);
-        ctx.closePath();
-        ctx.fill();
-        
-        // Bell clapper
-        ctx.fillStyle = '#8B4513';
-        ctx.beginPath();
-        ctx.arc(bellX, bellY + 25, 3, 0, 2 * Math.PI);
-        ctx.fill();
+        // Try tertiary bell image path
+        try {
+          const bellImageTertiary = new Image();
+          bellImageTertiary.crossOrigin = 'anonymous';
+          
+          await new Promise((resolve, reject) => {
+            bellImageTertiary.onload = () => {
+              console.log('Tertiary bell image loaded successfully from bell_ring path');
+              resolve();
+            };
+            bellImageTertiary.onerror = reject;
+            bellImageTertiary.src = '/img/bell_ring.png'; // Tertiary path with bell_ring
+          });
+          
+          console.log('Tertiary bell image drawn successfully', bellImageTertiary);
+          const bellAreaWidth = canvas.width * 0.25;
+          const bellAreaHeight = 180;
+          
+          ctx.drawImage(bellImageTertiary, 10, 8, bellAreaWidth, bellAreaHeight);
+          
+        } catch (tertiaryError) {
+          console.warn('All bell image paths failed, drawing fallback shape');
+          
+          // Fallback: Draw a simple bell shape
+          ctx.fillStyle = '#D4AF37'; // Golden color
+          const bellX = 35;
+          const bellY = 50;
+          const bellSize = 20;
+          
+          // Simple bell shape
+          ctx.beginPath();
+          ctx.arc(bellX, bellY, bellSize, Math.PI, 0, false);
+          ctx.fill();
+          
+          ctx.beginPath();
+          ctx.moveTo(bellX - bellSize, bellY);
+          ctx.lineTo(bellX - bellSize - 5, bellY + 30);
+          ctx.lineTo(bellX + bellSize + 5, bellY + 30);
+          ctx.lineTo(bellX + bellSize, bellY);
+          ctx.closePath();
+          ctx.fill();
+          
+          // Bell clapper
+          ctx.fillStyle = '#8B4513';
+          ctx.beginPath();
+          ctx.arc(bellX, bellY + 25, 3, 0, 2 * Math.PI);
+          ctx.fill();
+          
+          console.log('Fallback bell shape drawn successfully');
+        }
       }
     }
     
