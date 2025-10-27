@@ -141,12 +141,12 @@ function VratKathaDetail() {
 
             // Bell positioning to match reference image exactly
             const bellAreaWidth = canvas.width * 0.25; // 25% width for proper proportion
-            const bellAreaHeight = 180; // Fixed height for better proportion
+            const bellAreaHeight = 320; // Fixed height for better proportion
             
             ctx.drawImage(
                 bellImage,
-                10, // x position - closer to edge like in reference
-                8,  // y position - near top edge
+                15, // x position - closer to edge like in reference
+                12,  // y position - near top edge
                 bellAreaWidth,
                 bellAreaHeight
             );
