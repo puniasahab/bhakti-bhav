@@ -367,7 +367,7 @@ export default function ChalisaDetail() {
   // 📖 Read the complete चालीसा here:
   // ${currentUrl}
 
-  // 📱 Download Bhakti Bhav app from Google Play Store:
+  // � Download Bhakti Bhav app from Google Play Store:
   // ${playStoreUrl}
 
   // 🙏 Har Har Mahadev 🙏`;
@@ -492,17 +492,57 @@ ${appUrl}
 
       if (navigator.share && navigator.canShare) {
         console.log("Native sharing supported");
+        console.log("Text to be shared:", shareText);
         
-        // Sequential sharing: Image first, then text after 500ms
+        // PRIMARY: Try combined sharing first (most reliable for text below image)
         try {
-          // Step 1: Share the image first
+          const combinedShareData = {
+            title: `🙏 ${chalisaName} - चालीसा from Bhakti Bhav! 🙏`,
+            text: shareText,
+            files: [imageFile],
+          };
+          
+          if (navigator.canShare(combinedShareData)) {
+            await navigator.share(combinedShareData);
+            console.log("✅ Combined share (image + text) succeeded - text appears below image");
+            return; // Exit early on success
+          } else {
+            console.log("Combined sharing not supported, trying sequential...");
+          }
+        } catch (combinedErr) {
+          console.error("Combined share failed:", combinedErr);
+        }
+        
+        // SECONDARY: Sequential sharing - Image first, then text
+        try {
+          // Step 1: Share the image
           await navigator.share({
             title: `🙏 ${chalisaName} - चालीसा Image`,
             files: [imageFile],
           });
-          console.log("Image shared successfully");
+          console.log("✅ Image shared successfully");
 
-          // Step 2: Share the text after 500ms delay
+          // Step 2: Share text with links after delay
+          setTimeout(async () => {
+            try {
+              await navigator.share({
+                title: `🙏 ${chalisaName} - चालीसा Links & Info`,
+                text: shareText,
+              });
+              console.log("✅ SUCCESS: Text with website and download links shared after image");
+              alert("✅ Both image and text with links shared successfully!");
+            } catch (textErr) {
+              console.error("❌ Text share failed:", textErr);
+              
+              // Clipboard fallback
+              try {
+                await navigator.clipboard.writeText(shareText);
+                alert(`✅ Image shared!\n⚠️ Text sharing failed, but copied to clipboard.\n\nPlease paste this below the shared image:\n\n${shareText}`);
+              } catch (clipErr) {
+                alert(`✅ Image shared!\n⚠️ Please copy this text to paste below the image:\n\n${shareText}`);
+              }
+            }
+          }, 1000);
           setTimeout(async () => {
             try {
               await navigator.share({
