@@ -161,7 +161,7 @@ export default function MantraDetail() {
                     <span className="audio_repeat_icon"></span>
                   </button>
 
-                  <button
+                  {/* <button
                     onClick={() => replayAudio(item.audioUrl?.hi, item._id || index)}
                     disabled={!item.audioUrl?.hi}
                     className={`ml-3 p-2 flex items-center justify-center rounded-full transition font-hindi 
@@ -171,7 +171,7 @@ export default function MantraDetail() {
                       }`}
                   >
                     <span className="audio_restart_icon">↻</span>
-                  </button>
+                  </button> */}
                 </div>
               </div>
             ))}

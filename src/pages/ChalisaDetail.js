@@ -352,114 +352,228 @@ export default function ChalisaDetail() {
     ctx.lineWidth = 2;
     ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
     // Website link text
-   
+
     return canvas;
   };
 
-  const handleNativeShare = async () => {
-    const chalisaName = chalisa.name?.hi || chalisa.name?.en || "चालीसा";
-    const currentUrl = window.location.href;
-    const playStoreUrl = 'https://play.google.com/store/apps/details?id=com.bhakti_bhav';
+  //   const handleNativeShare = async () => {
+  //     const chalisaName = chalisa.name?.hi || chalisa.name?.en || "चालीसा";
+  //     const currentUrl = window.location.href;
+  //     const playStoreUrl = 'https://play.google.com/store/apps/details?id=com.bhakti_bhav';
 
-    // Create share message with website URL and download link that appears below the image
-    const shareMessage = `🙏 ${chalisaName} - Beautiful चालीसा from Bhakti Bhav! 🙏
+  //     // Create share message with website URL and download link that appears below the image
+  //     const shareMessage = `🙏 ${chalisaName} - Beautiful चालीसा from Bhakti Bhav! 🙏
+
+  // 📖 Read the complete चालीसा here:
+  // ${currentUrl}
+
+  // 📱 Download Bhakti Bhav app from Google Play Store:
+  // ${playStoreUrl}
+
+  // 🙏 Har Har Mahadev 🙏`;
+
+  //     try {
+  //       const canvas = await generateShareTemplate();
+
+  //       // Convert canvas to blob and share directly with text below
+  //       canvas.toBlob(async (blob) => {
+  //         if (navigator.share && navigator.canShare) {
+  //           const file = new File([blob], `${chalisaName.replace(/\s+/g, '-')}-bhakti-bhav-chalisa.png`, { type: 'image/png' });
+
+  //           // Try sharing with both image and text
+  //           const shareData = {
+  //             title: `🙏 ${chalisaName} - चालीसा from Bhakti Bhav! 🙏`,
+  //             text: shareMessage,
+  //             files: [file]
+  //           };
+
+  //           // Sequential sharing: Image first, then text after 500ms
+  //           try {
+  //             // First: Share the image
+  //             const imageOnlyData = {
+  //               title: `🙏 ${chalisaName} - चालीसा Image`,
+  //               files: [file]
+  //             };
+
+  //             await navigator.share(imageOnlyData);
+  //             console.log("Image shared successfully");
+
+  //             // Second: Share the text after 500ms delay
+  //             setTimeout(async () => {
+  //               try {
+  //                 const textOnlyData = {
+  //                   title: `🙏 ${chalisaName} - चालीसा Links & Info`,
+  //                   text: shareMessage
+  //                 };
+  //                 await navigator.share(textOnlyData);
+  //                 console.log("Text content shared successfully after image");
+  //               } catch (textErr) {
+  //                 console.error("Text share failed:", textErr);
+  //                 console.log("Text that would have been shared:", shareMessage);
+  //               }
+  //             }, 500);
+
+  //           } catch (imageErr) {
+  //             console.error("Image share failed, trying combined approach:", imageErr);
+
+  //             // Fallback: Try combined sharing if sequential fails
+  //             try {
+  //               await navigator.share(shareData);
+  //               console.log("Combined share succeeded as fallback");
+  //             } catch (combinedErr) {
+  //               console.error("Combined share also failed:", combinedErr);
+
+  //               // Final fallback: Text only
+  //               try {
+  //                 await navigator.share({
+  //                   title: `🙏 ${chalisaName} - चालीसा from Bhakti Bhav! 🙏`,
+  //                   text: shareMessage
+  //                 });
+  //                 console.log("Text-only share succeeded as final fallback");
+  //               } catch (textOnlyErr) {
+  //                 console.error("All sharing methods failed:", textOnlyErr);
+  //               }
+  //             }
+  //           }
+  //         } else {
+  //           // For browsers that don't support native sharing
+  //           console.log("Native sharing not supported");
+
+  //           // Create a download link for the image
+  //           const link = document.createElement('a');
+  //           link.download = `${chalisaName.replace(/\s+/g, '-')}-bhakti-bhav-chalisa.png`;
+  //           link.href = canvas.toDataURL();
+  //           link.click();
+
+  //           // Copy text content to clipboard and show to user
+  //           try {
+  //             await navigator.clipboard.writeText(shareMessage);
+  //             alert(`Image downloaded! Text content copied to clipboard:\n\n${shareMessage}\n\nYou can now paste this text when sharing the image manually.`);
+  //           } catch (clipErr) {
+  //             // If clipboard fails, show text for manual copying
+  //             alert(`Image downloaded! Please copy this text to share along with the image:\n\n${shareMessage}`);
+  //           }
+  //         }
+  //       }, 'image/png');
+  //     } catch (err) {
+  //       console.error("Share failed:", err);
+  //       alert("Share failed. Please try again.");
+  //     }
+  //   };
+
+  const handleNativeShare = async () => {
+    try {
+      const canvas = await generateShareTemplate();
+      
+      // Convert canvas to blob
+      const imageBlob = await new Promise((resolve) =>
+        canvas.toBlob(resolve, "image/png")
+      );
+      if (!imageBlob) return;
+
+      const chalisaName = chalisa.name?.hi || chalisa.name?.en || "चालीसा";
+      const imageFile = new File([imageBlob], `${chalisaName.replace(/\s+/g, '-')}-bhakti-bhav-chalisa.png`, {
+        type: "image/png",
+      });
+
+      const currentUrl = window.location.href;
+      const appUrl = "https://play.google.com/store/apps/details?id=com.bhakti_bhav";
+
+      // Complete share message that goes with the image
+      const shareText = `🙏 ${chalisaName} - Beautiful चालीसा from Bhakti Bhav! 🙏
 
 📖 Read the complete चालीसा here:
 ${currentUrl}
 
-📱 Download Bhakti Bhav app from Google Play Store:
-${playStoreUrl}
+� Download Bhakti Bhav app from Google Play Store:
+${appUrl}
 
 🙏 Har Har Mahadev 🙏`;
 
-    try {
-      const canvas = await generateShareTemplate();
+      if (navigator.share && navigator.canShare) {
+        console.log("Native sharing supported");
+        
+        // Sequential sharing: Image first, then text after 500ms
+        try {
+          // Step 1: Share the image first
+          await navigator.share({
+            title: `🙏 ${chalisaName} - चालीसा Image`,
+            files: [imageFile],
+          });
+          console.log("Image shared successfully");
 
-      // Convert canvas to blob and share directly with text below
-      canvas.toBlob(async (blob) => {
-        if (navigator.share && navigator.canShare) {
-          const file = new File([blob], `${chalisaName.replace(/\s+/g, '-')}-bhakti-bhav-chalisa.png`, { type: 'image/png' });
-
-          // Try sharing with both image and text
-          const shareData = {
-            title: `🙏 ${chalisaName} - चालीसा from Bhakti Bhav! 🙏`,
-            text: shareMessage,
-            files: [file]
-          };
-
-          // Sequential sharing: Image first, then text after 500ms
-          try {
-            // First: Share the image
-            const imageOnlyData = {
-              title: `🙏 ${chalisaName} - चालीसा Image`,
-              files: [file]
-            };
-            
-            await navigator.share(imageOnlyData);
-            console.log("Image shared successfully");
-            
-            // Second: Share the text after 500ms delay
-            setTimeout(async () => {
-              try {
-                const textOnlyData = {
-                  title: `🙏 ${chalisaName} - चालीसा Links & Info`,
-                  text: shareMessage
-                };
-                await navigator.share(textOnlyData);
-                console.log("Text content shared successfully after image");
-              } catch (textErr) {
-                console.error("Text share failed:", textErr);
-                console.log("Text that would have been shared:", shareMessage);
-              }
-            }, 500);
-            
-          } catch (imageErr) {
-            console.error("Image share failed, trying combined approach:", imageErr);
-            
-            // Fallback: Try combined sharing if sequential fails
+          // Step 2: Share the text after 500ms delay
+          setTimeout(async () => {
             try {
-              await navigator.share(shareData);
-              console.log("Combined share succeeded as fallback");
-            } catch (combinedErr) {
-              console.error("Combined share also failed:", combinedErr);
+              await navigator.share({
+                title: `🙏 ${chalisaName} - चालीसा Links & Info`,
+                text: shareText,
+              });
+              console.log("Text content shared successfully after image");
+            } catch (textErr) {
+              console.error("Text share failed:", textErr);
               
-              // Final fallback: Text only
+              // Fallback: Copy to clipboard if text sharing fails
               try {
-                await navigator.share({
-                  title: `🙏 ${chalisaName} - चालीसा from Bhakti Bhav! 🙏`,
-                  text: shareMessage
-                });
-                console.log("Text-only share succeeded as final fallback");
-              } catch (textOnlyErr) {
-                console.error("All sharing methods failed:", textOnlyErr);
+                await navigator.clipboard.writeText(shareText);
+                console.log("Text copied to clipboard as fallback");
+              } catch (clipErr) {
+                console.error("Clipboard copy also failed:", clipErr);
               }
             }
-          }
-        } else {
-          // For browsers that don't support native sharing
-          console.log("Native sharing not supported");
+          }, 500);
+
+        } catch (imageErr) {
+          console.error("Image share failed, trying combined approach:", imageErr);
           
-          // Create a download link for the image
-          const link = document.createElement('a');
-          link.download = `${chalisaName.replace(/\s+/g, '-')}-bhakti-bhav-chalisa.png`;
-          link.href = canvas.toDataURL();
-          link.click();
-          
-          // Copy text content to clipboard and show to user
+          // Fallback: Try combined sharing if sequential fails
           try {
-            await navigator.clipboard.writeText(shareMessage);
-            alert(`Image downloaded! Text content copied to clipboard:\n\n${shareMessage}\n\nYou can now paste this text when sharing the image manually.`);
-          } catch (clipErr) {
-            // If clipboard fails, show text for manual copying
-            alert(`Image downloaded! Please copy this text to share along with the image:\n\n${shareMessage}`);
+            await navigator.share({
+              title: `🙏 ${chalisaName} - चालीसा from Bhakti Bhav! 🙏`,
+              text: shareText,
+              files: [imageFile],
+            });
+            console.log("Combined share succeeded as fallback");
+          } catch (combinedErr) {
+            console.error("Combined share also failed:", combinedErr);
+            
+            // Final fallback: Text only
+            try {
+              await navigator.share({
+                title: `🙏 ${chalisaName} - चालीसा from Bhakti Bhav! 🙏`,
+                text: shareText,
+              });
+              console.log("Text-only share succeeded as final fallback");
+            } catch (textOnlyErr) {
+              console.error("All sharing methods failed:", textOnlyErr);
+            }
           }
         }
-      }, 'image/png');
+        
+      } else {
+        // Fallback for browsers without native sharing
+        console.log("Native sharing not supported");
+        
+        // Download image
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(imageBlob);
+        link.download = `${chalisaName.replace(/\s+/g, '-')}-bhakti-bhav-chalisa.png`;
+        link.click();
+        
+        // Copy text to clipboard
+        try {
+          await navigator.clipboard.writeText(shareText);
+          alert(`Image downloaded and text copied to clipboard!\n\nTo share:\n1. Upload the downloaded image\n2. Paste the text content below the image\n\nText content:\n${shareText}`);
+        } catch (clipErr) {
+          alert(`Image downloaded!\n\nTo share:\n1. Upload the downloaded image\n2. Copy and paste this text below the image:\n\n${shareText}`);
+        }
+      }
+      
     } catch (err) {
-      console.error("Share failed:", err);
+      console.error("Share generation failed:", err);
       alert("Share failed. Please try again.");
     }
-  };
+  }
   return (
     <>
       <Header pageName={{ hi: "pkyhlk", en: "Chalisa" }} hindiFontSize="true" />
