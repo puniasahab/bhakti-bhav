@@ -4,7 +4,7 @@ import Footer from "../components/Footer";
 import { Camera } from "lucide-react";
 import { profileApis } from "../api";
 import { getTokenFromLS } from "../commonFunctions";
-// import kundaliBanner from "../assets/img/kundali_banner.png";
+import kundaliBanner from "../assets/img/kundali_banner.png";
 import { useNavigate } from "react-router-dom";
 
 function EditProfile() {
@@ -326,7 +326,11 @@ function EditProfile() {
               >
                 {loading ? "Saving..." : "Save Profile"}
               </button>
+
             </form>
+
+            <img onClick = {()=>{navigate('/kundli')}} style={{width: '90%', height: 'auto', margin: '32px auto'}} src={kundaliBanner} alt="Kundali Banner" className="w-full h-40 object-cover" />
+
         </>
         )}
       </div>
