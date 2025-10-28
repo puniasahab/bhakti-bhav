@@ -142,7 +142,7 @@ function VratKathaDetail() {
             // Bell positioning to match reference image exactly
             const bellAreaWidth = canvas.width * 0.25; // 25% width for proper proportion
             const bellAreaHeight = 320; // Fixed height for better proportion
-            
+
             ctx.drawImage(
                 bellImage,
                 15, // x position - closer to edge like in reference
@@ -154,12 +154,12 @@ function VratKathaDetail() {
 
         } catch (error) {
             console.warn('Bell image failed to load from main path, trying alternative paths');
-            
+
             // Try alternative bell image paths
             try {
                 const bellImageAlt = new Image();
                 bellImageAlt.crossOrigin = 'anonymous';
-                
+
                 await new Promise((resolve, reject) => {
                     bellImageAlt.onload = () => {
                         console.log('Bell image loaded successfully from alternative path');
@@ -171,18 +171,18 @@ function VratKathaDetail() {
 
                 const bellAreaWidth = canvas.width * 0.25;
                 const bellAreaHeight = 180;
-                
+
                 ctx.drawImage(bellImageAlt, 10, 8, bellAreaWidth, bellAreaHeight);
                 console.log('Alternative bell image drawn successfully', bellImageAlt);
-                
+
             } catch (altError) {
                 console.warn('Alternative bell image also failed, trying bell_ring.png');
-                
+
                 // Try bell_ring.png as third option
                 try {
                     const bellImageRing = new Image();
                     bellImageRing.crossOrigin = 'anonymous';
-                    
+
                     await new Promise((resolve, reject) => {
                         bellImageRing.onload = () => {
                             console.log('Bell ring image loaded successfully');
@@ -191,27 +191,27 @@ function VratKathaDetail() {
                         bellImageRing.onerror = reject;
                         bellImageRing.src = '/img/bell_ring.png'; // Alternative bell image
                     });
-                    
+
                     const bellAreaWidth = canvas.width * 0.25;
                     const bellAreaHeight = 180;
-                    
+
                     ctx.drawImage(bellImageRing, 10, 8, bellAreaWidth, bellAreaHeight);
                     console.log('Bell ring image drawn successfully', bellImageRing);
-                    
+
                 } catch (ringError) {
                     console.warn('All bell images failed to load, drawing fallback bell shape');
-                    
+
                     // Fallback: Draw a simple bell shape
                     ctx.fillStyle = '#D4AF37'; // Golden color
                     const bellX = 35;
                     const bellY = 50;
                     const bellSize = 20;
-                    
+
                     // Simple bell shape
                     ctx.beginPath();
                     ctx.arc(bellX, bellY, bellSize, Math.PI, 0, false);
                     ctx.fill();
-                    
+
                     ctx.beginPath();
                     ctx.moveTo(bellX - bellSize, bellY);
                     ctx.lineTo(bellX - bellSize - 5, bellY + 30);
@@ -219,13 +219,13 @@ function VratKathaDetail() {
                     ctx.lineTo(bellX + bellSize, bellY);
                     ctx.closePath();
                     ctx.fill();
-                    
+
                     // Bell clapper
                     ctx.fillStyle = '#8B4513';
                     ctx.beginPath();
                     ctx.arc(bellX, bellY + 25, 3, 0, 2 * Math.PI);
                     ctx.fill();
-                    
+
                     console.log('Fallback bell shape drawn successfully');
                 }
             }
@@ -362,13 +362,13 @@ function VratKathaDetail() {
         ctx.fillStyle = '#0066CC'; // Blue color for link
         ctx.font = 'bold 13px sans-serif';
         ctx.textAlign = 'center';
-        
+
         // Split URL to fit properly if too long
         if (currentUrl.length > 50) {
             const urlParts = currentUrl.split('/');
             const domain = urlParts[0] + '//' + urlParts[2];
             const path = '/' + urlParts.slice(3).join('/');
-            
+
             ctx.fillText(domain, canvas.width / 2, titleY + 145);
             ctx.fillText(path, canvas.width / 2, titleY + 160);
         } else {
@@ -447,7 +447,7 @@ function VratKathaDetail() {
     const handleNativeShare = async () => {
         const kathaName = detail.name?.hi || detail.name?.en || "व्रत कथा";
         const currentUrl = window.location.href;
-        
+
         // Create share message with website URL
         const shareMessage = `🙏 ${kathaName} - Beautiful व्रत कथा from Bhakti Bhav! 🙏
 
@@ -461,18 +461,18 @@ function VratKathaDetail() {
 
         try {
             const canvas = await generateShareTemplate();
-            
+
             // Convert canvas to blob and share directly
             canvas.toBlob(async (blob) => {
                 if (navigator.share && navigator.canShare) {
                     const file = new File([blob], `${kathaName.replace(/\s+/g, '-')}-bhakti-bhav-katha.png`, { type: 'image/png' });
-                    
+
                     const shareData = {
                         title: `🙏 ${kathaName} - व्रत कथा from Bhakti Bhav! 🙏`,
                         text: shareMessage,
                         files: [file]
                     };
-                    
+
                     if (navigator.canShare(shareData)) {
                         try {
                             await navigator.share(shareData);
@@ -581,10 +581,24 @@ function VratKathaDetail() {
                 </div>
                 <div className="text-center my-8 text-xl">
                     <p className={`${language === "hi" ? " font-hindi" : "hidden"} text-[#9A283D] ${fontSize}`}>
-                        {detail.mantra?.hi?.replace(/"/g, '')}
+                        {detail.mantra?.hi?.replace(/"/g, '').replace(/:/g, "ः")           // English colon → Devanagari visarga
+                            .replace(/-/g, " ")           // Replace dash with space
+                            .replace(/\//g, " ")          // Replace slash with space
+                            .replace(/[(){}\[\]]/g, "")   // Remove brackets
+                            .replace(/[.,;]/g, " ")       // Replace English punctuation
+                            .replace(/[|]/g, "॥")         // Replace single danda bar | with Hindi double danda
+                            .replace(/[^\u0900-\u097F\s।॥ः]/g, "") // Remove non-Devanagari chars
+                            .normalize("NFC")}
                     </p>
                     <p className={`${language === "en" ? " font-eng" : "hidden"} text-[#9A283D] ${fontSize}`}>
-                        {detail.mantra?.hi?.replace(/"/g, '')}
+                        {detail.mantra?.hi?.replace(/:/g, "ः")           // English colon → Devanagari visarga
+                            .replace(/-/g, " ")           // Replace dash with space
+                            .replace(/\//g, " ")          // Replace slash with space
+                            .replace(/[(){}\[\]]/g, "")   // Remove brackets
+                            .replace(/[.,;]/g, " ")       // Replace English punctuation
+                            .replace(/[|]/g, "॥")         // Replace single danda bar | with Hindi double danda
+                            .replace(/[^\u0900-\u097F\s।॥ः]/g, "") // Remove non-Devanagari chars
+                            .normalize("NFC")}
                     </p>
                 </div>
 
@@ -612,7 +626,10 @@ function VratKathaDetail() {
                     {language === "hi"
                         ? detail.pujaVidhi?.hi?.split("\n").map((line, idx) => (
                             <p key={idx} className={`font-hindi text-[rgba(0,0,0,0.7)] ${fontSize}`}>
-                                {line.replace(/,/g, '•').replace(/\(/g, "¼").replace(/\)/g, "½")}
+                                {line.replace(/,/g, ']').replace(/\(/g, "¼").replace(/\)/g, "½").replace(/-/g, " ").replace(/\:/g, "ः").replace(/\//g, " ").replace(/"/g, "”")       // Replace plain English quotes with right Hindi quote
+                                    .replace(/``|''/g, "”")   // Replace double single quotes
+                                    .replace(/“/g, "")       // Normalize any weird quote forms
+                                    .replace(/”/g, "")}
                             </p>
                         ))
                         : detail.pujaVidhi?.en?.split("\n").map((line, idx) => (
@@ -676,7 +693,17 @@ function VratKathaDetail() {
 
                     </h2>
                     {language === "hi"
-                        ? <div className={`font-hindi text-[rgba(0,0,0,0.7)] ${fontSize} break-words  w-full`} dangerouslySetInnerHTML={{ __html: detail.pujaMahatva?.hi.replace(/,/g, "]").replace(/\(/g, "¼").replace(/\)/g, "½").replace(/\:/g, "%") }} />
+                        ? <div className={`font-hindi text-[rgba(0,0,0,0.7)] ${fontSize} break-words  w-full`} dangerouslySetInnerHTML={{
+                            __html: detail.pujaMahatva?.hi.replace(/,/g, "]").replace(/\(/g, "¼").replace(/\)/g, "½").replace(/\:/g, "%").replace(/:/g, "ः")         // Replace colon with visarga
+                                .replace(/ँ/g, "ं")          // Normalize chandrabindu if misencoded
+                                .replace(/\u200D|\u200C/g, "").replace(/[.,;!?'"“”‘’]/g, "")    // Remove English punctuation
+                                .replace(/[\[\]{}()]/g, "")       // Remove brackets and parentheses
+                                .replace(/[*/\\#%^+=_|<>~`@$₹]/g, " ").replace(/[^\u0900-\u097F\s।॥]/g, "") // remove non-Devanagari chars except space & punctuation
+                                .replace(/\u00A0/g, " ") // replace non-breaking space with normal space
+                                .replace(/\u200B|\u200C|\u200D/g, "") // remove zero-width chars
+                                .replace(/\s+/g, " ")// Remove zero-width joiners
+                                .normalize("NFC")
+                        }} />
                         : <div className={`font-eng text-[rgba(0,0,0,0.7)] ${fontSize} break-words w-full`} dangerouslySetInnerHTML={{ __html: detail.pujaMahatva?.en }} />
                     }
                 </div>

@@ -5,6 +5,7 @@ import { Camera } from "lucide-react";
 import { profileApis } from "../api";
 import kundaliBanner from "../assets/img/kundali_banner.png";
 import { useNavigate } from "react-router-dom";
+import { getTokenFromLS, isAuthenticated } from "../commonFunctions";
 
 function Kundli() {
   const navigate = useNavigate();
@@ -73,8 +74,13 @@ function Kundli() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+     if(isAuthenticated() === false) {
+        alert("Please login first to save your details.");
+        navigate("/login");
+      }
     if (validate()) {
       setLoading(true);
+     
       try {
         const response = await profileApis.updateProfile(formData);
         console.log("Profile updated successfully:", response);

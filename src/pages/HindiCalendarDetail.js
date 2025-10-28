@@ -135,7 +135,12 @@ function HindiCalendarDetail() {
                   <div className="w-px h-10 bg-white/50 mx-3"></div>
 
                   <div className="flex flex-col w-[70%]">
-                    <span className="text-lg font-hindi">{festival.name.hi}</span>
+                    <span className="text-lg font-hindi">{festival.name.hi.replace(/:/g, "ः")         // Replace colon with visarga
+                    .replace(/ँ/g, "ं")          // Normalize chandrabindu if misencoded
+                    .replace(/\u200D|\u200C/g, "").replace(/[.,;!?'"“”‘’]/g, "")    // Remove English punctuation
+    .replace(/[\[\]{}()]/g, "")       // Remove brackets and parentheses
+    .replace(/[*/\\#%^+=_|<>~`@$₹]/g, " ")// Remove zero-width joiners
+                    .normalize("NFC")}</span>
                     <span className="text-sm font-eng">
                       {festival.name.en}
                     </span>

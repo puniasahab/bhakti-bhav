@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import TodayThoughts from "../components/TodayThoughts";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination, Autoplay } from "swiper/modules";
+import { useNavigate } from "react-router-dom"; 
 
 import "swiper/css";
 import "swiper/css/pagination";
@@ -13,8 +14,12 @@ import { setSubscriptionStatusInLS } from "../commonFunctions";
 
 function Home() {
 
+
+    const navigate = useNavigate();
+
     const [isOpen, setIsOpen] = useState(false);
     const [panchangData, setPanchangData] = useState([]);
+    const [bannersData, setBannersData] = useState([]);
 
 
     useEffect(() => {
@@ -82,6 +87,7 @@ function Home() {
             try {
                 const banners = await wallpaperApis.getBanners();
                 console.log("Banners:", banners);
+                setBannersData(banners?.data);
             } catch (error) {
                 console.error("Error fetching banners:", error);
             }
@@ -104,7 +110,24 @@ function Home() {
                             loop={true}
                             className="w-full h-full rounded-xl"
                         >
-                            <SwiperSlide>
+                            {
+                                bannersData?.map((banner, index) => (
+                                    <SwiperSlide key={index}>
+                                        <div
+                                            onClick={() => {
+                                                const relativePath = new URL(banner.Urls).pathname;
+                                                console.log("relativePath", relativePath);
+                                                navigate(relativePath);
+                                            }}
+                                            className="h-[20vh] md:h-[60vh] bg-cover bg-center flex items-center justify-center"
+                                            style={{ backgroundImage: `url(${banner.imageUrl})` }}
+                                        >
+                                            {/* <h2 className="text-white text-lg font-bold">{banner.title}</h2> */}
+                                        </div>
+                                    </SwiperSlide>
+                                ))
+                            }
+                            {/* <SwiperSlide>
                                 <div
                                     className="h-[20vh] md:h-[60vh] bg-[url('/img/banner-3.jpeg')] bg-cover bg-center flex items-center justify-center"
                                 ></div>
@@ -114,7 +137,7 @@ function Home() {
                                 <div
                                     className="h-[20vh] md:h-[60vh] bg-[url('/img/banner-5.jpeg')] bg-cover bg-center flex items-center justify-center"
                                 ></div>
-                            </SwiperSlide>
+                            </SwiperSlide> */}
                         </Swiper>
                     </div>
                 </section>

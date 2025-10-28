@@ -125,7 +125,7 @@ function WallpaperDetail() {
 
 📱 Download Bhakti Bhav app from Play Store for more spiritual wallpapers, mantras, and devotional content!
 
-🔗 App Link: https://play.google.com/store/apps/details?id=com.bhaktibhav
+🔗 App Link: https://play.google.com/store/apps/details?id=com.bhakti_bhav
 
 🙏 Har Har Mahadev 🙏`;
 
