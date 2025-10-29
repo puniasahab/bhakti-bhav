@@ -144,7 +144,7 @@ export default function HindiCalendar() {
                       <div className="w-px h-10 bg-white/50 mx-3"></div>
 
                       <div className="flex flex-col w-[70%]">
-                        <span className="text-lg font-hindi">{festival.name.hi}</span>
+                        <span className="text-lg font-hindi">{festival.name.hi.replace(/\//g, "").replace(/[⁄∕／]/g, "/")}</span>
                         <span className="text-sm font-eng">
                           {festival.name.en}
                         </span>

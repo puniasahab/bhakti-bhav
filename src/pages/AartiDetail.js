@@ -450,7 +450,8 @@ function AartiDetail() {
         <div className={`theme_text leading-loose mt-4 text-center ${fontSize}  ${language === "hi" ? "font-hindi" : "font-eng"}`}>
           {language === "hi"
             ? 
-            <div dangerouslySetInnerHTML={{ __html: detail.description?.hi.replace(/\.\.\./g, "---").replace(/,/g, "]") }} /> 
+            <div dangerouslySetInnerHTML={{ __html: detail.description?.hi.replace(/\.\.\./g, "---").replace(/,/g, "]").replace(/^'(.*)'$/, "“$1”")  // If the entire text is wrapped in quotes
+  .replace(/'/g, "") }} /> 
             :  
             <div dangerouslySetInnerHTML={{ __html: detail.description?.en }} />
           }
@@ -462,7 +463,8 @@ function AartiDetail() {
             <pre
               className={`whitespace-pre-wrap leading-relaxed ${language === "hi" ? `font-hindi ${fontSize}` : `italic font-eng ${fontSize}`}`}
             >
-              {language === "hi" ? detail.text.hi : detail.text.en}
+              {language === "hi" ? detail.text.hi.replace(/^'(.*)'$/, "“$1”")  // If the entire text is wrapped in quotes
+  .replace(/'/g, "’") : detail.text.en}
             </pre>
           </div>
         )}

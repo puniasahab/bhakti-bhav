@@ -36,7 +36,7 @@ function EditProfile() {
         
         if (response) {
           setFormData({
-            name: response.name || "",
+            name: response.name === "New User" ? "" : response.name || "",
             mobileNumber: response.mobileNumber || "",
             email: response.email || "",
             state: response.state || "",

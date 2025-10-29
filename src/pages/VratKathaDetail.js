@@ -654,14 +654,28 @@ function VratKathaDetail() {
                             ? Array.isArray(detail.pujaSamagri?.hi)
                                 ? detail.pujaSamagri.hi.map((item, i) => (
                                     <li key={`hi-${i}`} className="font-hindi">
-                                        {item.replace(/,/g, "]").replace(/\(/g, "¼").replace(/\)/g, "½").replace(/\:/g, "%")}
+                                        {item.replace(/,/g, "]").replace(/\(/g, "¼").replace(/\)/g, "½").replace(/\:/g, "%").replace(/"/g, '').replace(/:/g, "ः")           // English colon → Devanagari visarga
+                            .replace(/-/g, " ")           // Replace dash with space
+                            .replace(/\//g, " ")          // Replace slash with space
+                            // .replace(/[(){}\[\]]/g, "")   // Remove brackets
+                            // .replace(/[.,;]/g, " ")       // Replace English punctuation
+                            .replace(/[|]/g, "॥")         // Replace single danda bar | with Hindi double danda
+                            // .replace(/[^\u0900-\u097F\s।॥ः]/g, "") // Remove non-Devanagari chars
+                            .normalize("NFC")}
                                     </li>
                                 ))
                                 : detail.pujaSamagri?.hi
                                     ?.split(/\n|,/)
                                     .map((item, i) => (
                                         <li key={`hi-${i}`} className="font-hindi">
-                                            {item.trim().replace(/,/g, "]").replace(/\(/g, "¼").replace(/\)/g, "½").replace(/\:/g, "%")}
+                                            {item.trim().replace(/,/g, "]").replace(/\(/g, "¼").replace(/\)/g, "½").replace(/\:/g, "%").replace(/"/g, '').replace(/:/g, "ः")           // English colon → Devanagari visarga
+                            .replace(/-/g, " ")           // Replace dash with space
+                            .replace(/\//g, " ")          // Replace slash with space
+                            .replace(/[(){}\[\]]/g, "")   // Remove brackets
+                            .replace(/[.,;]/g, " ")       // Replace English punctuation
+                            .replace(/[|]/g, "॥")         // Replace single danda bar | with Hindi double danda
+                            .replace(/[^\u0900-\u097F\s।॥ः]/g, "") // Remove non-Devanagari chars
+                            .normalize("NFC")}
                                         </li>
                                     ))
                             : Array.isArray(detail.pujaSamagri?.en)

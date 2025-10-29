@@ -51,9 +51,9 @@ function HindiCalendarDetail() {
 
 
   const handleNavigate = (kathaId, accessType) => {
-    if(getSubscriptionStatusFromLS()) {
-      if(kathaId) {
-      return `/vrat-katha/${kathaId}`;
+    if (getSubscriptionStatusFromLS()) {
+      if (kathaId) {
+        return `/vrat-katha/${kathaId}`;
       }
       else {
         alert("No Kath available for this festival");
@@ -61,8 +61,8 @@ function HindiCalendarDetail() {
       }
     }
     else {
-      if(accessType === "free") {
-        if(kathaId) {
+      if (accessType === "free") {
+        if (kathaId) {
           return `/vrat-katha/${kathaId}`;
 
         }
@@ -72,7 +72,7 @@ function HindiCalendarDetail() {
         }
       }
       else {
-        if(getTokenFromLS()) {
+        if (getTokenFromLS()) {
           return "/payment";
         }
         else {
@@ -136,11 +136,12 @@ function HindiCalendarDetail() {
 
                   <div className="flex flex-col w-[70%]">
                     <span className="text-lg font-hindi">{festival.name.hi.replace(/:/g, "ः")         // Replace colon with visarga
-                    .replace(/ँ/g, "ं")          // Normalize chandrabindu if misencoded
-                    .replace(/\u200D|\u200C/g, "").replace(/[.,;!?'"“”‘’]/g, "")    // Remove English punctuation
-    .replace(/[\[\]{}()]/g, "")       // Remove brackets and parentheses
-    .replace(/[*/\\#%^+=_|<>~`@$₹]/g, " ")// Remove zero-width joiners
-                    .normalize("NFC")}</span>
+                      .replace(/ँ/g, "ं")          // Normalize chandrabindu if misencoded
+                      .replace(/\u200D|\u200C/g, " ").replace(/[.,;!?'"“”‘’]/g, "")    // Remove English punctuation
+                      .replace(/[\[\]{}()]/g, "").replace(/^["'](.*)["']$/, "“$1”")
+                      .replace(/["']/g, "’")    // Remove brackets and parentheses
+                      .replace(/[*/\\#%^+=_|<>~`@$₹]/g, " ").replace(/[\u200B-\u200D\uFEFF]/g, " ").replace(/[⁄∕／]/g, "/")  // Remove zero-width joiners
+                      .normalize("NFC")}</span>
                     <span className="text-sm font-eng">
                       {festival.name.en}
                     </span>

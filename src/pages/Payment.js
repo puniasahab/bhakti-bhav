@@ -117,7 +117,12 @@ export default function Payment() {
   ];
 
   const makePayment = async (selectedPlan) => {
-    const planDetails = plans.filter((plan) => plan._id === selectedPlan);
+    if(!selectedPlan) {
+      alert("No valid plan is selected for payment.");
+      navigate("/payment");
+    }
+    else {
+      const planDetails = plans.filter((plan) => plan?._id === selectedPlan);
     console.log("selectedPlan", planDetails);
     console.log("profile", profile);
     if(profile.email === '' || profile.email == null || profile.email === undefined) {
@@ -143,6 +148,8 @@ export default function Payment() {
       navigate("/paymentPage");
     }
     console.log(res, "Payment Response");
+    }
+    
   }
 
   return (

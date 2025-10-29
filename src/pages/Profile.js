@@ -26,7 +26,7 @@ const Profile = () => {
                 if (res) {
                     console.log("Setting profile data:", res);
                     setProfile({
-                        name: res.name || "",
+                        name: res.name === "New User" ? "" : res.name || "",
                         mobileNumber: res.mobileNumber || "",
                         email: res.email || "",
                         state: res.state || "",
