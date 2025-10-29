@@ -123,7 +123,7 @@ export default function MantraDetail() {
                   {item.text?.hi
                     .replace(/:/g, "ः")         // Replace colon with visarga
                     .replace(/ँ/g, "ं")          // Normalize chandrabindu if misencoded
-                    .replace(/\u200D|\u200C/g, "") // Remove zero-width joiners
+                    .replace(/\u200D|\u200C/g, " ") // Remove zero-width joiners
                     .normalize("NFC")}
                 </p>
 

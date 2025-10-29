@@ -97,6 +97,16 @@ function normalizeEnglishText(text) {
     .replace(/\s+/g, " ")
     .trim();
 }
+
+const replacements = {
+    ",": "၊",     // comma alternative — or you can keep "," if you prefer
+    ";": "]",     // semicolon alternative (or just "।" if you want sentence end)
+    ":": "꠱",     // colon alternative
+    "?": "?",     // optional: can replace with "?"
+    "!": "!",     // optional: can replace with "!"
+    ".": "।",   // Hindi "पूर्णविराम" (Danda) 
+    "-": "–",     
+  };
   return (
     <>
       <Header pageName={{ hi: "jkf'kQy", en: "Rashifal" }} />
@@ -167,7 +177,10 @@ function normalizeEnglishText(text) {
                       <li key={idx} className="text-lg leading-relaxed flex items-start">
                         <span className="text-[#9A283D] mr-3 mt-1 flex-shrink-0 font-bold text-lg min-w-[16px]">●</span>
                         <span className="flex-1 text-md">
-                          {normalizeHindiText(line).replace(/\.\.\./g, "---").replace(/,/g, "]")}
+                          {normalizeHindiText(line).replace(/\.\.\./g, "---").replace(/,/g, "]").replace(/:/g, "ः").replace(/[,:;.!?-]/g, match => replacements[match] || match)        // Replace colon with visarga
+                    .replace(/ँ/g, "ं")          // Normalize chandrabindu if misencoded
+                    .replace(/\u200D|\u200C/g, " ") // Remove zero-width joiners
+                    .normalize("NFC")}
                         </span>
                       </li>
                     ))}
