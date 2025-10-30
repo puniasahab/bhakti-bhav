@@ -38,7 +38,7 @@ const Transactions = () => {
       console.log(response, "Response Data");
       if (response && response.orders) {
         // Transform the API data to match our component structure
-        const transformedTransactions = response.orders.map(order => ({
+        const transformedTransactions = response.orders.map((order, index) => ({
           id: order._id,
           orderId: order.orderId,
           transactionId: Array.isArray(order.paymentResponse) 
@@ -53,9 +53,7 @@ const Transactions = () => {
           customerEmail: response.email || 'N/A',
           customerPhone: response.mobileNumber || 'N/A',
           createdAt: order.createdAt,
-          expiryDate: Array.isArray(order.paymentResponse) 
-            ? order.paymentResponse[0]?.order_expiry_time || null
-            : order.paymentResponse?.order_expiry_time || null,
+          expiryDate: response.activePlans[index].endDate,
           gatewayResponse: Array.isArray(order.paymentResponse) 
             ? order.paymentResponse[0]?.payment_message || 'Transaction processed'
             : 'Order created'
