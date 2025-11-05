@@ -128,7 +128,7 @@ function VratKathaDetail() {
                 title: `🙏 ${kathaName} - व्रत कथा from Bhakti Bhav! 🙏`,
                 text: shareMessage
             });
-            
+
             console.log('✅ Content shared successfully!');
         } catch (error) {
             // Only log if user didn't cancel the share dialog
@@ -141,46 +141,46 @@ function VratKathaDetail() {
     };
 
     const hindiToEnglishMap = {
-    '०': '0',
-    '१': '1',
-    '२': '2',
-    '३': '3',
-    '४': '4',
-    '५': '5',
-    '६': '6',
-    '७': '7',
-    '८': '8',
-    '९': '9'
-  };
-  const englishToHindiMap = {
-    '0': '०',
-    '1': '१',
-    '2': '२',
-    '3': '३',
-    '4': '४',
-    '5': '५',
-    '6': '६',
-    '7': '७',
-    '8': '८',
-    '9': '९'
-  };
+        '०': '0',
+        '१': '1',
+        '२': '2',
+        '३': '3',
+        '४': '4',
+        '५': '5',
+        '६': '6',
+        '७': '7',
+        '८': '8',
+        '९': '9'
+    };
+    const englishToHindiMap = {
+        '0': '०',
+        '1': '१',
+        '2': '२',
+        '3': '३',
+        '4': '४',
+        '5': '५',
+        '6': '६',
+        '7': '७',
+        '8': '८',
+        '9': '९'
+    };
 
-  const fixHindiDigits = (text) => {
-  if (!text) return text;
+    const fixHindiDigits = (text) => {
+        if (!text) return text;
 
-  // Replace Devanagari digits with ASCII numbers manually
-  return text
-    .replaceAll("०", "0")
-    .replaceAll("१", "1")
-    .replaceAll("२", "2")
-    .replaceAll("३", "3")
-    .replaceAll("४", "4")
-    .replaceAll("५", "5")
-    .replaceAll("६", "6")
-    .replaceAll("७", "7")
-    .replaceAll("८", "8")
-    .replaceAll("९", "9");
-};
+        // Replace Devanagari digits with ASCII numbers manually
+        return text
+            .replaceAll("०", "0")
+            .replaceAll("१", "1")
+            .replaceAll("२", "2")
+            .replaceAll("३", "3")
+            .replaceAll("४", "4")
+            .replaceAll("५", "5")
+            .replaceAll("६", "6")
+            .replaceAll("७", "7")
+            .replaceAll("८", "8")
+            .replaceAll("९", "9");
+    };
 
     // useEffect(() => {
     //     if (audioRef.current) {
@@ -188,6 +188,42 @@ function VratKathaDetail() {
     //         audioRef.current.currentTime = 0;
     //     }
     // }, [location])
+
+
+
+    const HighlightNumbers = (text) => {
+
+        // Split text into segments — words, numbers, and symbols
+        const parts = text.split(/(\d+)/g);
+
+        return (
+            <span>
+                {parts.map((part, index) =>
+                    /^\d+$/.test(part) ? (
+                        <span
+                            key={index}
+                            style={{
+                                fontFamily: "Roboto Mono, monospace",
+                                // fontWeight: "600",
+                                color: "black",
+                            }}
+                        >
+                            {part}
+                        </span>
+                    ) : (
+                        <span key={index}>{part.replace(/,/g, ']')
+                            .replace(/\(/g, '¼')
+                            .replace(/\)/g, '½')
+                            .replace(/-/g, ' ')
+                            .replace(/\:/g, 'ः')
+                            .replace(/\//g, ' ')
+                            .replace(/"/g, '”')
+                            .replace(/``|''/g, '”')}</span>
+                    )
+                )}
+            </span>
+        );
+    };
 
     return (
         <>
@@ -305,11 +341,7 @@ function VratKathaDetail() {
                     {language === "hi"
                         ? detail.pujaVidhi?.hi?.split("\n").map((line, idx) => (
                             <p key={idx} className={`font-hindi text-[rgba(0,0,0,0.7)] ${fontSize}`}>
-                                {line.replace(/,/g, ']').replace(/\(/g, "¼").replace(/\)/g, "½").replace(/-/g, " ").replace(/\:/g, "ः").replace(/\//g, " ").replace(/"/g, "”")       // Replace plain English quotes with right Hindi quote
-                                    .replace(/``|''/g, "”")   // Replace double single quotes
-                                    .replace(/“/g, "")       // Normalize any weird quote forms
-                                    .replace(/”/g, "")
-                                    .split(/(\d+)/)}
+                                {HighlightNumbers(line)}
                             </p>
                         ))
                         : detail.pujaVidhi?.en?.split("\n").map((line, idx) => (
@@ -335,13 +367,13 @@ function VratKathaDetail() {
                                 ? detail.pujaSamagri.hi.map((item, i) => (
                                     <li key={`hi-${i}`} className="font-hindi">
                                         {item.replace(/,/g, "]").replace(/\(/g, "¼").replace(/\)/g, "½").replace(/\:/g, "%").replace(/"/g, '').replace(/:/g, "ः")           // English colon → Devanagari visarga
-                            .replace(/-/g, " ")           // Replace dash with space
-                            .replace(/\//g, " ")          // Replace slash with space
-                            // .replace(/[(){}\[\]]/g, "")   // Remove brackets
-                            // .replace(/[.,;]/g, " ")       // Replace English punctuation
-                            .replace(/[|]/g, "॥").replace(/[०-९]/g, digit => hindiToEnglishMap[digit])        // Replace single danda bar | with Hindi double danda
-                            // .replace(/[^\u0900-\u097F\s।॥ः]/g, "") // Remove non-Devanagari chars
-                            .normalize("NFC")}
+                                            .replace(/-/g, " ")           // Replace dash with space
+                                            .replace(/\//g, " ")          // Replace slash with space
+                                            // .replace(/[(){}\[\]]/g, "")   // Remove brackets
+                                            // .replace(/[.,;]/g, " ")       // Replace English punctuation
+                                            .replace(/[|]/g, "॥").replace(/[०-९]/g, digit => hindiToEnglishMap[digit])        // Replace single danda bar | with Hindi double danda
+                                            // .replace(/[^\u0900-\u097F\s।॥ः]/g, "") // Remove non-Devanagari chars
+                                            .normalize("NFC")}
                                     </li>
                                 ))
                                 : detail.pujaSamagri?.hi
@@ -349,13 +381,13 @@ function VratKathaDetail() {
                                     .map((item, i) => (
                                         <li key={`hi-${i}`} className="font-hindi">
                                             {item.trim().replace(/,/g, "]").replace(/\(/g, "¼").replace(/\)/g, "½").replace(/\:/g, "%").replace(/"/g, '').replace(/:/g, "ः")           // English colon → Devanagari visarga
-                            .replace(/-/g, " ")           // Replace dash with space
-                            .replace(/\//g, " ")          // Replace slash with space
-                            .replace(/[(){}\[\]]/g, "")   // Remove brackets
-                            .replace(/[.,;]/g, " ")       // Replace English punctuation
-                            .replace(/[|]/g, "॥")         // Replace single danda bar | with Hindi double danda
-                            .replace(/[^\u0900-\u097F\s।॥ः]/g, "").replace(/[०-९]/g, digit => hindiToEnglishMap[digit]) // Remove non-Devanagari chars
-                            .normalize("NFC")}
+                                                .replace(/-/g, " ")           // Replace dash with space
+                                                .replace(/\//g, " ")          // Replace slash with space
+                                                .replace(/[(){}\[\]]/g, "")   // Remove brackets
+                                                .replace(/[.,;]/g, " ")       // Replace English punctuation
+                                                .replace(/[|]/g, "॥")         // Replace single danda bar | with Hindi double danda
+                                                .replace(/[^\u0900-\u097F\s।॥ः]/g, "").replace(/[०-९]/g, digit => hindiToEnglishMap[digit]) // Remove non-Devanagari chars
+                                                .normalize("NFC")}
                                         </li>
                                     ))
                             : Array.isArray(detail.pujaSamagri?.en)
@@ -412,7 +444,7 @@ function VratKathaDetail() {
             </div>
 
         </>
-    );
+    );  
 }
 
 export default VratKathaDetail;
