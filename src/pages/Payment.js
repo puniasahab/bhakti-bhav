@@ -18,6 +18,11 @@ export default function Payment() {
           state: "",
           gender: "",
   });
+
+  const [selectedActivePlanName, setSelectedActivePlanName] = useState({
+    activePlanName: "", 
+    expiryDate: "",
+  });
   const [selectedPlan, setSelectedPlan] = useState(null);
 
   const navigate = useNavigate();
@@ -52,6 +57,10 @@ export default function Payment() {
         const response = await subscriptionApis.getSubscriptionPlans();
         setPlans(response.plans.sort((a, b) => b.price - a.price));
         // Set the first plan as selected by default
+        setSelectedActivePlanName({
+          activePlanName: response.activePlanName || "",
+          expiryDate: response.expiryDate || "",
+        })
         if (response && response.plans.length > 0) {
           setSelectedPlan(response.plans[0]._id || response.plans[0].id);
         }
@@ -236,21 +245,39 @@ export default function Payment() {
             </div>
           )) : (
             <div className="text-center py-12">
-              <div className="text-gray-400 text-6xl mb-4">📋</div>
-              <div className="font-eng text-lg font-semibold text-gray-600 mb-2">
-                You have no plans available at the moment.
+              {/* <div className="text-[#9A283D] text-6xl mb-4">�</div> */}
+              <div className="font-eng text-lg font-semibold text-[#9A283D] mb-2">
+                Your Active Plan
+              </div>
+              <div className="bg-gradient-to-br from-[#FFFAF8] to-[#FCD34D] border-2 border-[#9A283D] rounded-xl p-6 mx-4 mb-4">
+                <h3 className="font-eng text-xl font-bold text-[#9A283D] mb-2">
+                  {selectedActivePlanName.activePlanName || "Premium Plan"}
+                </h3>
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <span className="font-eng text-sm text-gray-600">Expires on:</span>
+                  <span className="font-eng text-sm font-semibold text-[#9A283D]">
+                    {selectedActivePlanName.expiryDate ? new Date(selectedActivePlanName.expiryDate).toLocaleDateString('en-IN', {
+                      day: 'numeric',
+                      month: 'short',
+                      year: 'numeric'
+                    }) : "N/A"}
+                  </span>
+                </div>
+                <div className="font-eng bg-green-100 text-green-800 text-xs font-medium px-3 py-1 rounded-full inline-block">
+                  Active
+                </div>
               </div>
               <p className="font-eng text-sm text-gray-500">
-                Please check back later for subscription plans.
+                Enjoy unlimited access to all spiritual content
               </p>
             </div>
           )}
         </div>
 
         <div className="mx-auto px-4 mt-6 flex flex-col space-y-3 font-eng justify-between">
-          <button className="bg-[#9A283D] text-white py-3 rounded-xl shadow " onClick={() => makePayment(selectedPlan)}>
+          {plans && plans.length > 0 && <button className="bg-[#9A283D] text-white py-3 rounded-xl shadow " onClick={() => makePayment(selectedPlan)}>
             Get Started
-          </button>
+          </button>}
           <button className="border border-[#9A283D] text-[#9A283D] py-3 rounded-xl shadow" onClick={() => navigate("/")}>
             Skip
           </button>
