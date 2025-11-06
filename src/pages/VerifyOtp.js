@@ -93,7 +93,7 @@ function VerifyOtp() {
             
             if (data && data?.token?.length > 0) {
                 setTokenInLS(data.token);
-                navigate("/"); // redirect to home/dashboard
+                navigate(-2); // redirect to home/dashboard
             }
         } catch (error) {
             console.error("Verify API Error:", error);
