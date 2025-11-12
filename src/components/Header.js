@@ -118,10 +118,12 @@ function Header({
                     {!isHomeRoute && !showProfileHeader && (
                         <div className="flex items-center gap-2">
                             <button onClick={() => {
-                                navigate(-1);
-                                // setTimeout(() => {
-                                //     window.location.reload();
-                                // }, 50);
+
+                                if (window.history.state && window.history.state.idx > 0) {
+                                    navigate(-1);
+                                } else {
+                                    navigate("/");
+                                }
                             }}>
                                 <img src={backBtn} alt="Back" width="24" height="24" />
                             </button>
