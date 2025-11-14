@@ -77,6 +77,7 @@ export default function ChalisaDetail() {
     }
   }
 
+  
   // Direct sharing function using navigator.share only
   const handleNativeShare = async () => {
     try {
