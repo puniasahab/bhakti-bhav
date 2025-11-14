@@ -73,7 +73,7 @@ const HindiWithEnglishNumbers = ( text ) => {
         } else {
           // Hindi or other text
           return (
-            <span key={index} className="font-hindi">
+            <span key={index} className="font-hindi" style={{fontSize: '18px'}}>
               {part}
             </span>
           );
@@ -119,7 +119,7 @@ const HindiWithEnglishNumbers = ( text ) => {
                     // style={{fontFamily: "KrutiDev"}}>
                       >{item.title.hi}</h2> */}
                       {HindiWithEnglishNumbers(item.title.hi)}
-                    <p className="text-sm font-eng">{item.title.en}</p>
+                    <p className="text-sm font-eng" style={{fontSize: '13px'}}>{item.title.en}</p>
                   </div>
                 </div>
               </Link>
