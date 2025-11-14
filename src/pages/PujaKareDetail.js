@@ -57,7 +57,7 @@ export default function PujaKareDetail() {
     }
   }, [id, getPujaKareItemById, selectPujaKareItem]);
 
-  if (loading) return <Loader message="🙏 Loading भक्ति भाव 🙏" size={200} />;
+  if (loading) return <Loader message="🙏 Loading भक्ति भाव 🙏" size={200} logo="/img/logo_splash.png" />;
 
   if (!item) {
     return (

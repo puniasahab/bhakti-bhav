@@ -43,9 +43,37 @@ function JaapMalaDetail() {
       .catch((err) => console.error(err));
   }, [id]);
 
-  if (loading) return <Loader message="🙏 Loading भक्ति भाव 🙏" size={200} />;
+  if (loading) return <Loader message="🙏 Loading भक्ति भाव 🙏" size={200} logo="/img/logo_splash.png" />;
   if (!detail) return <p className="text-center mt-10">No data found!</p>;
+  const HighlightNumbers = (text) => {
 
+        // Split text into segments — words, numbers, and symbols
+        const parts = text.split(/(\d+)/g);
+
+        return (
+            <span>
+                {parts.map((part, index) =>
+                    /^\d+$/.test(part) ? (
+                        <span
+                            key={index}
+                            style={{
+                                fontFamily: "Roboto Mono, monospace",
+                                // fontWeight: "600",
+                                color: "black",
+                            }}
+                        >
+                            {part}
+                        </span>
+                    ) : (
+                        <span key={index}>{part.replace(/,/g, ']').replace(/\(/g, "¼").replace(/\)/g, "½").replace(/-/g, " ").replace(/\:/g, "ः").replace(/\//g, " ").replace(/"/g, "”")       // Replace plain English quotes with right Hindi quote
+                                    .replace(/``|''/g, "”")   // Replace double single quotes
+                                    .replace(/“/g, "")       // Normalize any weird quote forms
+                                    .replace(/”/g, "")}</span>
+                    )
+                )}
+            </span>
+        );
+    };
   return (
     <>
       <Header pageName={{ hi: "tki ekyk", en: "Jaap mala" }} />
@@ -93,7 +121,7 @@ function JaapMalaDetail() {
                   <div className="mt-6 text-center max-w-md">
                     <p className="text-2xl font-semibold theme_text mb-4">अर्थ%</p>
                     <p className="text-lg md:text-lg text-gray-700">
-                      {item.meaning.hi}
+                      {HighlightNumbers(item.meaning.hi)}
                     </p>
                     <p className="text-lg text-gray-500 font-eng">
                       {item.meaning.en}
