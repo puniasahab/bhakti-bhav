@@ -168,7 +168,10 @@ function AartiDetail() {
         <div className={`theme_text leading-loose mt-4 text-center ${fontSize}  ${language === "hi" ? "font-hindi" : "font-eng"}`}>
           {language === "hi"
             ? 
-            <div dangerouslySetInnerHTML={{ __html: detail.description?.hi.replace(/\.\.\./g, "---").replace(/,/g, "]").replace(/^'(.*)'$/, "“$1”")  // If the entire text is wrapped in quotes
+            <div dangerouslySetInnerHTML={{ __html: detail.description?.hi.replace(/\.\.\./g, "---").replace(/,/g, "]").replace(/^'(.*)'$/, "“$1”").replace(/-/g, " ").replace(/\:/g, "ः").replace(/\;/g, " ").replace(/[؛ꣾ]/g, ";")       // Replace plain English quotes with right Hindi quote
+                                    .replace(/``|''/g, "”")   // Replace double single quotes
+                                    .replace(/“/g, "")       // Normalize any weird quote forms
+                                    .replace(/”/g, "")  // If the entire text is wrapped in quotes
   .replace(/'/g, "") }} /> 
             :  
             <div dangerouslySetInnerHTML={{ __html: detail.description?.en }} />
