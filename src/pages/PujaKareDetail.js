@@ -123,7 +123,7 @@ export default function PujaKareDetail() {
     const thaali = document.createElement("img");
     thaali.src = "/img/puja_ki_thali.gif";
     thaali.className = "puja-thaali absolute";
-    thaali.style.left = "25%";
+    thaali.style.left = "20%";
     thaali.style.top = "25%";
     thaali.style.width = "250px";
     thaali.style.zIndex = "50";
@@ -163,7 +163,8 @@ export default function PujaKareDetail() {
     // Get container dimensions for responsive positioning
     const containerRect = container.getBoundingClientRect();
     const containerWidth = containerRect.width;
-    const containerHeight = containerRect.height;
+    const containerHeight = containerRect.height - 200;
+    console.log(containerWidth, containerHeight, "Container dimensions");
 
     const ring = document.createElement("img");
     ring.src = "/img/flower-mala.png";
@@ -172,11 +173,11 @@ export default function PujaKareDetail() {
     // Calculate responsive positioning for center-neck area
     // Position mala at center horizontally and around neck area (25-30% from top)
     const leftPercentage = 70; // Center horizontally
-    const topPercentage = 10; // Neck area positioning
-    const malaWidth = Math.min(150, containerWidth * 0.4); // Responsive width, max 150px
-    
+    const topPercentage = 6; // Neck area positioning
+    const malaWidth = Math.max(300, containerWidth * 0.8); // Responsive width, max 300px
+
     // Center the mala by adjusting for its width
-    const leftPosition = leftPercentage - (malaWidth / containerWidth * 100 / 2);
+    const leftPosition = leftPercentage - (malaWidth / containerWidth * 25);
     console.log(leftPosition, topPercentage, malaWidth, "Something is useful");
     
     ring.style.left = `${leftPosition}%`;
@@ -212,7 +213,7 @@ export default function PujaKareDetail() {
     kalash.src = "/img/kalash.png";
     kalash.className = "absolute animate-fade puja-kalash";
     kalash.style.right = "36%";
-    kalash.style.top = "45%";
+    kalash.style.top = "47%";
     kalash.style.width = "125px";
     kalash.style.zIndex = "50";
     container.appendChild(kalash);
@@ -250,12 +251,12 @@ export default function PujaKareDetail() {
       <div className="container mx-auto px-4 mt-6">
 
         <main className="px-4 relative">
-          <div className="container mx-auto mt-4">
-            <div className="image_wrapper mb-[150px]">
+          <div className="container mx-auto mt-2">
+            <div className="image_wrapper mb-[10px]">
               <img src={item.imageUrl} alt="" width="350" height="420" className="max-w-full h-auto mx-auto mb-8" />
             </div>
             <div className="relative w-full justify-center">
-              <div className="grid grid-cols-4 gap-6 p-3 mt-6 md:mt-3">
+              <div className="grid grid-cols-4 gap-7 p-2 mt-1 md:mt-3">
                 <button onClick={mala}
                   className="pooja-btn bg-gradient-to-b from-yellow-200 to-orange-300 rounded-full shadow-md flex justify-center items-center hover:scale-105 transition w-16 h-16">
                   <img src="/img/mala.png" alt="Mala" className="w-12 h-12" />
@@ -277,7 +278,7 @@ export default function PujaKareDetail() {
                 </button>
               </div>
 
-              <div className="grid grid-cols-4 gap-6 p-3 mt-6 md:mt-3">
+              <div className="grid grid-cols-4 gap-7 p-2 mt-1 md:mt-3">
                 <button onClick={flowerRain}
                   className="pooja-btn bg-gradient-to-b from-yellow-200 to-orange-300 rounded-full shadow-md flex justify-center items-center hover:scale-105 transition w-16 h-16">
                   <img src="/img/mandala.png" alt="Flower" className="w-12 h-12" />
