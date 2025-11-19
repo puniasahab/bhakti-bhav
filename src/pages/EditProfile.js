@@ -329,7 +329,7 @@ function EditProfile() {
 
             </form>
 
-            <img onClick = {()=>{navigate('/kundli')}} style={{width: '90%', height: 'auto', margin: '32px auto'}} src={kundaliBanner} alt="Kundali Banner" className="w-full h-40 object-cover" />
+            {/* <img onClick = {()=>{navigate('/kundli')}} style={{width: '90%', height: 'auto', margin: '32px auto'}} src={kundaliBanner} alt="Kundali Banner" className="w-full h-40 object-cover" /> */}
 
         </>
         )}
