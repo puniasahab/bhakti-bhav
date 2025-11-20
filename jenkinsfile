@@ -32,11 +32,12 @@ pipeline {
         stage('Checkout Code') {
             steps {
                 script {
-                    echo "Deploying branch: main"
+                    def selectedBranch = 'main'.replaceFirst('^origin/', '')
+                    echo "Deploying branch: ${selectedBranch}"
                     
                     checkout([
                         $class: 'GitSCM',
-                        branches: [[name: '*/main']],
+                        branches: [[name: "*/${selectedBranch}"]],
                         userRemoteConfigs: [[
                             url: 'https://github.com/puniasahab/bhakti-bhav.git',
                             credentialsId: 'github-gameofstones'
@@ -44,8 +45,8 @@ pipeline {
                     ])
                     
                     sh """
-                        git checkout main
-                        git reset --hard origin/main
+                        git checkout ${selectedBranch}
+                        git reset --hard origin/${selectedBranch}
                         git clean -fd
                     """
                 }
