@@ -2,18 +2,6 @@ pipeline {
     agent any
     
     parameters {
-        gitParameter(
-            name: 'BRANCH',
-            type: 'PT_BRANCH',
-            description: 'Select branch from GitHub to deploy',
-            branch: '',
-            branchFilter: '.*',
-            defaultValue: 'main',
-            selectedValue: 'DEFAULT',
-            sortMode: 'ASCENDING_SMART',
-            tagFilter: '*',
-            useRepository: 'https://github.com/puniasahab/bhakti-bhav.git'
-        )
         string(
             name: 'SSH_KEY_PATH',
             defaultValue: '/var/lib/jenkins/.ssh/id_ed25519',
@@ -44,12 +32,11 @@ pipeline {
         stage('Checkout Code') {
             steps {
                 script {
-                    def selectedBranch = params.BRANCH ?: 'main'
-                    echo "Deploying branch: ${selectedBranch}"
+                    echo "Deploying branch: main"
                     
                     checkout([
                         $class: 'GitSCM',
-                        branches: [[name: "*/${selectedBranch}"]],
+                        branches: [[name: '*/main']],
                         userRemoteConfigs: [[
                             url: 'https://github.com/puniasahab/bhakti-bhav.git',
                             credentialsId: 'github-gameofstones'
@@ -57,8 +44,8 @@ pipeline {
                     ])
                     
                     sh """
-                        git checkout ${selectedBranch}
-                        git reset --hard origin/${selectedBranch}
+                        git checkout main
+                        git reset --hard origin/main
                         git clean -fd
                     """
                 }
