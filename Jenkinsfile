@@ -9,7 +9,7 @@ pipeline {
         )
         string(
             name: 'GAMESTONE_SERVER',
-            defaultValue: '143.110.186.103',
+            defaultValue: '195.154.184.2',
             description: 'Gamestone server IP address or hostname'
         )
         string(
@@ -96,21 +96,7 @@ pipeline {
             }
         }
         
-        stage('Reload Application') {
-            steps {
-                sh """
-                    ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no -o BatchMode=yes ${GAMESTONE_USER}@${GAMESTONE_SERVER} '
-                        cd ${GAMESTONE_PATH}
-                        if pm2 list | grep -q "${PM2_APP_NAME}"; then
-                            pm2 reload ${PM2_APP_NAME}
-                        else
-                            pm2 start npm --name "${PM2_APP_NAME}" -- start
-                            pm2 save
-                        fi
-                    '
-                """
-            }
-        }
+
     }
     
     post {
