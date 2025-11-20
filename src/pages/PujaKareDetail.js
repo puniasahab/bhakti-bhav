@@ -204,7 +204,6 @@ export default function PujaKareDetail() {
     container.appendChild(nariyal);
     setTimeout(() => nariyal.remove(), 20000);
   };
-
   const kalash = () => {
     const container = containerRef.current;
     if (!container) return;
