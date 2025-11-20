@@ -189,7 +189,7 @@ export const pujaKareApis = {
     }
   },
   
-  getPujaKareItemById: async (id) => {
+  getPujaKareDetailsFromId: async (id) => {
     try {
       const response = await api.get(`${endPoints.pujaKarein}/${id}`);
       return response.data;

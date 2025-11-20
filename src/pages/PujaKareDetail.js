@@ -19,7 +19,7 @@ export default function PujaKareDetail() {
     async function fetchItemDetail() {
       try {
         // First try to get from context
-        let itemData = getPujaKareItemById(id);
+        let itemData = await pujaKareApis.getPujaKareDetailsFromId(id);
 
         console.log("Fetching item detail for ID:", id);
         console.log("Item data from context:", itemData);
@@ -174,10 +174,10 @@ export default function PujaKareDetail() {
     // Position mala at center horizontally and around neck area (25-30% from top)
     const leftPercentage = 70; // Center horizontally
     const topPercentage = 6; // Neck area positioning
-    const malaWidth = Math.max(300, containerWidth * 0.8); // Responsive width, max 300px
-
+    // const malaWidth = Math.max(300, containerWidth * 0.5); // Responsive width, max 300px
+    const malaWidth = containerWidth * 0.50;
     // Center the mala by adjusting for its width
-    const leftPosition = leftPercentage - (malaWidth / containerWidth * 25);
+    const leftPosition = leftPercentage - (malaWidth / containerWidth * 35);
     console.log(leftPosition, topPercentage, malaWidth, "Something is useful");
     
     ring.style.left = `${leftPosition}%`;
@@ -212,7 +212,7 @@ export default function PujaKareDetail() {
     const kalash = document.createElement("img");
     kalash.src = "/img/kalash.png";
     kalash.className = "absolute animate-fade puja-kalash";
-    kalash.style.right = "36%";
+    kalash.style.right = "34%";
     kalash.style.top = "47%";
     kalash.style.width = "125px";
     kalash.style.zIndex = "50";
@@ -256,7 +256,7 @@ export default function PujaKareDetail() {
               <img src={item.imageUrl} alt="" width="350" height="420" className="max-w-full h-auto mx-auto mb-8" />
             </div>
             <div className="relative w-full justify-center">
-              <div className="grid grid-cols-4 gap-7 p-2 mt-1 md:mt-3">
+              <div className="grid grid-cols-4 gap-7 p-2 mt-1 md:mt-3" style={{marginTop: '88px'}}>
                 <button onClick={mala}
                   className="pooja-btn bg-gradient-to-b from-yellow-200 to-orange-300 rounded-full shadow-md flex justify-center items-center hover:scale-105 transition w-16 h-16">
                   <img src="/img/mala.png" alt="Mala" className="w-12 h-12" />
