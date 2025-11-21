@@ -9,7 +9,7 @@ pipeline {
         )
         string(
             name: 'GAMESTONE_SERVER',
-            defaultValue: '195.154.184.2',
+            defaultValue: '143.110.186.103',
             description: 'Gamestone server IP address or hostname'
         )
         string(
@@ -63,6 +63,7 @@ pipeline {
             steps {
                 sh """
                     export NODE_ENV=production
+                    export CI=false
                     npm run build
                 """
             }
@@ -70,7 +71,13 @@ pipeline {
         
         stage('Deploy to Server') {
             steps {
-                sh "rsync -avz --delete --exclude='node_modules' --exclude='.git' --exclude='.env' -e 'ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no -o BatchMode=yes' ./ ${GAMESTONE_USER}@${GAMESTONE_SERVER}:${GAMESTONE_PATH}/"
+                sh """
+                    # Ensure directory exists on remote server
+                    ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no -o BatchMode=yes ${GAMESTONE_USER}@${GAMESTONE_SERVER} "mkdir -p ${GAMESTONE_PATH}" || true
+                    
+                    # Deploy files to server
+                    rsync -avz --delete --exclude='node_modules' --exclude='.git' --exclude='.env' -e 'ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no -o BatchMode=yes' ./ ${GAMESTONE_USER}@${GAMESTONE_SERVER}:${GAMESTONE_PATH}/
+                """
             }
         }
         
@@ -96,7 +103,21 @@ pipeline {
             }
         }
         
-
+        stage('Reload Application') {
+            steps {
+                sh """
+                    ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no -o BatchMode=yes ${GAMESTONE_USER}@${GAMESTONE_SERVER} '
+                        cd ${GAMESTONE_PATH}
+                        if pm2 list | grep -q "${PM2_APP_NAME}"; then
+                            pm2 reload ${PM2_APP_NAME}
+                        else
+                            pm2 start npm --name "${PM2_APP_NAME}" -- start
+                            pm2 save
+                        fi
+                    '
+                """
+            }
+        }
     }
     
     post {
@@ -111,3 +132,4 @@ pipeline {
         }
     }
 }
+
