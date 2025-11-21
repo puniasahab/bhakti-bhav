@@ -17,6 +17,11 @@ pipeline {
             defaultValue: 'jenkins',
             description: 'SSH username for gamestone server'
         )
+        string(
+            name: 'SSH_PORT',
+            defaultValue: '22',
+            description: 'SSH port for server access (default: 22)'
+        )
     }
     
     environment {
@@ -24,6 +29,7 @@ pipeline {
         GAMESTONE_USER = "${params.GAMESTONE_USER}"
         GAMESTONE_PATH = '/var/www/bhakti-bhav'
         SSH_KEY = "${params.SSH_KEY_PATH ?: '/var/lib/jenkins/.ssh/id_ed25519'}"
+        SSH_PORT = "${params.SSH_PORT ?: '22'}"
         ENV_FILE = '/var/lib/jenkins/.env/bhakti-bhav.env'
         PM2_APP_NAME = 'bhakti-bhav'
     }
@@ -73,10 +79,10 @@ pipeline {
             steps {
                 sh """
                     # Ensure directory exists on remote server
-                    ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no -o BatchMode=yes ${GAMESTONE_USER}@${GAMESTONE_SERVER} "mkdir -p ${GAMESTONE_PATH}" || true
+                    ssh -i ${SSH_KEY} -p ${SSH_PORT} -o StrictHostKeyChecking=no -o BatchMode=yes ${GAMESTONE_USER}@${GAMESTONE_SERVER} "mkdir -p ${GAMESTONE_PATH}" || true
                     
                     # Deploy files to server
-                    rsync -avz --delete --exclude='node_modules' --exclude='.git' --exclude='.env' -e 'ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no -o BatchMode=yes' ./ ${GAMESTONE_USER}@${GAMESTONE_SERVER}:${GAMESTONE_PATH}/
+                    rsync -avz --delete --exclude='node_modules' --exclude='.git' --exclude='.env' -e "ssh -p ${SSH_PORT} -i ${SSH_KEY} -o StrictHostKeyChecking=no -o BatchMode=yes" ./ ${GAMESTONE_USER}@${GAMESTONE_SERVER}:${GAMESTONE_PATH}/
                 """
             }
         }
@@ -84,7 +90,7 @@ pipeline {
         stage('Upload Environment File') {
             steps {
                 sh """
-                    scp -i ${SSH_KEY} -o StrictHostKeyChecking=no -o BatchMode=yes ${ENV_FILE} ${GAMESTONE_USER}@${GAMESTONE_SERVER}:${GAMESTONE_PATH}/.env || {
+                    scp -P ${SSH_PORT} -i ${SSH_KEY} -o StrictHostKeyChecking=no -o BatchMode=yes ${ENV_FILE} ${GAMESTONE_USER}@${GAMESTONE_SERVER}:${GAMESTONE_PATH}/.env || {
                         echo "⚠️  Warning: .env file not found or upload failed"
                         echo "⚠️  Continuing deployment - .env may need manual setup"
                     }
@@ -95,7 +101,7 @@ pipeline {
         stage('Install Dependencies on Server') {
             steps {
                 sh """
-                    ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no -o BatchMode=yes ${GAMESTONE_USER}@${GAMESTONE_SERVER} '
+                    ssh -i ${SSH_KEY} -p ${SSH_PORT} -o StrictHostKeyChecking=no -o BatchMode=yes ${GAMESTONE_USER}@${GAMESTONE_SERVER} '
                         cd ${GAMESTONE_PATH}
                         npm ci --production || npm install --production
                     '
@@ -106,7 +112,7 @@ pipeline {
         stage('Reload Application') {
             steps {
                 sh """
-                    ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no -o BatchMode=yes ${GAMESTONE_USER}@${GAMESTONE_SERVER} '
+                    ssh -i ${SSH_KEY} -p ${SSH_PORT} -o StrictHostKeyChecking=no -o BatchMode=yes ${GAMESTONE_USER}@${GAMESTONE_SERVER} '
                         cd ${GAMESTONE_PATH}
                         if pm2 list | grep -q "${PM2_APP_NAME}"; then
                             pm2 reload ${PM2_APP_NAME}
@@ -123,7 +129,7 @@ pipeline {
     post {
         success {
             echo "Deployment completed successfully!"
-            echo "Server: ${GAMESTONE_USER}@${GAMESTONE_SERVER}"
+            echo "Server: ${GAMESTONE_USER}@${GAMESTONE_SERVER}:${SSH_PORT}"
             echo "Path: ${GAMESTONE_PATH}"
             echo "PM2 App: ${PM2_APP_NAME}"
         }
