@@ -169,23 +169,24 @@ export default function PujaKareDetail() {
     const ring = document.createElement("img");
     ring.src = "/img/flower-mala.png";
     ring.className = "absolute animate-fade puja-ring";
-    
+
     // Calculate responsive positioning for center-neck area
     // Position mala at center horizontally and around neck area (25-30% from top)
     const leftPercentage = 70; // Center horizontally
     const topPercentage = 6; // Neck area positioning
     // const malaWidth = Math.max(300, containerWidth * 0.5); // Responsive width, max 300px
-    const malaWidth = containerWidth * 0.50;
+    const malaWidth = containerWidth * 0.60;
     // Center the mala by adjusting for its width
-    const leftPosition = leftPercentage - (malaWidth / containerWidth * 35);
+    const leftPosition = leftPercentage - (malaWidth / containerWidth * 32.6);
     console.log(leftPosition, topPercentage, malaWidth, "Something is useful");
-    
+
     ring.style.left = `${leftPosition}%`;
     ring.style.top = `${topPercentage}%`;
     ring.style.width = `${malaWidth}px`;
+    ring.style.height = '250px';
     ring.style.transform = "translateX(-50%)"; // Additional centering
     ring.style.zIndex = "50";
-    
+
     container.appendChild(ring);
     setTimeout(() => ring.remove(), 20000);
   };
@@ -255,7 +256,7 @@ export default function PujaKareDetail() {
               <img src={item.imageUrl} alt="" width="350" height="420" className="max-w-full h-auto mx-auto mb-8" />
             </div>
             <div className="relative w-full justify-center">
-              <div className="grid grid-cols-4 gap-7 p-2 mt-1 md:mt-3" style={{marginTop: '88px'}}>
+              <div className="grid grid-cols-4 gap-7 p-2 mt-1 md:mt-3" style={{ marginTop: '88px' }}>
                 <button onClick={mala}
                   className="pooja-btn bg-gradient-to-b from-yellow-200 to-orange-300 rounded-full shadow-md flex justify-center items-center hover:scale-105 transition w-16 h-16">
                   <img src="/img/mala.png" alt="Mala" className="w-12 h-12" />
