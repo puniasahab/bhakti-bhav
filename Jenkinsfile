@@ -59,7 +59,7 @@ pipeline {
                 sh 'npm install'
 
                 echo "Building Next.js project..."
-                sh 'npm run build'
+                sh 'CI=false npm run build'
             }
         }
 
