@@ -18,8 +18,7 @@ pipeline {
                     $class: 'GitSCM',
                     branches: [[name: '*/main']],
                     userRemoteConfigs: [[
-                        url: 'git@github.com:puniasahab/bhakti-bhav.git',
-                        credentialsId: 'cms-ssh-key'
+                        url: 'git@github.com:puniasahab/bhakti-bhav.git'
                     ]]
                 ])
             }
@@ -67,7 +66,5 @@ pipeline {
                 """
             }
         }
-
-        // PM2 stage is removed completely
     }
 }
