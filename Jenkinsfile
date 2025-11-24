@@ -24,6 +24,33 @@ pipeline {
             }
         }
 
+     
+
+        stage('Debug User') {
+            steps {
+                sh 'whoami'
+                sh 'pwd'
+                sh 'ls -la'
+            }
+        }
+
+        stage('Debug Node') {
+            steps {
+                sh 'which node'
+                sh 'node -v'
+                sh 'which npm'
+                sh 'npm -v'
+            }
+        }
+
+        stage('Debug Path') {
+            steps {
+                sh 'echo $PATH'
+            }
+        }
+
+        /* --------------------------------------------------- */
+
         stage('Install & Build Next.js') {
             steps {
                 echo "Installing dependencies..."
@@ -50,21 +77,3 @@ pipeline {
                 sh """
                     rsync -az --delete -e "ssh -i ${SSH_KEY} -p ${PROD_PORT}" .next ${PROD_USER}@${PROD_HOST}:${DEPLOY_DIR}/
                     rsync -az --delete -e "ssh -i ${SSH_KEY} -p ${PROD_PORT}" public ${PROD_USER}@${PROD_HOST}:${DEPLOY_DIR}/
-                    rsync -az --delete -e "ssh -i ${SSH_KEY} -p ${PROD_PORT}" package.json ${PROD_USER}@${PROD_HOST}:${DEPLOY_DIR}/
-                """
-            }
-        }
-
-        stage('Install Production Node Modules (Server)') {
-            steps {
-                echo "Installing production node modules..."
-                sh """
-                    ssh -i ${SSH_KEY} -p ${PROD_PORT} ${PROD_USER}@${PROD_HOST} '
-                        cd ${DEPLOY_DIR} &&
-                        npm install --omit=dev
-                    '
-                """
-            }
-        }
-    }
-}
