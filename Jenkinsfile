@@ -1,141 +1,73 @@
 pipeline {
     agent any
-    
-    parameters {
-        string(
-            name: 'SSH_KEY_PATH',
-            defaultValue: '/var/lib/jenkins/.ssh/id_ed25519',
-            description: 'Path to SSH private key for server access (default: /var/lib/jenkins/.ssh/id_ed25519)'
-        )
-        string(
-            name: 'GAMESTONE_SERVER',
-            defaultValue: '143.110.186.103',
-            description: 'Gamestone server IP address or hostname'
-        )
-        string(
-            name: 'GAMESTONE_USER',
-            defaultValue: 'jenkins',
-            description: 'SSH username for gamestone server'
-        )
-        string(
-            name: 'SSH_PORT',
-            defaultValue: '22',
-            description: 'SSH port for server access (default: 22)'
-        )
-    }
-    
+
     environment {
-        GAMESTONE_SERVER = "${params.GAMESTONE_SERVER}"
-        GAMESTONE_USER = "${params.GAMESTONE_USER}"
-        GAMESTONE_PATH = '/var/www/bhakti-bhav'
-        SSH_KEY = "${params.SSH_KEY_PATH ?: '/var/lib/jenkins/.ssh/id_ed25519'}"
-        SSH_PORT = "${params.SSH_PORT ?: '22'}"
-        ENV_FILE = '/var/lib/jenkins/.env/bhakti-bhav.env'
-        PM2_APP_NAME = 'bhakti-bhav'
+        PROD_USER = "jenkins"
+        PROD_HOST = "195.154.184.2"
+        PROD_PORT = "20238"
+        DEPLOY_DIR = "/var/www/bhakti-bhav"
+        SSH_KEY = "/var/lib/jenkins/.ssh/id_ed25519"
     }
-    
+
     stages {
+
         stage('Checkout Code') {
             steps {
-                script {
-                    def selectedBranch = 'main'.replaceFirst('^origin/', '')
-                    echo "Deploying branch: ${selectedBranch}"
-                    
-                    checkout([
-                        $class: 'GitSCM',
-                        branches: [[name: "*/${selectedBranch}"]],
-                        userRemoteConfigs: [[
-                            url: 'https://github.com/puniasahab/bhakti-bhav.git',
-                            credentialsId: 'github-gameofstones'
-                        ]]
-                    ])
-                    
-                    sh """
-                        git checkout ${selectedBranch}
-                        git reset --hard origin/${selectedBranch}
-                        git clean -fd
-                    """
-                }
+                echo "Pulling code from GitHub..."
+                checkout([
+                    $class: 'GitSCM',
+                    branches: [[name: '*/main']],
+                    userRemoteConfigs: [[
+                        url: 'git@github.com:puniasahab/bhakti-bhav.git',
+                        credentialsId: 'cms-ssh-key'
+                    ]]
+                ])
             }
         }
-        
-        stage('Install Dependencies') {
+
+        stage('Install & Build Next.js') {
             steps {
-                sh 'npm ci || npm install'
+                echo "Installing dependencies..."
+                sh 'npm install'
+
+                echo "Building Next.js project..."
+                sh 'npm run build'
             }
         }
-        
-        stage('Build Application') {
+
+        stage('Upload .env file to Server') {
             steps {
+                echo "Uploading ENV file..."
                 sh """
-                    export NODE_ENV=production
-                    export CI=false
-                    npm run build
+                    ssh -i ${SSH_KEY} -p ${PROD_PORT} ${PROD_USER}@${PROD_HOST} 'mkdir -p ${DEPLOY_DIR}'
+                    ssh -i ${SSH_KEY} -p ${PROD_PORT} ${PROD_USER}@${PROD_HOST} 'echo "NEXT_PUBLIC_API_URL=https://example.com/api" > ${DEPLOY_DIR}/.env'
                 """
             }
         }
-        
-        stage('Deploy to Server') {
+
+        stage('Deploy Build to Server') {
             steps {
+                echo "Deploying build to production server..."
                 sh """
-                    # Ensure directory exists on remote server
-                    ssh -i ${SSH_KEY} -p ${SSH_PORT} -o StrictHostKeyChecking=no -o BatchMode=yes ${GAMESTONE_USER}@${GAMESTONE_SERVER} "mkdir -p ${GAMESTONE_PATH}" || true
-                    
-                    # Deploy files to server
-                    rsync -avz --delete --exclude='node_modules' --exclude='.git' --exclude='.env' -e "ssh -p ${SSH_PORT} -i ${SSH_KEY} -o StrictHostKeyChecking=no -o BatchMode=yes" ./ ${GAMESTONE_USER}@${GAMESTONE_SERVER}:${GAMESTONE_PATH}/
+                    rsync -az --delete -e "ssh -i ${SSH_KEY} -p ${PROD_PORT}" .next ${PROD_USER}@${PROD_HOST}:${DEPLOY_DIR}/
+                    rsync -az --delete -e "ssh -i ${SSH_KEY} -p ${PROD_PORT}" public ${PROD_USER}@${PROD_HOST}:${DEPLOY_DIR}/
+                    rsync -az --delete -e "ssh -i ${SSH_KEY} -p ${PROD_PORT}" package.json ${PROD_USER}@${PROD_HOST}:${DEPLOY_DIR}/
                 """
             }
         }
-        
-        stage('Upload Environment File') {
+
+        stage('Install Production Node Modules (Server)') {
             steps {
+                echo "Installing production node modules..."
                 sh """
-                    scp -P ${SSH_PORT} -i ${SSH_KEY} -o StrictHostKeyChecking=no -o BatchMode=yes ${ENV_FILE} ${GAMESTONE_USER}@${GAMESTONE_SERVER}:${GAMESTONE_PATH}/.env || {
-                        echo "⚠️  Warning: .env file not found or upload failed"
-                        echo "⚠️  Continuing deployment - .env may need manual setup"
-                    }
-                """
-            }
-        }
-        
-        stage('Install Dependencies on Server') {
-            steps {
-                sh """
-                    ssh -i ${SSH_KEY} -p ${SSH_PORT} -o StrictHostKeyChecking=no -o BatchMode=yes ${GAMESTONE_USER}@${GAMESTONE_SERVER} '
-                        cd ${GAMESTONE_PATH}
-                        npm ci --production || npm install --production
+                    ssh -i ${SSH_KEY} -p ${PROD_PORT} ${PROD_USER}@${PROD_HOST} '
+                        cd ${DEPLOY_DIR} &&
+                        npm install --omit=dev
                     '
                 """
             }
         }
-        
-        stage('Reload Application') {
-            steps {
-                sh """
-                    ssh -i ${SSH_KEY} -p ${SSH_PORT} -o StrictHostKeyChecking=no -o BatchMode=yes ${GAMESTONE_USER}@${GAMESTONE_SERVER} '
-                        cd ${GAMESTONE_PATH}
-                        if pm2 list | grep -q "${PM2_APP_NAME}"; then
-                            pm2 reload ${PM2_APP_NAME}
-                        else
-                            pm2 start npm --name "${PM2_APP_NAME}" -- start
-                            pm2 save
-                        fi
-                    '
-                """
-            }
-        }
-    }
-    
-    post {
-        success {
-            echo "Deployment completed successfully!"
-            echo "Server: ${GAMESTONE_USER}@${GAMESTONE_SERVER}:${SSH_PORT}"
-            echo "Path: ${GAMESTONE_PATH}"
-            echo "PM2 App: ${PM2_APP_NAME}"
-        }
-        failure {
-            echo "Deployment failed! Please check the logs."
-        }
+
+        // PM2 stage is removed completely
     }
 }
-
