@@ -63,12 +63,16 @@ pipeline {
             }
         }
 
-        stage('Upload .env file to Server') {
+       stage('Upload Environment File') {
             steps {
-                echo "Uploading ENV file..."
+                echo "Uploading .env file..."
                 sh """
-                    ssh -i ${SSH_KEY} -p ${PROD_PORT} ${PROD_USER}@${PROD_HOST} 'mkdir -p ${DEPLOY_DIR}'
-                    ssh -i ${SSH_KEY} -p ${PROD_PORT} ${PROD_USER}@${PROD_HOST} 'echo "NEXT_PUBLIC_API_URL=https://example.com/api" > ${DEPLOY_DIR}/.env'
+                    scp -P ${PROD_PORT} -i ${SSH_KEY} -o StrictHostKeyChecking=no \
+                        /var/lib/jenkins/.env/bhakti-bhav.env \
+                        ${PROD_USER}@${PROD_HOST}:${DEPLOY_DIR}/.env || {
+                        echo "⚠️ Warning: .env file not found or upload failed"
+                        echo "⚠️ Continuing deployment - .env may need manual setup"
+                    }
                 """
             }
         }
