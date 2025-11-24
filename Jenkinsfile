@@ -24,7 +24,9 @@ pipeline {
             }
         }
 
-     
+        /* --------------------------------------------------- */
+        /*   DEBUG STAGES — Immediately After Git Checkout     */
+        /* --------------------------------------------------- */
 
         stage('Debug User') {
             steps {
@@ -77,3 +79,21 @@ pipeline {
                 sh """
                     rsync -az --delete -e "ssh -i ${SSH_KEY} -p ${PROD_PORT}" .next ${PROD_USER}@${PROD_HOST}:${DEPLOY_DIR}/
                     rsync -az --delete -e "ssh -i ${SSH_KEY} -p ${PROD_PORT}" public ${PROD_USER}@${PROD_HOST}:${DEPLOY_DIR}/
+                    rsync -az --delete -e "ssh -i ${SSH_KEY} -p ${PROD_PORT}" package.json ${PROD_USER}@${PROD_HOST}:${DEPLOY_DIR}/
+                """
+            }
+        }
+
+        stage('Install Production Node Modules (Server)') {
+            steps {
+                echo "Installing production node modules..."
+                sh """
+                    ssh -i ${SSH_KEY} -p ${PROD_PORT} ${PROD_USER}@${PROD_HOST} '
+                        cd ${DEPLOY_DIR} &&
+                        npm install --omit=dev
+                    '
+                """
+            }
+        }
+    }
+}
