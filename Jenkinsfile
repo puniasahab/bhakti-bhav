@@ -81,7 +81,7 @@ pipeline {
             steps {
                 echo "Deploying build to production server..."
                 sh """
-                    rsync -az --delete -e "ssh -i ${SSH_KEY} -p ${PROD_PORT}" .build ${PROD_USER}@${PROD_HOST}:${DEPLOY_DIR}/
+                    rsync -az --delete -e "ssh -i ${SSH_KEY} -p ${PROD_PORT}" build ${PROD_USER}@${PROD_HOST}:${DEPLOY_DIR}/
                     rsync -az --delete -e "ssh -i ${SSH_KEY} -p ${PROD_PORT}" public ${PROD_USER}@${PROD_HOST}:${DEPLOY_DIR}/
                     rsync -az --delete -e "ssh -i ${SSH_KEY} -p ${PROD_PORT}" package.json ${PROD_USER}@${PROD_HOST}:${DEPLOY_DIR}/
                 """
