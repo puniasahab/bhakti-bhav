@@ -256,47 +256,47 @@ export default function PujaKareDetail() {
               <img src={item.imageUrl} alt="" width="300" height="360" className="max-w-full h-auto mx-auto mb-8" />
             </div>
             <div className="relative w-full justify-center">
-              <div className="grid grid-cols-4 gap-7 p-2 mt-1 md:mt-3" style={{ marginTop: '88px' }}>
+              <div className="grid grid-cols-4 gap-7 p-2 mt-1 md:mt-3" style={{ marginTop: '45px' }}>
                 <button onClick={mala}
-                  className="pooja-btn bg-gradient-to-b from-yellow-200 to-orange-300 rounded-full shadow-md flex justify-center items-center hover:scale-105 transition w-16 h-16">
-                  <img src="/img/mala.png" alt="Mala" className="w-12 h-12" />
+                  className="pooja-btn bg-gradient-to-b from-yellow-200 to-orange-300 rounded-full shadow-md flex justify-center items-center hover:scale-105 transition w-12 h-12">
+                  <img src="/img/mala.png" alt="Mala" className="w-10 h-10" />
                 </button>
 
                 <button onClick={nariyal}
-                  className="pooja-btn bg-gradient-to-b from-yellow-200 to-orange-300 rounded-full shadow-md flex justify-center items-center hover:scale-105 transition w-16 h-16">
-                  <img src="/img/nariyal.png" alt="Nariyal" className="w-12 h-12" />
+                  className="pooja-btn bg-gradient-to-b from-yellow-200 to-orange-300 rounded-full shadow-md flex justify-center items-center hover:scale-105 transition w-12 h-12">
+                  <img src="/img/nariyal.png" alt="Nariyal" className="w-10 h-10" />
                 </button>
 
                 <button onClick={kalash}
-                  className="pooja-btn bg-gradient-to-b from-yellow-200 to-orange-300 rounded-full shadow-md flex justify-center items-center hover:scale-105 transition w-16 h-16">
-                  <img src="/img/kalash.png" alt="Kalash" className="w-8 h-8" />
+                  className="pooja-btn bg-gradient-to-b from-yellow-200 to-orange-300 rounded-full shadow-md flex justify-center items-center hover:scale-105 transition w-12 h-12">
+                  <img src="/img/kalash.png" alt="Kalash" className="w-10 h-10" />
                 </button>
 
                 <button onClick={bell}
-                  className="pooja-btn bg-gradient-to-b from-yellow-200 to-orange-300 rounded-full shadow-md flex justify-center items-center hover:scale-105 transition w-16 h-16">
-                  <img src="/img/bell_icon.png" alt="Bell" className="w-8 h-8" />
+                  className="pooja-btn bg-gradient-to-b from-yellow-200 to-orange-300 rounded-full shadow-md flex justify-center items-center hover:scale-105 transition w-12 h-12">
+                  <img src="/img/bell_icon.png" alt="Bell" className="w-10 h-10" />
                 </button>
               </div>
 
               <div className="grid grid-cols-4 gap-7 p-2 mt-1 md:mt-3">
                 <button onClick={flowerRain}
-                  className="pooja-btn bg-gradient-to-b from-yellow-200 to-orange-300 rounded-full shadow-md flex justify-center items-center hover:scale-105 transition w-16 h-16">
-                  <img src="/img/mandala.png" alt="Flower" className="w-12 h-12" />
+                  className="pooja-btn bg-gradient-to-b from-yellow-200 to-orange-300 rounded-full shadow-md flex justify-center items-center hover:scale-105 transition w-12 h-12">
+                  <img src="/img/mandala.png" alt="Flower" className="w-10 h-10" />
                 </button>
 
                 <button onClick={pujaThaali}
-                  className="pooja-btn bg-gradient-to-b from-yellow-200 to-orange-300 rounded-full shadow-md flex justify-center items-center hover:scale-105 transition w-16 h-16">
-                  <img src="/img/puja_thali.png" alt="Deep" className="w-12 h-12" />
+                  className="pooja-btn bg-gradient-to-b from-yellow-200 to-orange-300 rounded-full shadow-md flex justify-center items-center hover:scale-105 transition w-12 h-12">
+                  <img src="/img/puja_thali.png" alt="Deep" className="w-10 h-10" />
                 </button>
 
                 <button onClick={shankhAnimation}
-                  className="pooja-btn bg-gradient-to-b from-yellow-200 to-orange-300 rounded-full shadow-md flex justify-center items-center hover:scale-105 transition w-16 h-16">
-                  <img src="/img/sank.png" alt="Sankh" className="w-12 h-12" />
+                  className="pooja-btn bg-gradient-to-b from-yellow-200 to-orange-300 rounded-full shadow-md flex justify-center items-center hover:scale-105 transition w-12 h-12">
+                  <img src="/img/sank.png" alt="Sankh" className="w-10 h-10" />
                 </button>
 
                 <button onClick={diya}
-                  className="pooja-btn bg-gradient-to-b from-yellow-200 to-orange-300 rounded-full shadow-md flex justify-center items-center hover:scale-105 transition w-16 h-16">
-                  <img src="/img/deep.png" alt="Deep" className="w-12 h-12" />
+                  className="pooja-btn bg-gradient-to-b from-yellow-200 to-orange-300 rounded-full shadow-md flex justify-center items-center hover:scale-105 transition w-12 h-12">
+                  <img src="/img/deep.png" alt="Deep" className="w-10 h-10" />
                 </button>
               </div>
             </div>
