@@ -4,6 +4,7 @@ import Header from '../components/Header';
 import PageTitleCard from '../components/PageTitleCard';
 import Loader from '../components/Loader';
 import { paymentApis } from '../api';
+// import { duration } from 'html2canvas/dist/types/css/property-descriptors/duration';
 
 const Transactions = () => {
   const [transactions, setTransactions] = useState([]);
@@ -35,8 +36,10 @@ const Transactions = () => {
     try {
       setLoading(true);
       const response = await paymentApis.getTransactions();
+
       console.log(response, "Response Data");
       if (response && response.orders) {
+        console.log("Transforming transaction data", response);
         // Transform the API data to match our component structure
         const transformedTransactions = response.orders.map((order, index) => ({
           id: order._id,
@@ -45,7 +48,8 @@ const Transactions = () => {
             ? order.paymentResponse[0]?.cf_payment_id || 'N/A'
             : order.paymentResponse?.cf_order_id || 'N/A',
           planName: order.planName || getPlanName(order.planId, order.amount),
-          duration: getPlanDuration(order.amount),
+          // duration: getPlanDuration(order.amount),
+          duration: order?.duration || "N/A",
           amount: order.amount,
           status: order.status.toLowerCase(),
           paymentMethod: getPaymentMethod(order.paymentResponse),
@@ -53,11 +57,13 @@ const Transactions = () => {
           customerEmail: response.email || 'N/A',
           customerPhone: response.mobileNumber || 'N/A',
           createdAt: order.createdAt,
-          expiryDate: response.activePlans[index].endDate,
+          // expiryDate: response.activePlans[index]?.endDate || "N/A",
+          expiryDate: order?.expiryDate || "N/A",
           gatewayResponse: Array.isArray(order.paymentResponse) 
             ? order.paymentResponse[0]?.payment_message || 'Transaction processed'
             : 'Order created'
         }));
+        console.log("Transformed transaction data", transformedTransactions);
         setTransactions(transformedTransactions);
       }
     } catch (error) {

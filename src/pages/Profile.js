@@ -4,6 +4,7 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { profileApis } from "../api";
 import { useNavigate } from "react-router-dom";
+import { getTokenFromLS, getSubscriptionStatusFromLS } from "../commonFunctions";
 
 const Profile = () => {
     const navigate = useNavigate();
@@ -63,7 +64,7 @@ const Profile = () => {
 
                     <div className="mx-6 mt-6 bg-gradient-to-r from-[#F59E0B] to-[#FCD34D] rounded-xl shadow-lg p-4 flex items-center justify-between cursor-pointer border border-[#F59E0B]" onClick={() => navigate("/transactions")}>
                         <span className="text-[#7A1C2B] font-semibold text-base">
-                            Your Premium plan is active
+                            {getTokenFromLS() && getSubscriptionStatusFromLS() ? "Your Premium plan is active" : "Upgrade to premium for enhanced features"}
                         </span>
                         <ChevronRight className="text-[#7A1C2B] w-5 h-5" />
                     </div>

@@ -173,17 +173,17 @@ export default function PujaKareDetail() {
     // Calculate responsive positioning for center-neck area
     // Position mala at center horizontally and around neck area (25-30% from top)
     const leftPercentage = 70; // Center horizontally
-    const topPercentage = 6; // Neck area positioning
+    const topPercentage = 7; // Neck area positioning
     // const malaWidth = Math.max(300, containerWidth * 0.5); // Responsive width, max 300px
-    const malaWidth = containerWidth * 0.60;
+    const malaWidth = containerWidth * 0.65;
     // Center the mala by adjusting for its width
-    const leftPosition = leftPercentage - (malaWidth / containerWidth * 32.6);
+    const leftPosition = leftPercentage - (malaWidth / containerWidth * 31);
     console.log(leftPosition, topPercentage, malaWidth, "Something is useful");
 
     ring.style.left = `${leftPosition}%`;
     ring.style.top = `${topPercentage}%`;
     ring.style.width = `${malaWidth}px`;
-    ring.style.height = '250px';
+    ring.style.height = '200px';
     ring.style.transform = "translateX(-50%)"; // Additional centering
     ring.style.zIndex = "50";
 
@@ -253,7 +253,7 @@ export default function PujaKareDetail() {
         <main className="px-4 relative">
           <div className="container mx-auto mt-2">
             <div className="image_wrapper mb-[10px]">
-              <img src={item.imageUrl} alt="" width="350" height="420" className="max-w-full h-auto mx-auto mb-8" />
+              <img src={item.imageUrl} alt="" width="300" height="360" className="max-w-full h-auto mx-auto mb-8" />
             </div>
             <div className="relative w-full justify-center">
               <div className="grid grid-cols-4 gap-7 p-2 mt-1 md:mt-3" style={{ marginTop: '88px' }}>

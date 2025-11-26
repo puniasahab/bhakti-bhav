@@ -14,4 +14,5 @@ export const endPoints = {
     downloadWallpaper: 'download',
     pujaKarein: 'puja-kare',
     banner: 'banners',
+    wallpaperCategories: 'wallpaper-categories',
 }

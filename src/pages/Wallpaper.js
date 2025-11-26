@@ -4,15 +4,20 @@ import { Download, Eye, Heart, Lock } from "lucide-react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Loader from "../components/Loader";
+import { wallpaperApis } from "../api";
 import { getTokenFromLS, getSubscriptionStatusFromLS } from "../commonFunctions";
 
 export default function Wallpaper() {
   const [wallpapers, setWallpapers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState("All");
+  const [categories, setCategories] = useState([]);
 
   useEffect(() => {
-    fetch("https://api.bhaktibhav.app/frontend/wallpapers")
+    let apiUrl = activeCategory === "All"
+      ? "https://api.bhaktibhav.app/frontend/wallpapers"
+      : `https://api.bhaktibhav.app/frontend/wallpapers?categoryId=${activeCategory}`;
+    fetch(apiUrl)
       .then((res) => res.json())
       .then((resJson) => {
         if (resJson.status === "success" && Array.isArray(resJson.data)) {
@@ -27,19 +32,31 @@ export default function Wallpaper() {
         setWallpapers([]);
         setLoading(false);
       });
-  }, []);
+
+      const getData = async () => {
+        try {
+          const data = await wallpaperApis.getWallpaperCategories();
+          // console.log("Fetched wallpaper categories:", data);
+          setCategories([{ _id: "All", name: { en: "All" } }, ...data.data]);
+        } catch (error) {
+          console.error("Error fetching wallpaper categories:", error);
+        }
+      }
+      getData();
+      // console.log("Fetching wallpaper categories", categories);
+  }, [activeCategory]);
 
   if (loading) return <Loader message="🙏 Loading भक्ति भाव 🙏" size={200} />;
   if (!wallpapers.length) return <p className="text-center py-10">❌ No wallpapers found</p>;
  
-  const categories = ["All", ...new Set(wallpapers.map((wp) => wp.godName.toLowerCase()))];
+  // const categories = ["All", ...new Set(wallpapers.map((wp) => wp.godName.toLowerCase()))];
  
-  const filteredWallpapers =
-    activeCategory === "All"
-      ? wallpapers
-      : wallpapers.filter(
-        (wp) => wp.godName?.toLowerCase() === activeCategory.toLowerCase()
-      );
+  // const filteredWallpapers =
+  //   activeCategory === "All"
+  //     ? wallpapers
+  //     : wallpapers.filter(
+  //       (wp) => wp.category === activeCategory
+  //     );
  
   const getImageUrl = (wp) => {
     if (wp.imagethumb && wp.imagethumb !== "") {
@@ -76,23 +93,23 @@ export default function Wallpaper() {
       <Header />
  
       <div className="flex gap-3 justify-start px-4 mt-4 mb-6 overflow-x-auto scrollbar-hide">
-        {categories.map((cat) => (
+        {categories && categories.length > 0 && categories?.map((cat) => (
           <button
-            key={cat}
-            onClick={() => setActiveCategory(cat)}
-            className={`px-5 py-2 rounded-full border text-sm font-eng whitespace-nowrap transition ${activeCategory === cat
+            key={cat._id}
+            onClick={() => setActiveCategory(cat._id)}
+            className={`px-5 py-2 rounded-full border text-sm font-eng whitespace-nowrap transition ${activeCategory === cat._id
                 ? "bg-[#9A283D] text-white"
                 : "border-[#9A283D] text-[#9A283D]"
               }`}
           >
-            {cat.charAt(0).toUpperCase() + cat.slice(1)}
+            {cat.name.en.charAt(0).toUpperCase() + cat.name.en.slice(1)}
           </button>
         ))}
       </div>
 
       <div className="container mx-auto px-4">
         <ul className="grid grid-cols-2 gap-3">
-          {filteredWallpapers.map((wp) => (
+          {wallpapers?.map((wp) => (
             <li key={wp._id}>
               <Link to={handleNavigate(wp._id, wp.accessType)} className="block">
                 <div className="relative rounded-2xl overflow-hidden shadow-lg bg-white">

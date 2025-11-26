@@ -1,10 +1,11 @@
 import React, { useContext, useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import rupeesIcon from "../assets/img/rupees_icon.png";
-import bellIcon from "../assets/img/bell.png";
+// import bellIcon from "../assets/img/bell.png";
 import userIcon from "../assets/img/hd_user_icon.png";
 import logo from "../assets/img/logo.png";
 import backBtn from "../assets/img/back_icon.svg";
+import { ReceiptText } from "lucide-react";
 import { LanguageContext } from "../contexts/LanguageContext";
 import { Download, Eye, Heart, Pencil, MoreVertical, LogOut } from "lucide-react";
 import { getTokenFromLS, removeMobileNoFromLS, removeSubscriptionStatusFromLS, removeTokenFromLS } from "../commonFunctions";
@@ -203,9 +204,9 @@ function Header({
                                 <a href={getTokenFromLS() ? "/payment" : "/login"}>
                                     <img src={rupeesIcon} alt="₹" width="22" height="22" />
                                 </a>
-                                <a href="#">
-                                    <img src={bellIcon} alt="Bell" width="22" height="22" />
-                                </a>
+                                    <a href={getTokenFromLS() ? "/transactions" : "/login"}>
+                                    <ReceiptText size={22} className="text-[#9A283D]" />
+                                    </a>
                                 <a href={getProfileOrLoginRoute()}>
                                     <img src={userIcon} alt="User" width="22" height="20" />
                                 </a>

@@ -10,7 +10,7 @@ import { useNavigate } from "react-router-dom";
 import "swiper/css";
 import "swiper/css/pagination";
 import { profileApis, wallpaperApis } from "../api";
-import { setSubscriptionStatusInLS } from "../commonFunctions";
+import { getMobileNoFromLS, setSubscriptionStatusInLS } from "../commonFunctions";
 
 function Home() {
 
@@ -65,6 +65,7 @@ function Home() {
         
     }, [isOpen]);
 
+    const phoneNumber = getMobileNoFromLS();
 
     useEffect(() => {
         
@@ -94,7 +95,7 @@ function Home() {
         };
 
         fetchBanners();
-    }, [])
+    }, [phoneNumber])
 
 
     return (
