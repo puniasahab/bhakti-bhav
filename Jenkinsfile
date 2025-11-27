@@ -35,6 +35,7 @@ pipeline {
             }
         }
 
+        /* --------------------------------------------------- */
 
         stage('Deploy Build to Server') {
             steps {
@@ -45,5 +46,28 @@ pipeline {
             }
         }
 
+        /* --------------------------------------------------- */
+
+        stage('Set Permissions on Server') {
+            steps {
+                echo "Setting correct permissions on production server..."
+
+                sh """
+                    ssh -i ${SSH_KEY} -p ${PROD_PORT} ${PROD_USER}@${PROD_HOST} << 'EOF'
+                    
+                    echo "Changing owner to jenkins:www-data"
+                    sudo chown -R jenkins:www-data ${DEPLOY_DIR}
+
+                    echo "Setting directory permissions to 775"
+                    sudo find ${DEPLOY_DIR} -type d -exec chmod 775 {} \\;
+
+                    echo "Setting file permissions to 664"
+                    sudo find ${DEPLOY_DIR} -type f -exec chmod 664 {} \\;
+
+                    echo "Permissions updated!"
+                    EOF
+                """
+            }
+        }
     }
 }
