@@ -11,6 +11,7 @@ pipeline {
 
     stages {
 
+        /* --------------------------------------------------- */
         stage('Checkout Code') {
             steps {
                 echo "Pulling code from GitHub..."
@@ -25,32 +26,29 @@ pipeline {
         }
 
         /* --------------------------------------------------- */
-
         stage('Install & Build Next.js') {
             steps {
                 echo "Installing dependencies..."
+                sh 'npm install'
                 echo "Building Next.js project..."
                 sh 'CI=false npm run build'
             }
         }
 
         /* --------------------------------------------------- */
-
-        stage('Deploy Build to Server') {
+        stage('Deploy Project to Server') {
             steps {
-                echo "Deploying build to production server..."
+                echo "Deploying full project to production server..."
                 sh """
-                    rsync -az --delete -e "ssh -i ${SSH_KEY} -p ${PROD_PORT}" build ${PROD_USER}@${PROD_HOST}:${DEPLOY_DIR}/
+                    rsync -az --delete --exclude 'node_modules' --exclude '.env' -e "ssh -i ${SSH_KEY} -p ${PROD_PORT}" ./ ${PROD_USER}@${PROD_HOST}:${DEPLOY_DIR}/
                 """
             }
         }
 
         /* --------------------------------------------------- */
-
         stage('Set Permissions on Server') {
             steps {
                 echo "Setting correct permissions on production server..."
-
                 sh """
                     ssh -i ${SSH_KEY} -p ${PROD_PORT} ${PROD_USER}@${PROD_HOST} "\
                         echo 'Changing owner to jenkins:www-data'; \
