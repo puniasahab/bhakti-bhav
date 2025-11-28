@@ -53,7 +53,7 @@ pipeline {
                 echo "Setting correct permissions on production server..."
 
                 sh """
-                    ssh -i ${SSH_KEY} -p ${PROD_PORT} ${PROD_USER}@${PROD_HOST} << 'EOF'
+                    ssh -i ${SSH_KEY} -p ${PROD_PORT} ${PROD_USER}@${PROD_HOST}
                     
                     echo "Changing owner to jenkins:www-data"
                     sudo chown -R jenkins:www-data ${DEPLOY_DIR}
