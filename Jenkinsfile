@@ -40,12 +40,17 @@ pipeline {
             steps {
                 echo "Deploying full project to production server..."
                 sh """
-                    # Sync all files except node_modules and .env
-                    rsync -az --times --delete --exclude 'node_modules' --exclude '.env' -e "ssh -i ${SSH_KEY} -p ${PROD_PORT}" ./ ${PROD_USER}@${PROD_HOST}:${DEPLOY_DIR}/
+                    # Sync all files except node_modules and .env, do not preserve owner/group
+                    rsync -az --no-o --no-g --times --delete --exclude 'node_modules' --exclude '.env' -e "ssh -i ${SSH_KEY} -p ${PROD_PORT}" ./ ${PROD_USER}@${PROD_HOST}:${DEPLOY_DIR}/
 
-                    # Sync dist/ folder if it exists
+                    # Sync dist/ folder separately if it exists
                     if [ -d "dist" ]; then
-                        rsync -az --times -e "ssh -i ${SSH_KEY} -p ${PROD_PORT}" dist/ ${PROD_USER}@${PROD_HOST}:${DEPLOY_DIR}/dist/
+                        rsync -az --no-o --no-g --times -e "ssh -i ${SSH_KEY} -p ${PROD_PORT}" dist/ ${PROD_USER}@${PROD_HOST}:${DEPLOY_DIR}/dist/
+                    fi
+
+                    # Preserve Laravel storage symbolic links if they exist
+                    if [ -d "storage" ]; then
+                        rsync -az --no-o --no-g --times -e "ssh -i ${SSH_KEY} -p ${PROD_PORT}" --links storage/ ${PROD_USER}@${PROD_HOST}:${DEPLOY_DIR}/storage/
                     fi
                 """
             }
