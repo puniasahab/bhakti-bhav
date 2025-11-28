@@ -29,7 +29,6 @@ pipeline {
         stage('Install & Build Next.js') {
             steps {
                 echo "Installing dependencies..."
-
                 echo "Building Next.js project..."
                 sh 'CI=false npm run build'
             }
@@ -53,19 +52,15 @@ pipeline {
                 echo "Setting correct permissions on production server..."
 
                 sh """
-                    ssh -i ${SSH_KEY} -p ${PROD_PORT} ${PROD_USER}@${PROD_HOST}
-                    
-                    echo "Changing owner to jenkins:www-data"
-                    sudo chown -R jenkins:www-data ${DEPLOY_DIR}
-
-                    echo "Setting directory permissions to 775"
-                    sudo find ${DEPLOY_DIR} -type d -exec chmod 775 {} \\;
-
-                    echo "Setting file permissions to 664"
-                    sudo find ${DEPLOY_DIR} -type f -exec chmod 664 {} \\;
-
-                    echo "Permissions updated!"
-                    EOF
+                    ssh -i ${SSH_KEY} -p ${PROD_PORT} ${PROD_USER}@${PROD_HOST} "\
+                        echo 'Changing owner to jenkins:www-data'; \
+                        sudo chown -R jenkins:www-data ${DEPLOY_DIR}; \
+                        echo 'Setting directory permissions to 775'; \
+                        sudo find ${DEPLOY_DIR} -type d -exec chmod 775 {} \\\\; ; \
+                        echo 'Setting file permissions to 664'; \
+                        sudo find ${DEPLOY_DIR} -type f -exec chmod 664 {} \\\\; ; \
+                        echo 'Permissions updated!'; \
+                    "
                 """
             }
         }
