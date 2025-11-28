@@ -58,6 +58,27 @@ function Header({
         }
     }
 
+    const handleProfileNavigation = () => {
+        const route = getProfileOrLoginRoute();
+        navigate(route);
+    }
+
+    const handlePaymentNavigation = () => {
+        if (getTokenFromLS()) {
+            navigate("/payment");
+        } else {
+            navigate("/login");
+        }
+    }
+
+    const handleTransactionNavigation = () => {
+        if (getTokenFromLS()) {
+            navigate("/transactions");
+        } else {
+            navigate("/login");
+        }
+    }
+
     const handleLogout = () => {
         removeTokenFromLS();
         removeSubscriptionStatusFromLS();
@@ -202,15 +223,15 @@ function Header({
                             </h1>
 
                             <div className="flex items-center md:space-x-6 space-x-4 text-xl ms-auto">
-                                <a href={getTokenFromLS() ? "/payment" : "/login"}>
+                                <button onClick={handlePaymentNavigation}>
                                     <img src={rupeesIcon} alt="₹" width="22" height="22" />
-                                </a>
-                                    <a href={getTokenFromLS() ? "/transactions" : "/login"}>
+                                </button>
+                                <button onClick={handleTransactionNavigation}>
                                     <ReceiptText size={22} className="text-[#9A283D]" />
-                                    </a>
-                                <a href={getProfileOrLoginRoute()}>
+                                </button>
+                                <button onClick={handleProfileNavigation}>
                                     <img src={userIcon} alt="User" width="22" height="20" />
-                                </a>
+                                </button>
                             </div>
                         </>
                     )}
