@@ -11,7 +11,6 @@ pipeline {
 
     stages {
 
-        /* --------------------------------------------------- */
         stage('Checkout Code') {
             steps {
                 echo "Pulling code from GitHub..."
@@ -26,27 +25,27 @@ pipeline {
         }
 
         /* --------------------------------------------------- */
-        stage('Install & Build Next.js') {
+        stage('Install & Build NestJS') {
             steps {
-                echo "Installing dependencies..."
+                echo "Installing Node modules..."
                 sh 'npm install'
-                echo "Building Next.js project..."
-                sh 'CI=false npm run build'
+                echo "Building NestJS project..."
+                sh 'npm run build'
             }
         }
 
         /* --------------------------------------------------- */
-        stage('Deploy Project to Server') {
+        stage('Deploy Build to CMS Server') {
             steps {
-                echo "Deploying full project to production server..."
+                echo "Deploying dist/ folder to production server..."
                 sh """
-                    rsync -az --delete --exclude 'node_modules' --exclude '.env' -e "ssh -i ${SSH_KEY} -p ${PROD_PORT}" ./ ${PROD_USER}@${PROD_HOST}:${DEPLOY_DIR}/
+                    rsync -az --delete -e "ssh -i ${SSH_KEY} -p ${PROD_PORT}" dist/ ${PROD_USER}@${PROD_HOST}:${DEPLOY_DIR}/
                 """
             }
         }
 
         /* --------------------------------------------------- */
-        stage('Set Permissions on Server') {
+        stage('Set Permissions on CMS Server') {
             steps {
                 echo "Setting correct permissions on production server..."
                 sh """
@@ -54,13 +53,22 @@ pipeline {
                         echo 'Changing owner to jenkins:www-data'; \
                         sudo chown -R jenkins:www-data ${DEPLOY_DIR}; \
                         echo 'Setting directory permissions to 775'; \
-                        sudo find ${DEPLOY_DIR} -type d -exec chmod 775 {} \\\\; ; \
+                        sudo find ${DEPLOY_DIR} -type d -exec chmod 775 {} \\\\;; \
                         echo 'Setting file permissions to 664'; \
-                        sudo find ${DEPLOY_DIR} -type f -exec chmod 664 {} \\\\; ; \
+                        sudo find ${DEPLOY_DIR} -type f -exec chmod 664 {} \\\\;; \
                         echo 'Permissions updated!'; \
                     "
                 """
             }
+        }
+    }
+
+    post {
+        success {
+            echo "✅ NestJS Deployment completed successfully!"
+        }
+        failure {
+            echo "❌ Deployment failed!"
         }
     }
 }
