@@ -51,6 +51,7 @@ function Header({
 
     const getProfileOrLoginRoute = () => {
         if (getTokenFromLS()) {
+            console.log("Already login going to profile page!!");
             return "/profile";
         } else {
             return "/login";
