@@ -68,7 +68,7 @@ function Login() {
                             <p className="md:text-xl text-3xl font-semibold mb-4 theme_text font-eng">Sign In</p>
                             <div className="mb-4">
                                 <div className="relative flex items-center">
-                                    <span className="absolute left-3 text-gray-700 font-semibold md:text-xl text-3xl pointer-events-none z-10">
+                                    <span className="absolute left-3 text-gray-700 font-semibold md:text-lg text-2xl pointer-events-none z-10">
                                         +91
                                     </span>
                                     <input
@@ -78,7 +78,7 @@ function Login() {
                                             setMobile(e.target.value.replace(/\D/g, "").slice(0, 10))  
                                         }
                                         placeholder="Phone Number"
-                                        className="w-full border border-red-300 rounded-lg pl-16 pr-4 md:text-lg text-3xl py-2 focus:outline-none focus:ring-2 focus:ring-red-400 theme_text"
+                                        className="w-full border border-red-300 rounded-lg pl-16 pr-4 md:text-lg text-2xl py-3 focus:outline-none focus:ring-2 focus:ring-red-400 theme_text flex items-center placeholder:text-lg placeholder:md:text-base"
                                     />
                                 </div>
                             </div>

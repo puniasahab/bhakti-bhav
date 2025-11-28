@@ -8,11 +8,11 @@ import PageTitleCard from "../components/PageTitleCard";
 
 export default function MantraDetail() {
   const { id } = useParams();
-  const [detail, setDetail] = useState(null); // store object, not array
+  const [detail, setDetail] = useState(null);
   const [loading, setLoading] = useState(true);
   const { language, fontSize } = useContext(LanguageContext);
   const { play, pause, isPlaying, currentTrack, audioRef } = useAudio();
-  const [loopStates, setLoopStates] = useState({});
+  const [currentLoopMantra, setCurrentLoopMantra] = useState(null);
 
   useEffect(() => {
     async function fetchMantras() {
@@ -30,37 +30,75 @@ export default function MantraDetail() {
     fetchMantras();
   }, [id]);
 
+  // Monitor audio state changes to clear loop when audio stops
+  useEffect(() => {
+    if (!isPlaying && currentLoopMantra) {
+      setCurrentLoopMantra(null);
+      if (audioRef.current) {
+        audioRef.current.loop = false;
+      }
+    }
+  }, [isPlaying, currentLoopMantra]);
+
+  // Monitor track changes to clear loop when switching tracks
+  useEffect(() => {
+    if (currentTrack && currentLoopMantra) {
+      const currentLoopUrl = detail?.mantras?.find(m => (m._id || detail.mantras.indexOf(m)) === currentLoopMantra)?.audioUrl?.hi;
+      if (currentTrack !== currentLoopUrl) {
+        setCurrentLoopMantra(null);
+        if (audioRef.current) {
+          audioRef.current.loop = false;
+        }
+      }
+    }
+  }, [currentTrack, currentLoopMantra, detail?.mantras]);
+
   const handlePlay = (url, mantraId) => {
-    if (!url) return; // no audio available
+    if (!url) return;
     
-    // If the same audio is playing, pause it
     if (currentTrack === url && isPlaying) {
       pause();
+      setCurrentLoopMantra(null);
+      if (audioRef.current) {
+        audioRef.current.loop = false;
+      }
       return;
     }
     
-    // Play the new audio using global audio context
+    if (currentTrack !== url) {
+      setCurrentLoopMantra(null);
+    }
+    
     play(url);
     localStorage.setItem('currentTrackName', `${detail.name?.hi} मंत्र`);
-
-    // Set loop state if enabled for this mantra
-    if (audioRef.current && loopStates[mantraId]) {
-      audioRef.current.loop = true;
-    }
   };
 
   const toggleLoop = (mantraId, audioUrl) => {
     if (!audioUrl) return;
     
-    const newLoopState = !loopStates[mantraId];
-    setLoopStates(prev => ({
-      ...prev,
-      [mantraId]: newLoopState
-    }));
+    if (currentLoopMantra === mantraId) {
+      setCurrentLoopMantra(null);
+      if (audioRef.current) {
+        audioRef.current.loop = false;
+      }
+      return;
+    }
     
-    // If this is the currently playing audio, update its loop property immediately
-    if (currentTrack === audioUrl && audioRef.current) {
-      audioRef.current.loop = newLoopState;
+    if (currentTrack === audioUrl) {
+      setCurrentLoopMantra(mantraId);
+      if (audioRef.current) {
+        audioRef.current.loop = true;
+      }
+    } else {
+      play(audioUrl);
+      setCurrentLoopMantra(mantraId);
+      localStorage.setItem('currentTrackName', `${detail.name?.hi} मंत्र`);
+      
+      setTimeout(() => {
+        if (audioRef.current) {
+          audioRef.current.loop = true;
+        }
+      }, 100);
     }
   };
 
@@ -71,7 +109,6 @@ export default function MantraDetail() {
         play(audioUrl);
       }
     } else {
-      // If not currently playing, start playing
       handlePlay(audioUrl, mantraId);
     }
   };
@@ -87,7 +124,6 @@ export default function MantraDetail() {
         titleEn={detail.name.en} 
         customEngFontSize={"13px"}
         customFontSize={"19px"}
-        
       /> 
 
       <div className="container mx-auto px-4">
@@ -108,73 +144,65 @@ export default function MantraDetail() {
             ?.sort((a, b) => {
               const lengthA = a.text?.hi?.length || 0;
               const lengthB = b.text?.hi?.length || 0;
-              return lengthA - lengthB; // Sort by ascending order (shortest first)
-              // Use: return lengthB - lengthA; // For descending order (longest first)
+              return lengthA - lengthB;
             })
-            ?.map((item, index) => (
-              <div
-                key={item._id || index}
-                className="bg-[#FFD35A] text-center p-4 rounded-lg shadow relative"
-              >
-                <p
-                  className={`theme_text text-[21px] font-semibold font-hindi ${fontSize}
-                  }`}
+            ?.map((item, index) => {
+              const mantraId = item._id || index;
+              const isCurrentlyLooping = currentLoopMantra === mantraId;
+              
+              return (
+                <div
+                  key={mantraId}
+                  className="bg-[#FFD35A] text-center p-4 rounded-lg shadow relative"
                 >
-                  {item.text?.hi
-                    .replace(/:/g, "ः")         // Replace colon with visarga
-                    .replace(/ँ/g, "ं")          // Normalize chandrabindu if misencoded
-                    .replace(/\u200D|\u200C/g, " ") // Remove zero-width joiners
-                    .normalize("NFC")}
-                </p>
-
-                <div className="mt-8 mb-2 w-full flex items-center justify-center">
-                  <button
-                    onClick={() => handlePlay(item.audioUrl?.hi, item._id || index)}
-                    disabled={!item.audioUrl?.hi}
-                    className={`p-2 flex items-center justify-center rounded-full 
-                    transition font-hindi 
-                    ${!item.audioUrl?.hi
-                        ? "bg-[#9A283D]/50 text-gray-500 cursor-not-allowed"
-                        : currentTrack === item.audioUrl?.hi && isPlaying
-                          ? "bg_theme text-white"
-                          : "bg_theme text-white"
-                      }`}
+                  <p
+                    className={`theme_text text-[21px] font-semibold font-hindi ${fontSize}`}
                   >
-                    {currentTrack === item.audioUrl?.hi && isPlaying ? (
-                      <span className="audio_pause_icon"></span>
-                    ) : (
-                      <span className="audio_icon"></span>
-                    )}
-                  </button>
+                    {item.text?.hi
+                      .replace(/:/g, "ः")
+                      .replace(/ँ/g, "ं")
+                      .replace(/,/g, "]")
+                      .replace(/\u200D|\u200C/g, " ")
+                      .normalize("NFC")}
+                  </p>
 
-                  <button
-                    onClick={() => toggleLoop(item._id || index, item.audioUrl?.hi)}
-                    disabled={!item.audioUrl?.hi}
-                    className={`ml-3 p-2 flex items-center justify-center rounded-full transition font-hindi 
-                    ${!item.audioUrl?.hi
-                        ? "bg-[#9A283D]/50 text-gray-500 cursor-not-allowed"
-                        : loopStates[item._id || index]
-                          ? "bg-green-600 text-white"
-                          : "bg_theme text-white"
-                      }`}
-                  >
-                    <span className="audio_repeat_icon"></span>
-                  </button>
+                  <div className="mt-8 mb-2 w-full flex items-center justify-center">
+                    <button
+                      onClick={() => handlePlay(item.audioUrl?.hi, mantraId)}
+                      disabled={!item.audioUrl?.hi}
+                      className={`p-2 flex items-center justify-center rounded-full 
+                      transition font-hindi 
+                      ${!item.audioUrl?.hi
+                          ? "bg-[#9A283D]/50 text-gray-500 cursor-not-allowed"
+                          : currentTrack === item.audioUrl?.hi && isPlaying
+                            ? "bg_theme text-white"
+                            : "bg_theme text-white"
+                        }`}
+                    >
+                      {currentTrack === item.audioUrl?.hi && isPlaying ? (
+                        <span className="audio_pause_icon"></span>
+                      ) : (
+                        <span className="audio_icon"></span>
+                      )}
+                    </button>
 
-                  {/* <button
-                    onClick={() => replayAudio(item.audioUrl?.hi, item._id || index)}
-                    disabled={!item.audioUrl?.hi}
-                    className={`ml-3 p-2 flex items-center justify-center rounded-full transition font-hindi 
-                    ${!item.audioUrl?.hi
-                        ? "bg-[#9A283D]/50 text-gray-500 cursor-not-allowed"
-                        : "bg_theme text-white"
-                      }`}
-                  >
-                    <span className="audio_restart_icon">↻</span>
-                  </button> */}
+                    <button
+                      onClick={() => toggleLoop(mantraId, item.audioUrl?.hi)}
+                      disabled={!item.audioUrl?.hi}
+                      className={`ml-3 p-2 flex items-center justify-center rounded-full transition font-hindi 
+                      ${!item.audioUrl?.hi
+                          ? "bg-[#9A283D]/50 text-gray-500 cursor-not-allowed"
+                          : isCurrentlyLooping
+                            ? "bg-green-600 text-white"
+                            : "bg_theme text-white"
+                        }`}
+                    >
+                      <span className="audio_repeat_icon"></span>
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
         </div>
       </div>
     </div>

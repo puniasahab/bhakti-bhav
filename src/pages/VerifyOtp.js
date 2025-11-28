@@ -75,7 +75,6 @@ function VerifyOtp() {
         }
 
         setLoading(true);
-
         try {
             const res = await fetch("https://api.bhaktibhav.app/frontend/verify-otp", {
                 method: "POST",
