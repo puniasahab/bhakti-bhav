@@ -11,6 +11,7 @@ pipeline {
 
     stages {
 
+        /* --------------------------------------------------- */
         stage('Checkout Code') {
             steps {
                 echo "Pulling code from GitHub..."
@@ -25,27 +26,33 @@ pipeline {
         }
 
         /* --------------------------------------------------- */
-        stage('Install & Build NestJS') {
+        stage('Install & Build Next.js') {
             steps {
-                echo "Installing Node modules..."
+                echo "Installing dependencies..."
                 sh 'npm install'
-                echo "Building NestJS project..."
-                sh 'npm run build'
+                echo "Building Next.js project..."
+                sh 'CI=false npm run build'
             }
         }
 
         /* --------------------------------------------------- */
-        stage('Deploy Build to CMS Server') {
+        stage('Deploy Project to Server') {
             steps {
-                echo "Deploying dist/ folder to production server..."
+                echo "Deploying full project to production server..."
                 sh """
-                    rsync -az --delete -e "ssh -i ${SSH_KEY} -p ${PROD_PORT}" dist/ ${PROD_USER}@${PROD_HOST}:${DEPLOY_DIR}/
+                    # Sync all files except node_modules and .env
+                    rsync -az --times --delete --exclude 'node_modules' --exclude '.env' -e "ssh -i ${SSH_KEY} -p ${PROD_PORT}" ./ ${PROD_USER}@${PROD_HOST}:${DEPLOY_DIR}/
+
+                    # Sync dist/ folder if it exists
+                    if [ -d "dist" ]; then
+                        rsync -az --times -e "ssh -i ${SSH_KEY} -p ${PROD_PORT}" dist/ ${PROD_USER}@${PROD_HOST}:${DEPLOY_DIR}/dist/
+                    fi
                 """
             }
         }
 
         /* --------------------------------------------------- */
-        stage('Set Permissions on CMS Server') {
+        stage('Set Permissions on Server') {
             steps {
                 echo "Setting correct permissions on production server..."
                 sh """
@@ -53,22 +60,13 @@ pipeline {
                         echo 'Changing owner to jenkins:www-data'; \
                         sudo chown -R jenkins:www-data ${DEPLOY_DIR}; \
                         echo 'Setting directory permissions to 775'; \
-                        sudo find ${DEPLOY_DIR} -type d -exec chmod 775 {} \\\\;; \
+                        sudo find ${DEPLOY_DIR} -type d -exec chmod 775 {} \\\\; ; \
                         echo 'Setting file permissions to 664'; \
-                        sudo find ${DEPLOY_DIR} -type f -exec chmod 664 {} \\\\;; \
+                        sudo find ${DEPLOY_DIR} -type f -exec chmod 664 {} \\\\; ; \
                         echo 'Permissions updated!'; \
                     "
                 """
             }
-        }
-    }
-
-    post {
-        success {
-            echo "✅ NestJS Deployment completed successfully!"
-        }
-        failure {
-            echo "❌ Deployment failed!"
         }
     }
 }
