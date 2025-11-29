@@ -1,6 +1,6 @@
 import React from "react";
 import { Facebook, Instagram } from 'lucide-react';
-import  whatsapp_icon  from "../assets/img/whatssapp_icon.png";
+import whatsapp_icon from "../assets/img/whatssapp_icon.png";
 
 function Footer() {
     return (
@@ -15,7 +15,9 @@ function Footer() {
                         className="w-10 h-10 flex items-center justify-center rounded-full bg-[#5a001d] text-white text-lg hover:bg-[#7a0028]">
                         <Instagram color="white" size={20} />
                     </a>
-                    <a href="#"
+                    <a href="https://wa.me/917042515876"
+                        target="_blank"
+                        rel="noopener noreferrer"
                         className="w-10 h-10 flex items-center justify-center rounded-full bg-[#5a001d] text-white text-lg hover:bg-[#7a0028]">
                         <img src={whatsapp_icon} alt="WhatsApp" width="20" height="20" className="max-w-full h-auto" />
                     </a>
