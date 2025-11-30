@@ -93,7 +93,7 @@ pipeline {
                 echo "Reloading PM2 process..."
                 sh """
                     ssh -i ${SSH_KEY} -p ${PROD_PORT} ${PROD_USER}@${PROD_HOST} "\
-                        pm2 reload bhaktibhav-api || pm2 start ecosystem.config.js --only bhaktibhav-api; \
+                        sudo pm2 reload bhaktibhav-api;\
                     "
                 """
             }
