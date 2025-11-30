@@ -56,6 +56,19 @@ pipeline {
             }
         }
 
+        /* ------------------------------------------ */
+        stage('Copy ENV File to Server') {
+            steps {
+                echo "Copying .env file to production server..."
+                sh """
+                    scp -i ${SSH_KEY} -P ${PROD_PORT} \
+                        /var/lib/jenkins/.env/bhakti-bhav.env \
+                        ${PROD_USER}@${PROD_HOST}:${DEPLOY_DIR}/.env
+                """
+            }
+        }
+
+
         /* --------------------------------------------------- */
         stage('Set Permissions on Server') {
             steps {
@@ -73,5 +86,18 @@ pipeline {
                 """
             }
         }
+
+                /* --------------------------------------------------- */
+        stage('Reload PM2 Process') {
+            steps {
+                echo "Reloading PM2 process..."
+                sh """
+                    ssh -i ${SSH_KEY} -p ${PROD_PORT} ${PROD_USER}@${PROD_HOST} "\
+                        pm2 reload bhaktibhav-api || pm2 start ecosystem.config.js --only bhaktibhav-api; \
+                    "
+                """
+            }
+        }
+
     }
 }
