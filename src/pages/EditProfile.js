@@ -211,6 +211,7 @@ function EditProfile() {
                 
                 <div>
                   <input
+                    disabled
                     type="text"
                     name="mobileNumber"
                     placeholder="Mobile number*"

@@ -90,9 +90,10 @@ function Header({
 
 
     return (
-        <header className="px-4 pt-3">
-            <div className="container mx-auto hd_bg rounded-xl">
-                <div className="flex justify-between items-center px-4 py-6">
+        <>
+            <header className="fixed top-0 left-0 right-0 z-50 px-4 pt-3 bg-white shadow-sm" style={{height: '80px'}}>
+                <div className="container mx-auto hd_bg rounded-xl">
+                    <div className="flex justify-between items-center px-4 py-6">
 
                     {showProfileHeader && (
                         <>
@@ -239,6 +240,9 @@ function Header({
                 </div>
             </div>
         </header>
+        {/* Spacer div to prevent content overlap */}
+        <div className="h-20 w-full"></div>
+        </>
     );
 }
 
