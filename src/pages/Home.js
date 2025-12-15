@@ -10,7 +10,7 @@ import { useNavigate } from "react-router-dom";
 import "swiper/css";
 import "swiper/css/pagination";
 import { profileApis, wallpaperApis } from "../api";
-import { getMobileNoFromLS, setSubscriptionStatusInLS } from "../commonFunctions";
+import { clearAllLS, getMobileNoFromLS, setSubscriptionStatusInLS } from "../commonFunctions";
 
 function Home() {
 
@@ -79,6 +79,7 @@ function Home() {
                     console.log("Profile data:", resp);
                 }
             } catch (error) {
+                clearAllLS();
                 console.error("Error fetching profile data:", error);
             }
         }

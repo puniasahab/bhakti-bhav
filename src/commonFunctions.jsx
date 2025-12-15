@@ -44,3 +44,7 @@ export const removeMobileNoFromLS = () => {
 // export async function setWallpaper(imagePath) {
 //     await wallpaper.set(imagePath);
 // }
+
+export const clearAllLS = () => {
+    localStorage.clear();
+}
