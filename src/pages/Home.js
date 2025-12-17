@@ -90,7 +90,7 @@ function Home() {
             try {
                 const banners = await wallpaperApis.getBanners();
                 console.log("Banners:", banners);
-                setBannersData(banners?.data);
+                setBannersData(banners?.data.filter(b => b.pageName === "home"));
             } catch (error) {
                 console.error("Error fetching banners:", error);
             }

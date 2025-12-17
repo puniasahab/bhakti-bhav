@@ -3,7 +3,7 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import bannerImg from "../assets/img/paymentPageBanner.jpeg";
 import { Check } from "lucide-react";
-import { paymentApis, subscriptionApis, profileApis } from "../api";
+import { paymentApis, subscriptionApis, profileApis, wallpaperApis } from "../api";
 import { useNavigate } from "react-router-dom";
 import { usePayment } from "../contexts/PaymentContext";
 import { getTokenFromLS } from "../commonFunctions";
@@ -18,6 +18,7 @@ export default function Payment() {
           state: "",
           gender: "",
   });
+  const [bannersData, setBannersData] = useState([]);
 
   const [selectedActivePlanName, setSelectedActivePlanName] = useState({
     activePlanName: "", 
@@ -71,6 +72,17 @@ export default function Payment() {
     };
 
     fetchSubscriptionPlans();
+    const fetchBanners = async () => {
+                try {
+                    const banners = await wallpaperApis.getBanners();
+                    console.log("Banners:", banners);
+                    setBannersData(banners?.data.filter(b => b.pageName === "payment"));
+                } catch (error) {
+                    console.error("Error fetching banners:", error);
+                }
+            };
+    
+    fetchBanners();
   }, []);
 
   // const plans = [
@@ -169,7 +181,7 @@ export default function Payment() {
       <div className="container mx-auto px-4 py-6 theme_text">
         <div className="rounded-xl shadow flex flex-col items-center">
           <img
-            src={bannerImg || "/img/paymentPageBanner.jpeg"}
+            src={bannersData && bannersData[0]?.imageUrl || "../assets/img/paymentPageBanner.jpeg"}
             alt={"payment_bg"}
             className="w-auto rounded-md max-h-[100%] md:max-h-[100%]"
           />
