@@ -157,6 +157,7 @@ function EditProfile() {
         showEnglishText={true}
         showVerticalLogout={true}
       />
+      <div className="h-2"></div>
       <div className="container mx-auto px-4 mt-4 text-center font-eng">
         {initialLoading ? (
           <div className="flex justify-center items-center h-64">

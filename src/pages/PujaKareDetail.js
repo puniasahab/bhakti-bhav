@@ -242,7 +242,7 @@ export default function PujaKareDetail() {
   return (
     <>
       <Header pageName={{ hi: "iwtk djs", en: "Puja kare" }} />
-
+    <div className="h-2"></div>
       <PageTitleCard
         titleHi={item.name?.hi || "पूजा करे"}
         titleEn={item.name?.en || "Puja kare"}

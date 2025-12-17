@@ -24,26 +24,26 @@ const PrivacyPolicy = () => {
       <main className="p-4">
         <div className="container mx-auto">
           <div className="bg-[#FFFAF4] rounded-xl p-6 md:p-8 shadow-md">
-            <div className="text-[#610419] font-eng">
-              <h1 className="text-2xl md:text-3xl font-bold mb-6 text-center">Privacy Policy</h1>
+            <div className="text-[#610419] font-eng italic" style={{fontStyle: "italic"}}>
+              <h1 className="text-2xl md:text-3xl font-bold mb-6 text-center italic" style={{fontStyle: "italic"}}>Privacy Policy</h1>
               
-              <div className="space-y-6 text-sm md:text-base leading-relaxed">
-                <p className="text-gray-700">
+              <div className="space-y-6 text-sm md:text-base leading-relaxed italic" style={{fontStyle: "italic"}}>
+                <p className="text-gray-700 italic" style={{fontStyle: "italic"}}>
                   This Privacy Policy describes Our policies and procedures on the collection, use and disclosure of Your information when You use the Service and tells You about Your privacy rights and how the law protects You.
                 </p>
 
                 <section>
-                  <h2 className="text-xl md:text-2xl font-bold mb-4 theme_text">Interpretation and Definitions</h2>
+                  <h2 className="text-xl md:text-2xl font-bold mb-4 theme_text italic" style={{fontStyle: "italic"}}>Interpretation and Definitions</h2>
                   
-                  <h3 className="text-lg md:text-xl font-semibold mb-3 theme_text">Interpretation</h3>
-                  <p className="text-gray-700 mb-4">
+                  <h3 className="text-lg md:text-xl font-semibold mb-3 theme_text italic" style={{fontStyle: "italic"}}>Interpretation</h3>
+                  <p className="text-gray-700 mb-4 italic" style={{fontStyle: "italic"}}>
                     The words of which the initial letter is capitalized have meanings defined under the following conditions. The following definitions shall have the same meaning regardless of whether they appear in singular or in plural.
                   </p>
 
-                  <h3 className="text-lg md:text-xl font-semibold mb-3 theme_text">Definitions</h3>
-                  <p className="text-gray-700 mb-3">For the purposes of this Privacy Policy:</p>
+                  <h3 className="text-lg md:text-xl font-semibold mb-3 theme_text italic" style={{fontStyle: "italic"}}>Definitions</h3>
+                  <p className="text-gray-700 mb-3 italic" style={{fontStyle: "italic"}}>For the purposes of this Privacy Policy:</p>
                   
-                  <ul className="list-disc pl-6 space-y-2 text-gray-700">
+                  <ul className="list-disc pl-6 space-y-2 text-gray-700 italic" style={{fontStyle: "italic"}}>
                     <li><strong>Account</strong> means a unique account created for You to access our Service or parts of our Service.</li>
                     <li><strong>Affiliate</strong> means an entity that controls, is controlled by or is under common control with a party, where "control" means ownership of 50% or more of the shares, equity interest or other securities entitled to vote for election of directors or other managing authority.</li>
                     <li><strong>Application</strong> refers to Bhakti Bhav App, the software program provided by the Company.</li>
@@ -149,21 +149,21 @@ const PrivacyPolicy = () => {
                 </section>
 
                 <section>
-                  <h2 className="text-xl md:text-2xl font-bold mb-4 theme_text">Children's Privacy</h2>
-                  <p className="text-gray-700 mb-4">
+                  <h2 className="text-xl md:text-2xl font-bold mb-4 theme_text italic" style={{fontStyle: "italic"}}>Children's Privacy</h2>
+                  <p className="text-gray-700 mb-4 italic" style={{fontStyle: "italic"}}>
                     Our Service does not address anyone under the age of 13. We do not knowingly collect personally identifiable information from anyone under the age of 13. If You are a parent or guardian and You are aware that Your child has provided Us with Personal Data, please contact Us.
                   </p>
-                  <p className="text-gray-700">
+                  <p className="text-gray-700 italic" style={{fontStyle: "italic"}}>
                     If We need to rely on consent as a legal basis for processing Your information and Your country requires consent from a parent, We may require Your parent's consent before We collect and use that information.
                   </p>
                 </section>
 
                 <section>
-                  <h2 className="text-xl md:text-2xl font-bold mb-4 theme_text">Changes to this Privacy Policy</h2>
-                  <p className="text-gray-700 mb-4">
+                  <h2 className="text-xl md:text-2xl font-bold mb-4 theme_text italic" style={{fontStyle: "italic"}}>Changes to this Privacy Policy</h2>
+                  <p className="text-gray-700 mb-4 italic" style={{fontStyle: "italic"}}>
                     We may update Our Privacy Policy from time to time. We will notify You of any changes by posting the new Privacy Policy on this page.
                   </p>
-                  <p className="text-gray-700">
+                  <p className="text-gray-700 italic" style={{fontStyle: "italic"}}>
                     You are advised to review this Privacy Policy periodically for any changes. Changes to this Privacy Policy are effective when they are posted on this page.
                   </p>
                 </section> */}
@@ -173,7 +173,8 @@ const PrivacyPolicy = () => {
               <div className="mt-8 text-center">
                 <button 
                   onClick={handleBack}
-                  className="bg-[#610419] text-white px-8 py-3 rounded-[10px] font-eng text-lg hover:bg-[#7a0028] transition-colors flex items-center mx-auto"
+                  className="bg-[#610419] text-white px-8 py-3 rounded-[10px] font-eng text-lg hover:bg-[#7a0028] transition-colors flex items-center mx-auto italic"
+                  style={{fontStyle: "italic"}}
                 >
                   <ArrowLeft className="w-5 h-5 mr-2" />
                   Back to Home
@@ -187,14 +188,14 @@ const PrivacyPolicy = () => {
       {/* Footer */}
       <footer className="mt-6 py-4">
         <div className="container mx-auto flex flex-col md:flex-row justify-between items-center text-2xl px-4">
-          <div className="flex flex-col md:flex-row md:space-x-6 theme_text text-center font-eng mb-3 md:mb-0 space-y-2 md:space-y-0">
-            <Link to="/termsAndConditions" className="theme-text text-lg text-[#610419] hover:underline" style={{ fontFamily: 'Calibri, sans-serif' }}>
+          <div className="flex flex-col md:flex-row md:space-x-6 theme_text text-center font-eng mb-3 md:mb-0 space-y-2 md:space-y-0 italic" style={{fontStyle: "italic"}}>
+            <Link to="/termsAndConditions" className="theme-text text-lg text-[#610419] hover:underline italic" style={{ fontFamily: 'Calibri, sans-serif', fontStyle: 'italic' }}>
               Terms & Conditions
             </Link>
-            <Link to="/privacyPolicy" className="theme-text text-lg text-[#610419] hover:underline" style={{ fontFamily: 'Calibri, sans-serif' }}>
+            <Link to="/privacyPolicy" className="theme-text text-lg text-[#610419] hover:underline italic" style={{ fontFamily: 'Calibri, sans-serif', fontStyle: 'italic' }}>
               Privacy Policy
             </Link>
-            <Link to="/aboutUs" className="theme-text text-lg text-[#610419] hover:underline" style={{ fontFamily: 'Calibri, sans-serif' }}>
+            <Link to="/aboutUs" className="theme-text text-lg text-[#610419] hover:underline italic" style={{ fontFamily: 'Calibri, sans-serif', fontStyle: 'italic' }}>
               About us
             </Link>
           </div>

@@ -258,6 +258,8 @@ function VratKathaCategoryDetails({ detail }) {
                 profileText="भक्ति भाव"
                 hideEditIcon={true}
             />
+
+            <div className="h-2"></div>
             <PageTitleCard
                 titleHi={detail.name.hi}
                 titleEn={detail.name.en}

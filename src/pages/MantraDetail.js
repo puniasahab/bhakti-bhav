@@ -119,6 +119,7 @@ export default function MantraDetail() {
   return (
     <div className="min-h-screen">
       <Header pageName={{ hi: "ea=", en: "Mantra" }} fontSizeOption="true" />
+      <div className="h-2"></div>
       <PageTitleCard
         titleHi={detail.name.hi}
         titleEn={detail.name.en} 

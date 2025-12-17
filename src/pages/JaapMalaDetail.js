@@ -77,7 +77,7 @@ function JaapMalaDetail() {
   return (
     <>
       <Header pageName={{ hi: "tki ekyk", en: "Jaap mala" }} />
-
+      <div className="h-2"></div>
       <PageTitleCardJaapMala
         titleHi={detail.title.hi}
         titleEn={detail.title.en}

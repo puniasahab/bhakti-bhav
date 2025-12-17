@@ -188,6 +188,7 @@ const Transactions = () => {
   return (
     <>
       <Header profileText={"My Transactions"} showProfileHeader={true} showEnglishText={true} hideEditIcon={true}/>
+      <div className='h-2'></div>
       <PageTitleCard
         titleHi={""}
         titleEn={"Transaction History"} 

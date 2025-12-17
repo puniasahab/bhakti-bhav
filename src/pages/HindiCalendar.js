@@ -83,7 +83,7 @@ export default function HindiCalendar() {
   return (
     <div className="bg-[url('../img/home_bg.png')] bg-cover bg-top bg-no-repeat min-h-screen w-full text-white font-kruti">
       <Header />
-
+    <div className="h-1"></div>
       <PageTitleCard
         titleHi={"fgUnh dySaMj"}
         titleEn={"Hindi Calender"}

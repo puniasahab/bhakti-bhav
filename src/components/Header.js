@@ -177,22 +177,22 @@ function Header({
                     )}
 
                     {hindiFontSize && (
-                        <div className="flex space-x-2 theme_text text-lg font-eng ml-auto">
+                        <div className="flex space-x-2 theme_text text-lg font-eng ml-auto max-[374px]:space-x-1 max-[374px]:text-sm">
                             <button
                                 onClick={() => setLanguage(language === "hi" ? "en" : "hi")}
-                                className="px-2 border-[#9A283D] border rounded-lg"
+                                className="px-2 border-[#9A283D] border rounded-lg max-[374px]:px-1 max-[374px]:py-1 max-[374px]:text-xs"
                             >
                                 {language === "hi" ? "En" : "हिं"}
                             </button>
                             <button
                                 onClick={() => setFontSize("text-base")}
-                                className="px-2 border-[#9A283D] border rounded-lg"
+                                className="px-2 border-[#9A283D] border rounded-lg max-[374px]:px-1 max-[374px]:py-1 max-[374px]:text-xs"
                             >
                                 A
                             </button>
                             <button
                                 onClick={() => setFontSize("text-xl")}
-                                className="px-2 border-[#9A283D] border rounded-lg"
+                                className="px-2 border-[#9A283D] border rounded-lg max-[374px]:px-1 max-[374px]:py-1 max-[374px]:text-xs"
                             >
                                 A+
                             </button>

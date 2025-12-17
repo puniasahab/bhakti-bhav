@@ -288,6 +288,7 @@ function VratKathaDetail() {
     return (
         <>
             <Header pageName={{ hi: "ozr dFkk", en: "Vrat Katha" }} hindiFontSize="true" />
+            <div className="h-2"></div>
             <PageTitleCard
                 titleHi={detail.name.hi}
                 titleEn={detail.name.en}

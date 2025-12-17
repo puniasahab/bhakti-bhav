@@ -116,7 +116,7 @@ export default function ChalisaDetail() {
   return (
     <>
       <Header pageName={{ hi: "pkyhlk", en: "Chalisa" }} hindiFontSize="true" />
-
+      <div className="h-2"></div>
       <PageTitleCard
         titleHi={chalisa.name.hi}
         titleEn={chalisa.name.en}

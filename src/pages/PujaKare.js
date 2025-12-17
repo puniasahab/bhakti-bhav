@@ -39,7 +39,7 @@ export default function PujaKare() {
   return (
     <>
       <Header pageName={{ hi: "iwtk djs", en: "Puja kare" }} />
-
+      <div className="h-1"></div>
       <PageTitleCard
         titleHi={"iwtk djs"}
         titleEn={"Puja kare"}

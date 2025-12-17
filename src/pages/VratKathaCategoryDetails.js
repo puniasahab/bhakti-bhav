@@ -45,7 +45,7 @@ export default function VratKathaCategoryDetails() {
   return (
     <>
       <Header hideEditIcon={true} showProfileHeader={true} profileText="भक्ति भाव" />
-
+      <div className="h-2"></div>
       <PageTitleCard
         titleHi={selectedCategoryName?.hi || "dFkk"}
         titleEn={selectedCategoryName?.en || "Katha"}

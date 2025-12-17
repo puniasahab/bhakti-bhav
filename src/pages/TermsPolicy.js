@@ -24,16 +24,16 @@ const TermsAndConditions = () => {
       <main className="p-4">
         <div className="container mx-auto">
           <div className="bg-[#FFFAF4] rounded-xl p-6 md:p-8 shadow-md">
-            <div className="text-[#610419] font-eng">
-              <h1 className="text-2xl md:text-3xl font-bold mb-6 text-center">Terms & Conditions</h1>
+            <div className="text-[#610419] font-eng italic" style={{fontStyle: "italic"}}>
+              <h1 className="text-2xl md:text-3xl font-bold mb-6 text-center italic" style={{fontStyle: "italic"}}>Terms & Conditions</h1>
               
-              <div className="space-y-6 text-sm md:text-base leading-relaxed">
+              <div className="space-y-6 text-sm md:text-base leading-relaxed italic" style={{fontStyle: "italic"}}>
                 <section>
-                  <h2 className="text-xl md:text-2xl font-bold mb-4 theme_text">TERMS SPECIFIC TO THE APP</h2>
+                  <h2 className="text-xl md:text-2xl font-bold mb-4 theme_text italic" style={{fontStyle: "italic"}}>TERMS SPECIFIC TO THE APP</h2>
                   
-                  <h3 className="text-lg md:text-xl font-semibold mb-3 theme_text">Fees & Subscriptions</h3>
+                  <h3 className="text-lg md:text-xl font-semibold mb-3 theme_text italic" style={{fontStyle: "italic"}}>Fees & Subscriptions</h3>
                   
-                  <div className="space-y-4 text-gray-700">
+                  <div className="space-y-4 text-gray-700 italic" style={{fontStyle: "italic"}}>
                     <p>
                       Bhakti Bhav may charge a subscription fee to Users in consideration for the use of certain aspects of the Bhakti Bhav App. Bhakti Bhav reserves the right to revisit and revise its subscription fees and amounts at its sole discretion. The Services shall be available to users with different modes of subscription. Bhakti Bhav reserves its right to modify the different modes of subscription at its sole discretion. Bhakti Bhav shall advise users of any changes to any modes of subscription thereon after.
                     </p>
@@ -57,9 +57,9 @@ const TermsAndConditions = () => {
                 </section>
 
                 <section>
-                  <h3 className="text-lg md:text-xl font-semibold mb-4 theme_text">Penalties</h3>
+                  <h3 className="text-lg md:text-xl font-semibold mb-4 theme_text italic" style={{fontStyle: "italic"}}>Penalties</h3>
                   
-                  <div className="space-y-4 text-gray-700">
+                  <div className="space-y-4 text-gray-700 italic" style={{fontStyle: "italic"}}>
                     <p>
                       A user is liable for no penalty post the cancellation of subscription. If the application cancels a subscription of a user due to a suspicious activity, the user would get an email to showcase the reasons for the same.
                     </p>
@@ -67,9 +67,9 @@ const TermsAndConditions = () => {
                 </section>
 
                 <section>
-                  <h3 className="text-lg md:text-xl font-semibold mb-4 theme_text">Contact Us</h3>
+                  <h3 className="text-lg md:text-xl font-semibold mb-4 theme_text italic" style={{fontStyle: "italic"}}>Contact Us</h3>
                   
-                  <div className="space-y-2 text-gray-700">
+                  <div className="space-y-2 text-gray-700 italic" style={{fontStyle: "italic"}}>
                     <p>
                       If you have any questions about this Terms & Conditions, You can contact us:
                     </p>
@@ -84,7 +84,8 @@ const TermsAndConditions = () => {
               <div className="mt-8 text-center">
                 <button 
                   onClick={handleBack}
-                  className="bg-[#610419] text-white px-8 py-3 rounded-[10px] font-eng text-lg hover:bg-[#7a0028] transition-colors flex items-center mx-auto"
+                  className="bg-[#610419] text-white px-8 py-3 rounded-[10px] font-eng text-lg hover:bg-[#7a0028] transition-colors flex items-center mx-auto italic"
+                  style={{fontStyle: "italic"}}
                 >
                   <ArrowLeft className="w-5 h-5 mr-2" />
                   Back to Home
@@ -98,14 +99,14 @@ const TermsAndConditions = () => {
       {/* Footer */}
       <footer className="mt-6 py-4">
         <div className="container mx-auto flex flex-col md:flex-row justify-between items-center text-2xl px-4">
-          <div className="flex flex-col md:flex-row md:space-x-6 theme_text text-center font-eng mb-3 md:mb-0 space-y-2 md:space-y-0">
-            <Link to="/termsAndConditions" className="theme-text text-lg text-[#610419] hover:underline"  style={{ fontFamily: 'Calibri, sans-serif' }}>
+          <div className="flex flex-col md:flex-row md:space-x-6 theme_text text-center font-eng mb-3 md:mb-0 space-y-2 md:space-y-0 italic" style={{fontStyle: "italic"}}>
+            <Link to="/termsAndConditions" className="theme-text text-lg text-[#610419] hover:underline italic"  style={{ fontFamily: 'Calibri, sans-serif', fontStyle: 'italic' }}>
               Terms & Conditions
             </Link>
-            <Link to="/privacyPolicy" className="theme-text text-lg text-[#610419] hover:underline" style={{ fontFamily: 'Calibri, sans-serif' }} >
+            <Link to="/privacyPolicy" className="theme-text text-lg text-[#610419] hover:underline italic" style={{ fontFamily: 'Calibri, sans-serif', fontStyle: 'italic' }} >
               Privacy Policy
             </Link>
-            <Link to="/aboutUs" className="theme-text text-lg text-[#610419] hover:underline" style={{ fontFamily: 'Calibri, sans-serif' }}>
+            <Link to="/aboutUs" className="theme-text text-lg text-[#610419] hover:underline italic" style={{ fontFamily: 'Calibri, sans-serif', fontStyle: 'italic' }}>
               About us
             </Link>
           </div>

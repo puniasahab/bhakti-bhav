@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import bannerImg from "../assets/img/banner_bg.png";
+import bannerImg from "../assets/img/paymentPageBanner.jpeg";
 import { Check } from "lucide-react";
 import { paymentApis, subscriptionApis, profileApis } from "../api";
 import { useNavigate } from "react-router-dom";
@@ -169,7 +169,7 @@ export default function Payment() {
       <div className="container mx-auto px-4 py-6 theme_text">
         <div className="rounded-xl shadow flex flex-col items-center">
           <img
-            src={bannerImg || "/img/default-mantra.png"}
+            src={bannerImg || "/img/paymentPageBanner.jpeg"}
             alt={"payment_bg"}
             className="w-auto rounded-md max-h-[100%] md:max-h-[100%]"
           />

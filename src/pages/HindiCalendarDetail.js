@@ -85,7 +85,7 @@ function HindiCalendarDetail() {
   return (
     <>
       <Header pageName={{ hi: "fgUnh dySaMj", en: "Hindi Calender" }} />
-
+    <div className="h-2"></div>
       <PageTitleCard
         titleHi={"fgUnh dySaMj"}
         titleEn={"Hindi Calender"}
