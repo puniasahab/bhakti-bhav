@@ -9,6 +9,8 @@ function VerifyOtp() {
     const navigate = useNavigate();
     const phone = location.state?.phone || "";
 
+    console.log("Phone number from state:", phone);
+
     const [otp, setOtp] = useState(["", "", "", ""]);
     const [timeLeft, setTimeLeft] = useState(30);
     const [loading, setLoading] = useState(false);
@@ -120,7 +122,7 @@ function VerifyOtp() {
                     <div className="w-full bg-[rgba(255,250,244,0.6)] rounded-xl shadow-md p-6 border-[#9A283D] border-[0.2px]">
                         <h2 className="md:text-xl text-3xl font-semibold mb-4 theme_text font-eng">Verify OTP</h2>
                         <p className="text-gray-700 mt-2 text-xl">
-                            We've sent a code to <span className="font-semibold">{phone}</span>
+                            We've sent a code to <span className="font-semibold">{getMobileNoFromLS()}</span>
                         </p>
 
                         <div className="flex justify-between mt-6 mb-4 gap-2" onPaste={handlePaste}>
