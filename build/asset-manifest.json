@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/static/css/main.653e97f5.css",
-    "main.js": "/static/js/main.917c0910.js",
+    "main.js": "/static/js/main.a38d84a7.js",
     "static/js/977.5164d1e2.chunk.js": "/static/js/977.5164d1e2.chunk.js",
     "static/js/455.85aa9246.chunk.js": "/static/js/455.85aa9246.chunk.js",
     "static/media/repeat_bg.png": "/static/media/repeat_bg.8dd1983cdffb3ac0324e.png",
@@ -10,19 +10,19 @@
     "static/media/Poppins-Regular.ttf": "/static/media/Poppins-Regular.35d26b781dc5fda684cc.ttf",
     "static/media/Poppins-SemiBold.ttf": "/static/media/Poppins-SemiBold.ac8d04b620e54be9b0f0.ttf",
     "static/media/Poppins-Bold.ttf": "/static/media/Poppins-Bold.cdb29a5d7ccf57ff05a3.ttf",
-    "static/media/banner_bg.png": "/static/media/banner_bg.b7d5124c9018e38f75ed.png",
     "static/media/kundali_banner.png": "/static/media/kundali_banner.dbc2e90cee68507fd738.png",
     "static/media/Kruti_Dev_714_Normal.ttf": "/static/media/Kruti_Dev_714_Normal.1fd4f8bbe197c180100b.ttf",
+    "static/media/paymentPageBanner.jpeg": "/static/media/paymentPageBanner.f880b2c165b626a10eff.jpeg",
     "index.html": "/index.html",
     "static/media/index.cjs": "/static/media/index.f6d03137e8c9dd0de04c.cjs",
     "static/media/back_icon.svg": "/static/media/back_icon.7e7814d35251d606ef1805bb74b76d9f.svg",
     "main.653e97f5.css.map": "/static/css/main.653e97f5.css.map",
-    "main.917c0910.js.map": "/static/js/main.917c0910.js.map",
+    "main.a38d84a7.js.map": "/static/js/main.a38d84a7.js.map",
     "977.5164d1e2.chunk.js.map": "/static/js/977.5164d1e2.chunk.js.map",
     "455.85aa9246.chunk.js.map": "/static/js/455.85aa9246.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.653e97f5.css",
-    "static/js/main.917c0910.js"
+    "static/js/main.a38d84a7.js"
   ]
 }
