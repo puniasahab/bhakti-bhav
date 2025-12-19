@@ -38,7 +38,8 @@ function Login() {
         // } finally {
         //     setLoading(false);
         // }
-        const response = await loginApis.generateOtp(mobile);
+        const mobileNumber = mobile;
+        const response = await loginApis.generateOtp(mobileNumber);
         console.log("OTP Response:", response);
         setLoading(false);
         if(response.success) {

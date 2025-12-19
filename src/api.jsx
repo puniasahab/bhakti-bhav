@@ -168,7 +168,8 @@ export const paymentApis = {
 export const loginApis = {
   generateOtp: async (data) => {
     try {
-      const response = await api.post(endPoints.generateOtp, { mobile: data });
+      console.log("Generating OTP for data:", data);
+      const response = await api.post(endPoints.generateOtp, { mobileNumber: data, source: "web"});
       return response.data;
     } catch (error) {
       console.error("Error generating OTP:", error);
@@ -177,8 +178,12 @@ export const loginApis = {
   },
 
   verifyOtp: async (data) => {
+    console.log("Verifying OTP with data:", data);
+    const { mobile, otp } = data;
     try {
-      const response = await api.post(endPoints.verifyOtp, data);
+
+      debugger;
+      const response = await api.post(endPoints.verifyOtp, {mobileNumber: mobile, otp: otp, source: "web"});
       return response.data;
     } catch (error) {
       console.error("Error verifying OTP:", error);

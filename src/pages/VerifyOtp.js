@@ -18,8 +18,8 @@ function VerifyOtp() {
 
     const generateOtp = async () => {
         try {
-            const mobile = getMobileNoFromLS();
-            const response = await loginApis.generateOtp(mobile);
+            const mobileNumber = getMobileNoFromLS();
+            const response = await loginApis.generateOtp(mobileNumber);
             console.log("OTP Response:", response);
         }
         catch (error) {
@@ -81,7 +81,7 @@ function VerifyOtp() {
             const res = await fetch("https://api.bhaktibhav.app/frontend/verify-otp", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ mobile: getMobileNoFromLS(), otp: otpCode }),
+                body: JSON.stringify({ mobileNumber: getMobileNoFromLS(), otp: otpCode, source: "web" }),
             });
 
             const data = await res.json();
