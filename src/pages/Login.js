@@ -39,7 +39,16 @@ function Login() {
         //     setLoading(false);
         // }
         const mobileNumber = mobile;
-        const response = await loginApis.generateOtp(mobileNumber);
+        
+        // Generate or get deviceId
+        let deviceId = localStorage.getItem('deviceId');
+        if (!deviceId) {
+            // Generate a unique device ID if it doesn't exist
+            deviceId = crypto.randomUUID()
+            localStorage.setItem('deviceId', deviceId);
+        }
+        
+        const response = await loginApis.generateOtp(mobileNumber, deviceId);
         console.log("OTP Response:", response);
         setLoading(false);
         if(response.success) {

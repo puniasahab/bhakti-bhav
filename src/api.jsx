@@ -166,10 +166,10 @@ export const paymentApis = {
   }
 }
 export const loginApis = {
-  generateOtp: async (data) => {
+  generateOtp: async (mobileNumber, deviceId) => {
     try {
-      console.log("Generating OTP for data:", data);
-      const response = await api.post(endPoints.generateOtp, { mobileNumber: data, source: "web"});
+      console.log("Generating OTP for data:", mobileNumber, deviceId);
+      const response = await api.post(endPoints.generateOtp, { mobileNumber, source: "web", deviceId });
       return response.data;
     } catch (error) {
       console.error("Error generating OTP:", error);

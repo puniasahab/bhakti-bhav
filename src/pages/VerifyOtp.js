@@ -19,7 +19,13 @@ function VerifyOtp() {
     const generateOtp = async () => {
         try {
             const mobileNumber = getMobileNoFromLS();
-            const response = await loginApis.generateOtp(mobileNumber);
+            let deviceId = localStorage.getItem('deviceId');
+        if (!deviceId) {
+            // Generate a unique device ID if it doesn't exist
+            deviceId = crypto.randomUUID()
+            localStorage.setItem('deviceId', deviceId);
+        }
+            const response = await loginApis.generateOtp(mobileNumber, deviceId);
             console.log("OTP Response:", response);
         }
         catch (error) {
@@ -78,10 +84,16 @@ function VerifyOtp() {
 
         setLoading(true);
         try {
+            let deviceId = localStorage.getItem('deviceId');
+        if (!deviceId) {
+            // Generate a unique device ID if it doesn't exist
+            deviceId = crypto.randomUUID()
+            localStorage.setItem('deviceId', deviceId);
+        }
             const res = await fetch("https://api.bhaktibhav.app/frontend/verify-otp", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ mobileNumber: getMobileNoFromLS(), otp: otpCode, source: "web" }),
+                body: JSON.stringify({ mobileNumber: getMobileNoFromLS(), otp: otpCode, source: "web", deviceId }),
             });
 
             const data = await res.json();

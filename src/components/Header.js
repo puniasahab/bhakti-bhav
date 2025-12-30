@@ -80,7 +80,7 @@ function Header({
     }
 
     const handleLogout = () => {
-        removeTokenFromLS();
+        removeTokenFromLS();    
         removeSubscriptionStatusFromLS();
         removeMobileNoFromLS();
 
