@@ -68,6 +68,7 @@ function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/vrat-katha" element={<VratKatha />} />
                 <Route path="/vrat-katha/:id" element={<VratKathaDetail />} />
+                <Route path="/vrat-katha/:id/date/:date" element={<VratKathaDetail />} />
                 <Route path="/jaap-mala" element={<JaapMala />} />
                 <Route path="/jaapmala/:id" element={<JaapMalaDetail />} />
                 <Route path="/mantra" element={<Mantra />} />

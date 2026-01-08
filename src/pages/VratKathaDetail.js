@@ -10,7 +10,7 @@ import PageTitleCard from "../components/PageTitleCard";
 import { useLocation } from "react-router-dom";
 
 function VratKathaDetail() {
-    const { id } = useParams();
+    const { id, date } = useParams();
     const [detail, setDetail] = useState(null);
     const [loading, setLoading] = useState(true);
     const { language, setLanguage, fontSize, setFontSize } = useContext(LanguageContext);
@@ -20,8 +20,9 @@ function VratKathaDetail() {
     useEffect(() => {
         if (!id) return;
         console.log("Fetching katha with id:", id);
+        console.log("Date parameter:", date);
 
-        fetch(`https://api.bhaktibhav.app/frontend/katha/${id}`)
+        fetch(date ? `https://api.bhaktibhav.app/frontend/katha/${id}?date=${date}` : `https://api.bhaktibhav.app/frontend/katha/${id}`)
             .then((res) => res.json())
             .then((resJson) => {
                 if (resJson.status === "success" && resJson.data) {
@@ -46,7 +47,7 @@ function VratKathaDetail() {
                 setDetail(null);
                 setLoading(false);
             });
-    }, [id]);
+    }, [id, date]);
 
     const redirectToAartiPage = (artiId) => {
         if (!artiId) {

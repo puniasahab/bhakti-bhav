@@ -50,10 +50,10 @@ function HindiCalendarDetail() {
   }
 
 
-  const handleNavigate = (kathaId, accessType) => {
+  const handleNavigate = (kathaId, accessType, date) => {
     if (getSubscriptionStatusFromLS()) {
       if (kathaId) {
-        return `/vrat-katha/${kathaId}`;
+        return `/vrat-katha/${kathaId}/date/${date}`;
       }
       else {
         alert("No Kath available for this festival");
@@ -63,7 +63,7 @@ function HindiCalendarDetail() {
     else {
       if (accessType === "free") {
         if (kathaId) {
-          return `/vrat-katha/${kathaId}`;
+          return `/vrat-katha/${kathaId}/date/${date}`;
 
         }
         else {
@@ -120,7 +120,7 @@ function HindiCalendarDetail() {
 
               return (
                 <li
-                  onClick={() => navigate(handleNavigate(festival.kathaId, festival.accessType))}
+                  onClick={() => navigate(handleNavigate(festival.kathaId, festival.accessType, festival.date))}
                   key={festival._id}
                   className={`bg-[#9A283D] text-white rounded-lg flex items-center px-4 py-3 shadow-md ${getSubscriptionStatusFromLS() ? "" : festival.accessType === "paid" ? "blur" : ""}`}
                 >

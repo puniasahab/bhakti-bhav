@@ -45,11 +45,11 @@ export default function HindiCalendar() {
   );
 
 
-  const handleNavigate = (id, accessType) => {
+  const handleNavigate = (id, accessType, date) => {
     if (getSubscriptionStatusFromLS()) {
       if (id) {
 
-        return `/vrat-katha/${id}`;
+        return `/vrat-katha/${id}/date/${date}`;
       }
       else {
         alert("No Kath available for this festival");
@@ -60,7 +60,7 @@ export default function HindiCalendar() {
       if (accessType === "free") {
         if (id) {
 
-          return `/vrat-katha/${id}`;
+          return `/vrat-katha/${id}/date/${date}`;
         }
         else {
           alert("No Kath available for this festival");
@@ -130,7 +130,7 @@ export default function HindiCalendar() {
                     <li
                       key={festival._id}
                       onClick={
-                        () => navigate(handleNavigate(festival.kathaId, festival.accessType))}
+                        () => navigate(handleNavigate(festival.kathaId, festival.accessType, festival.date))}
                       className={`bg-[#9A283D] text-white rounded-lg flex items-center px-4 py-3 shadow-md  ${getSubscriptionStatusFromLS() ? "" : festival.accessType === "paid" ? "blur-sm" : ""}`}
                     >
                       <div className="flex items-center text-sm font-medium w-1/2">
