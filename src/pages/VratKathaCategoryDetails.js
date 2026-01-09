@@ -74,7 +74,7 @@ export default function VratKathaCategoryDetails() {
                   <div className={`absolute inset-0 theme_text flex flex-col items-center justify-center text-center px-4 z-10 top-[35%] ${getSubscriptionStatusFromLS() ? "" : katha.accessType === "paid" ? "blur-sm" : ""}`}>
                     {katha.name?.hi && (
                       <h2 className="text-xl font-bold font-hindi">
-                        {katha.name.hi}
+                        {katha.name.hi.replace(/\//g, "।")}
                       </h2>
                     )}
                     {katha.name?.en && (

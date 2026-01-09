@@ -240,7 +240,7 @@ export default function VratKatha() {
                 <div className="p-2">
                   {katha.name?.hi && (
                     <h2 className={`md:text-xl text-lg font-semibold truncate font-hindi pt-3 ${getSubscriptionStatusFromLS() ? "" : getPaidLogic(katha)}`}>
-                      {katha.name.hi}
+                      {katha.name.hi.replace(/\//g, "।")}
                     </h2>
                   )}
                   {katha.name?.en && (

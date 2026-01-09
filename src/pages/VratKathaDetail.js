@@ -286,12 +286,37 @@ function VratKathaDetail() {
         );
     };
 
+    const formatDateToDDMMYYYY = (dateString) => {
+        if (!dateString) return '';
+        try {
+            const date = new Date(dateString);
+            const day = date.getDate().toString().padStart(2, '0');
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const year = date.getFullYear();
+            
+            // Format time in 12-hour format with AM/PM
+            let hours = date.getHours();
+            const minutes = date.getMinutes().toString().padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            
+            // Convert to 12-hour format
+            hours = hours % 12;
+            hours = hours ? hours : 12; // 0 should be 12
+            const formattedHours = hours.toString().padStart(2, '0');
+            
+            return `${day}/${month}/${year} ${formattedHours}:${minutes} ${ampm}`;
+        } catch (error) {
+            console.error('Error formatting date:', error);
+            return dateString;
+        }
+    };
+
     return (
         <>
             <Header pageName={{ hi: "ozr dFkk", en: "Vrat Katha" }} hindiFontSize="true" />
             <div className="h-2"></div>
             <PageTitleCard
-                titleHi={detail.name.hi}
+                titleHi={detail.name.hi.replace(/\//g, "।")}
                 titleEn={detail.name.en}
                 customEngFontSize={"13px"}
                 customFontSize={"18px"}
@@ -313,11 +338,11 @@ function VratKathaDetail() {
                     <div className="bg-[rgba(255,250,244,0.6)] shadow rounded-lg px-6 py-3 md:flex-row gap-4 text-center border border-[#9A283D]">
                         <div className="flex justify-center items-center">
                             <p className={`font-semibold text-black text-sm ${language === "hi" ? "font-hindi" : "font-eng"}`}>{language === "hi" ? `${jsonFile.timings.start.hi} %` : `${jsonFile.timings.start.en} :`}</p>
-                            <p className="text-sm text-black font-eng ml-2">{new Date(detail.time?.start).toLocaleString()}</p>
+                            <p className="text-sm text-black font-eng ml-2">{formatDateToDDMMYYYY(detail.time?.start)}</p>
                         </div>
                         <div className="flex justify-center items-center">
                             <p className={`font-semibold text-black text-sm ${language === "hi" ? "font-hindi" : "font-eng"}`}>{language === "hi" ? `${jsonFile.timings.end.hi} %` : `${jsonFile.timings.end.en} :`}</p>
-                            <p className="text-sm text-black font-eng ml-2">{new Date(detail.time?.end).toLocaleString()}</p>
+                            <p className="text-sm text-black font-eng ml-2">{formatDateToDDMMYYYY(detail.time?.end)}</p>
                         </div>
                     </div>
                 </div>
