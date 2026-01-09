@@ -261,7 +261,7 @@ function VratKathaCategoryDetails({ detail }) {
 
             <div className="h-2"></div>
             <PageTitleCard
-                titleHi={detail.name.hi}
+                titleHi={detail.name.hi.replace(/\//g, "।")}
                 titleEn={detail.name.en}
                 customEngFontSize={"13px"}
                 customFontSize={"18px"}
