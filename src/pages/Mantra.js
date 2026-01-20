@@ -9,22 +9,63 @@ import { getTokenFromLS, getSubscriptionStatusFromLS } from "../commonFunctions"
 export default function Mantra() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const limit = 10;
 
   useEffect(() => {
     async function fetchItems() {
       try {
-        const res = await fetch("https://api.bhaktibhav.app/frontend/all-mantras");
+        if (currentPage === 1) setLoading(true);
+        else setLoadingMore(true);
+        
+        const res = await fetch(`https://api.bhaktibhav.app/frontend/all-mantras?page=${currentPage}&limit=${limit}`);
         const json = await res.json();
-        setItems(json.data || []);
+        
+        if (json.status === "success" && Array.isArray(json.data)) {
+          if (currentPage === 1) {
+            setItems(json.data);
+          } else {
+            setItems(prevItems => [...prevItems, ...json.data]);
+          }
+          
+          // Check if there's more data
+          if (json.data.length < limit) {
+            setHasMore(false);
+          }
+        } else {
+          if (currentPage === 1) {
+            setItems([]);
+          }
+          setHasMore(false);
+        }
       } catch (error) {
         console.error("API Error:", error);
+        if (currentPage === 1) {
+          setItems([]);
+        }
+        setHasMore(false);
       } finally {
         setLoading(false);
+        setLoadingMore(false);
       }
     }
 
     fetchItems();
-  }, []);
+  }, [currentPage]);
+
+  // Infinite scroll handler
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.innerHeight + document.documentElement.scrollTop + 100 >= document.documentElement.offsetHeight && hasMore && !loadingMore && !loading) {
+        setCurrentPage(prev => prev + 1);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [hasMore, loadingMore, loading]);
 
   if (loading) return <Loader message="🙏 Loading भक्ति भाव 🙏" size={200} />;
   if (!items.length) return <p className="text-center py-10 theme_text font-eng">❌ No mantras found</p>;
@@ -85,6 +126,22 @@ export default function Mantra() {
             </li>
           ))}
         </ul>
+        
+        {/* Loading more indicator */}
+        {loadingMore && (
+          <div className="flex justify-center items-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
+            <span className="ml-2 text-sm text-gray-600">Loading more...</span>
+          </div>
+        )}
+        
+        {/* No more data indicator */}
+        {/* {!hasMore && items.length > 0 && (
+          <div className="text-center py-8 text-gray-500">
+            <p>🙏 सभी मंत्र लोड हो गए हैं 🙏</p>
+            <p className="text-sm">All Mantras loaded</p>
+          </div>
+        )} */}
 
       </div>
 

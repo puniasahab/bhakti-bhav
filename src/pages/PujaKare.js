@@ -12,26 +12,61 @@ import { parse } from "postcss";
 export default function PujaKare() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const limit = 10;
   const { updatePujaKareItems } = usePujaKare();
 
   useEffect(() => {
     async function fetchItems() {
       try {
-        const res = await pujaKareApis.getPujaKareItems();
+        if (currentPage === 1) setLoading(true);
+        else setLoadingMore(true);
+        
+        const res = await pujaKareApis.getPujaKareItems(currentPage, limit);
         console.log("Puja Kare API Response:", res.data);
-        const itemsData = res || [];
-        setItems(itemsData);
+        const itemsData = res.data || [];
+        
+        if (currentPage === 1) {
+          setItems(itemsData);
+        } else {
+          setItems(prevItems => [...prevItems, ...itemsData]);
+        }
+        
+        // Check if there's more data
+        if (itemsData.length < limit) {
+          setHasMore(false);
+        }
+        
         // Update context with the fetched data
         updatePujaKareItems(itemsData);
       } catch (error) {
         console.error("API Error:", error);
+        if (currentPage === 1) {
+          setItems([]);
+        }
+        setHasMore(false);
       } finally {
         setLoading(false);
+        setLoadingMore(false);
       }
     }
 
     fetchItems();
-  }, []);
+  }, [currentPage]);
+
+  // Infinite scroll handler
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.innerHeight + document.documentElement.scrollTop + 100 >= document.documentElement.offsetHeight && hasMore && !loadingMore && !loading) {
+        setCurrentPage(prev => prev + 1);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [hasMore, loadingMore, loading]);
 
   if (loading) return <Loader message="🙏 Loading भक्ति भाव 🙏" size={200} />;
   if (!items.length) return <p className="text-center py-10 text-white">❌ No items found</p>;
@@ -80,6 +115,22 @@ export default function PujaKare() {
             )
           })}
         </ul>
+        
+        {/* Loading more indicator */}
+        {loadingMore && (
+          <div className="flex justify-center items-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
+            <span className="ml-2 text-sm text-gray-600">Loading more...</span>
+          </div>
+        )}
+        
+        {/* No more data indicator */}
+        {/* {!hasMore && items.length > 0 && (
+          <div className="text-center py-8 text-gray-500">
+            <p>🙏 सभी पूजा करे लोड हो गए हैं 🙏</p>
+            <p className="text-sm">All Puja Kare loaded</p>
+          </div>
+        )} */}
       </div>
 
 

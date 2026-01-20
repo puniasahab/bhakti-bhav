@@ -194,9 +194,9 @@ export const loginApis = {
 
 
 export const pujaKareApis = {
-  getPujaKareItems: async () => {
+  getPujaKareItems: async (curentPage, limit) => {
     try {
-      const response = await api.get(endPoints.pujaKarein);
+      const response = await api.get(`${endPoints.pujaKarein}?activeOnly=true&page=${curentPage}&limit=${limit}`);
       return response.data;
     } catch (error) {
       console.error("Error fetching Puja Kare items:", error);

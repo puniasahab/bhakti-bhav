@@ -10,41 +10,93 @@ import { getTokenFromLS, getSubscriptionStatusFromLS } from "../commonFunctions"
 export default function Wallpaper() {
   const [wallpapers, setWallpapers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const limit = 10;
   const [activeCategory, setActiveCategory] = useState("All");
   const [categories, setCategories] = useState([]);
 
   useEffect(() => {
-    let apiUrl = activeCategory === "All"
-      ? "https://api.bhaktibhav.app/frontend/wallpapers"
-      : `https://api.bhaktibhav.app/frontend/wallpapers?categoryId=${activeCategory}`;
-    fetch(apiUrl)
-      .then((res) => res.json())
-      .then((resJson) => {
+    const fetchWallpapers = async () => {
+      try {
+        if (currentPage === 1) setLoading(true);
+        else setLoadingMore(true);
+        
+        let apiUrl = activeCategory === "All"
+          ? `https://api.bhaktibhav.app/frontend/wallpapers?page=${currentPage}&limit=${limit}`
+          : `https://api.bhaktibhav.app/frontend/wallpapers?categoryId=${activeCategory}&page=${currentPage}&limit=${limit}`;
+        
+        const res = await fetch(apiUrl);
+        const resJson = await res.json();
+        
         if (resJson.status === "success" && Array.isArray(resJson.data)) {
-          setWallpapers(resJson.data);
+          setLoading(false);
+          if (currentPage === 1) {
+            setWallpapers(resJson.data);
+          } else {
+            setWallpapers(prevWallpapers => [...prevWallpapers, ...resJson.data]);
+          }
+          
+          // Check if there's more data
+          if (resJson.data.length < limit) {
+            setHasMore(false);
+          } else {
+            setHasMore(true);
+          }
         } else {
+          setLoading(false);
+          if (currentPage === 1) {
+            setWallpapers([]);
+          }
+          setHasMore(false);
+        }
+      } catch (err) {
+        console.error("Error fetching wallpapers:", err);
+        if (currentPage === 1) {
           setWallpapers([]);
         }
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Error fetching wallpapers:", err);
-        setWallpapers([]);
-        setLoading(false);
-      });
-
-      const getData = async () => {
-        try {
-          const data = await wallpaperApis.getWallpaperCategories();
-          // console.log("Fetched wallpaper categories:", data);
-          setCategories([{ _id: "All", name: { en: "All" } }, ...data.data]);
-        } catch (error) {
-          console.error("Error fetching wallpaper categories:", error);
-        }
+        setHasMore(false);
+      } finally {
+        setLoadingMore(false);
       }
-      getData();
-      // console.log("Fetching wallpaper categories", categories);
+    };
+
+    fetchWallpapers();
+  }, [currentPage, activeCategory]);
+
+  // Reset pagination when category changes
+  useEffect(() => {
+    if (currentPage !== 1) {
+      setCurrentPage(1);
+    }
+    setHasMore(true);
   }, [activeCategory]);
+
+  // Fetch categories
+  useEffect(() => {
+    const getData = async () => {
+      try {
+        const data = await wallpaperApis.getWallpaperCategories();
+        setCategories([{ _id: "All", name: { en: "All" } }, ...data.data]);
+      } catch (error) {
+        console.error("Error fetching wallpaper categories:", error);
+      }
+    };
+    getData();
+  }, []);
+
+  // Infinite scroll handler
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.innerHeight + document.documentElement.scrollTop + 100 >= document.documentElement.offsetHeight && hasMore && !loadingMore && !loading) {
+        setCurrentPage(prev => prev + 1);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [hasMore, loadingMore, loading]);
 
   if (loading) return <Loader message="🙏 Loading भक्ति भाव 🙏" size={200} />;
   if (!wallpapers.length) return <p className="text-center py-10">❌ No wallpapers found</p>;
@@ -146,6 +198,22 @@ export default function Wallpaper() {
             </li>
           ))}
         </ul>
+        
+        {/* Loading more indicator */}
+        {loadingMore && (
+          <div className="flex justify-center items-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
+            <span className="ml-2 text-sm text-gray-600">Loading more...</span>
+          </div>
+        )}
+        
+        {/* No more data indicator */}
+        {/* {!hasMore && wallpapers.length > 0 && (
+          <div className="text-center py-8 text-gray-500">
+            <p>🙏 सभी वॉलपेपर लोड हो गए हैं 🙏</p>
+            <p className="text-sm">All Wallpapers loaded</p>
+          </div>
+        )} */}
       </div>
 
       

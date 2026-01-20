@@ -21,7 +21,10 @@ export default function VratKatha() {
         /// all-kathas
         const res = await fetch("https://api.bhaktibhav.app/frontend/CategoryKatha");
         const json = await res.json();
-        console.log("katha data", json)
+        if(res.status === 'success') {
+          setLoading(false);
+          console.log("katha data", json);
+        }
 
         // if (json.status === "success" && Array.isArray(json.data)) {
         // Flatten all kathas from all categories

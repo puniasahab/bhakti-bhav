@@ -9,29 +9,68 @@ import { getTokenFromLS, getSubscriptionStatusFromLS } from "../commonFunctions"
 export default function Aarti() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const limit = 10; // Number of items per page
 
   useEffect(() => {
     async function fetchItems() {
       try {
-        const res = await fetch("https://api.bhaktibhav.app/frontend/all-artis");
+        const res = await fetch(`https://api.bhaktibhav.app/frontend/all-artis?page=${currentPage}&limit=${limit}`);
         const json = await res.json();
         if (json?.status === "success") {
-          setItems(json.data || []);
+          if (currentPage === 1) {
+            setItems(json.data || []);
+          } else {
+            setItems(prevItems => [...prevItems, ...(json.data || [])]);
+          }
+          
+          // Check if there are more items to load
+          if (!json.data || json.data.length < limit) {
+            setHasMore(false);
+          }
+          
           console.log(json.data);
         } else {
-          setItems([]);
-          alert("No data found!");
+          if (currentPage === 1) {
+            setItems([]);
+            alert("No data found!");
+          }
         }
       } catch (error) {
         console.error("API Error:", error);
-        setItems([]);
+        if (currentPage === 1) {
+          setItems([]);
+        }
       } finally {
         setLoading(false);
+        setLoadingMore(false);
       }
     }
 
     fetchItems();
-  }, []);
+  }, [currentPage]);
+
+  // Infinite scroll handler
+  useEffect(() => {
+    const handleScroll = () => {
+      if (loadingMore || !hasMore) return;
+
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const scrollHeight = document.documentElement.scrollHeight;
+      const clientHeight = window.innerHeight;
+
+      // Load more when user is near the bottom (100px before reaching the end)
+      if (scrollTop + clientHeight >= scrollHeight - 100) {
+        setLoadingMore(true);
+        setCurrentPage(prevPage => prevPage + 1);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [loadingMore, hasMore]);
 
   if (loading) return <Loader message="🙏 Loading भक्ति भाव 🙏" size={200} />;
 
@@ -104,6 +143,21 @@ export default function Aarti() {
           })}
         </ul>
       </div>
+
+      {/* Loading indicator for infinite scroll */}
+      {loadingMore && (
+        <div className="flex justify-center items-center py-4">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#9A283D]"></div>
+          <span className="ml-2 text-[#9A283D] font-eng">Loading more...</span>
+        </div>
+      )}
+
+      {/* End of data indicator */}
+      {/* {!hasMore && items.length > 0 && (
+        <div className="text-center py-4 text-gray-500 font-eng">
+          No more आरती to load
+        </div>
+      )} */}
 
 
     </>

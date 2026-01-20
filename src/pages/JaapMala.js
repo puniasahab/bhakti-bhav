@@ -9,24 +9,64 @@ import { getTokenFromLS, getSubscriptionStatusFromLS } from "../commonFunctions"
 function JaapMala() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const limit = 10;
 
   useEffect(() => {
-    fetch("https://api.bhaktibhav.app/frontend/all-jaapmala")
-      .then((res) => res.json())
-      .then((result) => {
+    const fetchJaapMalaData = async () => {
+      try {
+        if (currentPage === 1) setLoading(true);
+        else setLoadingMore(true);
+        
+        const response = await fetch(`https://api.bhaktibhav.app/frontend/all-jaapmala?page=${currentPage}&limit=${limit}`);
+        const result = await response.json();
+        
         if (result.status === "success" && Array.isArray(result.data)) {
-          setData(result.data);
+          if (currentPage === 1) {
+            setData(result.data);
+          } else {
+            setData(prevData => [...prevData, ...result.data]);
+          }
+          
+          // Check if there's more data
+          if (result.data.length < limit) {
+            setHasMore(false);
+          }
         } else {
-          setData([]);
-          alert("No data found!");
+          if (currentPage === 1) {
+            setData([]);
+            alert("No data found!");
+          }
+          setHasMore(false);
         }
-        setLoading(false);
-      })
-      .catch((err) => {
+      } catch (err) {
         console.error(err);
+        if (currentPage === 1) {
+          setData([]);
+        }
+        setHasMore(false);
+      } finally {
         setLoading(false);
-      });
-  }, []);
+        setLoadingMore(false);
+      }
+    };
+
+    fetchJaapMalaData();
+  }, [currentPage]);
+
+  // Infinite scroll handler
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.innerHeight + document.documentElement.scrollTop + 100 >= document.documentElement.offsetHeight && hasMore && !loadingMore && !loading) {
+        setCurrentPage(prev => prev + 1);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [hasMore, loadingMore, loading]);
 
   if (loading) return <Loader message="🙏 Loading भक्ति भाव 🙏" size={200} />;
   const handleNavigate = (id, accessType) => {
@@ -126,6 +166,22 @@ const HindiWithEnglishNumbers = ( text ) => {
             </li>
           ))}
         </ul>
+        
+        {/* Loading more indicator */}
+        {loadingMore && (
+          <div className="flex justify-center items-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
+            <span className="ml-2 text-sm text-gray-600">Loading more...</span>
+          </div>
+        )}
+        
+        {/* No more data indicator */}
+        {/* {!hasMore && data.length > 0 && (
+          <div className="text-center py-8 text-gray-500">
+            <p>🙏 सभी जप माला लोड हो गए हैं 🙏</p>
+            <p className="text-sm">All Jaap Mala loaded</p>
+          </div>
+        )} */}
       </div>
 
     </>
