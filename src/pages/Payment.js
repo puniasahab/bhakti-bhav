@@ -288,7 +288,7 @@ export default function Payment() {
 
         <div className="mx-auto px-4 mt-6 flex flex-col space-y-3 font-eng justify-between">
           {plans && plans.length > 0 && <button className="bg-[#9A283D] text-white py-3 rounded-xl shadow " onClick={() => makePayment(selectedPlan)}>
-            Get Started
+            Start Now
           </button>}
           <button className="border border-[#9A283D] text-[#9A283D] py-3 rounded-xl shadow" onClick={() => navigate("/")}>
             Skip

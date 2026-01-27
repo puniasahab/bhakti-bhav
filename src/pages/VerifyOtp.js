@@ -48,6 +48,13 @@ function VerifyOtp() {
         if (value && index < otp.length - 1) {
             document.getElementById(`otp-${index + 1}`).focus(); // move forward
         }
+
+        // Auto-verify when all digits are entered
+        if (value && newOtp.every(digit => digit !== "")) {
+            setTimeout(() => {
+                document.getElementById("verify-btn")?.click();
+            }, 100);
+        }
     };
 
     const handleKeyDown = (e, index) => {
@@ -73,6 +80,13 @@ function VerifyOtp() {
 
         const lastIndex = Math.min(pasteData.length - 1, otp.length - 1);
         document.getElementById(`otp-${lastIndex}`).focus();
+
+        // Auto-verify when all digits are entered via paste
+        if (newOtp.every(digit => digit !== "")) {
+            setTimeout(() => {
+                document.getElementById("verify-btn")?.click();
+            }, 100);
+        }
     };
 
     const handleVerify = async () => {
@@ -165,6 +179,7 @@ function VerifyOtp() {
                         </div>
 
                         <button
+                            id="verify-btn"
                             onClick={handleVerify}
                             disabled={loading}
                             className="w-full bg-[#800000] text-white py-2 rounded-lg hover:bg-[#a00000] transition disabled:opacity-50"
