@@ -114,7 +114,7 @@ export default function Chalisa() {
                 to={handleNavigate(chalisa._id, chalisa.accessType)}
                 className="theme_bg bg-white rounded-xl shadow hover:bg-yellow-50 transition block overflow-hidden"
               > 
-                <div className="w-full h-40 flex items-center justify-center bg-gray-50">
+                <div className="w-full h-40 flex items-center justify-center">
                   <img
                     src={chalisa.imagethumb?.startsWith("http")
                       ? chalisa.imagethumb
