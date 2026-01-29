@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Routes, Route } from "react-router-dom"; // DO NOT import BrowserRouter here
+import { Routes, Route, useLocation } from "react-router-dom"; // DO NOT import BrowserRouter here
 import Home from "./pages/Home";
 import VratKatha from "./pages/VratKatha";
 import JaapMala from "./pages/JaapMala";
@@ -41,22 +41,29 @@ import GlobalAudioPlayer from "./components/GlobalAudioPlayer";
 
 function App() {
   const [loading, setLoading] = useState(true);
+  const location = useLocation();
 
   useEffect(() => {
+    // Only show splash screen on home page ("/") and if not shown before in this session
     const splashShown = sessionStorage.getItem("splashShown");
+    const isHomePage = location.pathname === "/" || location.pathname === "";
 
-    if (!splashShown) {
+    if (!splashShown && isHomePage) {
       const timer = setTimeout(() => {
         setLoading(false);
         sessionStorage.setItem("splashShown", "true");
-      }, 2500);
+      }, 600);
       return () => clearTimeout(timer);
     } else {
       setLoading(false);
+      if (!splashShown) {
+        sessionStorage.setItem("splashShown", "true");
+      }
     }
-  }, []);
+  }, [location.pathname]);
 
-  if (loading) return <Splash />;
+  // Only show splash on home page
+  if (loading && (location.pathname === "/" || location.pathname === "")) return <Splash />;
 
   return (
     <AudioProvider>
