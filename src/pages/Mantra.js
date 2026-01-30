@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { Link } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Loader from "../components/Loader";
 import PageTitleCard from "../components/PageTitleCard";
 import { getTokenFromLS, getSubscriptionStatusFromLS } from "../commonFunctions";
+import { cachedFetch } from "../utils/apiCache";
 
 export default function Mantra() {
   const [items, setItems] = useState([]);
@@ -14,14 +15,22 @@ export default function Mantra() {
   const [hasMore, setHasMore] = useState(true);
   const limit = 10;
 
+  // Memoize subscription status to prevent re-computation on each render
+  const isSubscribed = useMemo(() => getSubscriptionStatusFromLS(), []);
+  const hasToken = useMemo(() => getTokenFromLS(), []);
+
   useEffect(() => {
     async function fetchItems() {
       try {
         if (currentPage === 1) setLoading(true);
         else setLoadingMore(true);
         
-        const res = await fetch(`https://api.bhaktibhav.app/frontend/all-mantras?page=${currentPage}&limit=${limit}`);
-        const json = await res.json();
+        // Use cached fetch for better performance
+        const json = await cachedFetch(
+          `https://api.bhaktibhav.app/frontend/all-mantras?page=${currentPage}&limit=${limit}`,
+          {},
+          5 * 60 * 1000 // Cache for 5 minutes
+        );
         
         if (json.status === "success" && Array.isArray(json.data)) {
           if (currentPage === 1) {
@@ -55,39 +64,42 @@ export default function Mantra() {
     fetchItems();
   }, [currentPage]);
 
-  // Infinite scroll handler
+  // Infinite scroll handler with throttling for better performance
   useEffect(() => {
+    let ticking = false;
+    
     const handleScroll = () => {
-      if (window.innerHeight + document.documentElement.scrollTop + 100 >= document.documentElement.offsetHeight && hasMore && !loadingMore && !loading) {
-        setCurrentPage(prev => prev + 1);
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          if (window.innerHeight + document.documentElement.scrollTop + 100 >= document.documentElement.offsetHeight && hasMore && !loadingMore && !loading) {
+            setCurrentPage(prev => prev + 1);
+          }
+          ticking = false;
+        });
+        ticking = true;
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, [hasMore, loadingMore, loading]);
 
-  if (loading) return <Loader message="🙏 Loading भक्ति भाव 🙏" size={200} />;
-  if (!items.length) return <p className="text-center py-10 theme_text font-eng">❌ No mantras found</p>;
-  const handleNavigation = (id, accessType) => {
-
-    if (getSubscriptionStatusFromLS()) {
+  // Memoized navigation handler
+  const handleNavigation = useCallback((id, accessType) => {
+    if (isSubscribed) {
       return `/mantra/${id}`;
-    }
-    else {
+    } else {
       if (accessType === "free") {
         return `/mantra/${id}`;
       } else {
-        if (getTokenFromLS()) {
-          return "/payment";
-        }
-        else {
-          return "/login";
-        }
+        return hasToken ? "/payment" : "/login";
       }
-    };
+    }
+  }, [isSubscribed, hasToken]);
 
-  }
+  if (loading) return <Loader message="🙏 Loading भक्ति भाव 🙏" size={200} />;
+  if (!items.length) return <p className="text-center py-10 theme_text font-eng">❌ No mantras found</p>;
+
   return (
     <div className="bg-[url('../img/home_bg.png')] bg-cover bg-top bg-no-repeat min-h-screen w-full font-hindi text-white">
       <Header />
@@ -109,17 +121,18 @@ export default function Mantra() {
                 to={handleNavigation(item._id, item.accessType)}
                 className="theme_bg bg-white rounded-xl shadow p-4 text-center hover:bg-yellow-50 transition flex flex-col"
               >
-                <div className={`w-full h-36 flex items-center justify-center ${getSubscriptionStatusFromLS() ? "" : item.accessType === "paid" ? "blur" : ""}`}>
+                <div className={`w-full h-36 flex items-center justify-center ${isSubscribed ? "" : item.accessType === "paid" ? "blur" : ""}`}>
                   <img
-
                     src={item.imagethumb || "/img/default-mantra.png"}
                     alt={item.title}
                     className="w-auto rounded-md max-h-[100%] md:max-h-[100%]"
+                    loading="lazy"
+                    decoding="async"
                   />
                 </div>
                 <div className="p-2">
-                  <h2 className={`md:text-lg text-lg font-semibold truncate font-hindi mt-1 ${getSubscriptionStatusFromLS() ? "" : item.accessType === "paid" ? "blur" : ""}`}>{item.name.hi}</h2>
-                  <p className={`md:text-md text-sm font-semibold truncate font-eng ${getSubscriptionStatusFromLS() ? "" : item.accessType === "paid" ? "blur-sm" : ""}`}>({item.name.en})</p>
+                  <h2 className={`md:text-lg text-lg font-semibold truncate font-hindi mt-1 ${isSubscribed ? "" : item.accessType === "paid" ? "blur" : ""}`}>{item.name.hi}</h2>
+                  <p className={`md:text-md text-sm font-semibold truncate font-eng ${isSubscribed ? "" : item.accessType === "paid" ? "blur-sm" : ""}`}>({item.name.en})</p>
 
                 </div>
               </Link>

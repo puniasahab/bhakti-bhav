@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { Link } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Loader from "../components/Loader";
 import PageTitleCard from "../components/PageTitleCard";
 import { getTokenFromLS, getSubscriptionStatusFromLS } from "../commonFunctions";
+import { cachedFetch } from "../utils/apiCache";
 
 export default function Aarti() {
   const [items, setItems] = useState([]);
@@ -14,11 +15,23 @@ export default function Aarti() {
   const [hasMore, setHasMore] = useState(true);
   const limit = 10; // Number of items per page
 
+  // Memoize subscription status to prevent re-computation on each render
+  const isSubscribed = useMemo(() => getSubscriptionStatusFromLS(), []);
+  const hasToken = useMemo(() => getTokenFromLS(), []);
+
   useEffect(() => {
     async function fetchItems() {
       try {
-        const res = await fetch(`https://api.bhaktibhav.app/frontend/all-artis?page=${currentPage}&limit=${limit}`);
-        const json = await res.json();
+        if (currentPage === 1) setLoading(true);
+        else setLoadingMore(true);
+        
+        // Use cached fetch for better performance
+        const json = await cachedFetch(
+          `https://api.bhaktibhav.app/frontend/all-artis?page=${currentPage}&limit=${limit}`,
+          {},
+          5 * 60 * 1000 // Cache for 5 minutes
+        );
+        
         if (json?.status === "success") {
           if (currentPage === 1) {
             setItems(json.data || []);
@@ -30,19 +43,18 @@ export default function Aarti() {
           if (!json.data || json.data.length < limit) {
             setHasMore(false);
           }
-          
-          console.log(json.data);
         } else {
           if (currentPage === 1) {
             setItems([]);
-            alert("No data found!");
           }
+          setHasMore(false);
         }
       } catch (error) {
         console.error("API Error:", error);
         if (currentPage === 1) {
           setItems([]);
         }
+        setHasMore(false);
       } finally {
         setLoading(false);
         setLoadingMore(false);
@@ -52,47 +64,50 @@ export default function Aarti() {
     fetchItems();
   }, [currentPage]);
 
-  // Infinite scroll handler
+  // Infinite scroll handler with throttling
   useEffect(() => {
+    let ticking = false;
+    
     const handleScroll = () => {
       if (loadingMore || !hasMore) return;
+      
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+          const scrollHeight = document.documentElement.scrollHeight;
+          const clientHeight = window.innerHeight;
 
-      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-      const scrollHeight = document.documentElement.scrollHeight;
-      const clientHeight = window.innerHeight;
-
-      // Load more when user is near the bottom (100px before reaching the end)
-      if (scrollTop + clientHeight >= scrollHeight - 100) {
-        setLoadingMore(true);
-        setCurrentPage(prevPage => prevPage + 1);
+          if (scrollTop + clientHeight >= scrollHeight - 100) {
+            setLoadingMore(true);
+            setCurrentPage(prevPage => prevPage + 1);
+          }
+          ticking = false;
+        });
+        ticking = true;
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, [loadingMore, hasMore]);
 
-  if (loading) return <Loader message="🙏 Loading भक्ति भाव 🙏" size={200} />;
-
-  if (!items.length)
-    return <p className="text-center py-10 theme_text">❌ No items found</p>;
-
-  const handleNavigate = (id, accessType) => {
-    if (getSubscriptionStatusFromLS()) {
+  // Memoized navigation handler
+  const handleNavigate = useCallback((id, accessType) => {
+    if (isSubscribed) {
       return `/aarti/${id}`;
     } else {
       if (accessType === "free") {
         return `/aarti/${id}`;
       } else {
-        if (getTokenFromLS()) {
-          return "/payment";
-        } else {
-          return "/login";
-        }
+        return hasToken ? "/payment" : "/login";
       }
     }
+  }, [isSubscribed, hasToken]);
 
-  }
+  if (loading) return <Loader message="🙏 Loading भक्ति भाव 🙏" size={200} />;
+
+  if (!items.length)
+    return <p className="text-center py-10 theme_text">❌ No items found</p>;
   return (
     <>
 
@@ -124,9 +139,11 @@ export default function Aarti() {
                     <img
                       src={imgSrc}
                       alt={item.name?.en || item.name?.hi || "Aarti"}
-                      className={`w-full rounded-md max-h-[150px] md:max-h-[150px] object-cover ${getSubscriptionStatusFromLS() ? "" : item.accessType === "paid" ? "blur" : ""}`}
+                      className={`w-full rounded-md max-h-[150px] md:max-h-[150px] object-cover ${isSubscribed ? "" : item.accessType === "paid" ? "blur" : ""}`}
+                      loading="lazy"
+                      decoding="async"
                     />
-                    <div className={`absolute inset-0 theme_text flex flex-col items-center justify-center text-center px-4 z-10 top-[35%] ${getSubscriptionStatusFromLS() ? "" : item.accessType === "paid" ? "blur-sm" : ""}`}>
+                    <div className={`absolute inset-0 theme_text flex flex-col items-center justify-center text-center px-4 z-10 top-[35%] ${isSubscribed ? "" : item.accessType === "paid" ? "blur-sm" : ""}`}>
                       {item.name?.hi && (
                         <h2 className="text-xl font-bold font-hindi">
                           {item.name.hi}

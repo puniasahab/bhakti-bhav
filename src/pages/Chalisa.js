@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { Link } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Loader from "../components/Loader";
 import PageTitleCard from "../components/PageTitleCard";
 import { getSubscriptionStatusFromLS, getTokenFromLS } from "../commonFunctions";
+import { cachedFetch } from "../utils/apiCache";
 
 export default function Chalisa() {
   const [chalisa, setChalisa] = useState([]);
@@ -14,11 +15,22 @@ export default function Chalisa() {
   const [hasMore, setHasMore] = useState(true);
   const limit = 10; // Number of items per page
 
+  // Memoize subscription status to prevent re-computation on each render
+  const isSubscribed = useMemo(() => getSubscriptionStatusFromLS(), []);
+  const hasToken = useMemo(() => getTokenFromLS(), []);
+
   useEffect(() => {
     async function fetchChalisa() {
       try {
-        const res = await fetch(`https://api.bhaktibhav.app/frontend/all-Chalisas?page=${currentPage}&limit=${limit}`);
-        const json = await res.json();
+        if (currentPage === 1) setLoading(true);
+        else setLoadingMore(true);
+        
+        // Use cached fetch for better performance
+        const json = await cachedFetch(
+          `https://api.bhaktibhav.app/frontend/all-Chalisas?page=${currentPage}&limit=${limit}`,
+          {},
+          5 * 60 * 1000 // Cache for 5 minutes
+        );
 
         if (json.status === "success" && Array.isArray(json.data)) {
           if (currentPage === 1) {
@@ -34,14 +46,15 @@ export default function Chalisa() {
         } else {
           if (currentPage === 1) {
             setChalisa([]);
-            alert("No data found!");
           }
+          setHasMore(false);
         }
       } catch (error) {
         console.error("API Error:", error);
         if (currentPage === 1) {
           setChalisa([]);
         }
+        setHasMore(false);
       } finally {
         setLoading(false);
         setLoadingMore(false);
@@ -51,47 +64,48 @@ export default function Chalisa() {
     fetchChalisa();
   }, [currentPage]);
 
-  // Infinite scroll handler
+  // Infinite scroll handler with throttling
   useEffect(() => {
+    let ticking = false;
+    
     const handleScroll = () => {
       if (loadingMore || !hasMore) return;
+      
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+          const scrollHeight = document.documentElement.scrollHeight;
+          const clientHeight = window.innerHeight;
 
-      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-      const scrollHeight = document.documentElement.scrollHeight;
-      const clientHeight = window.innerHeight;
-
-      // Load more when user is near the bottom (100px before reaching the end)
-      if (scrollTop + clientHeight >= scrollHeight - 100) {
-        setLoadingMore(true);
-        setCurrentPage(prevPage => prevPage + 1);
+          if (scrollTop + clientHeight >= scrollHeight - 100) {
+            setLoadingMore(true);
+            setCurrentPage(prevPage => prevPage + 1);
+          }
+          ticking = false;
+        });
+        ticking = true;
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, [loadingMore, hasMore]);
 
+  // Memoized navigation handler
+  const handleNavigate = useCallback((id, accessType) => {
+    if (isSubscribed) {
+      return `/chalisa/${id}`;
+    } else {
+      if (accessType === "free") {
+        return `/chalisa/${id}`;
+      } else {
+        return hasToken ? "/payment" : "/login";
+      }
+    }
+  }, [isSubscribed, hasToken]);
+
   if (loading) return <Loader message="🙏 Loading भक्ति भाव 🙏" size={200} />;
   if (!chalisa.length) return <p className="text-center py-10">❌ No chalisa found</p>;
-
-  const handleNavigate = (id, accessType) => {
-    if(getSubscriptionStatusFromLS()) {
-        return `/chalisa/${id}`;
-    }
-    else {
-      if(accessType === "free") {
-        return `/chalisa/${id}`;
-      }
-      else {
-        if(getTokenFromLS()) {
-          return "/payment";
-        }
-        else {
-          return "/login";
-        }
-      }
-    }
-  }
 
   return (
     <>
@@ -121,18 +135,20 @@ export default function Chalisa() {
                       : `https://api.bhaktibhav.app${chalisa.imagethumb}`
                     }
                     alt={chalisa.name?.hi || chalisa.name?.en}
-                    className={`w-auto rounded-md max-h-[100%] md:max-h-[100%] ${getSubscriptionStatusFromLS() ? "" : chalisa.accessType === "paid" ? "blur-sm" : ""}`}
+                    className={`w-auto rounded-md max-h-[100%] md:max-h-[100%] ${isSubscribed ? "" : chalisa.accessType === "paid" ? "blur-sm" : ""}`}
+                    loading="lazy"
+                    decoding="async"
                   />
                 </div> 
 
                 <div className="px-3 py-4">
                   {chalisa.name?.hi && (
-                    <h2 className={`md:text-lg text-lg font-semibold truncate font-hindi pt-2 ${getSubscriptionStatusFromLS() ? "" : chalisa.accessType === "paid" ? "blur-sm" : ""}`}>
+                    <h2 className={`md:text-lg text-lg font-semibold truncate font-hindi pt-2 ${isSubscribed ? "" : chalisa.accessType === "paid" ? "blur-sm" : ""}`}>
                       {chalisa.name.hi}
                     </h2>
                   )}
                   {chalisa.name?.en && (
-                    <p className={`text-sm truncate font-eng ${getSubscriptionStatusFromLS() ? "" : chalisa.accessType === "paid" ? "blur-sm" : ""}`}>{chalisa.name.en}</p>
+                    <p className={`text-sm truncate font-eng ${isSubscribed ? "" : chalisa.accessType === "paid" ? "blur-sm" : ""}`}>{chalisa.name.en}</p>
                   )} 
                 </div>
               </Link>

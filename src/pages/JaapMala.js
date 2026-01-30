@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { Link } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Loader from "../components/Loader";
 import PageTitleCard from "../components/PageTitleCard";
 import { getTokenFromLS, getSubscriptionStatusFromLS } from "../commonFunctions";
+import { cachedFetch } from "../utils/apiCache";
 
 function JaapMala() {
   const [data, setData] = useState([]);
@@ -14,14 +15,22 @@ function JaapMala() {
   const [hasMore, setHasMore] = useState(true);
   const limit = 10;
 
+  // Memoize subscription status to prevent re-computation on each render
+  const isSubscribed = useMemo(() => getSubscriptionStatusFromLS(), []);
+  const hasToken = useMemo(() => getTokenFromLS(), []);
+
   useEffect(() => {
     const fetchJaapMalaData = async () => {
       try {
         if (currentPage === 1) setLoading(true);
         else setLoadingMore(true);
         
-        const response = await fetch(`https://api.bhaktibhav.app/frontend/all-jaapmala?page=${currentPage}&limit=${limit}`);
-        const result = await response.json();
+        // Use cached fetch for better performance
+        const result = await cachedFetch(
+          `https://api.bhaktibhav.app/frontend/all-jaapmala?page=${currentPage}&limit=${limit}`,
+          {},
+          5 * 60 * 1000 // Cache for 5 minutes
+        );
         
         if (result.status === "success" && Array.isArray(result.data)) {
           if (currentPage === 1) {
@@ -37,7 +46,6 @@ function JaapMala() {
         } else {
           if (currentPage === 1) {
             setData([]);
-            alert("No data found!");
           }
           setHasMore(false);
         }
@@ -56,39 +64,40 @@ function JaapMala() {
     fetchJaapMalaData();
   }, [currentPage]);
 
-  // Infinite scroll handler
+  // Infinite scroll handler with throttling
   useEffect(() => {
+    let ticking = false;
+    
     const handleScroll = () => {
-      if (window.innerHeight + document.documentElement.scrollTop + 100 >= document.documentElement.offsetHeight && hasMore && !loadingMore && !loading) {
-        setCurrentPage(prev => prev + 1);
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          if (window.innerHeight + document.documentElement.scrollTop + 100 >= document.documentElement.offsetHeight && hasMore && !loadingMore && !loading) {
+            setCurrentPage(prev => prev + 1);
+          }
+          ticking = false;
+        });
+        ticking = true;
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, [hasMore, loadingMore, loading]);
 
-  if (loading) return <Loader message="🙏 Loading भक्ति भाव 🙏" size={200} />;
-  const handleNavigate = (id, accessType) => {
-    const subscriptionStatus = getSubscriptionStatusFromLS();
-    console.log("get Subscription Status From LS", subscriptionStatus);
-    console.log("Type of subscription status:", typeof subscriptionStatus);
-    
-    if (subscriptionStatus) {
-        return `/jaapmala/${id}`;
-      
+  // Memoized navigation handler
+  const handleNavigate = useCallback((id, accessType) => {
+    if (isSubscribed) {
+      return `/jaapmala/${id}`;
     } else {
       if (accessType === "free") {
         return `/jaapmala/${id}`;
       } else {
-        if (getTokenFromLS())
-          return `/payment`;
-        else {
-          return "/login";
-        }
+        return hasToken ? "/payment" : "/login";
       }
     }
-  }
+  }, [isSubscribed, hasToken]);
+
+  if (loading) return <Loader message="🙏 Loading भक्ति भाव 🙏" size={200} />;
 
   function toHindiDigits(str) {
   const map = { '0': '०', '1': '१', '2': '२', '3': '३', '4': '४', '5': '५', '6': '६', '7': '७', '8': '८', '9': '९' };
@@ -145,16 +154,17 @@ const HindiWithEnglishNumbers = ( text ) => {
                 <div className={`overflow_bg`}>
 
                   <img
-
                     src={
                       item.imageUrl.startsWith("http")
                         ? item.imageUrl
                         : `https://api.bhaktibhav.app${item.imageUrl}`
                     }
                     alt={item.title.en}
-                    className={`w-full rounded-md max-h-[150px] md:max-h-[150px] object-cover ${getSubscriptionStatusFromLS() ? "" : item.accessType === "paid" ? "blur-sm" : ""}`}
+                    className={`w-full rounded-md max-h-[150px] md:max-h-[150px] object-cover ${isSubscribed ? "" : item.accessType === "paid" ? "blur-sm" : ""}`}
+                    loading="lazy"
+                    decoding="async"
                   />
-                  <div className={`absolute inset-0 theme_text flex flex-col items-center justify-center text-center px-4 z-10 top-[35%] ${getSubscriptionStatusFromLS() ? "" : item.accessType === "paid" ? "blur-sm" : ""}`}>
+                  <div className={`absolute inset-0 theme_text flex flex-col items-center justify-center text-center px-4 z-10 top-[35%] ${isSubscribed ? "" : item.accessType === "paid" ? "blur-sm" : ""}`}>
                     {/* <h2 className="text-xl font-bold" 
                     // style={{fontFamily: "KrutiDev"}}>
                       >{item.title.hi}</h2> */}

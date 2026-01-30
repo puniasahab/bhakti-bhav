@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { Download, Eye, Heart, Lock } from "lucide-react";
 import Header from "../components/Header";
@@ -6,6 +6,7 @@ import Footer from "../components/Footer";
 import Loader from "../components/Loader";
 import { wallpaperApis } from "../api";
 import { getTokenFromLS, getSubscriptionStatusFromLS } from "../commonFunctions";
+import { cachedFetch } from "../utils/apiCache";
 
 export default function Wallpaper() {
   const [wallpapers, setWallpapers] = useState([]);
@@ -17,6 +18,10 @@ export default function Wallpaper() {
   const [activeCategory, setActiveCategory] = useState("All");
   const [categories, setCategories] = useState([]);
 
+  // Memoize subscription status to prevent re-computation on each render
+  const isSubscribed = useMemo(() => getSubscriptionStatusFromLS(), []);
+  const hasToken = useMemo(() => getTokenFromLS(), []);
+
   useEffect(() => {
     const fetchWallpapers = async () => {
       try {
@@ -27,8 +32,8 @@ export default function Wallpaper() {
           ? `https://api.bhaktibhav.app/frontend/wallpapers?page=${currentPage}&limit=${limit}`
           : `https://api.bhaktibhav.app/frontend/wallpapers?categoryId=${activeCategory}&page=${currentPage}&limit=${limit}`;
         
-        const res = await fetch(apiUrl);
-        const resJson = await res.json();
+        // Use cached fetch for better performance
+        const resJson = await cachedFetch(apiUrl, {}, 5 * 60 * 1000);
         
         if (resJson.status === "success" && Array.isArray(resJson.data)) {
           setLoading(false);
@@ -58,6 +63,7 @@ export default function Wallpaper() {
         }
         setHasMore(false);
       } finally {
+        setLoading(false);
         setLoadingMore(false);
       }
     };
@@ -86,31 +92,28 @@ export default function Wallpaper() {
     getData();
   }, []);
 
-  // Infinite scroll handler
+  // Infinite scroll handler with throttling
   useEffect(() => {
+    let ticking = false;
+    
     const handleScroll = () => {
-      if (window.innerHeight + document.documentElement.scrollTop + 100 >= document.documentElement.offsetHeight && hasMore && !loadingMore && !loading) {
-        setCurrentPage(prev => prev + 1);
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          if (window.innerHeight + document.documentElement.scrollTop + 100 >= document.documentElement.offsetHeight && hasMore && !loadingMore && !loading) {
+            setCurrentPage(prev => prev + 1);
+          }
+          ticking = false;
+        });
+        ticking = true;
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, [hasMore, loadingMore, loading]);
 
-  if (loading) return <Loader message="🙏 Loading भक्ति भाव 🙏" size={200} />;
-  if (!wallpapers.length) return <p className="text-center py-10">❌ No wallpapers found</p>;
- 
-  // const categories = ["All", ...new Set(wallpapers.map((wp) => wp.godName.toLowerCase()))];
- 
-  // const filteredWallpapers =
-  //   activeCategory === "All"
-  //     ? wallpapers
-  //     : wallpapers.filter(
-  //       (wp) => wp.category === activeCategory
-  //     );
- 
-  const getImageUrl = (wp) => {
+  // Memoized image URL getter
+  const getImageUrl = useCallback((wp) => {
     if (wp.imagethumb && wp.imagethumb !== "") {
       return wp.imagethumb.startsWith("http")
         ? wp.imagethumb
@@ -119,26 +122,23 @@ export default function Wallpaper() {
     return wp.imageUrl.startsWith("http")
       ? wp.imageUrl
       : `https://api.bhaktibhav.app${wp.imageUrl}`;
-  };
+  }, []);
 
-
-  const handleNavigate = (id, accessType) => {
-    if (getSubscriptionStatusFromLS()) {
+  // Memoized navigation handler
+  const handleNavigate = useCallback((id, accessType) => {
+    if (isSubscribed) {
       return `/wallpaper/${id}`;
-    }
-    else {
+    } else {
       if (accessType === "free") {
         return `/wallpaper/${id}`;
       } else {
-        if (getTokenFromLS()) {
-          return "/payment";
-        }
-        else {
-          return "/login";
-        }
+        return hasToken ? "/payment" : "/login";
       }
     }
-  }
+  }, [isSubscribed, hasToken]);
+
+  if (loading) return <Loader message="🙏 Loading भक्ति भाव 🙏" size={200} />;
+  if (!wallpapers.length) return <p className="text-center py-10">❌ No wallpapers found</p>;
 
   return (
     <>
@@ -169,7 +169,9 @@ export default function Wallpaper() {
                     <img
                       src={getImageUrl(wp)}
                       alt={wp.godName}
-                      className={`w-full h-full object-cover ${getSubscriptionStatusFromLS() ? "" : wp.accessType === "paid" ? "blur" : ""}`}
+                      className={`w-full h-full object-cover ${isSubscribed ? "" : wp.accessType === "paid" ? "blur" : ""}`}
+                      loading="lazy"
+                      decoding="async"
                     />
                   </div>
 
@@ -180,15 +182,15 @@ export default function Wallpaper() {
                   )} */}
 
                   <div className="absolute bottom-2 left-2 right-2 flex justify-center gap-2">
-                    <div  style={{paddingLeft: '6px', paddingRight: '6px'}}className={`flex items-center gap-1 bg-white/90 backdrop-blur-sm py-1 rounded-full shadow-sm text-xs font-eng ${getSubscriptionStatusFromLS() ? "" : wp.accessType === "paid" ? "blur" : ""}`}>
+                    <div  style={{paddingLeft: '6px', paddingRight: '6px'}}className={`flex items-center gap-1 bg-white/90 backdrop-blur-sm py-1 rounded-full shadow-sm text-xs font-eng ${isSubscribed ? "" : wp.accessType === "paid" ? "blur" : ""}`}>
                       <Download size={12} className="text-[#9A283D]" />
                       <span className="text-gray-700" style={{fontSize: `${wp.downloads.length >= 3 ? "10px" : "11px"}`}}>{wp.downloads}</span>
                     </div>
-                    <div  style={{paddingLeft: '6px', paddingRight: '6px'}} className={`flex items-center gap-1 bg-white/90 backdrop-blur-sm py-1 rounded-full shadow-sm text-xs font-eng ${getSubscriptionStatusFromLS() ? "" : wp.accessType === "paid" ? "blur" : ""}`}>
+                    <div  style={{paddingLeft: '6px', paddingRight: '6px'}} className={`flex items-center gap-1 bg-white/90 backdrop-blur-sm py-1 rounded-full shadow-sm text-xs font-eng ${isSubscribed ? "" : wp.accessType === "paid" ? "blur" : ""}`}>
                       <Eye size={12} className="text-[#9A283D]" />
                       <span className="text-gray-700" style={{fontSize: `${wp.views.length >= 3 ? "10px" : "12px"}`}}>{wp.views}</span>
                     </div>
-                    <div  style={{paddingLeft: '6px', paddingRight: '6px'}} className={`flex items-center gap-1 bg-white/90 backdrop-blur-sm py-1 rounded-full shadow-sm text-xs font-eng ${getSubscriptionStatusFromLS() ? "" : wp.accessType === "paid" ? "blur" : ""}`}>
+                    <div  style={{paddingLeft: '6px', paddingRight: '6px'}} className={`flex items-center gap-1 bg-white/90 backdrop-blur-sm py-1 rounded-full shadow-sm text-xs font-eng ${isSubscribed ? "" : wp.accessType === "paid" ? "blur" : ""}`}>
                       <Heart size={12} className="text-[#9A283D]" />
                       <span className="text-gray-700" style={{fontSize: `${wp.likes.length >= 3 ? "10px" : "12px"}`}}>{wp.likes}</span>
                     </div>

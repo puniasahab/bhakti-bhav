@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { Link } from "react-router-dom";
@@ -6,8 +6,6 @@ import Loader from "../components/Loader";
 import PageTitleCard from "../components/PageTitleCard";
 import { pujaKareApis } from "../api";
 import { usePujaKare } from "../contexts/PujaKareContext";
-import { type } from "@testing-library/user-event/dist/type";
-import { parse } from "postcss";
 
 export default function PujaKare() {
   const [items, setItems] = useState([]);
@@ -25,7 +23,6 @@ export default function PujaKare() {
         else setLoadingMore(true);
         
         const res = await pujaKareApis.getPujaKareItems(currentPage, limit);
-        console.log("Puja Kare API Response:", res.data);
         const itemsData = res.data || [];
         
         if (currentPage === 1) {
@@ -56,15 +53,23 @@ export default function PujaKare() {
     fetchItems();
   }, [currentPage]);
 
-  // Infinite scroll handler
+  // Infinite scroll handler with throttling
   useEffect(() => {
+    let ticking = false;
+    
     const handleScroll = () => {
-      if (window.innerHeight + document.documentElement.scrollTop + 100 >= document.documentElement.offsetHeight && hasMore && !loadingMore && !loading) {
-        setCurrentPage(prev => prev + 1);
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          if (window.innerHeight + document.documentElement.scrollTop + 100 >= document.documentElement.offsetHeight && hasMore && !loadingMore && !loading) {
+            setCurrentPage(prev => prev + 1);
+          }
+          ticking = false;
+        });
+        ticking = true;
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, [hasMore, loadingMore, loading]);
 
@@ -104,6 +109,8 @@ export default function PujaKare() {
                       src={item.imagethumb || "/img/default.png"}
                       alt={item.title}
                       className="w-auto rounded-md max-h-[100%] md:max-h-[100%]"
+                      loading="lazy"
+                      decoding="async"
                     />
                   </div>
                   <div className="p-2">
