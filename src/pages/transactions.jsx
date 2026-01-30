@@ -280,9 +280,15 @@ const Transactions = () => {
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
                       <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center space-x-2">
+                        {/* <div className="flex items-center space-x-2">
                           <span className="text-sm text-gray-600 font-eng">Txn Id :</span>
                           <span className="text-sm font-medium text-blue-600 font-eng">{transaction.transactionId}</span>
+                        </div> */}
+                        <div className="font-eng">
+                          <span className="font-medium" style={{ color: "black" }}>Valid till:</span>
+                          <span className={`ml-1 ${isExpired(transaction.expiryDate) ? 'text-red-600' : 'text-gray-800'}`}>
+                           {formatDateOnly(transaction.expiryDate)}
+                          </span>
                         </div>
                         <div className={`px-3 py-1 rounded-full text-xs font-medium ${
                           transaction.planName === 'Platinum Plan' || transaction.planName === 'Platinum' 
@@ -294,11 +300,15 @@ const Transactions = () => {
                       </div>
                       
                       <div className="flex items-center justify-between text-sm text-gray-600">
-                        <div className="font-eng">
+                        {/* <div className="font-eng">
                           <span className="font-medium">Valid till:</span> 
                           <span className={`ml-1 ${isExpired(transaction.expiryDate) ? 'text-red-600' : 'text-gray-800'}`}>
                             {formatDateOnly(transaction.expiryDate)}
                           </span>
+                        </div> */}
+                        <div className="flex items-center space-x-2">
+                          <span className="text-sm text-gray-600 font-eng">Txn Id :</span>
+                          <span className="text-sm font-medium text-blue-600 font-eng">{transaction.transactionId}</span>
                         </div>
                         <div className="text-lg font-bold text-[#9A283D] font-eng">
                           ₹{transaction.amount}

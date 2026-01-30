@@ -89,7 +89,7 @@ function App() {
           <KathaProvider>
             <PaymentProvider>
               <PujaKareProvider>
-                <Suspense fallback={<PageLoader />}>
+                <Suspense >
                   <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="/vrat-katha" element={<VratKatha />} />
