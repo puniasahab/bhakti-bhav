@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
@@ -7,43 +7,82 @@ import PageTitleCard from "../components/PageTitleCard";
 import { useKatha } from "../contexts/KathaContext";
 import { getSubscriptionStatusFromLS, getTokenFromLS } from "../commonFunctions";
 // import { useNavigate } from "react-router-dom";
+import { cachedFetch } from "../utils/apiCache";
+
 
 export default function VratKatha() {
   const navigate = useNavigate();
   const [kathas, setKathas] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const limit = 10;
+
+  // Memoryize subscription status to prevent re-computation on each render
+  const isSubscribed = useMemo(() => getSubscriptionStatusFromLS(), []);
+  const hasToken = useMemo(() => getTokenFromLS(), []);
   // const navigate = useNavigate();
   const { setCategoryData } = useKatha();
 
-  useEffect(() => {
-    async function fetchKathas() {
-      try {
-        /// all-kathas
-        const res = await fetch("https://api.bhaktibhav.app/frontend/CategoryKatha");
-        const json = await res.json();
-        if(res.status === 'success') {
-          setLoading(false);
-          console.log("katha data", json);
-        }
+  const processRawData = useCallback((categories = [], uncategorizedKathas = []) => {
+    const newData = [
+      ...(categories?.map(item => ({
+        ...item,
+        isCategory: true,
+      })) || []),
+      ...(uncategorizedKathas?.map(item => ({
+        ...item,
+        isCategory: false,
+      })) || [])
+    ];
 
-        // if (json.status === "success" && Array.isArray(json.data)) {
-        // Flatten all kathas from all categories
-        // const allKathas = [];
-        // json.forEach(category => {
-        //   if (category.kathas && Array.isArray(category.kathas)) {
-        //     allKathas.push(...category.kathas);
-        //   }
-        // });
-        const newData = [
-          ...json.categories.map(item => ({
+    // Assign accessType to categories based on their kathas
+    newData.forEach((item) => {
+      if (item.isCategory && item.kathas) {
+        const allKathasPaid = item.kathas.every(katha => katha.accessType === "paid");
+        item.accessType = allKathasPaid ? "paid" : "free";
+      }
+    });
+
+    return newData;
+  }, []);
+
+  // Helper function to sort data
+  const sortData = useCallback((data) => {
+    return [...data].sort((a, b) => {
+      if (a.accessType === "free" && b.accessType === "paid") {
+        return -1;
+      } else if (a.accessType === "paid" && b.accessType === "free") {
+        return 1;
+      }
+      return 0;
+    });
+  }, []);
+
+  // Helper function to remove duplicates by _id
+  const removeDuplicates = useCallback((data) => {
+    const seen = new Set();
+    return data.filter(item => {
+      if (seen.has(item._id)) {
+        return false;
+      }
+      seen.add(item._id);
+      return true;
+    });
+  }, []);
+
+  const getSortedData = (json) => {
+    const newData = [
+          ...(json?.categories?.map(item => ({
             ...item, isCategory: true,
-          })),
-          ...json.uncategorizedKathas.map(item => ({
+          })) || []),
+          ...(json?.uncategorizedKathas?.map(item => ({
             ...item, isCategory: false,
-          }))
+          })) || [])
         ]
 
-        newData.map((item) => {
+        newData?.map((item) => {
           if (item.isCategory) {
             const allKathasPaid = item.kathas.every(katha => katha.accessType === "paid");
             if (allKathasPaid) {
@@ -67,6 +106,113 @@ export default function VratKatha() {
             return 0;
           }
         });
+        return newData;
+  }
+
+  useEffect(() => {
+    async function fetchKathas() {
+      try {
+        /// all-kathas
+        if (currentPage === 1) setLoading(true);
+        else setLoadingMore(true);
+
+        const json = await cachedFetch(
+          `https://api.bhaktibhav.app/frontend/CategoryKatha?page=${currentPage}&limit=${limit}`,
+          {},
+          5 * 60 * 1000 // Cache for 5 minutes
+        );
+
+        if (json.status === 'success') {
+          const categories = json?.categories || [];
+          const uncategorizedKathas = json?.uncategorizedKathas || [];
+          
+          // Calculate total items received
+          const totalItemsReceived = categories.length + uncategorizedKathas.length;
+          
+          // Check if we received any data
+          if (totalItemsReceived === 0) {
+            // No more data available
+            setHasMore(false);
+            setLoadingMore(false);
+            setLoading(false);
+            return;
+          }
+
+          // Process new data from API
+          const processedNewData = processRawData(categories, uncategorizedKathas);
+
+          if (currentPage === 1) {
+            // First page - just set the sorted data
+            const sortedData = sortData(processedNewData);
+            setKathas(sortedData);
+          } else {
+            // Subsequent pages - merge with existing data
+            setKathas(prevKathas => {
+              // Combine previous data with new data
+              const combinedData = [...prevKathas, ...processedNewData];
+              // Remove duplicates
+              const uniqueData = removeDuplicates(combinedData);
+              // Sort the combined data
+              return sortData(uniqueData);
+            });
+          }
+
+          // Check if there's more data to load
+          if (totalItemsReceived < limit) {
+            setHasMore(false);
+          }
+        } else {
+          // API returned non-success status
+          if (currentPage === 1) {
+            setKathas([]);
+          }
+          setHasMore(false);
+        }
+        
+
+        // if (json.status === "success" && Array.isArray(json.data)) {
+        // Flatten all kathas from all categories
+        // const allKathas = [];
+        // json.forEach(category => {
+        //   if (category.kathas && Array.isArray(category.kathas)) {
+        //     allKathas.push(...category.kathas);
+        //   }
+        // });
+        // Sorting code starts from here 
+        // const newData = [
+        //   ...json.categories.map(item => ({
+        //     ...item, isCategory: true,
+        //   })),
+        //   ...json.uncategorizedKathas.map(item => ({
+        //     ...item, isCategory: false,
+        //   }))
+        // ]
+
+        // newData.map((item) => {
+        //   if (item.isCategory) {
+        //     const allKathasPaid = item.kathas.every(katha => katha.accessType === "paid");
+        //     if (allKathasPaid) {
+        //       item.accessType = "paid";
+        //     }
+        //     else {
+        //       item.accessType = "free";
+        //     }
+        //   }
+
+        // })
+
+        // newData.sort((a, b) => {
+        //   if(a.accessType === "free" && b.accessType === "paid") {
+        //     return -1;
+        //   }
+        //   else if(a.accessType === "paid" && b.accessType === "free") {
+        //     return 1;
+        //   }
+        //   else {
+        //     return 0;
+        //   }
+        // });
+        // sorting code ends here
 
         // newData.sort((a, b) => {
         //   if (a.isCategory && !b.isCategory) {
@@ -120,20 +266,48 @@ export default function VratKatha() {
         //     }
         //   }
         // })
-        setKathas(newData);
         // } else {
         //   setKathas([]);
         // }
       } catch (error) {
         console.error("API Error:", error);
         setKathas([]);
+        setHasMore(false);
       } finally {
         setLoading(false);
+        setLoadingMore(false);
       }
     }
 
     fetchKathas();
-  }, []);
+  }, [currentPage]);
+
+
+  useEffect(() => {
+      let ticking = false;
+      
+      const handleScroll = () => {
+        if (loadingMore || !hasMore) return;
+        
+        if (!ticking) {
+          window.requestAnimationFrame(() => {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const scrollHeight = document.documentElement.scrollHeight;
+            const clientHeight = window.innerHeight;
+  
+            if (scrollTop + clientHeight >= scrollHeight - 100) {
+              setLoadingMore(true);
+              setCurrentPage(prevPage => prevPage + 1);
+            }
+            ticking = false;
+          });
+          ticking = true;
+        }
+      };
+  
+      window.addEventListener('scroll', handleScroll, { passive: true });
+      return () => window.removeEventListener('scroll', handleScroll);
+    }, [loadingMore, hasMore]);
 
   if (loading) return <Loader message="🙏 Loading भक्ति भाव 🙏" size={200} />;
   if (!kathas.length) return <p className="text-center py-10">❌ No kathas found</p>;
@@ -257,6 +431,12 @@ export default function VratKatha() {
         </ul>
       </div>
 
+           {loadingMore && (
+        <div className="flex justify-center items-center py-4">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#9A283D]"></div>
+          <span className="ml-2 text-[#9A283D] font-eng">Loading more...</span>
+        </div>
+      )}
 
     </>
   );
