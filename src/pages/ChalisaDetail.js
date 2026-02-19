@@ -18,7 +18,7 @@ export default function ChalisaDetail() {
     async function fetchChalisa() {
       try {
         const res = await fetch(
-          `https://api.bhaktibhav.app/frontend/chalisa/${id}`
+          `https://api.bhaktibhav.app/api/v1/frontend/chalisa/${id}`
         );
         const json = await res.json();
 

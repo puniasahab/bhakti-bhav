@@ -27,7 +27,7 @@ export default function Aarti() {
         
         // Use cached fetch for better performance
         const json = await cachedFetch(
-          `https://api.bhaktibhav.app/frontend/all-artis?page=${currentPage}&limit=${limit}`,
+          `https://api.bhaktibhav.app/frontend/all-artis-v1?page=${currentPage}&limit=${limit}`,
           {},
           5 * 60 * 1000 // Cache for 5 minutes
         );

@@ -27,7 +27,7 @@ function JaapMala() {
         
         // Use cached fetch for better performance
         const result = await cachedFetch(
-          `https://api.bhaktibhav.app/frontend/all-jaapmala?page=${currentPage}&limit=${limit}`,
+          `https://api.bhaktibhav.app/frontend/all-jaapmala-v1?page=${currentPage}&limit=${limit}`,
           {},
           5 * 60 * 1000 // Cache for 5 minutes
         );

@@ -27,7 +27,7 @@ export default function Mantra() {
         
         // Use cached fetch for better performance
         const json = await cachedFetch(
-          `https://api.bhaktibhav.app/frontend/all-mantras?page=${currentPage}&limit=${limit}`,
+          `https://api.bhaktibhav.app/frontend/all-mantras-v1?page=${currentPage}&limit=${limit}`,
           {},
           5 * 60 * 1000 // Cache for 5 minutes
         );

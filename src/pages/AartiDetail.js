@@ -15,7 +15,7 @@ function AartiDetail() {
   const { play, pause, stop, isPlaying, currentTrack } = useAudio();
 
   useEffect(() => {
-    fetch(`https://api.bhaktibhav.app/frontend/arti/${id}`)
+    fetch(`https://api.bhaktibhav.app/api/v1/frontend/arti/${id}`)
       .then((res) => res.json())
       .then((data) => {
         if (data?.status === "success" && data.data) {

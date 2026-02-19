@@ -17,7 +17,7 @@ export default function MantraDetail() {
   useEffect(() => {
     async function fetchMantras() {
       try {
-        const res = await fetch(`https://api.bhaktibhav.app/frontend/mantra/${id}`);
+        const res = await fetch(`https://api.bhaktibhav.app/api/v1/frontend/mantra/${id}`);
         const json = await res.json();
         setDetail(json.data || null);
       } catch (error) {

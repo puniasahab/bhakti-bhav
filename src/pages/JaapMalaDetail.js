@@ -33,7 +33,7 @@ function JaapMalaDetail() {
   // };
 
   useEffect(() => {
-    fetch(`https://api.bhaktibhav.app/frontend/jaapmala/${id}`)
+    fetch(`https://api.bhaktibhav.app/api/v1/frontend/jaapmala/${id}`)
       .then((res) => res.json())
       .then((data) => {
         console.log("API Response:", data);
