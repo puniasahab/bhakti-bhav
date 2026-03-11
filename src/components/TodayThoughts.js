@@ -3,19 +3,29 @@ import { Link } from "react-router-dom";
 import Loader from "./Loader";
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import homeCache from "../utils/homeCache";
 import "../pages/style.css";
 
 function TodayThoughts() {
-  const [thoughtData, setThoughtData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [thoughtData, setThoughtData] = useState(() => homeCache.get("todayThought") || null);
+  const [loading, setLoading] = useState(() => !homeCache.has("todayThought"));
   const shareTemplateRef = useRef(null);
 
   useEffect(() => {
+    // If cached data exists, skip fetch
+    if (homeCache.has("todayThought")) {
+      setThoughtData(homeCache.get("todayThought"));
+      setLoading(false);
+      return;
+    }
+
     fetch("https://api.bhaktibhav.app/frontend/daythoughts")
       .then((res) => res.json())
       .then((data) => {
         if (data?.status === "success" && data.data) {
           setThoughtData(data.data);
+          // Cache for 30 minutes
+          homeCache.set("todayThought", data.data);
         }
         setLoading(false);
       })
@@ -25,10 +35,22 @@ function TodayThoughts() {
       });
   }, []);
 
-  if (loading) return <Loader message="🙏 Loading भक्ति भाव 🙏" size={200} />;
+  // if (loading) return (
+  //   <div className="md:basis-[60%] basis-[60%] animate-pulse">
+  //     <div className="bg-gray-200 rounded-xl h-32 w-full"></div>
+  //     <div className="mt-2 bg-gray-200 rounded h-4 w-3/4"></div>
+  //     <div className="mt-1 bg-gray-200 rounded h-4 w-1/2"></div>
+  //   </div>
+  // );
 
-  if (!thoughtData) {
-    return <p className="text-center mt-4 text-red-500">No thought available.</p>;
+  if (loading || !thoughtData) {
+    return (
+      <div className="md:basis-[60%] basis-[60%] animate-pulse">
+        <div className="bg-gray-200 rounded-xl h-32 w-full"></div>
+        <div className="mt-2 bg-gray-200 rounded h-4 w-3/4"></div>
+        <div className="mt-1 bg-gray-200 rounded h-4 w-1/2"></div>
+      </div>
+    );
   }
 
 

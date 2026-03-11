@@ -1,4 +1,4 @@
-import React, { useState, useEffect, } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { Link } from "react-router-dom";
@@ -11,19 +11,75 @@ import "swiper/css";
 import "swiper/css/pagination";
 import { profileApis, wallpaperApis } from "../api";
 import { removeTokenFromLS, getMobileNoFromLS, removeSubscriptionStatusFromLS, setSubscriptionStatusInLS } from "../commonFunctions";
+import homeCache from "../utils/homeCache";
 
 function Home() {
 
 
     const navigate = useNavigate();
 
+    // Initialize state from cache if available (instant render on back-navigation)
     const [isOpen, setIsOpen] = useState(false);
-    const [panchangData, setPanchangData] = useState([]);
-    const [bannersData, setBannersData] = useState([]);
+    const [panchangData, setPanchangData] = useState(() => {
+        // Rebuild from cached raw data if available
+        const cachedRaw = homeCache.get("panchangRawData");
+        if (cachedRaw) {
+            return [
+                {
+                    side: "left",
+                    items: [
+                        <span><strong>तिथि</strong> % {cachedRaw.tithi.hi || "-"}</span>,
+                        <span><strong>नक्षत्र</strong> % {cachedRaw.nakshatra.hi || "-"}</span>,
+                        <span><strong>करण</strong> % {cachedRaw.karana.hi || "-"}</span>,
+                    ],
+                },
+                {
+                    side: "right",
+                    items: [
+                        <span><strong>पक्ष</strong> % {cachedRaw.paksha.hi || "-"}</span>,
+                        <span><strong>योग</strong> % {cachedRaw.yoga.hi || "-"}</span>,
+                        <span><strong>वार</strong> % {cachedRaw.vaar.hi || "-"}</span>,
+                    ],
+                },
+            ];
+        }
+        return [];
+    });
+    const [bannersData, setBannersData] = useState(() => homeCache.get("bannersData") || []);
+    const [wallpaperImage, setWallpaperImage] = useState(() => homeCache.get("wallpaperImage") || "");
+    const hasFetchedBanners = useRef(false);
+
+    // Helper to format raw panchang data into React elements
+    const formatPanchangData = (rawData) => [
+        {
+            side: "left",
+            items: [
+                <span><strong>तिथि</strong> % {rawData.tithi.hi || "-"}</span>,
+                <span><strong>नक्षत्र</strong> % {rawData.nakshatra.hi || "-"}</span>,
+                <span><strong>करण</strong> % {rawData.karana.hi || "-"}</span>,
+            ],
+        },
+        {
+            side: "right",
+            items: [
+                <span><strong>पक्ष</strong> % {rawData.paksha.hi || "-"}</span>,
+                <span><strong>योग</strong> % {rawData.yoga.hi || "-"}</span>,
+                <span><strong>वार</strong> % {rawData.vaar.hi || "-"}</span>,
+            ],
+        },
+    ];
 
 
     useEffect(() => {
         if (!isOpen) return;
+
+        // If cached panchang raw data exists, rebuild formatted data from it
+        const cachedPanchangRaw = homeCache.get("panchangRawData");
+        if (cachedPanchangRaw) {
+            const formatted = formatPanchangData(cachedPanchangRaw);
+            setPanchangData(formatted);
+            return;
+        }
 
         const fetchPanchang = async () => {
             try {
@@ -31,26 +87,10 @@ function Home() {
                 const data = await res.json();
 
                 if (data?.success && data.data) {
-                    const formatted = [
-                        {
-                            side: "left",
-                            items: [
-                                <span><strong>तिथि</strong> % {data.data.tithi.hi || "-"}</span>,
-                                <span><strong>नक्षत्र</strong> % {data.data.nakshatra.hi || "-"}</span>,
-                                <span><strong>करण</strong> % {data.data.karana.hi || "-"}</span>,
-                            ],
-                        },
-                        {
-                            side: "right",
-                            items: [
-                                <span><strong>पक्ष</strong> % {data.data.paksha.hi || "-"}</span>,
-                                <span><strong>योग</strong> % {data.data.yoga.hi || "-"}</span>,
-                                <span><strong>वार</strong> % {data.data.vaar.hi || "-"}</span>,
-                            ],
-                        },
-                    ];
-
+                    const formatted = formatPanchangData(data.data);
                     setPanchangData(formatted);
+                    // Cache the raw API data for 30 minutes
+                    homeCache.set("panchangRawData", data.data);
                 } else {
                     setPanchangData([]);
                 }
@@ -71,7 +111,7 @@ function Home() {
         
         const fetchProfileData = async () => {
             try {
-                const resp = await await profileApis.getProfile();
+                const resp = await profileApis.getProfile();
                 if (resp) {
 
                     setSubscriptionStatusInLS(resp.hasActivePlan)
@@ -86,11 +126,35 @@ function Home() {
         }
         fetchProfileData();
 
+        // Skip banner fetch if we already have cached data
+        if (hasFetchedBanners.current && bannersData.length > 0) return;
+
+        // Check cache first for instant render
+        const cachedBanners = homeCache.get("bannersData");
+        const cachedWallpaper = homeCache.get("wallpaperImage");
+
+        if (cachedBanners && cachedBanners.length > 0) {
+            setBannersData(cachedBanners);
+            setWallpaperImage(cachedWallpaper || "");
+            hasFetchedBanners.current = true;
+            return;
+        }
+
         const fetchBanners = async () => {
             try {
                 const banners = await wallpaperApis.getBanners();
                 console.log("Banners:", banners);
-                setBannersData(banners?.data.filter(b => b.pageName === "home"));
+
+                const homeBanners = banners?.data.filter(b => b.pageName === "home") || [];
+                const wpImage = banners?.data.find(b => b.pageName === "homewallapaper" && b.imageUrl)?.imageUrl || "";
+
+                setBannersData(homeBanners);
+                setWallpaperImage(wpImage);
+
+                // Cache for 30 minutes
+                homeCache.set("bannersData", homeBanners);
+                homeCache.set("wallpaperImage", wpImage);
+                hasFetchedBanners.current = true;
             } catch (error) {
                 console.error("Error fetching banners:", error);
             }
@@ -218,17 +282,18 @@ function Home() {
                 </div>
 
                 <div className="mt-6">
-                    <Link to="/wallpaper" className="relative theme_bg hd_bg rounded-xl flex items-center justify-center rounded-xl font-semibold overflow-hidden px-12 py-6 
+                    <Link to="/wallpaper" className="relative theme_bg hd_bg rounded-xl flex items-center justify-center rounded-xl font-semibold overflow-hidden 
           hover:bg-yellow-50 transition">
 
-                        <span className="absolute left-[30px] top-[50%] -translate-y-1/2 
+                        {/* <span className="absolute left-[30px] top-[50%] -translate-y-1/2 
                   bg-[url('/img/icon_7.png')] bg-no-repeat bg-cover w-[70px] h-[70px]"></span>
                         <span className="absolute right-[30px] top-[45%] -translate-y-1/2 
                   bg-[url('/img/icon_8.png')] bg-no-repeat bg-cover  w-[46px] h-[46px]"></span>
 
                         <span className="relative z-10 flex items-center">
                             <span className="text-3xl font-normal leading-[20px]">okWyisij <br /><span className="font-eng text-xs">(Wallpaper)</span></span>
-                        </span>
+                        </span> */}
+                        <img src={wallpaperImage} alt="Wallpaper" width="100%" height="100%" className="max-w-full h-auto" />
                     </Link>
                 </div>
 

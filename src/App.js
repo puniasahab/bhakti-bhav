@@ -9,9 +9,11 @@ import { AuthProvider } from "./contexts/AuthContext";
 import PageLoader from "./components/PageLoader";
 import GlobalAudioPlayer from "./components/GlobalAudioPlayer";
 import Splash from "./pages/Splash";
+// Import Home directly (not lazy) — it's the main screen,
+// should never show a loader when navigating back from other screens
+import Home from "./pages/Home";
 
-// Lazy load all pages for code splitting
-const Home = lazy(() => import("./pages/Home"));
+// Lazy load all other pages for code splitting
 const VratKatha = lazy(() => import("./pages/VratKatha"));
 const VratKathaDetail = lazy(() => import("./pages/VratKathaDetail"));
 const VratKathaCategoryDetails = lazy(() => import("./pages/VratKathaCategoryDetails"));
@@ -53,31 +55,39 @@ const preloadCommonRoutes = () => {
 };
 
 function App() {
-  const [loading, setLoading] = useState(true);
   const location = useLocation();
-
-  useEffect(() => {
-    // Only show splash screen on home page ("/") and if not shown before in this session
+  const [loading, setLoading] = useState(() => {
+    // Only show splash on first visit to home page, never again in this session
     const splashShown = sessionStorage.getItem("splashShown");
     const isHomePage = location.pathname === "/" || location.pathname === "";
+    return !splashShown && isHomePage;
+  });
 
-    if (!splashShown && isHomePage) {
+  useEffect(() => {
+    // If splash was already shown, never show it again
+    if (sessionStorage.getItem("splashShown")) {
+      setLoading(false);
+      preloadCommonRoutes();
+      return;
+    }
+
+    const isHomePage = location.pathname === "/" || location.pathname === "";
+
+    if (isHomePage) {
       const timer = setTimeout(() => {
         setLoading(false);
         sessionStorage.setItem("splashShown", "true");
-        // Preload common routes after splash
         preloadCommonRoutes();
       }, 600);
       return () => clearTimeout(timer);
     } else {
       setLoading(false);
-      if (!splashShown) {
-        sessionStorage.setItem("splashShown", "true");
-      }
-      // Preload common routes
+      sessionStorage.setItem("splashShown", "true");
       preloadCommonRoutes();
     }
-  }, [location.pathname]);
+    // Only run once on mount — do NOT re-run on location changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Only show splash on home page
   if (loading && (location.pathname === "/" || location.pathname === "")) return <Splash />;
@@ -89,41 +99,41 @@ function App() {
           <KathaProvider>
             <PaymentProvider>
               <PujaKareProvider>
-                <Suspense >
-                  <Routes>
-                    <Route path="/" element={<Home />} />
-                    <Route path="/vrat-katha" element={<VratKatha />} />
-                    <Route path="/vrat-katha/:id" element={<VratKathaDetail />} />
-                    <Route path="/vrat-katha/:id/date/:date" element={<VratKathaDetail />} />
-                    <Route path="/vrat-katha/categoryDetails/:id" element={<VratKathaCategoryDetails />} />
-                    <Route path="/jaap-mala" element={<JaapMala />} />
-                    <Route path="/jaapmala/:id" element={<JaapMalaDetail />} />
-                    <Route path="/mantra" element={<Mantra />} />
-                    <Route path="/mantra/:id" element={<MantraDetail />} />
-                    <Route path="/aarti" element={<Aarti />} />
-                    <Route path="/aarti/:id" element={<AartiDetail />} />
-                    <Route path="/wallpaper" element={<Wallpaper />} />
-                    <Route path="/wallpaper/:id" element={<WallpaperDetail />} />
-                    <Route path="/rashifal" element={<Rashifal />} />
-                    <Route path="/hindi-calendar" element={<HindiCalendar />} />
-                    <Route path="/hindi-calendar/:id" element={<HindiCalendarDetail />} />
-                    <Route path="/puja-kare" element={<PujaKare />} />
-                    <Route path="/puja-kare/:id" element={<PujaKareDetail />} />
-                    <Route path="/chalisa" element={<Chalisa />} />
-                    <Route path="/chalisa/:id" element={<ChalisaDetail />} />
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/verify-otp" element={<VerifyOtp />} />
-                    <Route path="/termsAndConditions" element={<TermsAndConditions />} />
-                    <Route path="/privacyPolicy" element={<PrivacyPolicy />} />
-                    <Route path="/aboutUs" element={<AboutUs />} />
-                    <Route path="/profile" element={<Profile />} />
-                    <Route path="/edit-profile" element={<EditProfile />} />
-                    <Route path="/payment" element={<Payment />} />
-                    <Route path="/transactions" element={<Transactions />} />
-                    <Route path="/paymentPage" element={<PaymentPage />} />
-                    <Route path="/kundli" element={<Kundli />} />
-                  </Routes>
-                </Suspense>
+                <Routes>
+                  {/* Home is directly imported — no Suspense, no loader, instant render */}
+                  <Route path="/" element={<Home />} />
+                  {/* All other routes are lazy-loaded with Suspense fallback */}
+                  <Route path="/vrat-katha" element={<Suspense fallback={<PageLoader />}><VratKatha /></Suspense>} />
+                  <Route path="/vrat-katha/:id" element={<Suspense fallback={<PageLoader />}><VratKathaDetail /></Suspense>} />
+                  <Route path="/vrat-katha/:id/date/:date" element={<Suspense fallback={<PageLoader />}><VratKathaDetail /></Suspense>} />
+                  <Route path="/vrat-katha/categoryDetails/:id" element={<Suspense fallback={<PageLoader />}><VratKathaCategoryDetails /></Suspense>} />
+                  <Route path="/jaap-mala" element={<Suspense fallback={<PageLoader />}><JaapMala /></Suspense>} />
+                  <Route path="/jaapmala/:id" element={<Suspense fallback={<PageLoader />}><JaapMalaDetail /></Suspense>} />
+                  <Route path="/mantra" element={<Suspense fallback={<PageLoader />}><Mantra /></Suspense>} />
+                  <Route path="/mantra/:id" element={<Suspense fallback={<PageLoader />}><MantraDetail /></Suspense>} />
+                  <Route path="/aarti" element={<Suspense fallback={<PageLoader />}><Aarti /></Suspense>} />
+                  <Route path="/aarti/:id" element={<Suspense fallback={<PageLoader />}><AartiDetail /></Suspense>} />
+                  <Route path="/wallpaper" element={<Suspense fallback={<PageLoader />}><Wallpaper /></Suspense>} />
+                  <Route path="/wallpaper/:id" element={<Suspense fallback={<PageLoader />}><WallpaperDetail /></Suspense>} />
+                  <Route path="/rashifal" element={<Suspense fallback={<PageLoader />}><Rashifal /></Suspense>} />
+                  <Route path="/hindi-calendar" element={<Suspense fallback={<PageLoader />}><HindiCalendar /></Suspense>} />
+                  <Route path="/hindi-calendar/:id" element={<Suspense fallback={<PageLoader />}><HindiCalendarDetail /></Suspense>} />
+                  <Route path="/puja-kare" element={<Suspense fallback={<PageLoader />}><PujaKare /></Suspense>} />
+                  <Route path="/puja-kare/:id" element={<Suspense fallback={<PageLoader />}><PujaKareDetail /></Suspense>} />
+                  <Route path="/chalisa" element={<Suspense fallback={<PageLoader />}><Chalisa /></Suspense>} />
+                  <Route path="/chalisa/:id" element={<Suspense fallback={<PageLoader />}><ChalisaDetail /></Suspense>} />
+                  <Route path="/login" element={<Suspense fallback={<PageLoader />}><Login /></Suspense>} />
+                  <Route path="/verify-otp" element={<Suspense fallback={<PageLoader />}><VerifyOtp /></Suspense>} />
+                  <Route path="/termsAndConditions" element={<Suspense fallback={<PageLoader />}><TermsAndConditions /></Suspense>} />
+                  <Route path="/privacyPolicy" element={<Suspense fallback={<PageLoader />}><PrivacyPolicy /></Suspense>} />
+                  <Route path="/aboutUs" element={<Suspense fallback={<PageLoader />}><AboutUs /></Suspense>} />
+                  <Route path="/profile" element={<Suspense fallback={<PageLoader />}><Profile /></Suspense>} />
+                  <Route path="/edit-profile" element={<Suspense fallback={<PageLoader />}><EditProfile /></Suspense>} />
+                  <Route path="/payment" element={<Suspense fallback={<PageLoader />}><Payment /></Suspense>} />
+                  <Route path="/transactions" element={<Suspense fallback={<PageLoader />}><Transactions /></Suspense>} />
+                  <Route path="/paymentPage" element={<Suspense fallback={<PageLoader />}><PaymentPage /></Suspense>} />
+                  <Route path="/kundli" element={<Suspense fallback={<PageLoader />}><Kundli /></Suspense>} />
+                </Routes>
                 <GlobalAudioPlayer />
               </PujaKareProvider>
             </PaymentProvider>

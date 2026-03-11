@@ -44,7 +44,17 @@ function Login() {
         let deviceId = localStorage.getItem('deviceId');
         if (!deviceId) {
             // Generate a unique device ID if it doesn't exist
-            deviceId = crypto.randomUUID()
+            // crypto.randomUUID() is only available in secure contexts (HTTPS)
+            if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+                deviceId = crypto.randomUUID();
+            } else {
+                // Fallback for non-secure contexts (HTTP / older browsers)
+                deviceId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+                    const r = (Math.random() * 16) | 0;
+                    const v = c === 'x' ? r : (r & 0x3) | 0x8;
+                    return v.toString(16);
+                });
+            }
             localStorage.setItem('deviceId', deviceId);
         }
         
