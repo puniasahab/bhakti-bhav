@@ -1,23 +1,42 @@
-import React, { useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import PageTitleCard from "../components/PageTitleCard";
+import Loader from "../components/Loader";
 import { useKatha } from "../contexts/KathaContext";
 import { getSubscriptionStatusFromLS, getTokenFromLS } from "../commonFunctions";
 
 export default function VratKathaCategoryDetails() {
+  const [kathaCategoryData, setKathaCategoryData ] = useState({category: {}, kathas: []});
+  const [loading, setLoading] = useState(true);
   const { selectedCategoryKathas, selectedCategoryName } = useKatha();
   const navigate = useNavigate();
+  const {id} = useParams();
 
   useEffect(() => {
     // If no data is available, redirect back to main katha page
-    if (!selectedCategoryKathas.length) {
-      navigate('/vrat-katha');
-    }
-  }, [selectedCategoryKathas, navigate]);
+    // if (!selectedCategoryKathas.length) {
+    //   navigate('/vrat-katha');
+    // }
+    fetch(`https://api.bhaktibhav.app/api/v1/frontend/katha-category/${id}`).then(res => res.json()).then(resJson => {
+      if (resJson.status === "success" && resJson.category) {
+        // Data is available, do nothing
+        console.log("This is data that we have to show", resJson.kathas);
+        setKathaCategoryData({category: resJson.category, kathas: resJson.kathas});
+        setLoading(false);
+      }
+      else {
+        // No data, navigate back
+        // navigate('/vrat-katha');
+      }
+      }).catch(err => {
+        console.error("Error fetching category details:", err);
+        // navigate('/vrat-katha');
+      });
+  }, [id, navigate]);
 
-  if (!selectedCategoryKathas.length) {
+  if (!kathaCategoryData?.kathas?.length) {
     return <div>Loading...</div>;
   }
 
@@ -41,21 +60,24 @@ export default function VratKathaCategoryDetails() {
     }
   }
 
+  if (loading) return <Loader message="🙏 Loading भक्ति भाव 🙏" size={200} logo="/img/logo_splash.png" />;
+    
+
 
   return (
     <>
       <Header hideEditIcon={true} showProfileHeader={true} profileText="भक्ति भाव" />
       <div className="h-2"></div>
       <PageTitleCard
-        titleHi={selectedCategoryName?.hi || "dFkk"}
-        titleEn={selectedCategoryName?.en || "Katha"}
+        titleHi={kathaCategoryData?.category.name?.hi || "dFkk"}
+        titleEn={kathaCategoryData?.category.name?.en || "Katha"}
         customEngFontSize={"13px"}
         customFontSize={"19px"}
       />
 
       <div className="container mx-auto px-4 mt-4">
         <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-          {selectedCategoryKathas.sort((a, b) => {
+          {kathaCategoryData?.kathas?.sort((a, b) => {
             if (a.accessType === "free" && b.accessType === "paid") return -1;
             if (a.accessType === "paid" && b.accessType === "free") return 1;
             return 0;

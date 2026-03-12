@@ -117,7 +117,7 @@ export default function VratKatha() {
         else setLoadingMore(true);
 
         const json = await cachedFetch(
-          `https://api.bhaktibhav.app/frontend/CategoryKatha?page=${currentPage}&limit=${limit}`,
+          `https://api.bhaktibhav.app/api/v1/frontend/katha-categories?page=${currentPage}&limit=${limit}`,
           {},
           5 * 60 * 1000 // Cache for 5 minutes
         );
@@ -127,7 +127,8 @@ export default function VratKatha() {
           const uncategorizedKathas = json?.uncategorizedKathas || [];
           
           // Calculate total items received
-          const totalItemsReceived = categories.length + uncategorizedKathas.length;
+          const totalItemsReceived = json?.data?.length;
+          // const totalItemsReceived = categories.length + uncategorizedKathas.length;
           
           // Check if we received any data
           if (totalItemsReceived === 0) {
@@ -138,24 +139,38 @@ export default function VratKatha() {
             return;
           }
 
-          // Process new data from API
-          const processedNewData = processRawData(categories, uncategorizedKathas);
+          console.log("API Response:", json.data);
 
-          if (currentPage === 1) {
-            // First page - just set the sorted data
-            const sortedData = sortData(processedNewData);
-            setKathas(sortedData);
-          } else {
-            // Subsequent pages - merge with existing data
-            setKathas(prevKathas => {
-              // Combine previous data with new data
-              const combinedData = [...prevKathas, ...processedNewData];
-              // Remove duplicates
-              const uniqueData = removeDuplicates(combinedData);
-              // Sort the combined data
-              return sortData(uniqueData);
-            });
+          // setKathas(json?.data)
+
+          if(currentPage === 1) {
+            // const sortedData = getSortedData(json);
+            setKathas(json?.data);
           }
+          else {
+            setKathas(prevKathas => [...prevKathas, ...json?.data]);
+          }
+
+          // Process new data from API
+          // const processedNewData = processRawData(categories, uncategorizedKathas);
+
+          // if (currentPage === 1) {
+            // First page - just set the sorted data
+            // const sortedData = sortData(processedNewData);
+            // setKathas(sortedData);
+          // } 
+          
+          // else {
+            // Subsequent pages - merge with existing data
+            // setKathas(prevKathas => {
+            //   // Combine previous data with new data
+            //   const combinedData = [...prevKathas, ...processedNewData];
+            //   // Remove duplicates
+            //   const uniqueData = removeDuplicates(combinedData);
+            //   // Sort the combined data
+            //   return sortData(uniqueData);
+            // });
+          // }
 
           // Check if there's more data to load
           if (totalItemsReceived < limit) {
@@ -323,33 +338,22 @@ export default function VratKatha() {
   //   }
   // }
 
-  const handleNavigate = (id, index, accessType) => {
+  const handleNavigate = (id, index, accessType, type, kathaId) => {
     const isActiveSubscription = getSubscriptionStatusFromLS();
     console.log("get Subscription Status From LS", isActiveSubscription);
     console.log("Type of subscription status:", typeof isActiveSubscription);
-    if (isActiveSubscription) {
-      console.log("Inside subscription true");
-      if (kathas[index]?.kathas?.length > 0 || kathas[index]?.isCategory) {
-        setCategoryData(kathas[index].kathas, kathas[index].name);
+    if(isActiveSubscription) {
+      if(type === 'multiple') {
         navigate(`/vrat-katha/categoryDetails/${id}`);
       }
       else {
-        navigate(`/vrat-katha/${id}`);
+        navigate(`/vrat-katha/${kathaId}`);
       }
     }
     else {
-      if (kathas[index]?.kathas?.length > 0 || kathas[index]?.isCategory) {
-        if (kathas[index]?.kathas?.length > 0) {
-          // Set the category data in context before navigation
-          setCategoryData(kathas[index].kathas, kathas[index].name);
-          navigate(`/vrat-katha/categoryDetails/${id}`);
-        }
-        // Update this route as needed
-      }
-
-      else if (!kathas[index]?.isCategory) {
-        if (kathas[index]?.accessType === "free") {
-          navigate(`/vrat-katha/${id}`);
+      if (type === 'single') {
+        if (accessType === 'free') {
+          navigate(`/vrat-katha/${kathaId}`);
         }
         else {
           if (getTokenFromLS()) {
@@ -361,16 +365,59 @@ export default function VratKatha() {
         }
       }
       else {
-        if (getTokenFromLS()) {
-          return "/payment";
-        }
-        else {
-          return "/login";
-        }
+        navigate(`/vrat-katha/categoryDetails/${id}`);
       }
     }
-
   }
+
+  // const handleNavigate = (id, index, accessType) => {
+  //   const isActiveSubscription = getSubscriptionStatusFromLS();
+  //   console.log("get Subscription Status From LS", isActiveSubscription);
+  //   console.log("Type of subscription status:", typeof isActiveSubscription);
+  //   if (isActiveSubscription) {
+  //     console.log("Inside subscription true");
+  //     if (kathas[index]?.kathas?.length > 0 || kathas[index]?.isCategory) {
+  //       setCategoryData(kathas[index].kathas, kathas[index].name);
+  //       navigate(`/vrat-katha/categoryDetails/${id}`);
+  //     }
+  //     else {
+  //       navigate(`/vrat-katha/${id}`);
+  //     }
+  //   }
+  //   else {
+  //     if (kathas[index]?.kathas?.length > 0 || kathas[index]?.isCategory) {
+  //       if (kathas[index]?.kathas?.length > 0) {
+  //         // Set the category data in context before navigation
+  //         setCategoryData(kathas[index].kathas, kathas[index].name);
+  //         navigate(`/vrat-katha/categoryDetails/${id}`);
+  //       }
+  //       // Update this route as needed
+  //     }
+
+  //     else if (!kathas[index]?.isCategory) {
+  //       if (kathas[index]?.accessType === "free") {
+  //         navigate(`/vrat-katha/${id}`);
+  //       }
+  //       else {
+  //         if (getTokenFromLS()) {
+  //           navigate("/payment");
+  //         }
+  //         else {
+  //           navigate("/login");
+  //         }
+  //       }
+  //     }
+  //     else {
+  //       if (getTokenFromLS()) {
+  //         return "/payment";
+  //       }
+  //       else {
+  //         return "/login";
+  //       }
+  //     }
+  //   }
+
+  // }
 
   const getPaidLogic = (katha) => {
     if (katha.isCategory) {
@@ -403,7 +450,7 @@ export default function VratKatha() {
           {kathas.map((katha, index) => (
             <li key={katha._id}>
               <div
-                onClick={() => handleNavigate(katha._id, index, katha.accessType)}
+                onClick={() => handleNavigate(katha._id, index, katha.accessType, katha.type, katha.kathaId)}
                 className="theme_bg bg-white rounded-xl shadow hover:bg-yellow-50 transition block overflow-hidden cursor-pointer"
               >
                 <div className="w-full h-40 flex items-center justify-center overflow-hidden  ">

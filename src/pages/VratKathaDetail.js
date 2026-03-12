@@ -22,7 +22,7 @@ function VratKathaDetail() {
         console.log("Fetching katha with id:", id);
         console.log("Date parameter:", date);
 
-        fetch(date ? `https://api.bhaktibhav.app/frontend/katha/${id}?date=${date}` : `https://api.bhaktibhav.app/frontend/katha/${id}`)
+        fetch(date ? `https://api.bhaktibhav.app/api/v1/frontend/katha/${id}?date=${date}` : `https://api.bhaktibhav.app/api/v1/frontend/katha/${id}`)
             .then((res) => res.json())
             .then((resJson) => {
                 if (resJson.status === "success" && resJson.data) {

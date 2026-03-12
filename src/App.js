@@ -6,7 +6,6 @@ import { PaymentProvider } from "./contexts/PaymentContext";
 import { PujaKareProvider } from "./contexts/PujaKareContext";
 import { AudioProvider } from "./contexts/AudioContext";
 import { AuthProvider } from "./contexts/AuthContext";
-import PageLoader from "./components/PageLoader";
 import GlobalAudioPlayer from "./components/GlobalAudioPlayer";
 import Splash from "./pages/Splash";
 // Import Home directly (not lazy) — it's the main screen,
@@ -102,37 +101,37 @@ function App() {
                 <Routes>
                   {/* Home is directly imported — no Suspense, no loader, instant render */}
                   <Route path="/" element={<Home />} />
-                  {/* All other routes are lazy-loaded with Suspense fallback */}
-                  <Route path="/vrat-katha" element={<Suspense fallback={<PageLoader />}><VratKatha /></Suspense>} />
-                  <Route path="/vrat-katha/:id" element={<Suspense fallback={<PageLoader />}><VratKathaDetail /></Suspense>} />
-                  <Route path="/vrat-katha/:id/date/:date" element={<Suspense fallback={<PageLoader />}><VratKathaDetail /></Suspense>} />
-                  <Route path="/vrat-katha/categoryDetails/:id" element={<Suspense fallback={<PageLoader />}><VratKathaCategoryDetails /></Suspense>} />
-                  <Route path="/jaap-mala" element={<Suspense fallback={<PageLoader />}><JaapMala /></Suspense>} />
-                  <Route path="/jaapmala/:id" element={<Suspense fallback={<PageLoader />}><JaapMalaDetail /></Suspense>} />
-                  <Route path="/mantra" element={<Suspense fallback={<PageLoader />}><Mantra /></Suspense>} />
-                  <Route path="/mantra/:id" element={<Suspense fallback={<PageLoader />}><MantraDetail /></Suspense>} />
-                  <Route path="/aarti" element={<Suspense fallback={<PageLoader />}><Aarti /></Suspense>} />
-                  <Route path="/aarti/:id" element={<Suspense fallback={<PageLoader />}><AartiDetail /></Suspense>} />
-                  <Route path="/wallpaper" element={<Suspense fallback={<PageLoader />}><Wallpaper /></Suspense>} />
-                  <Route path="/wallpaper/:id" element={<Suspense fallback={<PageLoader />}><WallpaperDetail /></Suspense>} />
-                  <Route path="/rashifal" element={<Suspense fallback={<PageLoader />}><Rashifal /></Suspense>} />
-                  <Route path="/hindi-calendar" element={<Suspense fallback={<PageLoader />}><HindiCalendar /></Suspense>} />
-                  <Route path="/hindi-calendar/:id" element={<Suspense fallback={<PageLoader />}><HindiCalendarDetail /></Suspense>} />
-                  <Route path="/puja-kare" element={<Suspense fallback={<PageLoader />}><PujaKare /></Suspense>} />
-                  <Route path="/puja-kare/:id" element={<Suspense fallback={<PageLoader />}><PujaKareDetail /></Suspense>} />
-                  <Route path="/chalisa" element={<Suspense fallback={<PageLoader />}><Chalisa /></Suspense>} />
-                  <Route path="/chalisa/:id" element={<Suspense fallback={<PageLoader />}><ChalisaDetail /></Suspense>} />
-                  <Route path="/login" element={<Suspense fallback={<PageLoader />}><Login /></Suspense>} />
-                  <Route path="/verify-otp" element={<Suspense fallback={<PageLoader />}><VerifyOtp /></Suspense>} />
-                  <Route path="/termsAndConditions" element={<Suspense fallback={<PageLoader />}><TermsAndConditions /></Suspense>} />
-                  <Route path="/privacyPolicy" element={<Suspense fallback={<PageLoader />}><PrivacyPolicy /></Suspense>} />
-                  <Route path="/aboutUs" element={<Suspense fallback={<PageLoader />}><AboutUs /></Suspense>} />
-                  <Route path="/profile" element={<Suspense fallback={<PageLoader />}><Profile /></Suspense>} />
-                  <Route path="/edit-profile" element={<Suspense fallback={<PageLoader />}><EditProfile /></Suspense>} />
-                  <Route path="/payment" element={<Suspense fallback={<PageLoader />}><Payment /></Suspense>} />
-                  <Route path="/transactions" element={<Suspense fallback={<PageLoader />}><Transactions /></Suspense>} />
-                  <Route path="/paymentPage" element={<Suspense fallback={<PageLoader />}><PaymentPage /></Suspense>} />
-                  <Route path="/kundli" element={<Suspense fallback={<PageLoader />}><Kundli /></Suspense>} />
+                  {/* All other routes are lazy-loaded with Suspense (no fallback loader) */}
+                  <Route path="/vrat-katha" element={<Suspense><VratKatha /></Suspense>} />
+                  <Route path="/vrat-katha/:id" element={<Suspense><VratKathaDetail /></Suspense>} />
+                  <Route path="/vrat-katha/:id/date/:date" element={<Suspense><VratKathaDetail /></Suspense>} />
+                  <Route path="/vrat-katha/categoryDetails/:id" element={<Suspense><VratKathaCategoryDetails /></Suspense>} />
+                  <Route path="/jaap-mala" element={<Suspense><JaapMala /></Suspense>} />
+                  <Route path="/jaapmala/:id" element={<Suspense><JaapMalaDetail /></Suspense>} />
+                  <Route path="/mantra" element={<Suspense><Mantra /></Suspense>} />
+                  <Route path="/mantra/:id" element={<Suspense><MantraDetail /></Suspense>} />
+                  <Route path="/aarti" element={<Suspense><Aarti /></Suspense>} />
+                  <Route path="/aarti/:id" element={<Suspense><AartiDetail /></Suspense>} />
+                  <Route path="/wallpaper" element={<Suspense><Wallpaper /></Suspense>} />
+                  <Route path="/wallpaper/:id" element={<Suspense><WallpaperDetail /></Suspense>} />
+                  <Route path="/rashifal" element={<Suspense><Rashifal /></Suspense>} />
+                  <Route path="/hindi-calendar" element={<Suspense><HindiCalendar /></Suspense>} />
+                  <Route path="/hindi-calendar/:id" element={<Suspense><HindiCalendarDetail /></Suspense>} />
+                  <Route path="/puja-kare" element={<Suspense><PujaKare /></Suspense>} />
+                  <Route path="/puja-kare/:id" element={<Suspense><PujaKareDetail /></Suspense>} />
+                  <Route path="/chalisa" element={<Suspense><Chalisa /></Suspense>} />
+                  <Route path="/chalisa/:id" element={<Suspense><ChalisaDetail /></Suspense>} />
+                  <Route path="/login" element={<Suspense><Login /></Suspense>} />
+                  <Route path="/verify-otp" element={<Suspense><VerifyOtp /></Suspense>} />
+                  <Route path="/termsAndConditions" element={<Suspense><TermsAndConditions /></Suspense>} />
+                  <Route path="/privacyPolicy" element={<Suspense><PrivacyPolicy /></Suspense>} />
+                  <Route path="/aboutUs" element={<Suspense><AboutUs /></Suspense>} />
+                  <Route path="/profile" element={<Suspense><Profile /></Suspense>} />
+                  <Route path="/edit-profile" element={<Suspense><EditProfile /></Suspense>} />
+                  <Route path="/payment" element={<Suspense><Payment /></Suspense>} />
+                  <Route path="/transactions" element={<Suspense><Transactions /></Suspense>} />
+                  <Route path="/paymentPage" element={<Suspense><PaymentPage /></Suspense>} />
+                  <Route path="/kundli" element={<Suspense><Kundli /></Suspense>} />
                 </Routes>
                 <GlobalAudioPlayer />
               </PujaKareProvider>

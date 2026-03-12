@@ -187,73 +187,52 @@ export default function Payment() {
           />
         </div>
 
-        <div className="text-center mt-4">
+        {/* <div className="text-center mt-4">
           <p className="font-hindi theme_text" style={{fontSize: '21px'}}>हो जायें प्रभु की भक्ति में लीन!</p>
           <p className="theme_text font-eng">Ho jaye prabhu ki bhakti me leen</p>
-        </div>
+        </div> */}
 
         <div className="container mx-auto px-4 mt-6 space-y-4">
           {plans && plans.length > 0  ? plans?.map((plan, index) => (
             <div
               key={plan._id || plan.id}
               onClick={() => setSelectedPlan(plan._id || plan.id)}
-              className={`cursor-pointer border-2 rounded-xl p-6 shadow-lg bg-white transition-all duration-200 hover:shadow-xl
+              className={`cursor-pointer border-2 rounded-2xl px-4 py-5 bg-white transition-all duration-200
           ${selectedPlan === (plan._id || plan.id)
-                  ? "border-[#9A283D] ring-2 ring-[#9A283D] ring-opacity-30 bg-gradient-to-br from-[#FFFAF8] to-[#FCD34D]"
-                  : "border-[#E9B9C5] hover:border-[#9A283D]"}`}
+                  ? "border-[#9A283D] shadow-lg"
+                  : "border-gray-200 hover:border-[#9A283D]"}`}
             >
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center
-                      ${selectedPlan === (plan._id || plan.id)
-                        ? "border-[#9A283D] bg-[#9A283D]"
-                        : "border-gray-300"}`}>
-                      {selectedPlan === (plan._id || plan.id) && (
-                        <div className="w-2 h-2 bg-white rounded-full"></div>
-                      )}
-                    </div>
-                    <h3 className="font-eng theme_text text-[22px] font-bold">
-                      {plan.name || plan.title}
-                    </h3>
-                  </div>
-
-                  <div className="ml-7">
-                    <p className="text-sm font-eng text-gray-600 mb-1">
-                      Duration: {plan.days || plan.duration} days
-                    </p>
-                    <div className="flex items-baseline gap-2">
-                      <span className="text-[#9A283D] font-bold text-2xl font-eng">
-                        ₹{plan.price}
-                      </span>
-                      {plan.originalPrice && (
-                        <span className="text-gray-400 line-through text-lg font-eng">
-                          ₹{plan.originalPrice}
-                        </span>
-                      )}
-                    </div>
-                    {plan.discount && (
-                      <div className="mt-2">
-                        <span className="bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded-full">
-                          {plan.discount}% OFF
-                        </span>
-                      </div>
-                    )}
-                  </div>
+              <div className="flex items-center gap-2">
+                {/* Plan Logo Circle */}
+                <div className={`w-16 h-16 rounded-full flex items-center justify-center flex-shrink-0 text-center font-bold leading-tight
+                  ${index === 0
+                    ? "bg-gradient-to-br from-yellow-300 via-yellow-400 to-yellow-500 text-[#9A283D]"
+                    : "bg-gradient-to-br from-gray-200 via-gray-300 to-gray-400 text-[#9A283D]"}`}>
+                  <img src="./img/logo_splash.png" alt="Bhakti Bhav" className="w-10 h-10 object-contain" />
                 </div>
 
-                {plan.isPopular && (
-                  <div className="bg-[#9A283D] text-white px-3 py-1 rounded-full text-xs font-medium">
-                    Most Popular
+                {/* Plan Name & Duration */}
+                <div className="flex-1">
+                  <h3 className="font-eng text-[#9A283D] text-md font-bold leading-tight">
+                    {plan.name || plan.title}
+                  </h3>
+                  <p className="font-eng text-xs text-[#9A283D] mt-0.5">
+                    {plan.days || plan.duration} Days
+                  </p>
+                </div>
+
+                {/* Price */}
+                <span className="text-[#9A283D] mr-4 font-bold text-lg font-eng flex-shrink-0">
+                  ₹{plan.price}
+                </span>
+
+                {/* Checkmark for selected */}
+                {selectedPlan === (plan._id || plan.id) && (
+                  <div className="w-8 h-8 rounded-full bg-[#9A283D] flex items-center justify-center flex-shrink-0">
+                    <Check className="text-white w-5 h-5" />
                   </div>
                 )}
               </div>
-
-              {plan.description && (
-                <div className="mt-4 ml-7">
-                  <p className="text-sm text-gray-600 font-eng">{plan.description}</p>
-                </div>
-              )}
             </div>
           )) : (
             <div className="text-center py-12">
@@ -286,34 +265,47 @@ export default function Payment() {
           )}
         </div>
 
-        <div className="mx-auto px-4 mt-6 flex flex-col space-y-3 font-eng justify-between">
-          {plans && plans.length > 0 && <button className="bg-[#9A283D] text-white py-3 rounded-xl shadow " onClick={() => makePayment(selectedPlan)}>
-            Start Now
-          </button>}
-          <button className="border border-[#9A283D] text-[#9A283D] py-3 rounded-xl shadow" onClick={() => navigate("/")}>
+        <div className="mx-auto px-4 mt-8 flex flex-col items-center space-y-4">
+          {plans && plans.length > 0 && (
+            <button
+              className="w-full bg-[#9A283D] text-white py-4 rounded-full shadow-lg text-lg font-semibold hover:bg-[#7a1f30] transition-all duration-200"
+              onClick={() => makePayment(selectedPlan)}
+            >
+              <span className="font-hindi">प्रारंभ करें</span>{" "}
+              <span className="font-eng text-sm">(Start Now)</span>
+            </button>
+          )}
+          <button
+            className="text-[#9A283D] font-eng text-base hover:text-[#9A283D] transition-colors py-1"
+            onClick={() => navigate("/")}
+          >
             Skip
           </button>
         </div>
 
-        <div className="container mx-auto px-2 mt-8">
-          <h3 className="text-center font-hindi theme_text ">
+
+        {/* Benefits Section */}
+        <div className="container mx-auto px-2 mt-10 mb-8">
+          <h3 className="text-center font-hindi theme_text text-xl font-bold">
             आपको क्या प्राप्त होगा
           </h3>
-          <h3 className="text-center text-xl text-black mb-4 font-eng">
+          <p className="text-center theme_text text-sm text-black mb-6 font-eng font-semibold">
             What will you get?
-          </h3>
+          </p>
 
-          <div className="space-y-4 text-center">
+          <div className="space-y-3">
             {items.map((item, index) => (
               <div
                 key={index}
-                className="p-2 flex items-top gap-3 border border-['#9A283D'] rounded"
+                className="flex items-start gap-3 bg-white border border-[#E9B9C5] rounded-2xl px-4 py-4 shadow-sm"
               >
-                <Check className="theme_text w-6 h-6 flex-shrink-0" />
+                <div className="w-6 h-6 rounded-full bg-white flex items-center justify-center flex-shrink-0 mt-1">
+                  <Check className="text-[#9A283D] w-4 h-4" strokeWidth={3} />
+                </div>
 
-                <div className="flex flex-col text-left">
-                  <span className="font-hindi font-bold">{item.hi}</span>
-                  <span className="font-eng text-sm  text-black">{item.en}</span>
+                <div className="flex flex-col">
+                  <span className="font-hindi font-bold theme_text text-sm leading-snug">{item.hi}</span>
+                  <span className="font-eng text-black text-xs mt-0.5">{item.en}</span>
                 </div>
               </div>
             ))}
