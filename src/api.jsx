@@ -2,7 +2,7 @@ import axios from 'axios';
 import { getTokenFromLS } from './commonFunctions';
 import { endPoints } from './endpoints';
 
-const BASEURL = process.env.REACT_APP_API_BASE_URL || 'https://api.bhaktibhav.app/frontend/';
+const BASEURL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:3007/api/v1/frontend';
 console.log("API Base URL:", BASEURL);
 const api = axios.create({
   baseURL: BASEURL,
