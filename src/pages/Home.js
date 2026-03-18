@@ -178,7 +178,7 @@ function Home() {
                             className="w-full h-full rounded-xl"
                         >
                             {
-                                bannersData?.map((banner, index) => (
+                                bannersData?.slice(-1)?.map((banner, index) => (
                                     <SwiperSlide key={index}>
                                         <div
                                             onClick={() => {

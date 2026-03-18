@@ -42,6 +42,8 @@ const Payment = lazy(() => import("./pages/Payment"));
 const Transactions = lazy(() => import("./pages/transactions"));
 const PaymentPage = lazy(() => import("./pages/PaymentPage"));
 const Kundli = lazy(() => import("./pages/kundli"));
+const ParsadPage = lazy(() => import("./pages/ParsadPage"));
+const WinnersList = lazy(() => import("./pages/WinnersList"));
 
 // Preload commonly accessed routes after initial render
 const preloadCommonRoutes = () => {
@@ -132,6 +134,8 @@ function App() {
                   <Route path="/transactions" element={<Suspense><Transactions /></Suspense>} />
                   <Route path="/paymentPage" element={<Suspense><PaymentPage /></Suspense>} />
                   <Route path="/kundli" element={<Suspense><Kundli /></Suspense>} />
+                  <Route path="/parsad" element={<Suspense><ParsadPage /></Suspense>} />
+                  <Route path="/winners" element={<Suspense><WinnersList /></Suspense>} />
                 </Routes>
                 <GlobalAudioPlayer />
               </PujaKareProvider>
