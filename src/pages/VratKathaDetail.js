@@ -316,7 +316,7 @@ function VratKathaDetail() {
             <Header pageName={{ hi: "ozr dFkk", en: "Vrat Katha" }} hindiFontSize="true" />
             <div className="h-2"></div>
             <PageTitleCard
-                titleHi={detail.name.hi.replace(/\//g, "।")}
+                titleHi={detail.name.hi.replace(/\//g, "|").replace(/\|/g, "।")}
                 titleEn={detail.name.en}
                 customEngFontSize={"13px"}
                 customFontSize={"18px"}
