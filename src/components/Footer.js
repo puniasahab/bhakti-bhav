@@ -28,6 +28,7 @@ function Footer() {
                     <a href="termsAndConditions" className="theme-text hover:underline text-sm">Terms & Conditions</a>
                     <a href="privacyPolicy" className="theme-text hover:underline text-sm">Privacy Policy</a>
                     <a href="aboutUs" className="theme-text hover:underline text-sm">About us</a>
+                    <a href="blogs" className="theme-text hover:underline text-sm">Blogs</a>
                 </div>
 
 
