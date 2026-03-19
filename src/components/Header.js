@@ -8,7 +8,7 @@ import backBtn from "../assets/img/back_icon.svg";
 import { ReceiptText } from "lucide-react";
 import { LanguageContext } from "../contexts/LanguageContext";
 import { Download, Eye, Heart, Pencil, MoreVertical, LogOut } from "lucide-react";
-import { getTokenFromLS, removeMobileNoFromLS, removeSubscriptionStatusFromLS, removeTokenFromLS } from "../commonFunctions";
+import { getTokenFromLS, removeMobileNoFromLS, removeSubscriptionStatusFromLS, removeTokenFromLS, formatNumber } from "../commonFunctions";
 
 function Header({
     showWallpaperHeader = false,
@@ -140,7 +140,7 @@ function Header({
                     )}
 
                     {!isHomeRoute && !showProfileHeader && (
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center" style={{ gap: window.innerWidth < 368 ? "2px" : "8px" }}>
                             <button onClick={() => {
 
                                 if (window.history.state && window.history.state.idx > 0) {
@@ -149,13 +149,13 @@ function Header({
                                     navigate("/");
                                 }
                             }}>
-                                <img src={backBtn} alt="Back" width="24" height="24" />
+                                <img src={backBtn} alt="Back" width={window.innerWidth < 375 ? "22" : "24"} height={window.innerWidth < 375 ? "22" : "24"} />
                             </button>
 
                             {pageName && (
                                 <div className="flex flex-row theme_text items-center">
                                     <span className="font-hindi text-xl">{pageName.hi}</span>
-                                    <span className="font-eng text-sm ml-2">({pageName.en})</span>
+                                    <span className="font-eng text-sm ml-0.5">({pageName.en})</span>
                                 </div>
                             )}
                         </div>
@@ -163,15 +163,15 @@ function Header({
 
 
                     {showWallpaperHeader && (
-                        <div className="flex items-center gap-4 text-sm font-eng theme_text ml-auto">
-                            <div className="flex items-center gap-1 text-lg">
-                                <Download size={16} /> {downloads}
+                        <div className="flex items-center gap-1 text-sm font-eng theme_text ml-auto">
+                            <div className="flex items-center gap-0.5 text-sm">
+                                <Download size={16} /> {formatNumber(downloads)}
                             </div>
-                            <div className="flex items-center gap-1 text-lg">
-                                <Eye size={16} /> {views}
+                            <div className="flex items-center gap-0.5 text-sm">
+                                <Eye size={16} /> {formatNumber(views)}
                             </div>
-                            <div className="flex items-center gap-1 text-lg">
-                                <Heart size={16} /> {likes}
+                            <div className="flex items-center gap-0.5 text-sm">
+                                <Heart size={16} /> {formatNumber(likes)}
                             </div>
                         </div>
                     )}

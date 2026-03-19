@@ -148,17 +148,15 @@ export default function Payment() {
     console.log("profile", profile);
     if(profile.email === '' || profile.email == null || profile.email === undefined) {
       setTimeout(() => {
-        alert("Please update your email in profile section to proceed with the payment.");
-        if(getTokenFromLS()) {
-          navigate("/edit-profile");
-        }
-        else {
+        // alert("Please update your email in profile section to proceed with the payment.");
+        if(!getTokenFromLS()) {
           navigate("/login");
         }
-      }, 2000);
+      }, 500);
     }
     console.log({ planId: planDetails[0]._id, amount: planDetails[0].price, name: profile.name, email: profile.email, phone: profile.mobileNumber }
-    )
+    );
+
     const res = await paymentApis.makePayment(
       { planId: planDetails[0]._id, amount: planDetails[0].price, name: profile.name, email: profile.email, phone: profile.mobileNumber }
     );
