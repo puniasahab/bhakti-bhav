@@ -331,15 +331,7 @@ function TodayThoughts() {
       </div>
 
       <div className="flex justify-center space-x-4 mt-6"> 
-        <button onClick={handleNativeShare}>
-          <img
-            src="./img/hd_share_icon.png"
-            alt="share"
-            width="24"
-            height="24"
-            className="max-w-full h-auto mx-auto"
-          />
-        </button>
+       
     
         <button onClick={handleWhatsAppShare}>
           <img

@@ -67,6 +67,19 @@ const TermsAndConditions = () => {
                 </section>
 
                 <section>
+                  <h3 className="text-lg md:text-xl font-semibold mb-4 theme_text italic" style={{fontStyle: "italic"}}>Vaishno Devi Prasad Rules</h3>
+                  
+                  <div className="space-y-3 text-gray-700 italic" style={{fontStyle: "italic"}}>
+                    <ul className="list-disc list-outside pl-5 space-y-3">
+                      <li>Open to Subscribed users Only.</li>
+                      <li>A few lucky subscribers would be shortlisted for the prasad and contacted directly by The Bhakti Bhav team for details.</li>
+                      <li>Vaishno Devi prasad from Bhakti Bhav is active from <strong>19th March – 5th April</strong> only.</li>
+                      <li>All winners will receive their prasad between <strong>15th – 22nd April</strong>.</li>
+                    </ul>
+                  </div>
+                </section>
+
+                <section>
                   <h3 className="text-lg md:text-xl font-semibold mb-4 theme_text italic" style={{fontStyle: "italic"}}>Contact Us</h3>
                   
                   <div className="space-y-2 text-gray-700 italic" style={{fontStyle: "italic"}}>

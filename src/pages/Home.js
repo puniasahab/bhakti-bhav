@@ -10,7 +10,7 @@ import { useNavigate } from "react-router-dom";
 import "swiper/css";
 import "swiper/css/pagination";
 import { profileApis, wallpaperApis } from "../api";
-import { removeTokenFromLS, getMobileNoFromLS, removeSubscriptionStatusFromLS, setSubscriptionStatusInLS } from "../commonFunctions";
+import { removeTokenFromLS, getMobileNoFromLS, removeSubscriptionStatusFromLS, setSubscriptionStatusInLS, getTokenFromLS } from "../commonFunctions";
 import homeCache from "../utils/homeCache";
 
 function Home() {
@@ -20,6 +20,7 @@ function Home() {
 
     // Initialize state from cache if available (instant render on back-navigation)
     const [isOpen, setIsOpen] = useState(false);
+    const [showLoginModal, setShowLoginModal] = useState(false);
     const [panchangData, setPanchangData] = useState(() => {
         // Rebuild from cached raw data if available
         const cachedRaw = homeCache.get("panchangRawData");
@@ -163,6 +164,14 @@ function Home() {
         fetchBanners();
     }, [phoneNumber])
 
+    const requireLogin = (e) => {
+        if (!getTokenFromLS()) {
+            e?.preventDefault();
+            setShowLoginModal(true);
+            return true;
+        }
+        return false;
+    };
 
     return (
         <>
@@ -211,14 +220,14 @@ function Home() {
 
                 <div className="mt-4 grid grid-cols-2 gap-3">
 
-                    <Link to="/Rashifal"
+                    <Link to="/Rashifal" onClick={requireLogin}
                         className="theme_bg bg-white rounded-xl shadow md:p-6 p-3 text-center hover:bg-yellow-50 transition w-auto flex">
                         <div className="mx-auto flex md:flex-row flex-col items-center space-y-3 md:space-y-0">
                             <img src="./img/icon_1.png" alt="" width="36" height="36" className="md:mr-3" />
                             <p className="md:text-2xl text-lg font-normal leading-[20px]">vkt dk jkf'kQy <br /><span className="font-eng text-xs">(Aaj Ka Rashifal)</span></p>
                         </div>
                     </Link>
-                    <button onClick={() => setIsOpen(true)}
+                    <button onClick={(e) => { if (!requireLogin(e)) setIsOpen(true); }}
                         className="theme_bg bg-white rounded-xl shadow md:p-6 p-3 text-center hover:bg-yellow-50 transition w-auto flex">
                         <div className="mx-auto flex md:flex-row flex-col items-center space-y-3 md:space-y-0">
                             <img src="./img/icon_5.png" alt="" width="36" height="36" className="md:mr-3" />
@@ -230,14 +239,14 @@ function Home() {
 
                 <div className="grid grid-cols-3 md:gap-4 gap-2 mt-3 text-center font-medium">
 
-                    <Link to="/hindi-calendar"
+                    <Link to="/hindi-calendar" onClick={requireLogin}
                         className="theme_bg bg-white rounded-xl shadow md:p-6 p-3 text-center hover:bg-yellow-50 transition w-auto flex">
                         <div className="mx-auto flex flex-col items-center space-y-3 md:space-y-0">
                             <img src="./img/icon_2.png" alt="" width="36" height="36" className="md:mr-3" />
                             <p className="md:text-2xl text-lg font-normal leading-[20px]">fgUnh dySaMj <br /><span className="font-eng text-xs">(Hindi Calender)</span></p>
                         </div>
                     </Link>
-                    <Link to="/vrat-katha"
+                    <Link to="/vrat-katha" onClick={requireLogin}
                         className="theme_bg bg-white rounded-xl shadow md:p-6 p-3 text-center hover:bg-yellow-50 transition w-auto flex">
                         <div className="mx-auto flex flex-col items-center space-y-3 md:space-y-0">
                             <img src="./img/icon_3.png" alt="" width="36" height="36" className="md:mr-3" />
@@ -246,7 +255,7 @@ function Home() {
                         </div>
 
                     </Link>
-                    <Link to="/jaap-mala"
+                    <Link to="/jaap-mala" onClick={requireLogin}
                         className="theme_bg bg-white rounded-xl shadow md:p-6 p-3 text-center hover:bg-yellow-50 transition w-auto flex">
                         <div className="mx-auto flex flex-col items-center space-y-3 md:space-y-0">
                             <img src="./img/icon_4.png" alt="" width="36" height="36" className="md:mr-3" />
@@ -256,14 +265,14 @@ function Home() {
                 </div>
                 <div className="grid grid-cols-3 md:gap-4 gap-2 mt-3 text-center font-medium">
 
-                    <Link to="/mantra"
+                    <Link to="/mantra" onClick={requireLogin}
                         className="theme_bg bg-white rounded-xl shadow md:p-6 p-3 text-center hover:bg-yellow-50 transition w-auto flex">
                         <div className="mx-auto flex flex-col items-center space-y-3 md:space-y-0">
                             <img src="./img/icon_5.png" alt="" width="36" height="36" className="md:mr-3" />
                             <p className="md:text-2xl text-lg font-normal leading-[20px]">ea=<br /><span className="font-eng text-xs">(Mantra)</span></p>
                         </div>
                     </Link>
-                    <Link to="/chalisa"
+                    <Link to="/chalisa" onClick={requireLogin}
                         className="theme_bg bg-white rounded-xl shadow md:p-6 p-3 text-center hover:bg-yellow-50 transition w-auto flex">
                         <div className="mx-auto flex flex-col items-center space-y-3 md:space-y-0">
                             <img src="./img/icon_1.png" alt="" width="36" height="36" className="md:mr-3" />
@@ -272,7 +281,7 @@ function Home() {
                         </div>
 
                     </Link>
-                    <Link to="/aarti"
+                    <Link to="/aarti" onClick={requireLogin}
                         className="theme_bg bg-white rounded-xl shadow md:p-6 p-3 text-center hover:bg-yellow-50 transition w-auto flex">
                         <div className="mx-auto flex flex-col items-center space-y-3 md:space-y-0">
                             <img src="./img/icon_6.png" alt="" width="36" height="36" className="md:mr-3" />
@@ -342,6 +351,42 @@ function Home() {
                     </div>
                 </div>
             )}
+
+            {/* Login Gate Modal */}
+            {showLoginModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-5">
+                    <div className=" relative w-full max-w-sm rounded-3xl overflow-hidden shadow-2xl bg-[#F5E6C8]">
+                        {/* Top image — fills full width, contains bell + title + Hindi text */}
+                        <img
+                            src="/img/popup.png"
+                            alt="Unlock Bhakti Bhav Plus"
+                            className="w-full h-full object-cover"
+                            style={{ width: "100%", display: "block" }}
+                        />
+                        {/* Buttons + trust text on cream background */}
+                        <div className="px-5 pt-4 pb-5 bg-[#F5E6C8]">
+                            <div className="flex gap-3 mb-3">
+                                <button
+                                    onClick={() => setShowLoginModal(false)}
+                                    className="flex-1 bg-white text-[#9A283D] font-eng font-semibold py-3 rounded-2xl shadow"
+                                >
+                                    Skip
+                                </button>
+                                <button
+                                    onClick={() => { setShowLoginModal(false); navigate("/login"); }}
+                                    className="flex-1 bg-[#9A283D] text-white font-eng font-semibold py-3 rounded-2xl shadow"
+                                >
+                                    Free Login
+                                </button>
+                            </div>
+                            <p className="text-center text-[#9A283D] font-eng text-sm font-medium">
+                                Trusted by Lakhs of Devotees
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <Footer />
         </>
 
