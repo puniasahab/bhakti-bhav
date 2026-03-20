@@ -220,14 +220,14 @@ function Home() {
 
                 <div className="mt-4 grid grid-cols-2 gap-3">
 
-                    <Link to="/Rashifal" onClick={requireLogin}
+                    <Link to="/Rashifal"
                         className="theme_bg bg-white rounded-xl shadow md:p-6 p-3 text-center hover:bg-yellow-50 transition w-auto flex">
                         <div className="mx-auto flex md:flex-row flex-col items-center space-y-3 md:space-y-0">
                             <img src="./img/icon_1.png" alt="" width="36" height="36" className="md:mr-3" />
                             <p className="md:text-2xl text-lg font-normal leading-[20px]">vkt dk jkf'kQy <br /><span className="font-eng text-xs">(Aaj Ka Rashifal)</span></p>
                         </div>
                     </Link>
-                    <button onClick={(e) => { if (!requireLogin(e)) setIsOpen(true); }}
+                    <button onClick={(e) => { setIsOpen(true) }}
                         className="theme_bg bg-white rounded-xl shadow md:p-6 p-3 text-center hover:bg-yellow-50 transition w-auto flex">
                         <div className="mx-auto flex md:flex-row flex-col items-center space-y-3 md:space-y-0">
                             <img src="./img/icon_5.png" alt="" width="36" height="36" className="md:mr-3" />
@@ -291,7 +291,7 @@ function Home() {
                 </div>
 
                 <div className="mt-6">
-                    <Link to="/wallpaper" className="relative theme_bg hd_bg rounded-xl flex items-center justify-center rounded-xl font-semibold overflow-hidden 
+                    <Link to="/wallpaper" onClick={requireLogin} className="relative theme_bg hd_bg rounded-xl flex items-center justify-center rounded-xl font-semibold overflow-hidden 
           hover:bg-yellow-50 transition">
 
                         {/* <span className="absolute left-[30px] top-[50%] -translate-y-1/2 
@@ -355,13 +355,13 @@ function Home() {
             {/* Login Gate Modal */}
             {showLoginModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-5">
-                    <div className=" relative w-full max-w-sm rounded-3xl overflow-hidden shadow-2xl bg-[#F5E6C8]">
+                    <div className="relative w-full max-w-sm rounded-3xl overflow-hidden shadow-2xl" style={{ background: "linear-gradient(to bottom, #D4A843 0%, #F5E6C8 40%)" }}>
                         {/* Top image — fills full width, contains bell + title + Hindi text */}
                         <img
                             src="/img/popup.png"
                             alt="Unlock Bhakti Bhav Plus"
-                            className="w-full h-full object-cover"
-                            style={{ width: "100%", display: "block" }}
+                            className="w-full h-auto block rounded-t-3xl"
+                            style={{ width: "100%", display: "block", marginTop: "-12px", }}
                         />
                         {/* Buttons + trust text on cream background */}
                         <div className="px-5 pt-4 pb-5 bg-[#F5E6C8]">
