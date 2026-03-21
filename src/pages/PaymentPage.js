@@ -61,17 +61,13 @@ export default function PaymentDrop() {
               // Payment verification successful
               console.log("Payment verified successfully");
               
-              // Show success message briefly
-              setTimeout(() => {
-                // Redirect to transactions page
-                navigate('/transactions', { 
-                  state: { 
-                    paymentSuccess: true, 
-                    orderId: paymentResponse.data.cashfree.order_id,
-                    message: 'Payment completed successfully!' 
-                  } 
-                });
-              }, 1500);
+              // Navigate to payment complete page
+              navigate('/payment-complete', { 
+                state: { 
+                  paymentSuccess: true, 
+                  orderId: paymentResponse.data.cashfree.order_id,
+                } 
+              });
             } else {
               // Payment verification failed
               setError("Payment verification failed. Please contact support.");
