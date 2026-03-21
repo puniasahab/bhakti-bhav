@@ -20,7 +20,7 @@ export default function PaymentComplete() {
   const [contentVisible, setContentVisible] = useState(false);
 
   // Countdown state for auto-redirect (only on success)
-  const [countdown, setCountdown] = useState(5);
+  const [countdown, setCountdown] = useState(3);
 
   useEffect(() => {
     const t1 = setTimeout(() => setRingVisible(true), 100);
@@ -216,7 +216,7 @@ export default function PaymentComplete() {
           )}
 
           {/* Action buttons */}
-          <div className="flex flex-col gap-3 w-full">
+          {/* <div className="flex flex-col gap-3 w-full">
             {isSuccess ? (
               <button
                 onClick={() => navigate("/", { replace: true })}
@@ -240,7 +240,7 @@ export default function PaymentComplete() {
                 </button>
               </>
             )}
-          </div>
+          </div> */}
         </div>
 
         </div>{/* end card */}
