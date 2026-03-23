@@ -1,5 +1,13 @@
 import { useState, useEffect, Suspense, lazy } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
+
+// ── Firebase debug mode ───────────────────────────────────────────────────
+// Set debug_mode = "true" in localStorage to enable Firebase DebugView.
+// Remove or set to "false" to disable.
+// Change the value below to toggle: true = debug ON, false = debug OFF.
+const FIREBASE_DEBUG_MODE = true;
+localStorage.setItem("debug_mode", String(FIREBASE_DEBUG_MODE));
+// ─────────────────────────────────────────────────────────────────────────
 import { LanguageProvider } from "./contexts/LanguageContext";
 import { KathaProvider } from "./contexts/KathaContext";
 import { PaymentProvider } from "./contexts/PaymentContext";
@@ -46,6 +54,7 @@ const ParsadPage = lazy(() => import("./pages/ParsadPage"));
 const WinnersList = lazy(() => import("./pages/WinnersList"));
 const Blogs = lazy(() => import("./pages/Blogs"));
 const PaymentComplete = lazy(() => import("./pages/PaymentComplete"));
+const ContactUs = lazy(() => import("./pages/ContactUs"));
 
 // Preload commonly accessed routes after initial render
 const preloadCommonRoutes = () => {
@@ -140,6 +149,7 @@ function App() {
                   <Route path="/winners" element={<Suspense><WinnersList /></Suspense>} />
                   <Route path="/blogs" element={<Suspense><Blogs /></Suspense>} />
                   <Route path="/payment-complete" element={<Suspense><PaymentComplete /></Suspense>} />
+                  <Route path="/contact-us" element={<Suspense><ContactUs /></Suspense>} />
                 </Routes>
                 <GlobalAudioPlayer />
               </PujaKareProvider>

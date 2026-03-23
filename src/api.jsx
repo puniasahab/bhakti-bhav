@@ -268,4 +268,23 @@ export const blogApis = {
   },
 };
 
+export const contactUsApis = {
+  submitContactForm: async (data) => {
+    try {
+      // const response = await api.post(endPoints.contactUs, data);
+      const response = await fetch("https://api.bhaktibhav.app/frontend/contact-us", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error submitting contact form:", error);
+      throw error;
+    }
+  }
+};
+
 export default api;

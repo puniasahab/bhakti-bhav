@@ -23,12 +23,12 @@ function Footer() {
                     </a>
                 </div>
 
-                <div
-                    className="flex flex-row space-x-6 theme_text text-center font-eng my-6">
-                    <a href="termsAndConditions" className="theme-text hover:underline text-sm">Terms & Conditions</a>
-                    <a href="privacyPolicy" className="theme-text hover:underline text-sm">Privacy Policy</a>
-                    <a href="aboutUs" className="theme-text hover:underline text-sm">About us</a>
-                    <a href="blogs" className="theme-text hover:underline text-sm">Blogs</a>
+                <div className="flex flex-wrap justify-center gap-x-5 gap-y-2 theme_text text-center font-eng my-4">
+                    <a href="termsAndConditions" className="theme-text hover:underline text-sm whitespace-nowrap">Terms & Conditions</a>
+                    <a href="privacyPolicy" className="theme-text hover:underline text-sm whitespace-nowrap">Privacy Policy</a>
+                    <a href="aboutUs" className="theme-text hover:underline text-sm whitespace-nowrap">About Us</a>
+                    <a href="blogs" className="theme-text hover:underline text-sm whitespace-nowrap">Blogs</a>
+                    <a href="contact-us" className="theme-text hover:underline text-sm whitespace-nowrap">Contact Us</a>
                 </div>
 
 

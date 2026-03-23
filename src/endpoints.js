@@ -15,4 +15,5 @@ export const endPoints = {
     pujaKarein: 'puja-kare',
     banner: 'banners',
     wallpaperCategories: 'wallpaper-categories',
+    contactUs: "contact-us",
 }
