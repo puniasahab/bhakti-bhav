@@ -18,6 +18,7 @@ export default function ContactUs() {
   const [submitted, setSubmitted] = useState(false);
   const [countdown, setCountdown] = useState(3);
   const [apiError, setApiError] = useState("");
+  const [consented, setConsented] = useState(false);
 
   // Auto-redirect after success
   useEffect(() => {
@@ -216,12 +217,39 @@ export default function ContactUs() {
                 </div>
               )}
 
+              {/* Consent checkbox */}
+              <label className="flex items-start gap-3 cursor-pointer select-none">
+                <div className="relative mt-0.5 flex-shrink-0">
+                  {/* Real checkbox — drives state, visually hidden */}
+                  <input
+                    type="checkbox"
+                    checked={consented}
+                    onChange={(e) => setConsented(e.target.checked)}
+                    className="absolute opacity-0 w-0 h-0"
+                  />
+                  {/* Custom checkbox visual — pointer-events-none so clicks fall through to <label> */}
+                  <div
+                    className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all duration-200 pointer-events-none
+                      ${consented ? "bg-[#9A283D] border-[#9A283D]" : "bg-white border-[#9A283D]/40"}`}
+                  >
+                    {consented && (
+                      <svg viewBox="0 0 12 10" className="w-3 h-3" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="1,5 4.5,8.5 11,1" />
+                      </svg>
+                    )}
+                  </div>
+                </div>
+                <span className="font-eng text-xs text-gray-500 leading-relaxed">
+                  I agree and authorise to call / send SMS / WhatsApp / RCS / Promotional / Informational messages / notifications. This will override the registry with DNC/NDNC.
+                </span>
+              </label>
+
               {/* Submit */}
               <button
                 type="submit"
-                disabled={loading}
+                disabled={loading || !consented}
                 className={`w-full py-3 rounded-2xl font-eng font-semibold text-white shadow-md transition-all duration-300
-                  ${loading ? "bg-[#9A283D]/60 cursor-not-allowed" : "bg-[#9A283D] hover:scale-105"}`}
+                  ${loading || !consented ? "bg-[#9A283D]/40 cursor-not-allowed" : "bg-[#9A283D] hover:scale-105"}`}
               >
                 {loading ? (
                   <div className="flex items-center justify-center gap-2">
