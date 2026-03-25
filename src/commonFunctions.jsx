@@ -98,7 +98,7 @@ export const setSubscriptionPlanInLS = (planName, planPrice) => {
 export const getSubscriptionPlanFromLS = () => {
   const name = localStorage.getItem("subscriptionPlanName");
   const price = localStorage.getItem("subscriptionPlanPrice");
-  if (!name && !price) return "not_logged_in";
+  if (!name && !price) return "none";
   return `${name}_${price}`;
 };
 export const removeSubscriptionPlanFromLS = () => {

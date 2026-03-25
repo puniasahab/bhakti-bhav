@@ -1,43 +1,17 @@
 import React, { useEffect } from "react";
-import { trackEvent } from "../firebase/firebase";
-import {
-  getTokenFromLS,
-  getMobileNoFromLS,
-  getSubscriptionStatusFromLS,
-  getUserIdFromLS,
-  getDeviceId,
-  getSessionId,
-  getSubscriptionPlanFromLS,
-  getBrowserName,
-} from "../commonFunctions";
+
+import {GA4Events} from "../utils/ga4Events.enum";
+
+import useGA4BaseParams from "../hooks/useGA4BaseParams";
+import useGA4Tracker from "../hooks/useGA4Tracker";
 
 function Splash() {
 
+  const baseParams = useGA4BaseParams("splash_screen");
+  const { trackEvent } = useGA4Tracker(baseParams);
+
   useEffect(() => {
-    const isLoggedIn = !!getTokenFromLS();
-    const isSubscribed = getSubscriptionStatusFromLS();
-
-    const params = {
-      user_id: isLoggedIn ? (getUserIdFromLS() || "logged_in") : "anonymous",
-      device_id: getDeviceId(),
-      platform: getBrowserName(),
-      session_id: getSessionId(),
-      user_type: isLoggedIn ? (isSubscribed ? "paid" : "free") : "not_logged_in",
-      subscription_plan: isLoggedIn ? getSubscriptionPlanFromLS() : "not_logged_in",
-      language: "en",
-      country: "India",
-      screen_name: "splash_screen",
-      env: "prod",
-      phone_number: isLoggedIn ? (getMobileNoFromLS() || "not_logged_in") : "not_logged_in",
-      source: "web",
-    };
-
-    // Delay slightly so Firebase Analytics async init completes before sending
-    const timer = setTimeout(() => {
-      trackEvent("screen_view", params);
-    }, 500);
-
-    return () => clearTimeout(timer);
+    trackEvent(GA4Events.website_splash_screen_displayed);
   }, []);
 
   return (

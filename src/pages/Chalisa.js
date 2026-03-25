@@ -6,6 +6,8 @@ import Loader from "../components/Loader";
 import PageTitleCard from "../components/PageTitleCard";
 import { getSubscriptionStatusFromLS, getTokenFromLS } from "../commonFunctions";
 import { cachedFetch } from "../utils/apiCache";
+import useGA4BaseParams from "../hooks/useGA4BaseParams";
+import useGA4Tracker from "../hooks/useGA4Tracker";
 
 export default function Chalisa() {
   const [chalisa, setChalisa] = useState([]);
@@ -18,6 +20,14 @@ export default function Chalisa() {
   // Memoize subscription status to prevent re-computation on each render
   const isSubscribed = useMemo(() => getSubscriptionStatusFromLS(), []);
   const hasToken = useMemo(() => getTokenFromLS(), []);
+
+  const baseParams = useGA4BaseParams("Chalisa Screen");
+  const { trackEvent } = useGA4Tracker(baseParams);
+  useEffect(() => {
+    trackEvent("chalisa_widget_clicked", {
+      event_label: "chalisa_screen_visited"
+    })
+  }, []);
 
   useEffect(() => {
     async function fetchChalisa() {

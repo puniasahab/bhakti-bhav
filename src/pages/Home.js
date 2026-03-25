@@ -5,19 +5,24 @@ import { Link } from "react-router-dom";
 import TodayThoughts from "../components/TodayThoughts";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination, Autoplay } from "swiper/modules";
-import { useNavigate } from "react-router-dom"; 
+import { useNavigate } from "react-router-dom";
 
 import "swiper/css";
 import "swiper/css/pagination";
 import { profileApis, wallpaperApis } from "../api";
-import { removeTokenFromLS, getMobileNoFromLS, removeSubscriptionStatusFromLS, setSubscriptionStatusInLS, getTokenFromLS } from "../commonFunctions";
+import { removeTokenFromLS, getMobileNoFromLS, removeSubscriptionStatusFromLS, setSubscriptionStatusInLS, getTokenFromLS, getDeviceId, getSessionId, getBrowserName, getSubscriptionStatusFromLS, getUserIdFromLS, getSubscriptionPlanFromLS } from "../commonFunctions";
 import homeCache from "../utils/homeCache";
+// import { trackEventCommonFunction } from "../utils/eventCommonFunctions";
+import useGA4BaseParams from "../hooks/useGA4BaseParams";
+import useGA4Tracker from "../hooks/useGA4Tracker";
+import { GA4Events } from "../utils/ga4Events.enum";
 
 function Home() {
 
 
     const navigate = useNavigate();
-
+    const baseParams = useGA4BaseParams("Home Screen");
+    const { trackEvent } = useGA4Tracker(baseParams);
     // Initialize state from cache if available (instant render on back-navigation)
     const [isOpen, setIsOpen] = useState(false);
     const [showLoginModal, setShowLoginModal] = useState(false);
@@ -49,7 +54,7 @@ function Home() {
     const [bannersData, setBannersData] = useState(() => homeCache.get("bannersData") || []);
     const [wallpaperImage, setWallpaperImage] = useState(() => homeCache.get("wallpaperImage") || "");
     const hasFetchedBanners = useRef(false);
-
+   
     // Helper to format raw panchang data into React elements
     const formatPanchangData = (rawData) => [
         {
@@ -82,7 +87,14 @@ function Home() {
             return;
         }
 
+        
+
         const fetchPanchang = async () => {
+
+
+            trackEvent(GA4Events.panchang_card_clicked, {
+                event_label: "panchang_card_clicked_on_home_screen"
+            });
             try {
                 const res = await fetch("https://api.bhaktibhav.app/frontend/daily-panchang");
                 const data = await res.json();
@@ -103,13 +115,45 @@ function Home() {
 
         fetchPanchang();
 
-        
+
     }, [isOpen]);
+
+    useEffect(() => {
+        // const isLoggedIn = !!getTokenFromLS();
+        // const isSubscribed = getSubscriptionStatusFromLS();
+
+        // const params = {
+        //     user_id: isLoggedIn ? (getUserIdFromLS() || "logged_in") : "anonymous",
+        //     device_id: getDeviceId(),
+        //     platform: getBrowserName(),
+        //     session_id: getSessionId(),
+        //     user_type: isLoggedIn ? (isSubscribed ? "paid" : "free") : "free",
+        //     subscription_plan: isLoggedIn ? getSubscriptionPlanFromLS() : "none",
+        //     language: "en",
+        //     country: "India",
+        //     screen_name: "home_screen",
+        //     env: "prod",
+        //     phone_number: isLoggedIn ? (getMobileNoFromLS() || "none") : "none",
+        //     source: "web",
+        // };
+
+        // // Delay slightly so Firebase Analytics async init completes before sending
+        // const timer = setTimeout(() => {
+        //     trackEventCommonFunction("screen_view", params);
+        // }, 500);
+
+        // return () => clearTimeout(timer);
+
+        // const baseParams = useGA4BaseParams("panchang_card_clicked_on_home_screen");
+        // const { trackEvent } = useGA4Tracker(baseParams);
+        // trackEvent("panchang_card_clicked");
+        trackEvent(GA4Events.screen_view);
+    }, []);
 
     const phoneNumber = getMobileNoFromLS();
 
     useEffect(() => {
-        
+
         const fetchProfileData = async () => {
             try {
                 const resp = await profileApis.getProfile();
@@ -172,6 +216,56 @@ function Home() {
         }
         return false;
     };
+    const handleHindiCalendarClicked = (e) => {
+        if (requireLogin(e)) return;
+        trackEvent(GA4Events.hindi_calendar_widget_clicked, {
+            event_label: "hindi_calendar_card_clicked_on_home_screen"
+        });
+    };
+
+    const handleVratKathaClicked = (e) => {
+        if (requireLogin(e)) return;
+        trackEvent(GA4Events.vrat_katha_widget_clicked, {
+            event_label: "vrat_katha_card_clicked_on_home_screen"
+        });
+    };
+
+    const handleJaapMalaClicked = (e) => {
+        if (requireLogin(e)) return;
+        trackEvent(GA4Events.jaap_mala_widget_clicked, {
+            event_label: "jaap_mala_card_clicked_on_home_screen"
+        });
+    };
+
+    const handleMantraClicked = (e) => {
+        if (requireLogin(e)) return;
+        trackEvent(GA4Events.mantra_widget_clicked, {
+            event_label: "mantra_card_clicked_on_home_screen"
+        });
+    };
+
+    const handleChalisaClicked = (e) => {
+        if (requireLogin(e)) return;
+        trackEvent(GA4Events.chalisa_widget_clicked, {
+            event_label: "chalisa_card_clicked_on_home_screen"
+        });
+    };
+
+    const handleAartiClicked = (e) => {
+        if (requireLogin(e)) return;
+        trackEvent(GA4Events.aarti_widget_clicked, {
+            event_label: "aarti_card_clicked_on_home_screen"
+        });
+    };
+
+    const handleWallpaperClicked = (e) => {
+        if (requireLogin(e)) return;
+        trackEvent(GA4Events.wallpaper_widget_clicked, {
+            event_label: "wallpaper_card_clicked_on_home_screen"
+        });
+    };
+
+    
 
     return (
         <>
@@ -188,11 +282,15 @@ function Home() {
                         >
                             {
                                 bannersData?.slice(-1)?.map((banner, index) => (
+
                                     <SwiperSlide key={index}>
                                         <div
                                             onClick={() => {
                                                 const relativePath = new URL(banner.Urls).pathname;
                                                 console.log("relativePath", relativePath);
+                                                trackEvent(GA4Events.main_banner_clicked, {
+                                                    event_label: "main_banner_clicked_from_home_screen"
+                                                });
                                                 navigate(relativePath);
                                             }}
                                             className="h-[20vh] md:h-[60vh] bg-cover bg-center flex items-center justify-center"
@@ -201,7 +299,8 @@ function Home() {
                                             {/* <h2 className="text-white text-lg font-bold">{banner.title}</h2> */}
                                         </div>
                                     </SwiperSlide>
-                                ))
+                                )
+                                )
                             }
                             {/* <SwiperSlide>
                                 <div
@@ -221,6 +320,9 @@ function Home() {
                 <div className="mt-4 grid grid-cols-2 gap-3">
 
                     <Link to="/Rashifal"
+                        onClick = {() => {trackEvent(GA4Events.rashifal_tab_clicked, {
+                            event_label: "rashifal_card_clicked_on_home_screen"
+                        })}}
                         className="theme_bg bg-white rounded-xl shadow md:p-6 p-3 text-center hover:bg-yellow-50 transition w-auto flex">
                         <div className="mx-auto flex md:flex-row flex-col items-center space-y-3 md:space-y-0">
                             <img src="./img/icon_1.png" alt="" width="36" height="36" className="md:mr-3" />
@@ -246,7 +348,7 @@ function Home() {
                             <p className="md:text-2xl text-lg font-normal leading-[20px]">fgUnh dySaMj <br /><span className="font-eng text-xs">(Hindi Calender)</span></p>
                         </div>
                     </Link>
-                    <Link to="/vrat-katha" onClick={requireLogin}
+                    <Link to="/vrat-katha" onClick={handleVratKathaClicked}
                         className="theme_bg bg-white rounded-xl shadow md:p-6 p-3 text-center hover:bg-yellow-50 transition w-auto flex">
                         <div className="mx-auto flex flex-col items-center space-y-3 md:space-y-0">
                             <img src="./img/icon_3.png" alt="" width="36" height="36" className="md:mr-3" />
@@ -255,7 +357,7 @@ function Home() {
                         </div>
 
                     </Link>
-                    <Link to="/jaap-mala" onClick={requireLogin}
+                    <Link to="/jaap-mala" onClick={handleJaapMalaClicked}
                         className="theme_bg bg-white rounded-xl shadow md:p-6 p-3 text-center hover:bg-yellow-50 transition w-auto flex">
                         <div className="mx-auto flex flex-col items-center space-y-3 md:space-y-0">
                             <img src="./img/icon_4.png" alt="" width="36" height="36" className="md:mr-3" />
@@ -265,14 +367,14 @@ function Home() {
                 </div>
                 <div className="grid grid-cols-3 md:gap-4 gap-2 mt-3 text-center font-medium">
 
-                    <Link to="/mantra" onClick={requireLogin}
+                    <Link to="/mantra" onClick={handleMantraClicked}
                         className="theme_bg bg-white rounded-xl shadow md:p-6 p-3 text-center hover:bg-yellow-50 transition w-auto flex">
                         <div className="mx-auto flex flex-col items-center space-y-3 md:space-y-0">
                             <img src="./img/icon_5.png" alt="" width="36" height="36" className="md:mr-3" />
                             <p className="md:text-2xl text-lg font-normal leading-[20px]">ea=<br /><span className="font-eng text-xs">(Mantra)</span></p>
                         </div>
                     </Link>
-                    <Link to="/chalisa" onClick={requireLogin}
+                    <Link to="/chalisa" onClick={handleChalisaClicked}
                         className="theme_bg bg-white rounded-xl shadow md:p-6 p-3 text-center hover:bg-yellow-50 transition w-auto flex">
                         <div className="mx-auto flex flex-col items-center space-y-3 md:space-y-0">
                             <img src="./img/icon_1.png" alt="" width="36" height="36" className="md:mr-3" />
@@ -281,7 +383,7 @@ function Home() {
                         </div>
 
                     </Link>
-                    <Link to="/aarti" onClick={requireLogin}
+                    <Link to="/aarti" onClick={handleAartiClicked}
                         className="theme_bg bg-white rounded-xl shadow md:p-6 p-3 text-center hover:bg-yellow-50 transition w-auto flex">
                         <div className="mx-auto flex flex-col items-center space-y-3 md:space-y-0">
                             <img src="./img/icon_6.png" alt="" width="36" height="36" className="md:mr-3" />
@@ -291,7 +393,7 @@ function Home() {
                 </div>
 
                 <div className="mt-6">
-                    <Link to="/wallpaper" onClick={requireLogin} className="relative theme_bg hd_bg rounded-xl flex items-center justify-center rounded-xl font-semibold overflow-hidden 
+                    <Link to="/wallpaper" onClick={handleWallpaperClicked} className="relative theme_bg hd_bg rounded-xl flex items-center justify-center rounded-xl font-semibold overflow-hidden 
           hover:bg-yellow-50 transition">
 
                         {/* <span className="absolute left-[30px] top-[50%] -translate-y-1/2 
@@ -367,13 +469,13 @@ function Home() {
                         <div className="px-5 pt-4 pb-5 bg-[#F5E6C8]">
                             <div className="flex gap-3 mb-3">
                                 <button
-                                    onClick={() => setShowLoginModal(false)}
+                                    onClick={() => {setShowLoginModal(false); trackEvent(GA4Events.free_login_cta_clicked, { event_label: "free_login_skipped" });}}
                                     className="flex-1 bg-white text-[#9A283D] font-eng font-semibold py-3 rounded-2xl shadow"
                                 >
                                     Skip
                                 </button>
                                 <button
-                                    onClick={() => { setShowLoginModal(false); navigate("/login"); }}
+                                    onClick={() => { setShowLoginModal(false); trackEvent(GA4Events.free_login_cta_clicked, { event_label: "free_login_clicked" }); navigate("/login"); }}
                                     className="flex-1 bg-[#9A283D] text-white font-eng font-semibold py-3 rounded-2xl shadow"
                                 >
                                     Free Login

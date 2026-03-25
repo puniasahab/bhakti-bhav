@@ -2,12 +2,17 @@ import React, { useState, useEffect } from "react";
 import { data, useLocation, useNavigate } from "react-router-dom";
 import { getMobileNoFromLS, setTokenInLS } from "../commonFunctions";
 import { loginApis } from "../api";
-
+import useGA4BaseParams from "../hooks/useGA4BaseParams";
+import useGA4Tracker from "../hooks/useGA4Tracker";
+import { GA4Events } from "../utils/ga4Events.enum";
 
 function VerifyOtp() {
     const location = useLocation();
     const navigate = useNavigate();
     const phone = location.state?.phone || "";
+
+    const baseParams = useGA4BaseParams("Verify OTP Screen");
+    const { trackEvent } = useGA4Tracker(baseParams);
 
     console.log("Phone number from state:", phone);
 
@@ -20,11 +25,11 @@ function VerifyOtp() {
         try {
             const mobileNumber = getMobileNoFromLS();
             let deviceId = localStorage.getItem('deviceId');
-        if (!deviceId) {
-            // Generate a unique device ID if it doesn't exist
-            deviceId = crypto.randomUUID()
-            localStorage.setItem('deviceId', deviceId);
-        }
+            if (!deviceId) {
+                // Generate a unique device ID if it doesn't exist
+                deviceId = crypto.randomUUID()
+                localStorage.setItem('deviceId', deviceId);
+            }
             const response = await loginApis.generateOtp(mobileNumber, deviceId);
             console.log("OTP Response:", response);
         }
@@ -99,11 +104,13 @@ function VerifyOtp() {
         setLoading(true);
         try {
             let deviceId = localStorage.getItem('deviceId');
-        if (!deviceId) {
-            // Generate a unique device ID if it doesn't exist
-            deviceId = crypto.randomUUID()
-            localStorage.setItem('deviceId', deviceId);
-        }
+            if (!deviceId) {
+                // Generate a unique device ID if it doesn't exist
+                deviceId = crypto.randomUUID()
+                localStorage.setItem('deviceId', deviceId);
+            }
+
+            trackEvent(GA4Events.verify_otp_clicked, { event_label: "verify_otp_btn_clicked" });
             const res = await fetch("https://api.bhaktibhav.app/frontend/verify-otp", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -112,12 +119,12 @@ function VerifyOtp() {
 
             const data = await res.json();
             console.log("data", data);
-            
+
             if (res.status === 400) {
                 alert(data.message || "OTP verification failed");
                 return;
             }
-            
+
             if (data && data?.token?.length > 0) {
                 setTokenInLS(data.token);
                 navigate(-2); // redirect to home/dashboard
@@ -129,6 +136,11 @@ function VerifyOtp() {
             setLoading(false);
         }
     };
+
+
+    useEffect(() => {
+        trackEvent(GA4Events.otp_screen_opened, { event_label: "verify_otp_screen_opened" });
+    }, [])
 
     return (
 
@@ -169,7 +181,7 @@ function VerifyOtp() {
                         <div className="flex justify-between items-center text-sm text-gray-600">
                             <button
                                 disabled={timeLeft > 0}
-                                onClick={() => { setTimeLeft(30); generateOtp(); }}
+                                onClick={() => { setTimeLeft(30); trackEvent(GA4Events.resend_otp_button_clicked, { event_label: "resend_otp_button_clicked" }); generateOtp(); }}
                                 className={`${timeLeft > 0 ? "text-gray-400" : "text-[#800000] underline"
                                     }`}
                             >

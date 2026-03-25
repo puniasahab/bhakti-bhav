@@ -148,7 +148,7 @@ export default function Wallpaper() {
         {categories && categories.length > 0 && categories?.map((cat) => (
           <button
             key={cat._id}
-            onClick={() => setActiveCategory(cat._id)}
+            onClick={() => {setActiveCategory(cat._id); trackEvent(GA4Events.wallpaper_category_selected, { title: "", event_label: `${cat.name.en}_wallpaper_category_selected`, id: cat._id });}}
             className={`px-5 py-2 rounded-full border text-sm font-eng whitespace-nowrap transition ${activeCategory === cat._id
                 ? "bg-[#9A283D] text-white"
                 : "border-[#9A283D] text-[#9A283D]"

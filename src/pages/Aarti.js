@@ -7,6 +7,9 @@ import PageTitleCard from "../components/PageTitleCard";
 import { getTokenFromLS, getSubscriptionStatusFromLS } from "../commonFunctions";
 import { cachedFetch } from "../utils/apiCache";
 
+import useGA4BaseParams from "../hooks/useGA4BaseParams";
+import useGA4Tracker from "../hooks/useGA4Tracker";
+
 export default function Aarti() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);

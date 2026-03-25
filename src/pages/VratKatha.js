@@ -9,6 +9,9 @@ import { getSubscriptionStatusFromLS, getTokenFromLS } from "../commonFunctions"
 // import { useNavigate } from "react-router-dom";
 import { cachedFetch } from "../utils/apiCache";
 
+import useGA4BaseParams from "../hooks/useGA4BaseParams";
+import useGA4Tracker from "../hooks/useGA4Tracker";
+
 
 export default function VratKatha() {
   const navigate = useNavigate();

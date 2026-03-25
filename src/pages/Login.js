@@ -1,12 +1,21 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginApis } from "../api";
 import { setMobileNoInLS } from "../commonFunctions";
+import useGA4BaseParams from "../hooks/useGA4BaseParams";
+import useGA4Tracker from "../hooks/useGA4Tracker";
+import { GA4Events } from "../utils/ga4Events.enum";
 
 function Login() {
     const [mobile, setMobile] = useState("");
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+
+    const baseParams = useGA4BaseParams("Login Screen");
+    const { trackEvent } = useGA4Tracker(baseParams);
+
+
+    const hasTracked = useRef(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -39,7 +48,7 @@ function Login() {
         //     setLoading(false);
         // }
         const mobileNumber = mobile;
-        
+
         // Generate or get deviceId
         let deviceId = localStorage.getItem('deviceId');
         if (!deviceId) {
@@ -57,16 +66,28 @@ function Login() {
             }
             localStorage.setItem('deviceId', deviceId);
         }
-        
+
+        trackEvent(GA4Events.login_otp_requested, { event_label: "send_otp_button_clicked_on_login_screen" });
+
         const response = await loginApis.generateOtp(mobileNumber, deviceId);
         console.log("OTP Response:", response);
         setLoading(false);
-        if(response.success) {
+        if (response.success) {
             setMobileNoInLS(mobile)
         }
-        
+
         navigate("/verify-otp", { state: { mobile } });
     };
+
+    useEffect(() => {
+        if (hasTracked.current) return;
+        hasTracked.current = true;
+
+        trackEvent(GA4Events.login_screen_opened, {
+            event_label: "login_screen_visited",
+        });
+        // trackEvent(GA4Events.login_screen_opened, {event_label: "login_screen_visited"});
+    }, []);
     return (
 
         <div className="flex items-center justify-center h-screen relative">
@@ -95,7 +116,7 @@ function Login() {
                                         type="tel"
                                         value={mobile}
                                         onChange={(e) =>
-                                            setMobile(e.target.value.replace(/\D/g, "").slice(0, 10))  
+                                            setMobile(e.target.value.replace(/\D/g, "").slice(0, 10))
                                         }
                                         placeholder="Phone Number"
                                         className="w-full border border-red-300 rounded-lg pl-16 pr-4 md:text-lg text-2xl py-3 focus:outline-none focus:ring-2 focus:ring-red-400 theme_text flex items-center placeholder:text-lg placeholder:md:text-base"
