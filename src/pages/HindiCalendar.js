@@ -6,11 +6,17 @@ import Loader from "../components/Loader";
 import PageTitleCard from "../components/PageTitleCard";
 import { getTokenFromLS, getSubscriptionStatusFromLS } from "../commonFunctions";
 import { useNavigate } from "react-router-dom";
+import { GA4Events } from "../utils/ga4Events.enum";
+import useGA4BaseParams from "../hooks/useGA4BaseParams";
+import useGA4Tracker from "../hooks/useGA4Tracker";
 
 export default function HindiCalendar() {
   const [months, setMonths] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
+  const baseParams = useGA4BaseParams("Hindi Calendar Screen");
+  const { trackEvent } = useGA4Tracker(baseParams);
   useEffect(() => {
     async function fetchCalendar() {
       try {
@@ -48,7 +54,7 @@ export default function HindiCalendar() {
   const handleNavigate = (id, accessType, date) => {
     if (getSubscriptionStatusFromLS()) {
       if (id) {
-
+        trackEvent(GA4Events.calendar_festival_date_clicked, { event_label: "calendar_festival_date_clicked_from_hindi_calendar", festival_id: id });
         return `/vrat-katha/${id}/date/${date}`;
       }
       else {
@@ -101,6 +107,7 @@ export default function HindiCalendar() {
               return (
                 <li key={m._id}>
                   <Link
+                    onClick= {() => {trackEvent(GA4Events.calendar_month_clicked, { event_label: "calendar_month_clicked_from_hindi_calendar", month: monthData.hi })}}
                     to={`/hindi-calendar/${m._id || idx}`}
                     className={`theme_bg bg-white rounded-full shadow md:p-4 p-3 text-center hover:bg-yellow-50 transition flex flex-col`}
                   >

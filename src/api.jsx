@@ -251,15 +251,23 @@ export const profileApis = {
 export const blogApis = {
   getBlogs: async () => {
     try {
+      const url = "https://drupal.df3.club/jsonapi/node/blog?filter[field_portal.id][value]=7d43c493-6d43-4e6d-a7fd-052ac5fff8d2&page[limit]=10&page[offset]=0&include=field_blog_image,field_category,field_portal";
+      const response = await fetch(url, {
+  headers: {
+    "Accept": "application/vnd.api+json",
+    "Content-Type": "application/vnd.api+json",
+    "User-Agent": "Mozilla/5.0" // ✅ Helps bypass basic bot detection
+  }
+});
       // Route through /drupal-api proxy to avoid CORS (see src/setupProxy.js)
-      const response = await axios.get(
-        "/drupal-api/jsonapi/node/blog?filter[field_portal.id][value]=7d43c493-6d43-4e6d-a7fd-052ac5fff8d2&page[limit]=10&page[offset]=0&include=field_blog_image,field_category,field_portal",
-        {
-          headers: {
-            Accept: "application/vnd.api+json",
-          },
-        }
-      );
+      // const response = await axios.get(
+      //   "/drupal-api/jsonapi/node/blog?filter[field_portal.id][value]=7d43c493-6d43-4e6d-a7fd-052ac5fff8d2&page[limit]=10&page[offset]=0&include=field_blog_image,field_category,field_portal",
+      //   {
+      //     headers: {
+      //       Accept: "application/vnd.api+json",
+      //     },
+      //   }
+      // );
       return response.data;
     } catch (error) {
       console.error("Error fetching blogs:", error);

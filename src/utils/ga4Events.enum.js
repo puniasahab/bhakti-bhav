@@ -44,6 +44,7 @@ export const GA4Events = {
     aarti_widget_clicked                : "aarti_widget_clicked",
     // done
     login_icon_clicked                  : "login_icon_clicked",
+    // done
     wallpaper_widget_clicked            : "wallpaper_widget_clicked",
     suvichar_whatsapp_clicked           : "suvichar_whatsapp_clicked",
     suvichar_pdf_clicked                : "suvichar_pdf_clicked",
@@ -66,7 +67,9 @@ export const GA4Events = {
     resend_otp_button_clicked           : "resend_otp_button_clicked",
 
     // ─── HINDU & CHALISA CALENDAR ─────────────────────────────────
-    calendar_month_changed              : "calendar_month_changed",
+    // calendar_month_changed              : "calendar_month_changed",
+    // done
+    calendar_month_clicked                    : "calendar_month_clicked",
     calendar_festival_date_clicked      : "calendar_festival_date_clicked",
     chalisa_selected                    : "chalisa_selected",
     chalisa_share_cta_clicked           : "chalisa_share_cta_clicked",
@@ -74,11 +77,13 @@ export const GA4Events = {
 
     // ─── MANTRAS, BHAJAN & AUDIO ──────────────────────────────────
     mantra_selected                     : "mantra_selected",
-    audio_play                          : "audio_play",
+    mantra_played                       : "mantra_played",
+    mantra_loop_toggled                 : "mantra_loop_toggled",
+
     audio_pause                         : "audio_pause",
     audio_complete                      : "audio_complete",
     audio_seek                          : "audio_seek",
-    audio_loop_toggled                  : "audio_loop_toggled",
+    // audio_loop_toggled                  : "audio_loop_toggled",
     font_size_changed                   : "font_size_changed",
 
     // ─── VRAT KATHA & PUJA GUIDE ──────────────────────────────────

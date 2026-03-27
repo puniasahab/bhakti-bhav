@@ -5,6 +5,9 @@ import { useAudio } from "../contexts/AudioContext";
 import Header from "../components/Header";
 import Loader from "../components/Loader";
 import PageTitleCard from "../components/PageTitleCard";
+import useGA4BaseParams from "../hooks/useGA4BaseParams";
+import useGA4Tracker from "../hooks/useGA4Tracker";
+import { GA4Events } from "../utils/ga4Events.enum";
 
 export default function MantraDetail() {
   const { id } = useParams();
@@ -13,6 +16,9 @@ export default function MantraDetail() {
   const { language, fontSize } = useContext(LanguageContext);
   const { play, pause, isPlaying, currentTrack, audioRef } = useAudio();
   const [currentLoopMantra, setCurrentLoopMantra] = useState(null);
+
+  const baseParams = useGA4BaseParams("Mantra Detail Screen");
+  const { trackEvent } = useGA4Tracker(baseParams);
 
   useEffect(() => {
     async function fetchMantras() {
@@ -169,7 +175,7 @@ export default function MantraDetail() {
 
                   <div className="mt-8 mb-2 w-full flex items-center justify-center">
                     <button
-                      onClick={() => handlePlay(item.audioUrl?.hi, mantraId)}
+                      onClick={() => {trackEvent(GA4Events.mantra_played, { event_label: "mantra_played_from_mantra_detail_page", mantraName: item.name?.hi, mantraId }); handlePlay(item.audioUrl?.hi, mantraId)}}
                       disabled={!item.audioUrl?.hi}
                       className={`p-2 flex items-center justify-center rounded-full 
                       transition font-hindi 
@@ -181,14 +187,14 @@ export default function MantraDetail() {
                         }`}
                     >
                       {currentTrack === item.audioUrl?.hi && isPlaying ? (
-                        <span className="audio_pause_icon"></span>
+                        <span onClick={() => {trackEvent(GA4Events.audio_pause, { event_label: "audio_pause_from_mantra_detail_page", mantraName: item.name?.hi, mantraId }); }} className="audio_pause_icon"></span>
                       ) : (
                         <span className="audio_icon"></span>
                       )}
                     </button>
 
                     <button
-                      onClick={() => toggleLoop(mantraId, item.audioUrl?.hi)}
+                      onClick={() => {trackEvent(GA4Events.mantra_loop_toggled, { event_label: "mantra_loop_toggled_from_mantra_detail_page", mantraName: item.name?.hi, mantraId }); toggleLoop(mantraId, item.audioUrl?.hi)}}
                       disabled={!item.audioUrl?.hi}
                       className={`ml-3 p-2 flex items-center justify-center rounded-full transition font-hindi 
                       ${!item.audioUrl?.hi

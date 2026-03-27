@@ -6,12 +6,18 @@ import Loader from "../components/Loader";
 import PageTitleCard from "../components/PageTitleCard";
 import { useNavigate } from "react-router-dom";
 import { getSubscriptionStatusFromLS, getTokenFromLS } from "../commonFunctions";
+import { GA4Events } from "../utils/ga4Events.enum";
+import useGA4BaseParams from "../hooks/useGA4BaseParams";
+import useGA4Tracker from "../hooks/useGA4Tracker";
 
 function HindiCalendarDetail() {
   const { id } = useParams();
   const [month, setMonth] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
+  const baseParams = useGA4BaseParams("Hindi Calendar Month Details Screen");
+  const { trackEvent } = useGA4Tracker(baseParams);
 
   const dayData = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
@@ -120,7 +126,8 @@ function HindiCalendarDetail() {
 
               return (
                 <li
-                  onClick={() => navigate(handleNavigate(festival.kathaId, festival.accessType, festival.date))}
+                  onClick={() => {trackEvent(GA4Events.calendar_festival_date_clicked, { event_label: "calendar_festival_date_clicked_from_hindi_calendar_month_details_page", festival_id: festival.kathaId }); 
+                  navigate(handleNavigate(festival.kathaId, festival.accessType, festival.date)); }}
                   key={festival._id}
                   className={`bg-[#9A283D] text-white rounded-lg flex items-center px-4 py-3 shadow-md ${getSubscriptionStatusFromLS() ? "" : festival.accessType === "paid" ? "blur" : ""}`}
                 >

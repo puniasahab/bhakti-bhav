@@ -7,8 +7,10 @@ import PageTitleCard from "../components/PageTitleCard";
 import { getTokenFromLS, getSubscriptionStatusFromLS } from "../commonFunctions";
 import { cachedFetch } from "../utils/apiCache";
 
+import { GA4Events } from "../utils/ga4Events.enum";
 import useGA4BaseParams from "../hooks/useGA4BaseParams";
 import useGA4Tracker from "../hooks/useGA4Tracker";
+
 
 export default function Mantra() {
   const [items, setItems] = useState([]);
@@ -17,6 +19,9 @@ export default function Mantra() {
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const limit = 10;
+
+  const baseParams = useGA4BaseParams("Mantra Screen");
+  const { trackEvent } = useGA4Tracker(baseParams);
 
   // Memoize subscription status to prevent re-computation on each render
   const isSubscribed = useMemo(() => getSubscriptionStatusFromLS(), []);
@@ -87,13 +92,17 @@ export default function Mantra() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [hasMore, loadingMore, loading]);
 
+  const handleTrackEvent = (id, mantra) => {
+      trackEvent(GA4Events.mantra_selected, { event_label: "mantra_selected_from_mantra_list", mantraName: mantra, mantraId: id });
+  }
+
   // Memoized navigation handler
   const handleNavigation = useCallback((id, accessType) => {
     if (isSubscribed) {
       return `/mantra/${id}`;
     } else {
       if (accessType === "free") {
-        return `/mantra/${id}`;
+         return `/mantra/${id}`;
       } else {
         return hasToken ? "/payment" : "/login";
       }
@@ -122,6 +131,7 @@ export default function Mantra() {
               <Link
 
                 to={handleNavigation(item._id, item.accessType)}
+                onClick = {() => handleTrackEvent(item._id, item.name?.en)}
                 className="theme_bg bg-white rounded-xl shadow p-4 text-center hover:bg-yellow-50 transition flex flex-col"
               >
                 <div className={`w-full h-36 flex items-center justify-center ${isSubscribed ? "" : item.accessType === "paid" ? "blur" : ""}`}>
