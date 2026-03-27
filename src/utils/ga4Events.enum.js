@@ -6,32 +6,51 @@
 export const GA4Events = {
 
     // ─── SPLASH SCREEN ────────────────────────────────────────────
+    // done
     website_splash_screen_displayed     : "website_splash_screen_displayed",
 
     // ─── SCREEN VIEW ──────────────────────────────────────────────
+    // done
     screen_view                         : "screen_view",
 
     // ─── HOME SCREEN & DASHBOARD ──────────────────────────────────
+    // done
     panchang_card_clicked               : "panchang_card_clicked",
+    // done
     main_banner_clicked                 : "main_banner_clicked",
+    // pending 
     festival_card_clicked               : "festival_card_clicked",        // ✅ fix: cilcked → clicked
+    // pending
     daily_quote_clicked                 : "daily_quote_clicked",
+    // pending
     rashifal_tab_clicked                : "rashifal_tab_clicked",
+    // pending
     rashifal_category_screen_opened     : "rashifal_category_screen_opened",
+    // pending
     rashifal_category_card_clicked      : "rashifal_category_card_clicked",
+    // pending
     rashifal_widget_clicked             : "rashifal_widget_clicked",
+    // done
     vrat_katha_widget_clicked           : "vrat_katha_widget_clicked",
+    // done
     jaap_mala_widget_clicked            : "jaap_mala_widget_clicked",
+    // done
     mantra_widget_clicked               : "mantra_widget_clicked",
+    // done
     chalisa_widget_clicked              : "chalisa_widget_clicked",
+    // done
     aarti_widget_clicked                : "aarti_widget_clicked",
+    // done
     login_icon_clicked                  : "login_icon_clicked",
     wallpaper_widget_clicked            : "wallpaper_widget_clicked",
     suvichar_whatsapp_clicked           : "suvichar_whatsapp_clicked",
     suvichar_pdf_clicked                : "suvichar_pdf_clicked",
     pooja_karein_widget_clicked         : "pooja_karein_widget_clicked",
+    // done
     instagram_icon_clicked              : "instagram_icon_clicked",       // ✅ fix: instgram + duplicate _clicked
+    // done
     facebook_icon_clicked               : "facebook_icon_clicked",        // ✅ fix: duplicate _clicked
+    // done
     whatsapp_icon_clicked               : "whatsapp_icon_clicked",        // ✅ fix: duplicate _clicked
 
     // ─── LOGIN & AUTH ─────────────────────────────────────────────
@@ -76,16 +95,25 @@ export const GA4Events = {
     jaap_mala_completed                 : "jaap_mala_completed",
 
     // ─── RASHIFAL / HOROSCOPE ─────────────────────────────────────
+    // done
     rashi_selected                      : "rashi_selected",
+    // done
     rashifal_viewed                     : "rashifal_viewed",
+    // done
     rashifal_pop_up_closed              : "rashifal_pop_up_closed",
 
     // ─── WALLPAPERS & SPIRITUAL IMAGES ────────────────────────────
+    // done
     wallpaper_category_selected         : "wallpaper_category_selected",
+    // not filter options given 
     wallpaper_filter_applied            : "wallpaper_filter_applied",
+    // done
     wallpaper_viewed                    : "wallpaper_viewed",
+    // done
     wallpaper_download_icon_clicked     : "wallpaper_download_icon_clicked",
+    // repeated
     wallpaper_download_cta_clicked      : "wallpaper_download_cta_clicked",
+    // done
     wallpaper_share_cta_clicked         : "wallpaper_share_cta_clicked",
 
     // ─── SUBSCRIPTION & PAYMENTS ──────────────────────────────────

@@ -6,6 +6,9 @@ import { LanguageContext } from "../contexts/LanguageContext";
 import { useAudio } from "../contexts/AudioContext";
 import Loader from "../components/Loader";
 import PageTitleCard from "../components/PageTitleCard";
+import useGA4BaseParams from "../hooks/useGA4BaseParams";
+import useGA4Tracker from "../hooks/useGA4Tracker";
+import { GA4Events } from "../utils/ga4Events.enum";
 
 export default function ChalisaDetail() {
   const { id } = useParams();
@@ -13,6 +16,11 @@ export default function ChalisaDetail() {
   const [loading, setLoading] = useState(true);
   const { language, fontSize } = useContext(LanguageContext);
   const { play, pause, stop, isPlaying, currentTrack } = useAudio();
+
+  const isFirstRender = useRef(false);
+
+  const baseParams = useGA4BaseParams("Chalisa Detail Screen");
+  const { trackEvent } = useGA4Tracker(baseParams);
 
   useEffect(() => {
     async function fetchChalisa() {
@@ -24,7 +32,14 @@ export default function ChalisaDetail() {
 
         if (json.status === "success" && json.data) {
           setChalisa(json.data);
-          console.log("Fetched chalisa detail:", json.data);
+          if(!isFirstRender.current) {
+            trackEvent(GA4Events.chalisa_selected, {
+              id: json.data._id,
+              event_label: "chalisa_selected_from_chalisa_detail_page",
+              title:  `${json.data.name?.en} Chalisa`
+            });
+            isFirstRender.current = true;
+          }
         } else {
           setChalisa(null);
           alert("No data found!");
@@ -41,6 +56,15 @@ export default function ChalisaDetail() {
   }, [id]);
 
   const handlePlay = () => {
+    let playedOrPaused = "played";
+    if(currentTrack === chalisa.audioUrl && isPlaying) {
+      playedOrPaused = "paused";
+    }
+    trackEvent(GA4Events.chalisa_hearing_cta_clicked, {
+      id: chalisa._id,
+      event_label: `chalisa_${playedOrPaused}__from_chalisa_detail_page`,
+      title:  `${chalisa.name?.en} Chalisa`
+    });
     const url = chalisa.audioUrl;
     if (!url) return;
 
@@ -80,6 +104,12 @@ export default function ChalisaDetail() {
   
   // Direct sharing function using navigator.share only
   const handleNativeShare = async () => {
+
+    trackEvent(GA4Events.chalisa_share_cta_clicked, {
+      id: chalisa._id,
+      event_label: "chalisa_shared_from_chalisa_detail_page",
+      title:  `${chalisa.name?.en} Chalisa`
+    });
     try {
       const chalisaName = chalisa?.name?.hi || chalisa?.name?.en || "चालीसा";
       const currentUrl = window.location.href;

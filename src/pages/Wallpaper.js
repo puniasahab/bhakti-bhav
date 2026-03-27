@@ -7,6 +7,9 @@ import Loader from "../components/Loader";
 import { wallpaperApis } from "../api";
 import { getTokenFromLS, getSubscriptionStatusFromLS } from "../commonFunctions";
 import { cachedFetch } from "../utils/apiCache";
+import { GA4Events } from "../utils/ga4Events.enum";
+import useGA4BaseParams from "../hooks/useGA4BaseParams";
+import useGA4Tracker from "../hooks/useGA4Tracker";
 
 export default function Wallpaper() {
   const [wallpapers, setWallpapers] = useState([]);
@@ -21,6 +24,9 @@ export default function Wallpaper() {
   // Memoize subscription status to prevent re-computation on each render
   const isSubscribed = useMemo(() => getSubscriptionStatusFromLS(), []);
   const hasToken = useMemo(() => getTokenFromLS(), []);
+
+  const baseParams = useGA4BaseParams("Wallpaper Screen");
+  const { trackEvent } = useGA4Tracker(baseParams);
 
   useEffect(() => {
     const fetchWallpapers = async () => {
@@ -128,13 +134,13 @@ export default function Wallpaper() {
   const handleNavigate = useCallback((id, accessType) => {
     if (isSubscribed) {
       return `/wallpaper/${id}`;
-    } else {
+    } else {                                                                                                                                                                                                                                                                                                      
       if (accessType === "free") {
         return `/wallpaper/${id}`;
       } else {
         return hasToken ? "/payment" : "/login";
       }
-    }
+    }                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
   }, [isSubscribed, hasToken]);
 
   if (loading) return <Loader message="🙏 Loading भक्ति भाव 🙏" size={200} />;
@@ -142,13 +148,13 @@ export default function Wallpaper() {
 
   return (
     <>
-      <Header />
+      <Header />                                                                                                       
  
       <div className="flex gap-3 justify-start px-4 mt-4 mb-6 overflow-x-auto scrollbar-hide">
         {categories && categories.length > 0 && categories?.map((cat) => (
           <button
             key={cat._id}
-            onClick={() => {setActiveCategory(cat._id); trackEvent(GA4Events.wallpaper_category_selected, { title: "", event_label: `${cat.name.en}_wallpaper_category_selected`, id: cat._id });}}
+            onClick={() => {setActiveCategory(cat._id); trackEvent(GA4Events.wallpaper_category_selected, { title: `${cat.name.en.charAt(0).toUpperCase() + cat.name.en.slice(1)}_wallpapers`, event_label: `${cat.name.en}_wallpaper_category_selected`, id: cat._id });}}
             className={`px-5 py-2 rounded-full border text-sm font-eng whitespace-nowrap transition ${activeCategory === cat._id
                 ? "bg-[#9A283D] text-white"
                 : "border-[#9A283D] text-[#9A283D]"

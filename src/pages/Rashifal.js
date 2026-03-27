@@ -3,12 +3,18 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Loader from "../components/Loader";
 import PageTitleCard from "../components/PageTitleCard";
+import useGA4BaseParams from "../hooks/useGA4BaseParams";
+import useGA4Tracker from "../hooks/useGA4Tracker";
+import { GA4Events } from "../utils/ga4Events.enum";
 
 function Rashifal() {
   const [rashis, setRashis] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedRashi, setSelectedRashi] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const baseParams = useGA4BaseParams("Rashifal Screen");
+  const { trackEvent } = useGA4Tracker(baseParams);
 
   const rashiImages = {
     mesh: "/img/aries.png",
@@ -45,7 +51,17 @@ function Rashifal() {
   }, []);
 
   const openModal = async (rashi) => {
+
+
+    trackEvent(GA4Events.rashi_selected, {
+      id: rashi._id,
+      event_label: `rashi_${rashi.key}_selected`,
+      name_en: rashi.name?.en,
+      name_hi: rashi.name?.hi,
+    });
     console.log("Opening modal for rashi:", rashi._id);
+
+
 
     try {
       const res = await fetch(
@@ -70,6 +86,13 @@ function Rashifal() {
         image: rashiImages[rashi.key] || "/img/default.png",
       });
 
+      trackEvent(GA4Events.rashifal_viewed, {
+        id: rashi._id,
+        event_label: `rashifal_${rashi.key}_viewed`,
+        name_en: rashi.name?.en,
+        name_hi: rashi.name?.hi,
+      });
+
       setModalOpen(true);
     } catch (err) {
       console.error("Error fetching rashifal details:", err);
@@ -77,6 +100,10 @@ function Rashifal() {
   };
 
   const closeModal = () => {
+    trackEvent(GA4Events.rashifal_pop_up_closed, {
+      id: selectedRashi?._id,
+      event_label: `rashifal_${selectedRashi?.key}_pop_up_closed`,
+    });
     setModalOpen(false);
     setSelectedRashi(null);
   };

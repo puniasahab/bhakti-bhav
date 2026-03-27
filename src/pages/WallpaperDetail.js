@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import Loader from "../components/Loader";
 import Header from "../components/Header";
@@ -6,6 +6,10 @@ import Footer from "../components/Footer";
 import PageTitleCard from "../components/PageTitleCard";
 import { wallpaperApis } from "../api";
 import axios from "axios";
+import useGA4BaseParams from "../hooks/useGA4BaseParams";
+import useGA4Tracker from "../hooks/useGA4Tracker";
+import { GA4Events } from "../utils/ga4Events.enum";
+
 
 function WallpaperDetail() {
   const { id } = useParams();
@@ -13,6 +17,11 @@ function WallpaperDetail() {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [method, setMethod] = useState("");
+
+  const baseParams = useGA4BaseParams("Wallpaper Detail Screen");
+  const { trackEvent } = useGA4Tracker(baseParams);
+
+  const hasTracked = useRef(false);
 
 
   const downloadWallpaper = async (id) => {
@@ -53,6 +62,10 @@ function WallpaperDetail() {
       .then((resJson) => {
         if (resJson.status === "success" && resJson.data) {
           setDetail(resJson.data);
+          if (!hasTracked.current) {
+            trackEvent(GA4Events.wallpaper_viewed, { id: resJson.data?._id, event_label: "wallpaper_detail_page_viewed", title: resJson.data?.godName });
+            hasTracked.current = true;
+          }
         } else {
           setDetail(null);
         }
@@ -64,6 +77,10 @@ function WallpaperDetail() {
         setLoading(false);
       });
   }, [id]);
+
+  //  useEffect(() => {
+  //   trackEvent(GA4Events.wallpaper_viewed, { id: detail?._id, event_label: "wallpaper_detail_page_viewed", title: detail?.godName });
+  // }, [])
 
   if (loading) return <Loader message="🙏 Loading भक्ति भाव 🙏" size={200} logo="/img/logo_splash.png" />;
   if (!detail) return <p>No data found!</p>;
@@ -173,6 +190,9 @@ function WallpaperDetail() {
     }
   };
 
+
+ 
+
   return (
     <>
 
@@ -211,14 +231,14 @@ function WallpaperDetail() {
             {/* <button className="flex-1 max-w-[120px] py-3 px-4 border-2 border-[#9A283D] rounded-xl theme_text font-semibold text-lg hover:bg-[#9A283D] hover:text-white transition-colors">
               Apply
             </button> */}
-            <button className="flex-1 max-w-[120px] py-3 px-4 border-2 border-[#9A283D] rounded-xl theme_text font-semibold text-lg hover:bg-[#9A283D] hover:text-white transition-colors font-eng" onClick={() => downloadWallpaper(detail._id)}>
+            <button className="flex-1 max-w-[120px] py-3 px-4 border-2 border-[#9A283D] rounded-xl theme_text font-semibold text-lg hover:bg-[#9A283D] hover:text-white transition-colors font-eng" onClick={() => {trackEvent(GA4Events.wallpaper_download_icon_clicked, { id: detail._id, event_label: "download_button_clicked_inside_wallpaper_detail_page", title: detail.godName }); downloadWallpaper(detail._id);}}>
               <a href={`https://api.bhaktibhav.app/frontend/download/${detail._id}`} download>
                 Download
               </a>
             </button>
             <button
               className="flex-1 max-w-[120px] py-3 px-4 border-2 border-[#9A283D] rounded-xl theme_text font-semibold text-lg hover:bg-[#9A283D] hover:text-white transition-colors font-eng"
-              onClick={handleWhatsAppShare.bind(this, detail.imageUrl)}
+              onClick={() => {trackEvent(GA4Events.wallpaper_share_cta_clicked, { id: detail._id, event_label: "share_button_clicked_inside_wallpaper_detail_page", title: detail.godName }); handleWhatsAppShare.bind(this, detail.imageUrl)();}}
             >
               Share
             </button>

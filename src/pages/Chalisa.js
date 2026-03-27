@@ -23,11 +23,11 @@ export default function Chalisa() {
 
   const baseParams = useGA4BaseParams("Chalisa Screen");
   const { trackEvent } = useGA4Tracker(baseParams);
-  useEffect(() => {
-    trackEvent("chalisa_widget_clicked", {
-      event_label: "chalisa_screen_visited"
-    })
-  }, []);
+  // useEffect(() => {
+  //   trackEvent("chalisa_widget_clicked", {
+  //     event_label: "chalisa_screen_visited"
+  //   })
+  // }, []);
 
   useEffect(() => {
     async function fetchChalisa() {
