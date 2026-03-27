@@ -33,11 +33,11 @@ function Footer() {
                 </div>
 
                 <div className="flex flex-wrap justify-center gap-x-5 gap-y-2 theme_text text-center font-eng my-4">
-                    <a href="termsAndConditions" className="theme-text hover:underline text-sm whitespace-nowrap">Terms & Conditions</a>
-                    <a href="privacyPolicy" className="theme-text hover:underline text-sm whitespace-nowrap">Privacy Policy</a>
-                    <a href="aboutUs" className="theme-text hover:underline text-sm whitespace-nowrap">About Us</a>
-                    <a href="blogs" className="theme-text hover:underline text-sm whitespace-nowrap">Blogs</a>
-                    <a href="contact-us" className="theme-text hover:underline text-sm whitespace-nowrap">Contact Us</a>
+                    <a href="termsAndConditions" onClick = {() => {trackEvent(GA4Events.terms_and_condition_option_clicked, { event_label: "terms_and_conditions_clicked_on_footer" })}} className="theme-text hover:underline text-sm whitespace-nowrap">Terms & Conditions</a>
+                    <a href="privacyPolicy" onClick = {() => {trackEvent(GA4Events.privacy_policy_clicked, { event_label: "privacy_policy_clicked_on_footer" })}} className="theme-text hover:underline text-sm whitespace-nowrap">Privacy Policy</a>
+                    <a href="aboutUs" onClick = {() => {trackEvent(GA4Events.about_us_clicked, { event_label: "about_us_clicked_on_footer" })}} className="theme-text hover:underline text-sm whitespace-nowrap">About Us</a>
+                    <a href="blogs" onClick = {() => {trackEvent(GA4Events.blogs_clicked, { event_label: "blogs_clicked_on_footer" })}} className="theme-text hover:underline text-sm whitespace-nowrap">Blogs</a>
+                    <a href="contact-us" onClick = {() => {trackEvent(GA4Events.contact_us_clicked, { event_label: "contact_us_clicked_on_footer" })}} className="theme-text hover:underline text-sm whitespace-nowrap">Contact Us</a>
                 </div>
 
 

@@ -6,7 +6,7 @@ import Loader from "../components/Loader";
 import PageTitleCard from "../components/PageTitleCard";
 import { getTokenFromLS, getSubscriptionStatusFromLS } from "../commonFunctions";
 import { cachedFetch } from "../utils/apiCache";
-
+import { GA4Events } from "../utils/ga4Events.enum";
 import useGA4BaseParams from "../hooks/useGA4BaseParams";
 import useGA4Tracker from "../hooks/useGA4Tracker";
 
@@ -21,6 +21,9 @@ function JaapMala() {
   // Memoize subscription status to prevent re-computation on each render
   const isSubscribed = useMemo(() => getSubscriptionStatusFromLS(), []);
   const hasToken = useMemo(() => getTokenFromLS(), []);
+
+  const baseParams = useGA4BaseParams("Jaap Mala Screen");
+  const { trackEvent } = useGA4Tracker(baseParams);
 
   useEffect(() => {
     const fetchJaapMalaData = async () => {
@@ -100,6 +103,12 @@ function JaapMala() {
     }
   }, [isSubscribed, hasToken]);
 
+  const handleTrackEvent = useCallback((id, nameEn, accessType) => {
+    if (isSubscribed || accessType === "free") {
+      trackEvent(GA4Events.jaap_mala_selected, { jaapMalaId: id, event_label: `jaap_mala_${nameEn}_clicked` });
+    }
+  }, [isSubscribed, trackEvent]);
+
   if (loading) return <Loader message="🙏 Loading भक्ति भाव 🙏" size={200} />;
 
   function toHindiDigits(str) {
@@ -152,6 +161,7 @@ const HindiWithEnglishNumbers = ( text ) => {
             <li key={item._id}>
               <Link
                 to={handleNavigate(item._id, item.accessType)}
+                onClick = {() => {handleTrackEvent(item._id, item.name.en, item.accessType);}}
                 className="relative block rounded-xl overflow-hidden shadow-lg  "
               >
                 <div className={`overflow_bg`}>

@@ -1,9 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Header from '../components/Header';
 import PageTitleCard from '../components/PageTitleCard';
 import Loader from '../components/Loader';
 import { paymentApis } from '../api';
+import useGA4BaseParams from '../hooks/useGA4BaseParams';
+import useGA4Tracker from '../hooks/useGA4Tracker';
+import { GA4Events } from '../utils/ga4Events.enum';
+
 // import { duration } from 'html2canvas/dist/types/css/property-descriptors/duration';
 
 const Transactions = () => {
@@ -15,6 +19,11 @@ const Transactions = () => {
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+
+  const baseParams = useGA4BaseParams("Transactions Screen");
+  const { trackEvent } = useGA4Tracker(baseParams);
+
+  const transactionScreenViewTracker = useRef(false);
 
   useEffect(() => {
     fetchTransactions();
@@ -74,6 +83,14 @@ const Transactions = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if(!transactionScreenViewTracker.current) {
+
+      trackEvent(GA4Events.transaction_screen_viewed, { event_label: "transaction_screen_viewed_from_transactions_screen" });
+      transactionScreenViewTracker.current = true;
+    }
+  }, [])
 
   const fetchUserProfile = async () => {
     try {

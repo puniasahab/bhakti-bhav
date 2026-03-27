@@ -9,6 +9,10 @@ import { ReceiptText } from "lucide-react";
 import { LanguageContext } from "../contexts/LanguageContext";
 import { Download, Eye, Heart, Pencil, MoreVertical, LogOut } from "lucide-react";
 import { getTokenFromLS, removeMobileNoFromLS, removeSubscriptionStatusFromLS, removeTokenFromLS, formatNumber } from "../commonFunctions";
+import useGA4Tracker from "../hooks/useGA4Tracker";
+import { GA4Events } from "../utils/ga4Events.enum";
+import useGA4BaseParams from "../hooks/useGA4BaseParams";
+
 
 function Header({
     showWallpaperHeader = false,
@@ -30,6 +34,9 @@ function Header({
     const { language, setLanguage, fontSize, setFontSize } = useContext(LanguageContext);
     const [showDropdown, setShowDropdown] = useState(false);
     const dropdownRef = useRef(null);
+
+    const baseParams = useGA4BaseParams("Header Component");
+    const { trackEvent } = useGA4Tracker(baseParams);
 
     const homeRoutes = ["/", "/home", "/Rashifal", "/payment", "/hindi-calendar", "/vrat-katha", "/chalisa", "/aarti", '/jaap-mala', "/mantra", "/wallpaper", "/termsAndConditions", "/aboutUs", "/privacyPolicy", "/parsad", "/winners"];
 
@@ -80,6 +87,7 @@ function Header({
     }
 
     const handleLogout = () => {
+        trackEvent(GA4Events.logout_clicked, { event_label: "logout_clicked_from_header_on_edit_profile_screen" });
         removeTokenFromLS();    
         removeSubscriptionStatusFromLS();
         removeMobileNoFromLS();
@@ -224,10 +232,10 @@ function Header({
                             </h1>
 
                             <div className="flex items-center md:space-x-6 space-x-4 text-xl ms-auto">
-                                <button onClick={handlePaymentNavigation}>
+                                <button onClick={() => { trackEvent(GA4Events.rupees_icon_clicked, {event_label: "rupees_icon_clicked_from_home_screen"}); handlePaymentNavigation(); }}>
                                     <img src={rupeesIcon} alt="₹" width="22" height="22" />
                                 </button>
-                                <button onClick={handleTransactionNavigation}>
+                                <button onClick={() => { trackEvent(GA4Events.transaction_option_clicked, {event_label: "transaction_icon_clicked_from_home_screen"}); handleTransactionNavigation(); }}>
                                     <ReceiptText size={22} className="text-[#9A283D]" />
                                 </button>
                                 <button onClick={handleProfileNavigation}>

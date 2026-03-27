@@ -31,6 +31,8 @@ export const GA4Events = {
     // pending
     rashifal_widget_clicked             : "rashifal_widget_clicked",
     // done
+    hindi_calendar_widget_clicked       : "hindi_calendar_widget_clicked",
+    // done
     vrat_katha_widget_clicked           : "vrat_katha_widget_clicked",
     // done
     jaap_mala_widget_clicked            : "jaap_mala_widget_clicked",
@@ -80,12 +82,22 @@ export const GA4Events = {
     font_size_changed                   : "font_size_changed",
 
     // ─── VRAT KATHA & PUJA GUIDE ──────────────────────────────────
+    // done
     vrat_katha_selected                 : "vrat_katha_selected",
+    // pending
     vrat_katha_read_50                  : "vrat_katha_read_50",
+    // pending
     vrat_katha_read_complete            : "vrat_katha_read_complete",
+    // done
     vrat_katha_shared                   : "vrat_katha_shared",
+    // done
     vrat_katha_hear_cta_clicked         : "vrat_katha_hear_cta_clicked",
+    // done
     aarti_cta_tapped_on_vrat_katha      : "aarti_cta_tapped_on_vrat_katha",
+    // done
+    vrat_katha_category_selected        : "vrat_katha_category_selected",
+    // done
+    vrat_katha_selected_from_category   : "vrat_katha_selected_from_category",
 
     // ─── JAAP MALA ────────────────────────────────────────────────
     mantra_jaap_category_screen_view    : "mantra_jaap_category_screen_view",
@@ -93,6 +105,7 @@ export const GA4Events = {
     jaap_bead_next_arrow_tapped         : "jaap_bead_next_arrow_tapped",
     jaap_bead_previous_arrow_tapped     : "jaap_bead_previous_arrow_tapped",
     jaap_mala_completed                 : "jaap_mala_completed",
+    jaap_mala_selected                  : "jaap_mala_selected",
 
     // ─── RASHIFAL / HOROSCOPE ─────────────────────────────────────
     // done
@@ -117,7 +130,8 @@ export const GA4Events = {
     wallpaper_share_cta_clicked         : "wallpaper_share_cta_clicked",
 
     // ─── SUBSCRIPTION & PAYMENTS ──────────────────────────────────
-    subscription_option_clicked         : "subscription_option_clicked",
+    rupees_icon_clicked                  : "rupees_icon_clicked",
+    // subscription_option_clicked         : "subscription_option_clicked",
     subscription_plans_screen_viewed    : "subscription_plans_screen_viewed",
     subscription_plan_selected          : "subscription_plan_selected",
     subscription_start_cta_clicked      : "subscription_start_cta_clicked",
@@ -127,7 +141,12 @@ export const GA4Events = {
     transaction_screen_viewed           : "transaction_screen_viewed",
     terms_and_condition_option_clicked  : "terms_and_condition_option_clicked", // ✅ fix: n → and
     privacy_policy_viewed               : "privacy_policy_viewed",
+    about_us_clicked                    : "about_us_clicked",
+    privacy_policy_clicked                : "privacy_policy_clicked",
+    contact_us_clicked                    : "contact_us_clicked",
     logout_clicked                      : "logout_clicked",
+    blogs_clicked                       : "blogs_clicked",
+    contact_us_clicked                  : "contact_us_clicked",
 
     // ─── ERRORS & EDGE CASES ──────────────────────────────────────
     network_error                       : "network_error",

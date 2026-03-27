@@ -11,6 +11,7 @@ import { cachedFetch } from "../utils/apiCache";
 
 import useGA4BaseParams from "../hooks/useGA4BaseParams";
 import useGA4Tracker from "../hooks/useGA4Tracker";
+import { GA4Events } from "../utils/ga4Events.enum";
 
 
 export default function VratKatha() {
@@ -21,6 +22,9 @@ export default function VratKatha() {
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const limit = 10;
+
+  const baseParams = useGA4BaseParams("Vrat Katha Screen");
+  const { trackEvent } = useGA4Tracker(baseParams);
 
   // Memoryize subscription status to prevent re-computation on each render
   const isSubscribed = useMemo(() => getSubscriptionStatusFromLS(), []);
@@ -348,14 +352,32 @@ export default function VratKatha() {
     if(isActiveSubscription) {
       if(type === 'multiple') {
         navigate(`/vrat-katha/categoryDetails/${id}`);
+        trackEvent(GA4Events.vrat_katha_category_selected, {
+          vratKathaCatgoryId: id,
+          event_label: "vrat_katha_category_selected",
+          name_en: kathas[index].name?.en,
+          name_hi: kathas[index].name?.hi,
+        });
       }
       else {
+        trackEvent(GA4Events.vrat_katha_selected, {
+          vratKathaId: kathaId,
+          event_label: "vrat_katha_selected",
+          name_en: kathas[index].name?.en,
+          name_hi: kathas[index].name?.hi,
+        });
         navigate(`/vrat-katha/${kathaId}`);
       }
     }
     else {
       if (type === 'single') {
         if (accessType === 'free') {
+          trackEvent(GA4Events.vrat_katha_selected, {
+          vratKathaId: kathaId,
+          event_label: "vrat_katha_selected",
+          name_en: kathas[index].name?.en,
+          name_hi: kathas[index].name?.hi,
+        });
           navigate(`/vrat-katha/${kathaId}`);
         }
         else {
@@ -368,6 +390,12 @@ export default function VratKatha() {
         }
       }
       else {
+        trackEvent(GA4Events.vrat_katha_category_selected, {
+          vratKathaCatgoryId: id,
+          event_label: "vrat_katha_category_selected",
+          name_en: kathas[index].name?.en,
+          name_hi: kathas[index].name?.hi,
+        });
         navigate(`/vrat-katha/categoryDetails/${id}`);
       }
     }

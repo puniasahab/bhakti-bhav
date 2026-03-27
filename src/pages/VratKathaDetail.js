@@ -7,6 +7,9 @@ import { LanguageContext } from "../contexts/LanguageContext";
 import { useAudio } from "../contexts/AudioContext";
 import PageTitleCard from "../components/PageTitleCard";
 
+import useGA4BaseParams from "../hooks/useGA4BaseParams";
+import useGA4Tracker from "../hooks/useGA4Tracker";
+import { GA4Events } from "../utils/ga4Events.enum";
 import { useLocation } from "react-router-dom";
 
 function VratKathaDetail() {
@@ -16,6 +19,9 @@ function VratKathaDetail() {
     const { language, setLanguage, fontSize, setFontSize } = useContext(LanguageContext);
     const { play, pause, stop, isPlaying, currentTrack } = useAudio();
     const location = useLocation();
+
+    const baseParams = useGA4BaseParams("Vrat Katha Detail Screen");
+    const { trackEvent } = useGA4Tracker(baseParams);
 
     useEffect(() => {
         if (!id) return;
@@ -350,7 +356,7 @@ function VratKathaDetail() {
                 <div className="flex justify-center gap-4">
                     <div className="mt-4">
 
-                        <button className={`bg-[#9A283D] text-white px-6 py-2 rounded-full shadow flex items-center ${language === "hi" ? "font-hindi" : "font-eng"}`} onClick={() => { handleNativeShare() }}>
+                        <button className={`bg-[#9A283D] text-white px-6 py-2 rounded-full shadow flex items-center ${language === "hi" ? "font-hindi" : "font-eng"}`} onClick={() => {trackEvent(GA4Events.vrat_katha_shared, { vratKathaId: detail._id, event_label: "vrat_katha_shared_button_clicked" }); handleNativeShare() }}>
                             <img src="../img/share_icon.png" alt="" className="w-[15px] h-[15px] mr-2" /> {language === "hi" ? jsonFile.share.hi : jsonFile.share.en}
                         </button>
                     </div>
@@ -358,7 +364,7 @@ function VratKathaDetail() {
 
                     <div className="mt-4">
                         <button
-                            onClick={() => handlePlay(detail.audioUrl)}
+                            onClick={() => {trackEvent(GA4Events.vrat_katha_hear_cta_clicked, { vratKathaId: detail._id, event_label: "vrat_katha_hear_btn_clicked" }); handlePlay(detail.audioUrl)}}
                             disabled={!detail.audioUrl}
                             className={`px-6 py-2 flex items-center justify-center rounded-full 
                              transition ${language === "hi" ? "font-hindi" : "font-eng"} ${!detail.audioUrl
@@ -507,7 +513,13 @@ function VratKathaDetail() {
                     }
                 </div>
 
-                <div className="mt-4 w-full text-center">
+                <div className="mt-4 w-full text-center" onClick = {() => {
+                    trackEvent(GA4Events.aarti_cta_tapped_on_vrat_katha, {
+                        event_label: `aarti_cta_tapped_on_vrat_katha || "no_arti_id"}`,
+                        aartiId: detail.artiId || "no_arti_id",
+                    })
+                   
+                }}>
                     <a href={redirectToAartiPage(detail.artiId)}
                         className={`bg-[#9A283D] text-white px-6 py-2 rounded-full shadow inline-flex items-center ${language === "hi" ? "font-hindi" : "font-eng"}`}
                     >

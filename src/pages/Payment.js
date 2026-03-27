@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef} from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import bannerImg from "../assets/img/paymentPageBanner.jpeg";
@@ -7,6 +7,10 @@ import { paymentApis, subscriptionApis, profileApis, wallpaperApis } from "../ap
 import { useNavigate } from "react-router-dom";
 import { usePayment } from "../contexts/PaymentContext";
 import { getTokenFromLS } from "../commonFunctions";
+import useGA4Tracker  from "../hooks/useGA4Tracker";
+import { GA4Events } from "../utils/ga4Events.enum";
+import useGA4BaseParams from "../hooks/useGA4BaseParams";
+
 
 export default function Payment() {
 
@@ -26,8 +30,13 @@ export default function Payment() {
   });
   const [selectedPlan, setSelectedPlan] = useState(null);
 
+  const baseParams = useGA4BaseParams("Payment Screen");
+  const { trackEvent } = useGA4Tracker(baseParams);
+
   const navigate = useNavigate();
   const { setPaymentData } = usePayment();
+
+  const paymentScreenViewTracker = useRef(false);
 
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -101,6 +110,13 @@ export default function Payment() {
   //     price: "₹ 101",
   //   },
   // ];
+
+  useEffect(() => {
+    if (!paymentScreenViewTracker.current) {
+      trackEvent(GA4Events.subscription_plans_screen_viewed, { event_label: "subscription_plans_screen_viewed_from_payment_screen" });
+      paymentScreenViewTracker.current = true;
+    }
+  }, [])
 
   const items = [
     {
@@ -267,7 +283,7 @@ export default function Payment() {
           {plans && plans.length > 0 && (
             <button
               className="w-full bg-[#9A283D] text-white py-4 rounded-full shadow-lg text-lg font-semibold hover:bg-[#7a1f30] transition-all duration-200"
-              onClick={() => makePayment(selectedPlan)}
+              onClick={() => {trackEvent(GA4Events.subscription_plan_selected, {event_label: "payment_button_clicked_from_payment_screen", selectedPlan: plans.find((x) => x._id === selectedPlan).name}); makePayment(selectedPlan)}}
             >
               <span className="font-hindi">प्रारंभ करें</span>{" "}
               <span className="font-eng text-sm">(Start Now)</span>

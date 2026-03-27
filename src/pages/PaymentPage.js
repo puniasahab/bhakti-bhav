@@ -6,6 +6,9 @@ import { load } from "@cashfreepayments/cashfree-js";  // ✅ Proper import
 import { paymentApis } from "../api";
 import Header from "../components/Header";
 import PageTitleCard from "../components/PageTitleCard";
+import useGA4BaseParams from "../hooks/useGA4BaseParams";
+import useGA4Tracker from "../hooks/useGA4Tracker";
+import { GA4Events } from "../utils/ga4Events.enum";
 
 export default function PaymentDrop() {
   const { paymentResponse, selectedPlanData, userProfile } = usePayment();
@@ -15,6 +18,13 @@ export default function PaymentDrop() {
   const [orderId, setOrderId] = useState("");
   const [loading, setLoading] = useState(false);
   const [paymentProcessing, setPaymentProcessing] = useState(false);
+
+
+  const baseParams = useGA4BaseParams("Payment Drop Screen");
+  const { trackEvent } = useGA4Tracker(baseParams);
+
+
+  
   console.log("Payment", paymentResponse.data.cashfree.payment_session_id);
   let cashfree;
   let initializeSDK = async () => {
@@ -37,6 +47,8 @@ export default function PaymentDrop() {
     try {
       setLoading(true);
       setError(null);
+
+      trackEvent(GA4Events.subscription_start_cta_clicked, { event_label: "subscription_start_cta_clicked_from_payment_drop_screen" });
       
       const sessionId = getSessionId();
       console.log("SessionId", sessionId);

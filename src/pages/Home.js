@@ -54,6 +54,7 @@ function Home() {
     const [bannersData, setBannersData] = useState(() => homeCache.get("bannersData") || []);
     const [wallpaperImage, setWallpaperImage] = useState(() => homeCache.get("wallpaperImage") || "");
     const hasFetchedBanners = useRef(false);
+    const hasTrackedScreenView = useRef(false);
    
     // Helper to format raw panchang data into React elements
     const formatPanchangData = (rawData) => [
@@ -147,7 +148,10 @@ function Home() {
         // const baseParams = useGA4BaseParams("panchang_card_clicked_on_home_screen");
         // const { trackEvent } = useGA4Tracker(baseParams);
         // trackEvent("panchang_card_clicked");
-        trackEvent(GA4Events.screen_view);
+        if(!hasTrackedScreenView.current) {
+            trackEvent(GA4Events.screen_view);
+            hasTrackedScreenView.current = true;
+        }
     }, []);
 
     const phoneNumber = getMobileNoFromLS();
@@ -341,7 +345,7 @@ function Home() {
 
                 <div className="grid grid-cols-3 md:gap-4 gap-2 mt-3 text-center font-medium">
 
-                    <Link to="/hindi-calendar" onClick={requireLogin}
+                    <Link to="/hindi-calendar" onClick={handleHindiCalendarClicked}
                         className="theme_bg bg-white rounded-xl shadow md:p-6 p-3 text-center hover:bg-yellow-50 transition w-auto flex">
                         <div className="mx-auto flex flex-col items-center space-y-3 md:space-y-0">
                             <img src="./img/icon_2.png" alt="" width="36" height="36" className="md:mr-3" />

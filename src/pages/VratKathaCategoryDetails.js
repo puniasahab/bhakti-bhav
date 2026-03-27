@@ -6,13 +6,19 @@ import PageTitleCard from "../components/PageTitleCard";
 import Loader from "../components/Loader";
 import { useKatha } from "../contexts/KathaContext";
 import { getSubscriptionStatusFromLS, getTokenFromLS } from "../commonFunctions";
+import useGA4BaseParams from "../hooks/useGA4BaseParams";
+import useGA4Tracker from "../hooks/useGA4Tracker";
+import { GA4Events } from "../utils/ga4Events.enum";
 
 export default function VratKathaCategoryDetails() {
-  const [kathaCategoryData, setKathaCategoryData ] = useState({category: {}, kathas: []});
+  const [kathaCategoryData, setKathaCategoryData] = useState({ category: {}, kathas: [] });
   const [loading, setLoading] = useState(true);
   const { selectedCategoryKathas, selectedCategoryName } = useKatha();
   const navigate = useNavigate();
-  const {id} = useParams();
+  const { id } = useParams();
+
+  const baseParams = useGA4BaseParams("Vrat Katha Category Details Screen");
+  const { trackEvent } = useGA4Tracker(baseParams);
 
   useEffect(() => {
     // If no data is available, redirect back to main katha page
@@ -23,17 +29,17 @@ export default function VratKathaCategoryDetails() {
       if (resJson.status === "success" && resJson.category) {
         // Data is available, do nothing
         console.log("This is data that we have to show", resJson.kathas);
-        setKathaCategoryData({category: resJson.category, kathas: resJson.kathas});
+        setKathaCategoryData({ category: resJson.category, kathas: resJson.kathas });
         setLoading(false);
       }
       else {
         // No data, navigate back
         // navigate('/vrat-katha');
       }
-      }).catch(err => {
-        console.error("Error fetching category details:", err);
-        // navigate('/vrat-katha');
-      });
+    }).catch(err => {
+      console.error("Error fetching category details:", err);
+      // navigate('/vrat-katha');
+    });
   }, [id, navigate]);
 
   if (!kathaCategoryData?.kathas?.length) {
@@ -41,27 +47,57 @@ export default function VratKathaCategoryDetails() {
   }
 
 
-  const handleNavigation = (id, accessType) => {
-    if (getSubscriptionStatusFromLS()) {
-      return `/vrat-katha/${id}`;
-    }
-    else {
-      if (accessType === "free") {
-        return `/vrat-katha/${id}`;
-      }
-      else {
-        if (getTokenFromLS()) {
-          return "/payment";
-        }
-        else {
-          return "/login";
-        }
-      }
-    }
+  const getNavigationPath = (id, accessType) => {
+  if (getSubscriptionStatusFromLS()) return `/vrat-katha/${id}`;
+  if (accessType === "free") return `/vrat-katha/${id}`;
+  if (getTokenFromLS()) return "/payment";
+  return "/login";
+};
+const handleTrackEvent = (id, katha) => {
+  const accessType = katha.accessType;
+  if (getSubscriptionStatusFromLS() || accessType === "free") {
+    trackEvent(GA4Events.vrat_katha_selected, {
+      vratKathaId: id,
+      event_label: "vrat_katha_selected_from_category_details",
+      name_en: katha.name?.en,
+      name_hi: katha.name?.hi,
+    });
   }
+};
+
+  // const handleNavigation = (id, accessType, katha) => {
+  //   if (getSubscriptionStatusFromLS()) {
+  //     trackEvent(GA4Events.vrat_katha_selected, {
+  //       vratKathaId: id,
+  //       event_label: "vrat_katha_selected_from_category_details",
+  //       name_en: katha.name?.en,
+  //       name_hi: katha.name?.hi,
+  //     });
+  //     return `/vrat-katha/${id}`;
+  //   }
+  //   else {
+  //     if (accessType === "free") {
+  //       trackEvent(GA4Events.vrat_katha_selected, {
+  //         vratKathaId: id,
+  //         event_label: "vrat_katha_selected_from_category_details",
+  //         name_en: katha.name?.en,
+  //         name_hi: katha.name?.hi,
+  //       });
+  //       return `/vrat-katha/${id}`;
+  //     }
+  //     else {
+  //       if (getTokenFromLS()) {
+  //         return "/payment";
+  //       }
+  //       else {
+  //         return "/login";
+  //       }
+  //     }
+  //   }
+  // }
 
   if (loading) return <Loader message="🙏 Loading भक्ति भाव 🙏" size={200} logo="/img/logo_splash.png" />;
-    
+
 
 
   return (
@@ -84,7 +120,8 @@ export default function VratKathaCategoryDetails() {
           }).map((katha) => (
             <li key={katha._id}>
               <Link
-                to={handleNavigation(katha._id, katha.accessType)}
+                to={getNavigationPath(katha._id, katha.accessType)}
+                onClick = {() => {handleTrackEvent(katha._id, katha);}}
                 className="relative block rounded-xl overflow-hidden shadow-lg"
               >
                 <div className="overflow_bg">
