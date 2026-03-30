@@ -10,7 +10,7 @@ import { useNavigate } from "react-router-dom";
 import "swiper/css";
 import "swiper/css/pagination";
 import { profileApis, wallpaperApis } from "../api";
-import { removeTokenFromLS, getMobileNoFromLS, removeSubscriptionStatusFromLS, setSubscriptionStatusInLS, getTokenFromLS, getDeviceId, getSessionId, getBrowserName, getSubscriptionStatusFromLS, getUserIdFromLS, getSubscriptionPlanFromLS } from "../commonFunctions";
+import { removeTokenFromLS, getMobileNoFromLS, setUserIdInLS, setUserName, removeSubscriptionStatusFromLS, setSubscriptionStatusInLS, getTokenFromLS, getDeviceId, getSessionId, getBrowserName, getSubscriptionStatusFromLS, getUserIdFromLS, getSubscriptionPlanFromLS } from "../commonFunctions";
 import homeCache from "../utils/homeCache";
 // import { trackEventCommonFunction } from "../utils/eventCommonFunctions";
 import useGA4BaseParams from "../hooks/useGA4BaseParams";
@@ -164,6 +164,8 @@ function Home() {
                 if (resp) {
 
                     setSubscriptionStatusInLS(resp.hasActivePlan)
+                    setUserIdInLS(resp._id);
+                    setUserName(resp.name === "New User" ? "" : resp.name || "");
                     // Handle successful response
                     console.log("Profile data:", resp);
                 }
@@ -311,7 +313,7 @@ function Home() {
                                                     event_label: "main_banner_clicked_from_home_screen"
                                                 });
                                                 navigate(relativePath);
-                                                
+
                                             }}
                                             className="h-[20vh] md:h-[60vh] bg-cover bg-center flex items-center justify-center"
                                             style={{ backgroundImage: `url(${banner.imageUrl})` }}
@@ -435,7 +437,7 @@ function Home() {
                     <div className="md:basis-[40%] basis-[40%] flex flex-col justify-between items-center md:p-4 theme_text">
                         <span className="font-semibold md:text-3xl text-2xl">iwtk djs!</span>
                         <div className="my-4"><img src="./img/puja_bgs.png" alt="" width="150" height="120" className="max-w-full h-auto" /></div>
-                        <Link to="/puja-kare" onClick = {() => {
+                        <Link to="/puja-kare" onClick={() => {
                             trackEvent(GA4Events.pooja_karein_widget_clicked, {
                                 event_label: "pooja_kare_card_clicked_on_home_screen"
                             });

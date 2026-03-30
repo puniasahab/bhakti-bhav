@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { getBrowserName, getDeviceId, getMobileNoFromLS, getSessionId, getSubscriptionPlanFromLS, getSubscriptionStatusFromLS, getTokenFromLS, getUserIdFromLS } from "../commonFunctions";
+import { getBrowserName, getDeviceId, getMobileNoFromLS, getSessionId, getSubscriptionPlanFromLS, getSubscriptionStatusFromLS, getTokenFromLS, getUserIdFromLS, getUserName } from "../commonFunctions";
 
 
 const useGA4BaseParams = (screenName) => {
@@ -8,6 +8,7 @@ const useGA4BaseParams = (screenName) => {
 
     const baseParams = useMemo(() => ({
         user_id: isLoggedIn ? (getUserIdFromLS() || "anonymous") : "anonymous",
+        userName: isLoggedIn ? (getUserName() || "anonymous") : "anonymous",
         device_id: getDeviceId(),
         platform: getBrowserName(),
         session_id: getSessionId(),

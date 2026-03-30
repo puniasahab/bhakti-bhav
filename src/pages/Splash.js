@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 
 import {GA4Events} from "../utils/ga4Events.enum";
 
@@ -10,8 +10,13 @@ function Splash() {
   const baseParams = useGA4BaseParams("splash_screen");
   const { trackEvent } = useGA4Tracker(baseParams);
 
+  const hasTrackedRef = useRef(false);
+
   useEffect(() => {
-    trackEvent(GA4Events.website_splash_screen_displayed);
+    if (!hasTrackedRef.current) {
+      trackEvent(GA4Events.website_splash_screen_displayed);
+      hasTrackedRef.current = true;
+    }
   }, []);
 
   return (

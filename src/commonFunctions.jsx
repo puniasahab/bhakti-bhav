@@ -90,6 +90,17 @@ export const removeUserIdFromLS = () => {
   localStorage.removeItem("userId");
 };
 
+
+export const setUserName = (name) => {
+  localStorage.setItem("userName", name);
+};
+export const getUserName = () => {
+  return localStorage.getItem("userName");
+};
+export const removeUserName = () => {
+  localStorage.removeItem("userName");
+};
+
 /** Store active subscription plan details after login / profile fetch */
 export const setSubscriptionPlanInLS = (planName, planPrice) => {
   localStorage.setItem("subscriptionPlanName", planName || "");

@@ -4,7 +4,8 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { profileApis } from "../api";
 import { useNavigate } from "react-router-dom";
-import { getTokenFromLS, getSubscriptionStatusFromLS } from "../commonFunctions";
+import { getTokenFromLS, getSubscriptionStatusFromLS, setUserName, setUserIdInLS
+} from "../commonFunctions";
 
 const Profile = () => {
     const navigate = useNavigate();
@@ -34,6 +35,8 @@ const Profile = () => {
                         gender: res.gender || "",
                         imageUrl: res.imageUrl || "",
                     });
+                    setUserIdInLS(res._id);
+                    setUserName(res.name === "New User" ? "" : res.name || "");
                 }
             } catch (error) {
                 console.error("Error fetching profile:", error);

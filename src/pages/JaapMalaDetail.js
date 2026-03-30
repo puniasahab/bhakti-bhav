@@ -11,6 +11,9 @@ import Loader from "../components/Loader";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import PageTitleCard from "../components/PageTitleCard";
 import PageTitleCardJaapMala from "../components/PageTitleCardJaapMala";
+import useGA4BaseParams from "../hooks/useGA4BaseParams";
+import useGA4Tracker from "../hooks/useGA4Tracker";
+import { GA4Events } from "../utils/ga4Events.enum";
 
 function JaapMalaDetail() {
   const { id } = useParams();
@@ -18,6 +21,10 @@ function JaapMalaDetail() {
   const [loading, setLoading] = useState(true);
   const { language, fontSize, setLanguage, setFontSize } = useContext(LanguageContext);
   const [currentIndex, setCurrentIndex] = useState(1);
+
+
+  const baseParams = useGA4BaseParams("Jaap Mala Detail Screen");
+  const { trackEvent } = useGA4Tracker(baseParams);
 
   // Function to convert Hindi numerals to English numerals
   // const convertHindiToEnglishNumerals = (text) => {
@@ -132,10 +139,30 @@ function JaapMalaDetail() {
             ))}
         </Swiper>
 
-        <div className="swiper-button-prev absolute top-1/2 left-2 -translate-y-1/2 bg-white rounded-full p-2 shadow z-20">
+        <div
+          className="swiper-button-prev absolute top-1/2 left-2 -translate-y-1/2 bg-white rounded-full p-2 shadow z-20"
+          onClick={() => {
+            console.log("[JaapMalaDetail] Previous arrow clicked | id:", id, "| name:", detail?.title?.en);
+            trackEvent(GA4Events.jaap_bead_previous_arrow_tapped, {
+              jaapMalaId: id,
+              jaapMalaName: detail?.title?.en,
+              event_label: "previous_arrow_clicked_inside_jaap_mala_details_page",
+            });
+          }}
+        >
           <ChevronLeft className="theme_text" />
         </div>
-        <div className="swiper-button-next absolute top-1/2 right-2 -translate-y-1/2 bg-white rounded-full p-2 shadow z-20">
+        <div
+          className="swiper-button-next absolute top-1/2 right-2 -translate-y-1/2 bg-white rounded-full p-2 shadow z-20"
+          onClick={() => {
+            console.log("[JaapMalaDetail] Next arrow clicked | id:", id, "| name:", detail?.title?.en);
+            trackEvent(GA4Events.jaap_bead_next_arrow_tapped, {
+              jaapMalaId: id,
+              jaapMalaName: detail?.title?.en,
+              event_label: "next_arrow_clicked_inside_jaap_mala_details",
+            });
+          }}
+        >
           <ChevronRight className="theme_text" />
         </div>
       </div>

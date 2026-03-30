@@ -8,7 +8,7 @@ import backBtn from "../assets/img/back_icon.svg";
 import { ReceiptText } from "lucide-react";
 import { LanguageContext } from "../contexts/LanguageContext";
 import { Download, Eye, Heart, Pencil, MoreVertical, LogOut } from "lucide-react";
-import { getTokenFromLS, removeMobileNoFromLS, removeSubscriptionStatusFromLS, removeTokenFromLS, formatNumber } from "../commonFunctions";
+import { getTokenFromLS, removeMobileNoFromLS, removeSubscriptionStatusFromLS, removeTokenFromLS, formatNumber, removeUserName, removeUserIdFromLS } from "../commonFunctions";
 import useGA4Tracker from "../hooks/useGA4Tracker";
 import { GA4Events } from "../utils/ga4Events.enum";
 import useGA4BaseParams from "../hooks/useGA4BaseParams";
@@ -89,6 +89,8 @@ function Header({
     const handleLogout = () => {
         trackEvent(GA4Events.logout_clicked, { event_label: "logout_clicked_from_header_on_edit_profile_screen" });
         removeTokenFromLS();    
+        removeUserName();
+        removeUserIdFromLS();
         removeSubscriptionStatusFromLS();
         removeMobileNoFromLS();
 

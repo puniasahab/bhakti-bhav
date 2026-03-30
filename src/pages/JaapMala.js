@@ -104,45 +104,42 @@ function JaapMala() {
   }, [isSubscribed, hasToken]);
 
   const handleTrackEvent = useCallback((id, nameEn, accessType) => {
+    console.log("[JaapMala] Card clicked → id:", id, "| nameEn:", nameEn, "| accessType:", accessType, "| isSubscribed:", isSubscribed);
     if (isSubscribed || accessType === "free") {
-      trackEvent(GA4Events.jaap_mala_selected, { jaapMalaId: id, event_label: `jaap_mala_${nameEn}_clicked` });
+      const eventParams = { jaapMalaId: id, event_label: `jaap_mala_${nameEn}_clicked` };
+      console.log("[JaapMala] Firing GA4 event:", GA4Events.jaap_mala_selected, eventParams);
+      trackEvent(GA4Events.jaap_mala_selected, eventParams);
+    } else {
+      console.log("[JaapMala] Skipping GA4 event — user not subscribed and content is paid.");
     }
   }, [isSubscribed, trackEvent]);
 
   if (loading) return <Loader message="🙏 Loading भक्ति भाव 🙏" size={200} />;
 
-  function toHindiDigits(str) {
-  const map = { '0': '०', '1': '१', '2': '२', '3': '३', '4': '४', '5': '५', '6': '६', '7': '७', '8': '८', '9': '९' };
-  return str.replace(/\d/g, d => map[d]);
-}
+  // ── Helpers ────────────────────────────────────────────────────────────────
 
+  // Render Hindi text but keep digits in their original English numeral form
+  const HindiWithEnglishNumbers = (text) => {
+    if (typeof text !== "string") {
+      console.warn("[HindiWithEnglishNumbers] Expected string but got:", typeof text, text);
+      return null;
+    }
+    // Split on digit sequences, keeping them in the result array
+    const parts = text.split(/(\d+)/);
+    return (
+      <h2 className="text-xl font-bold">
+        {parts.map((part, index) =>
+          /^\d+$/.test(part) ? (
+            <span key={index} className="font-eng">{part}</span>
+          ) : (
+            <span key={index} className="font-hindi" style={{ fontSize: "18px" }}>{part}</span>
+          )
+        )}
+      </h2>
+    );
+  };
 
-const HindiWithEnglishNumbers = ( text ) => {
-  // Split text by numbers while keeping numbers in result
-  const parts = text.split(/(\d+)/);
-
-  return (
-    <h2 className="text-xl font-bold">
-      {parts.map((part, index) => {
-        if (/^\d+$/.test(part)) {
-          // Numbers only
-          return (
-            <span key={index} className="font-eng">
-              {part}
-            </span>
-          );
-        } else {
-          // Hindi or other text
-          return (
-            <span key={index} className="font-hindi" style={{fontSize: '18px'}}>
-              {part}
-            </span>
-          );
-        }
-      })}
-    </h2>
-  );
-};
+  // ── Render ─────────────────────────────────────────────────────────────────
 
   return (
     <>
@@ -161,7 +158,7 @@ const HindiWithEnglishNumbers = ( text ) => {
             <li key={item._id}>
               <Link
                 to={handleNavigate(item._id, item.accessType)}
-                onClick = {() => {handleTrackEvent(item._id, item.name.en, item.accessType);}}
+                onClick={() => { handleTrackEvent(item._id, item.title.en, item.accessType); }}
                 className="relative block rounded-xl overflow-hidden shadow-lg  "
               >
                 <div className={`overflow_bg`}>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { data, useLocation, useNavigate } from "react-router-dom";
 import { getMobileNoFromLS, setTokenInLS } from "../commonFunctions";
 import { loginApis } from "../api";
@@ -10,6 +10,8 @@ function VerifyOtp() {
     const location = useLocation();
     const navigate = useNavigate();
     const phone = location.state?.phone || "";
+
+    const otpScreenOpenedTracker = useRef(false);
 
     const baseParams = useGA4BaseParams("Verify OTP Screen");
     const { trackEvent } = useGA4Tracker(baseParams);
@@ -139,7 +141,10 @@ function VerifyOtp() {
 
 
     useEffect(() => {
-        trackEvent(GA4Events.otp_screen_opened, { event_label: "verify_otp_screen_opened" });
+        if(!otpScreenOpenedTracker.current) {
+            trackEvent(GA4Events.otp_screen_opened, { event_label: "verify_otp_screen_opened" });
+            otpScreenOpenedTracker.current = true;
+        }
     }, [])
 
     return (
