@@ -55,7 +55,7 @@ function Home() {
     const [wallpaperImage, setWallpaperImage] = useState(() => homeCache.get("wallpaperImage") || "");
     const hasFetchedBanners = useRef(false);
     const hasTrackedScreenView = useRef(false);
-   
+
     // Helper to format raw panchang data into React elements
     const formatPanchangData = (rawData) => [
         {
@@ -88,7 +88,7 @@ function Home() {
             return;
         }
 
-        
+
 
         const fetchPanchang = async () => {
 
@@ -148,7 +148,7 @@ function Home() {
         // const baseParams = useGA4BaseParams("panchang_card_clicked_on_home_screen");
         // const { trackEvent } = useGA4Tracker(baseParams);
         // trackEvent("panchang_card_clicked");
-        if(!hasTrackedScreenView.current) {
+        if (!hasTrackedScreenView.current) {
             trackEvent(GA4Events.screen_view);
             hasTrackedScreenView.current = true;
         }
@@ -269,7 +269,7 @@ function Home() {
         });
     };
 
-    
+
 
     return (
         <>
@@ -292,10 +292,26 @@ function Home() {
                                             onClick={() => {
                                                 const relativePath = new URL(banner.Urls).pathname;
                                                 console.log("relativePath", relativePath);
+                                                if (!getTokenFromLS()) {
+                                                    setShowLoginModal(true);  // Show login modal
+                                                    return;
+                                                }
+
+                                                // Step 2: Check if user has active subscription
+                                                if (!getSubscriptionStatusFromLS()) {
+                                                    trackEvent(GA4Events.main_banner_clicked, {
+                                                        event_label: "main_banner_clicked_from_home_screen"
+                                                    });
+                                                    navigate("/payment");  // Redirect to payment
+                                                    return;
+                                                }
+
+                                                // Step 3: User is logged in + subscribed, navigate normally
                                                 trackEvent(GA4Events.main_banner_clicked, {
                                                     event_label: "main_banner_clicked_from_home_screen"
                                                 });
                                                 navigate(relativePath);
+                                                
                                             }}
                                             className="h-[20vh] md:h-[60vh] bg-cover bg-center flex items-center justify-center"
                                             style={{ backgroundImage: `url(${banner.imageUrl})` }}
@@ -324,9 +340,11 @@ function Home() {
                 <div className="mt-4 grid grid-cols-2 gap-3">
 
                     <Link to="/Rashifal"
-                        onClick = {() => {trackEvent(GA4Events.rashifal_tab_clicked, {
-                            event_label: "rashifal_card_clicked_on_home_screen"
-                        })}}
+                        onClick={() => {
+                            trackEvent(GA4Events.rashifal_tab_clicked, {
+                                event_label: "rashifal_card_clicked_on_home_screen"
+                            })
+                        }}
                         className="theme_bg bg-white rounded-xl shadow md:p-6 p-3 text-center hover:bg-yellow-50 transition w-auto flex">
                         <div className="mx-auto flex md:flex-row flex-col items-center space-y-3 md:space-y-0">
                             <img src="./img/icon_1.png" alt="" width="36" height="36" className="md:mr-3" />
@@ -417,7 +435,11 @@ function Home() {
                     <div className="md:basis-[40%] basis-[40%] flex flex-col justify-between items-center md:p-4 theme_text">
                         <span className="font-semibold md:text-3xl text-2xl">iwtk djs!</span>
                         <div className="my-4"><img src="./img/puja_bgs.png" alt="" width="150" height="120" className="max-w-full h-auto" /></div>
-                        <Link to="/puja-kare" className="relative bg-[#6d001f] bg-[url('/img/btn_icon_1.png'), 
+                        <Link to="/puja-kare" onClick = {() => {
+                            trackEvent(GA4Events.pooja_karein_widget_clicked, {
+                                event_label: "pooja_kare_card_clicked_on_home_screen"
+                            });
+                        }} className="relative bg-[#6d001f] bg-[url('/img/btn_icon_1.png'), 
           url('/img/btn_icon_1.png')] text-white text-center px-4 py-2 rounded-full font-eng md:text-lg text-sm md:w-[70%] w-full
                       hover:scale-105 transition-all duration-300 ease-in-out">
                             <span className="absolute left-2 top-1/2 -translate-y-1/2 
@@ -473,7 +495,7 @@ function Home() {
                         <div className="px-5 pt-4 pb-5 bg-[#F5E6C8]">
                             <div className="flex gap-3 mb-3">
                                 <button
-                                    onClick={() => {setShowLoginModal(false); trackEvent(GA4Events.free_login_cta_clicked, { event_label: "free_login_skipped" });}}
+                                    onClick={() => { setShowLoginModal(false); trackEvent(GA4Events.free_login_cta_clicked, { event_label: "free_login_skipped" }); }}
                                     className="flex-1 bg-white text-[#9A283D] font-eng font-semibold py-3 rounded-2xl shadow"
                                 >
                                     Skip

@@ -251,7 +251,8 @@ export const profileApis = {
 export const blogApis = {
   getBlogs: async () => {
     try {
-      const url = "https://drupal.df3.club/jsonapi/node/blog?filter[field_portal.id][value]=7d43c493-6d43-4e6d-a7fd-052ac5fff8d2&page[limit]=10&page[offset]=0&include=field_blog_image,field_category,field_portal";
+      // https://drupal.df3.club/jsonapi/node/blog?filter[field_portal.id]=7d43c493-6d43-4e6d-a7fd-052ac5fff8d2&page[limit]=25
+      const url = `https://drupal.df3.club/api/blogs?portal_uuid=${process.env.REACT_APP_DRUPAL_BHAKTI_BHAV_PORTAL_UUID}&category_uuid=${process.env.REACT_APP_DRUPAL_BHAKTI_BHAV_CATEGORY_UUID}&limit=25`;
       const response = await fetch(url, {
   headers: {
     "Accept": "application/vnd.api+json",

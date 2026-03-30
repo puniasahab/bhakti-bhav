@@ -5,11 +5,16 @@ import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import homeCache from "../utils/homeCache";
 import "../pages/style.css";
+import useGA4BasePrams from "../hooks/useGA4BaseParams";
+import useGA4Tracker from "../hooks/useGA4Tracker";
+import { GA4Events } from "../utils/ga4Events.enum";
 
 function TodayThoughts() {
   const [thoughtData, setThoughtData] = useState(() => homeCache.get("todayThought") || null);
   const [loading, setLoading] = useState(() => !homeCache.has("todayThought"));
   const shareTemplateRef = useRef(null);
+  const baseParams = useGA4BasePrams("Thoughts Section");
+  const {trackEvent} = useGA4Tracker(baseParams);
 
   useEffect(() => {
     // If cached data exists, skip fetch
@@ -331,9 +336,7 @@ function TodayThoughts() {
       </div>
 
       <div className="flex justify-center space-x-4 mt-6"> 
-       
-    
-        <button onClick={handleWhatsAppShare}>
+        <button onClick={() => {trackEvent(GA4Events.suvichar_whatsapp_clicked, {event_label: "thought_whatsapp_share_clicked_from_home_screen"}); handleWhatsAppShare()}}>
           <img
             src="./img/hd_whatsapp_icon.png"
             alt="whatsapp"
@@ -342,8 +345,8 @@ function TodayThoughts() {
             className="max-w-full h-auto mx-auto"
           />
         </button>
- 
-        <button onClick={handleDownload}>
+
+        <button onClick={() => {trackEvent(GA4Events.suvichar_pdf_clicked, {event_label: "download_thought_pdf_clicked_from_home_screen"}); handleDownload()}}>
           <img
             src="./img/hd_adobe_icon.png"
             alt="download"

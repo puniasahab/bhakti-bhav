@@ -49,6 +49,9 @@ export const GA4Events = {
     suvichar_whatsapp_clicked           : "suvichar_whatsapp_clicked",
     suvichar_pdf_clicked                : "suvichar_pdf_clicked",
     pooja_karein_widget_clicked         : "pooja_karein_widget_clicked",
+
+    //done
+    pooja_karein_card_selected              : "pooja_karein_card_selected",
     // done
     instagram_icon_clicked              : "instagram_icon_clicked",       // ✅ fix: instgram + duplicate _clicked
     // done

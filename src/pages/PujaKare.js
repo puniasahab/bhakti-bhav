@@ -6,6 +6,9 @@ import Loader from "../components/Loader";
 import PageTitleCard from "../components/PageTitleCard";
 import { pujaKareApis } from "../api";
 import { usePujaKare } from "../contexts/PujaKareContext";
+import useGA4BaseParams from "../hooks/useGA4BaseParams";
+import useGA4Tracker from "../hooks/useGA4Tracker";
+import { GA4Events } from "../utils/ga4Events.enum";
 
 export default function PujaKare() {
   const [items, setItems] = useState([]);
@@ -15,6 +18,9 @@ export default function PujaKare() {
   const [hasMore, setHasMore] = useState(true);
   const limit = 10;
   const { updatePujaKareItems } = usePujaKare();
+
+  const baseParams = useGA4BaseParams("Puja Kare Screen");
+  const { trackEvent } = useGA4Tracker(baseParams);
 
   useEffect(() => {
     async function fetchItems() {
@@ -102,6 +108,14 @@ export default function PujaKare() {
               <li key={item._id}>
                 <Link
                   to={`/puja-kare/${item._id}`}
+                  onClick = {() => {
+                      trackEvent(GA4Events.pooja_karein_card_selected, {
+                          event_label: "puja_kare_card_clicked_on_puja_karein_section",
+                          id: item._id,
+                          name_en: parsedName.en,
+                          name_hi: parsedName.hi,
+                      });
+                  }}
                   className="theme_bg bg-white rounded-xl shadow md:p-6 p-3 text-center hover:bg-yellow-50 transition w-auto flex flex-col"
                 >
                   <div className="w-full h-36 flex items-center justify-center">
