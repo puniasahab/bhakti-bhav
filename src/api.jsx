@@ -260,6 +260,10 @@ export const blogApis = {
     "User-Agent": "Mozilla/5.0" // ✅ Helps bypass basic bot detection
   }
 });
+
+const data = await response.json();
+
+console.log("Consoling line response:", data);
       // Route through /drupal-api proxy to avoid CORS (see src/setupProxy.js)
       // const response = await axios.get(
       //   "/drupal-api/jsonapi/node/blog?filter[field_portal.id][value]=7d43c493-6d43-4e6d-a7fd-052ac5fff8d2&page[limit]=10&page[offset]=0&include=field_blog_image,field_category,field_portal",
@@ -269,7 +273,7 @@ export const blogApis = {
       //     },
       //   }
       // );
-      return response.data;
+      return data;
     } catch (error) {
       console.error("Error fetching blogs:", error);
       throw error;

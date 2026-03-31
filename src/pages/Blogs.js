@@ -7,41 +7,8 @@ import Loader from "../components/Loader";
 import { blogApis } from "../api.jsx";
 import { X } from "lucide-react";
 
-// Drupal JSONAPI helpers
-function getImageUrl(blog, included) {
-  const imgRel = blog?.relationships?.field_blog_image?.data;
-  if (!imgRel || !included) return null;
-  const imgRes = included.find((inc) => inc.id === imgRel.id);
-  if (!imgRes) return null;
-
-  // Try different URI shapes Drupal JSONAPI may return
-  const uriUrl = imgRes?.attributes?.uri?.url;
-  const uriValue = imgRes?.attributes?.uri?.value; // e.g. "public://filename.jpg"
-  const imageStyleUri =
-    imgRes?.attributes?.image_style_uri?.[0]?.thumbnail ||
-    imgRes?.attributes?.image_style_uri?.[0]?.medium ||
-    imgRes?.attributes?.image_style_uri?.[0]?.large;
-
-  const raw = uriUrl || imageStyleUri;
-  if (raw) return raw.startsWith("http") ? raw : `https://drupal.df3.club${raw}`;
-
-  // Fallback: build public file URL from uri.value (public://path)
-  if (uriValue) {
-    const filePath = uriValue.replace("public://", "/sites/default/files/");
-    return `https://drupal.df3.club${filePath}`;
-  }
-
-  return null;
-}
-
-function stripHtml(html) {
-  if (!html) return "";
-  return html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
-}
-
 export default function Blogs() {
   const [blogs, setBlogs] = useState([]);
-  const [included, setIncluded] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selected, setSelected] = useState(null);
@@ -52,10 +19,10 @@ export default function Blogs() {
       try {
         setLoading(true);
         const data = await blogApis.getBlogs();
+        console.log("Consoling line data:", data);
         setBlogs(data?.data || []);
-        setIncluded(data?.included || []);
       } catch (err) {
-        console.error("Blog fetch error:", err);
+        console.error("Consoling line Blog fetch error:", err);
         setError("Failed to load blogs. Please try again.");
       } finally {
         setLoading(false);
@@ -90,48 +57,36 @@ export default function Blogs() {
         {/* Blog Cards List */}
         <div className="space-y-4">
           {blogs.map((blog) => {
-            const title = blog?.attributes?.title || "Untitled";
-            const bodyRaw = blog?.attributes?.body?.value || blog?.attributes?.body?.processed || "";
-            const summary = blog?.attributes?.body?.summary || stripHtml(bodyRaw).slice(0, 100);
-            const imgUrl = getImageUrl(blog, included);
-            const date = blog?.attributes?.created
-              ? new Date(blog.attributes.created).toLocaleDateString("en-IN", {
-                  day: "2-digit", month: "short", year: "numeric",
-                })
-              : null;
+            const thumbnailUrl = blog?.thumbnail?.url || null;
+            const thumbnailAlt = blog?.thumbnail?.alt || blog?.title || "Blog thumbnail";
 
             return (
               <div
                 key={blog.id}
-                onClick={() => setSelected({ blog, imgUrl, title, bodyRaw, date })}
+                onClick={() => setSelected(blog)}
                 className="flex gap-3 bg-[rgba(255,250,244,0.92)] rounded-2xl shadow-md overflow-hidden cursor-pointer active:scale-[0.98] transition-transform"
                 style={{ border: "1.5px solid #E9B9C5" }}
               >
-                {/* Thumbnail */}
-                <div className="shrink-0 w-24 h-24 bg-[#f5e9ec] flex items-center justify-center overflow-hidden rounded-l-2xl">
-                  {imgUrl ? (
+                {/* Thumbnail — only rendered when available */}
+                {thumbnailUrl && (
+                  <div className="shrink-0 w-24 self-stretch bg-[#f5e9ec] overflow-hidden rounded-l-2xl">
                     <img
-                      src={imgUrl}
-                      alt={title}
+                      src={thumbnailUrl}
+                      alt={thumbnailAlt}
                       className="w-full h-full object-cover"
                       loading="lazy"
                     />
-                  ) : (
-                    <span className="text-3xl">🙏</span>
-                  )}
-                </div>
+                  </div>
+                )}
 
                 {/* Text */}
-                <div className="flex-1 py-3 pr-3 flex flex-col justify-center">
+                <div className={`flex-1 py-3 pr-3 flex flex-col justify-center ${!thumbnailUrl ? "pl-3" : ""}`}>
                   <h3 className="font-eng font-bold text-[#9A283D] text-sm leading-snug line-clamp-2">
-                    {title}
+                    {blog.title}
                   </h3>
-                  {date && (
-                    <p className="font-eng text-xs text-gray-400 mt-0.5">{date}</p>
-                  )}
-                  {summary && (
+                  {blog.description && (
                     <p className="font-eng text-xs text-gray-600 mt-1 line-clamp-2 leading-relaxed">
-                      {summary}...
+                      {blog.description}
                     </p>
                   )}
                   <span className="font-eng text-xs text-[#9A283D] font-semibold mt-1.5">
@@ -144,16 +99,19 @@ export default function Blogs() {
         </div>
 
         {/* Return to Home */}
-        <div className="text-center mt-8">
-          <button
-            onClick={() => navigate("/")}
-            className="font-eng font-bold text-white py-3 px-8 rounded-full shadow-md"
-            style={{ backgroundColor: "#9A283D" }}
-          >
-            ← Return to Home
-          </button>
-        </div>
+        <div className="h-16" /> {/* spacer so last card isn't hidden behind the fixed button */}
 
+      </div>
+
+      {/* Return to Home — fixed at bottom */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 flex justify-center pb-4 pt-2 bg-gradient-to-t from-[#FFFAF4]/90 to-transparent pointer-events-none">
+        <button
+          onClick={() => navigate("/")}
+          className="font-eng font-bold text-white py-3 px-8 rounded-full shadow-lg pointer-events-auto"
+          style={{ backgroundColor: "#9A283D" }}
+        >
+          ← Return to Home
+        </button>
       </div>
 
       {/* Detail Modal */}
@@ -164,58 +122,75 @@ export default function Blogs() {
           onClick={() => setSelected(null)}
         >
           <div
-            className="relative w-full max-w-lg bg-[#FFFAF4] rounded-3xl overflow-y-auto"
+            className="relative w-full max-w-lg bg-[#FFFAF4] rounded-3xl overflow-hidden"
             style={{ maxHeight: "85vh" }}
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Close Button */}
+            {/* Close Button — fixed at top-right, never scrolls */}
             <button
               onClick={() => setSelected(null)}
-              className="absolute top-3 right-3 z-10 bg-white rounded-full p-1.5 shadow-md"
+              className="absolute top-3 right-3 z-20 bg-white rounded-full p-1.5 shadow-md"
             >
               <X size={20} className="text-[#9A283D]" />
             </button>
 
-            {/* Detail Image */}
-            {selected.imgUrl && (
-              <div className="w-full h-52 overflow-hidden rounded-t-3xl">
-                <img
-                  src={selected.imgUrl}
-                  alt={selected.title}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            )}
+            {/* Scrollable content area */}
+            <div className="overflow-y-auto" style={{ maxHeight: "85vh" }}>
 
-            <div className="px-5 pt-4 pb-8">
-              {/* Date */}
-              {selected.date && (
-                <p className="font-eng text-xs text-gray-400 mb-1">{selected.date}</p>
+              {/* Hero image — use blog_images[0] if available */}
+              {selected?.blog_images && selected.blog_images.length > 0 && (
+                <div className="w-full h-52 overflow-hidden rounded-t-3xl">
+                  <img
+                    src={selected.blog_images[0].url}
+                    alt={selected.blog_images[0].alt || selected.title}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
               )}
 
-              {/* Title */}
-              <h2 className="font-eng font-bold text-[#9A283D] text-lg leading-snug mb-3">
-                {selected.title}
-              </h2>
+              <div className="px-5 pt-4 pb-8">
+                {/* Title */}
+                <h2 className="font-eng font-bold text-[#9A283D] text-lg leading-snug mb-3">
+                  {selected.title}
+                </h2>
 
-              {/* Divider */}
-              <div className="w-16 h-1 rounded-full mb-4" style={{ background: "linear-gradient(to right, #9A283D, #F5A418)" }}></div>
-
-              {/* Body */}
-              {selected.bodyRaw ? (
+                {/* Divider */}
                 <div
-                  className="font-eng text-sm text-gray-700 leading-relaxed prose prose-sm max-w-none"
-                  dangerouslySetInnerHTML={{ __html: selected.bodyRaw }}
+                  className="w-16 h-1 rounded-full mb-4"
+                  style={{ background: "linear-gradient(to right, #9A283D, #F5A418)" }}
                 />
-              ) : (
-                <p className="font-eng text-sm text-gray-500">No content available.</p>
-              )}
+
+                {/* Description */}
+                {selected.description ? (
+                  <p className="font-eng text-sm text-gray-700 leading-relaxed">
+                    {selected.description}
+                  </p>
+                ) : (
+                  <p className="font-eng text-sm text-gray-500">No content available.</p>
+                )}
+
+                {/* Remaining blog images (index 1 onwards) */}
+                {selected?.blog_images && selected.blog_images.length > 1 && (
+                  <div className="mt-5 space-y-3">
+                    {selected.blog_images.slice(1).map((img, idx) => (
+                      <img
+                        key={idx}
+                        src={img.url}
+                        alt={img.alt || `Blog image ${idx + 2}`}
+                        className="w-full rounded-xl object-cover"
+                        loading="lazy"
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+
             </div>
           </div>
         </div>
       )}
 
-      <Footer />
+      {/* <Footer /> */}
     </>
   );
 }
