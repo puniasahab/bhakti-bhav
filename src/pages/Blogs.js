@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
-import Footer from "../components/Footer";
 import PageTitleCard from "../components/PageTitleCard";
 import Loader from "../components/Loader";
 import { blogApis } from "../api.jsx";
-import { X } from "lucide-react";
 
 export default function Blogs() {
   const [blogs, setBlogs] = useState([]);
@@ -33,9 +31,86 @@ export default function Blogs() {
 
   if (loading) return <Loader message="🙏 Loading Blogs 🙏" size={200} />;
 
+  // ── Blog Detail Page ────────────────────────────────────────────────────────
+  if (selected) {
+    return (
+      <>
+        {/* Reuse the same app Header with back button */}
+        <Header pageName={{ hi: "CykWx", en: "Blogs" }} />
+
+        <div className="min-h-screen pb-24" style={{ backgroundColor: "#FFFAF4" }}>
+
+          {/* Hero image — full width, rounded corners, respects container */}
+          {selected?.blog_images && selected.blog_images.length > 0 && (
+            <div className="container mx-auto px-4 pt-4">
+              <div className="w-full rounded-2xl overflow-hidden shadow-md">
+                <img
+                  src={selected.blog_images[0].url}
+                  alt={selected.blog_images[0].alt || selected.title}
+                  className="w-full h-auto object-contain"
+                />
+              </div>
+            </div>
+          )}
+
+          <div className="container mx-auto px-4 pt-5 pb-10">
+
+            {/* Title */}
+            <h2 className="font-eng font-bold text-[#9A283D] text-xl leading-snug mb-1">
+              {selected.title}
+            </h2>
+
+            {/* Gradient underline accent */}
+            <div
+              className="w-12 h-[3px] rounded-full mb-4"
+              style={{ background: "linear-gradient(to right, #9A283D, #F5A418)" }}
+            />
+
+            {/* Description */}
+            {selected.description ? (
+              <p className="font-eng text-sm text-gray-700 leading-relaxed">
+                {selected.description}
+              </p>
+            ) : (
+              <p className="font-eng text-sm text-gray-500">No content available.</p>
+            )}
+
+            {/* Remaining blog images (index 1 onwards) */}
+            {selected?.blog_images && selected.blog_images.length > 1 && (
+              <div className="mt-5 space-y-3">
+                {selected.blog_images.slice(1).map((img, idx) => (
+                  <div key={idx} className="w-full rounded-2xl overflow-hidden shadow-sm">
+                    <img
+                      src={img.url}
+                      alt={img.alt || `Blog image ${idx + 2}`}
+                      className="w-full h-auto object-contain"
+                      loading="lazy"
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Back to Blogs — fixed at bottom */}
+        <div className="fixed bottom-0 left-0 right-0 z-40 flex justify-center pb-4 pt-2 bg-gradient-to-t from-[#FFFAF4]/90 to-transparent pointer-events-none">
+          <button
+            onClick={() => { setSelected(null); window.scrollTo(0, 0); }}
+            className="font-eng font-bold text-white py-3 px-8 rounded-full shadow-lg pointer-events-auto"
+            style={{ backgroundColor: "#9A283D" }}
+          >
+            ← Back to Blogs
+          </button>
+        </div>
+      </>
+    );
+  }
+
+  // ── Blog List Page ──────────────────────────────────────────────────────────
   return (
     <>
-      <Header pageName={{ hi: "Cykx", en: "Blogs" }} />
+      <Header pageName={{ hi: "CykWx", en: "Blogs" }} />
 
       <PageTitleCard
         titleHi={"ब्लॉग"}
@@ -63,11 +138,11 @@ export default function Blogs() {
             return (
               <div
                 key={blog.id}
-                onClick={() => setSelected(blog)}
+                onClick={() => { setSelected(blog); window.scrollTo(0, 0); }}
                 className="flex gap-3 bg-[rgba(255,250,244,0.92)] rounded-2xl shadow-md overflow-hidden cursor-pointer active:scale-[0.98] transition-transform"
                 style={{ border: "1.5px solid #E9B9C5" }}
               >
-                {/* Thumbnail — only rendered when available */}
+                {/* Thumbnail */}
                 {thumbnailUrl && (
                   <div className="shrink-0 w-24 self-stretch bg-[#f5e9ec] overflow-hidden rounded-l-2xl">
                     <img
@@ -98,8 +173,8 @@ export default function Blogs() {
           })}
         </div>
 
-        {/* Return to Home */}
-        <div className="h-16" /> {/* spacer so last card isn't hidden behind the fixed button */}
+        {/* Spacer for fixed button */}
+        <div className="h-16" />
 
       </div>
 
@@ -113,84 +188,6 @@ export default function Blogs() {
           ← Return to Home
         </button>
       </div>
-
-      {/* Detail Modal */}
-      {selected && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center px-4"
-          style={{ backgroundColor: "rgba(0,0,0,0.55)" }}
-          onClick={() => setSelected(null)}
-        >
-          <div
-            className="relative w-full max-w-lg bg-[#FFFAF4] rounded-3xl overflow-hidden"
-            style={{ maxHeight: "85vh" }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Close Button — fixed at top-right, never scrolls */}
-            <button
-              onClick={() => setSelected(null)}
-              className="absolute top-3 right-3 z-20 bg-white rounded-full p-1.5 shadow-md"
-            >
-              <X size={20} className="text-[#9A283D]" />
-            </button>
-
-            {/* Scrollable content area */}
-            <div className="overflow-y-auto" style={{ maxHeight: "85vh" }}>
-
-              {/* Hero image — use blog_images[0] if available */}
-              {selected?.blog_images && selected.blog_images.length > 0 && (
-                <div className="w-full h-52 overflow-hidden rounded-t-3xl">
-                  <img
-                    src={selected.blog_images[0].url}
-                    alt={selected.blog_images[0].alt || selected.title}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              )}
-
-              <div className="px-5 pt-4 pb-8">
-                {/* Title */}
-                <h2 className="font-eng font-bold text-[#9A283D] text-lg leading-snug mb-3">
-                  {selected.title}
-                </h2>
-
-                {/* Divider */}
-                <div
-                  className="w-16 h-1 rounded-full mb-4"
-                  style={{ background: "linear-gradient(to right, #9A283D, #F5A418)" }}
-                />
-
-                {/* Description */}
-                {selected.description ? (
-                  <p className="font-eng text-sm text-gray-700 leading-relaxed">
-                    {selected.description}
-                  </p>
-                ) : (
-                  <p className="font-eng text-sm text-gray-500">No content available.</p>
-                )}
-
-                {/* Remaining blog images (index 1 onwards) */}
-                {selected?.blog_images && selected.blog_images.length > 1 && (
-                  <div className="mt-5 space-y-3">
-                    {selected.blog_images.slice(1).map((img, idx) => (
-                      <img
-                        key={idx}
-                        src={img.url}
-                        alt={img.alt || `Blog image ${idx + 2}`}
-                        className="w-full rounded-xl object-cover"
-                        loading="lazy"
-                      />
-                    ))}
-                  </div>
-                )}
-              </div>
-
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* <Footer /> */}
     </>
   );
 }
