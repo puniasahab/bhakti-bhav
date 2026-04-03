@@ -66,13 +66,24 @@ export default function Blogs() {
               style={{ background: "linear-gradient(to right, #9A283D, #F5A418)" }}
             />
 
-            {/* Description */}
-            {selected.description ? (
-              <p className="font-eng text-sm text-gray-700 leading-relaxed">
+            {/* Description — short summary, styled as intro */}
+            {selected.description && (
+              <p className="font-eng text-sm font-medium text-[#9A283D]/80 leading-relaxed bg-[#9A283D]/5 border-l-4 border-[#9A283D]/40 pl-3 py-2 rounded-r-xl mb-5">
                 {selected.description}
               </p>
-            ) : (
-              <p className="font-eng text-sm text-gray-500">No content available.</p>
+            )}
+
+            {/* Body — full HTML content from API */}
+            {selected.body && (
+              <div
+                className="font-eng text-sm text-gray-700 leading-relaxed blog-body"
+                dangerouslySetInnerHTML={{
+                  __html: selected.body
+                    .replace(/\n/g, "<br/>")
+                    .replace(/&amp;nbsp;/g, " ")
+                    .replace(/&nbsp;/g, " "),
+                }}
+              />
             )}
 
             {/* Remaining blog images (index 1 onwards) */}
