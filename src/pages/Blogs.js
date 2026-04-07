@@ -67,21 +67,20 @@ export default function Blogs() {
             />
 
             {/* Description — short summary, styled as intro */}
-            {selected.description && (
+            {/* {selected.description && (
               <p className="font-eng text-sm font-medium text-[#9A283D]/80 leading-relaxed bg-[#9A283D]/5 border-l-4 border-[#9A283D]/40 pl-3 py-2 rounded-r-xl mb-5">
                 {selected.description}
               </p>
-            )}
+            )} */}
 
             {/* Body — full HTML content from API */}
-            {selected.body && (
+            {selected.body_html && (
               <div
-                className="font-eng text-sm text-gray-700 leading-relaxed blog-body"
+                className="blog-body"
                 dangerouslySetInnerHTML={{
-                  __html: selected.body
-                    .replace(/\n/g, "<br/>")
-                    .replace(/&amp;nbsp;/g, " ")
-                    .replace(/&nbsp;/g, " "),
+                  __html: selected.body_html
+                    .replace(/&amp;nbsp;/g, "\u00a0")
+                    .replace(/&nbsp;/g, "\u00a0"),
                 }}
               />
             )}

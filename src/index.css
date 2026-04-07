@@ -377,4 +377,94 @@ body::before {
   height: 15px;
 display: inline-block; 
 }
- 
+
+/* ── Blog Body HTML Renderer ─────────────────────────────────────────────── */
+.blog-body {
+  font-family: 'PoppinsRegular', sans-serif;
+  font-size: 0.9rem;
+  line-height: 1.8;
+  color: #333;
+}
+
+.blog-body p {
+  margin: 0 0 1rem 0;
+}
+
+.blog-body h1 {
+  font-family: 'PoppinsBold', sans-serif;
+  font-size: 1.3rem;
+  color: #1a1a1a;
+  margin: 1.75rem 0 0.4rem;
+}
+
+.blog-body h2 {
+  font-family: 'PoppinsBold', sans-serif;
+  font-size: 1.15rem;
+  color: #1a1a1a;
+  margin: 1.5rem 0 0.35rem;
+}
+
+.blog-body h3 {
+  font-family: 'PoppinsSemiBold', sans-serif;
+  font-size: 1rem;
+  color: #1a1a1a;
+  margin: 1.25rem 0 0.3rem;
+}
+
+.blog-body ul,
+.blog-body ol {
+  margin: 0.25rem 0 1rem;
+  padding-left: 1.5rem;
+}
+
+.blog-body ul {
+  list-style-type: disc;
+}
+
+.blog-body ol {
+  list-style-type: decimal;
+}
+
+.blog-body li {
+  margin-bottom: 0.35rem;
+}
+
+.blog-body a {
+  color: #9A283D;
+  text-decoration: underline;
+}
+
+.blog-body strong {
+  font-family: 'PoppinsSemiBold', sans-serif;
+  color: #1a1a1a;
+}
+
+.blog-body blockquote {
+  border-left: 4px solid #9A283D;
+  margin: 1rem 0;
+  padding: 0.5rem 0 0.5rem 1rem;
+  color: #555;
+  background: #fff5f7;
+  border-radius: 0 8px 8px 0;
+}
+
+.blog-body img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin: 0.75rem 0;
+}
+
+.blog-body hr {
+  border: none;
+  border-top: 1px solid #e5e7eb;
+  margin: 1.25rem 0;
+}
+
+.blog-body pre,
+.blog-body code {
+  background: #f4f4f4;
+  border-radius: 4px;
+  font-size: 0.82rem;
+  padding: 0.1rem 0.3rem;
+}
