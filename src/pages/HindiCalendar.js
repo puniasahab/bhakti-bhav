@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { GA4Events } from "../utils/ga4Events.enum";
 import useGA4BaseParams from "../hooks/useGA4BaseParams";
 import useGA4Tracker from "../hooks/useGA4Tracker";
+import SEO from "../components/SEO";
 
 export default function HindiCalendar() {
   const [months, setMonths] = useState([]);
@@ -87,6 +88,8 @@ export default function HindiCalendar() {
 
 
   return (
+    <>
+    <SEO title="Best Hindu Calendar App | हिंदी पंचांग कैलेंडर डाउनलोड | भक्ति भाव"  description="Hindi Calendar 2026 और Hindu Panchang ऐप डाउनलोड करें। सभी व्रत, त्योहार, शुभ मुहूर्त और चंद्र कैलेंडर की जानकारी एक जगह | भक्ति भाव" canonical="https://bhaktibhav.app/hindi-calendar"/>
     <div className="bg-[url('../img/home_bg.png')] bg-cover bg-top bg-no-repeat min-h-screen w-full text-white font-kruti">
       <Header />
     <div className="h-1"></div>
@@ -175,5 +178,6 @@ export default function HindiCalendar() {
 
 
     </div>
+    </>
   );
 }

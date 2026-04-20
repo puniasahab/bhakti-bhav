@@ -1,5 +1,6 @@
 import { useState, useEffect, Suspense, lazy } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
+import { HelmetProvider } from 'react-helmet-async'
 
 // ── Firebase debug mode ───────────────────────────────────────────────────
 // Set debug_mode = "true" in localStorage to enable Firebase DebugView.
@@ -67,7 +68,7 @@ const preloadCommonRoutes = () => {
 function App() {
 
   const FIREBASE_DEBUG_MODE = true;
- localStorage.setItem("debug_mode", String(FIREBASE_DEBUG_MODE));
+  localStorage.setItem("debug_mode", String(FIREBASE_DEBUG_MODE));
   const location = useLocation();
   const [loading, setLoading] = useState(() => {
     // Only show splash on first visit to home page, never again in this session
@@ -106,59 +107,61 @@ function App() {
   if (loading && (location.pathname === "/" || location.pathname === "")) return <Splash />;
 
   return (
-    <AuthProvider>
-      <AudioProvider>
-        <LanguageProvider>
-          <KathaProvider>
-            <PaymentProvider>
-              <PujaKareProvider>
-                <Routes>
-                  {/* Home is directly imported — no Suspense, no loader, instant render */}
-                  <Route path="/" element={<Home />} />
-                  {/* All other routes are lazy-loaded with Suspense (no fallback loader) */}
-                  <Route path="/vrat-katha" element={<Suspense><VratKatha /></Suspense>} />
-                  <Route path="/vrat-katha/:id" element={<Suspense><VratKathaDetail /></Suspense>} />
-                  <Route path="/vrat-katha/:id/date/:date" element={<Suspense><VratKathaDetail /></Suspense>} />
-                  <Route path="/vrat-katha/categoryDetails/:id" element={<Suspense><VratKathaCategoryDetails /></Suspense>} />
-                  <Route path="/jaap-mala" element={<Suspense><JaapMala /></Suspense>} />
-                  <Route path="/jaapmala/:id" element={<Suspense><JaapMalaDetail /></Suspense>} />
-                  <Route path="/mantra" element={<Suspense><Mantra /></Suspense>} />
-                  <Route path="/mantra/:id" element={<Suspense><MantraDetail /></Suspense>} />
-                  <Route path="/aarti" element={<Suspense><Aarti /></Suspense>} />
-                  <Route path="/aarti/:id" element={<Suspense><AartiDetail /></Suspense>} />
-                  <Route path="/wallpaper" element={<Suspense><Wallpaper /></Suspense>} />
-                  <Route path="/wallpaper/:id" element={<Suspense><WallpaperDetail /></Suspense>} />
-                  <Route path="/rashifal" element={<Suspense><Rashifal /></Suspense>} />
-                  <Route path="/hindi-calendar" element={<Suspense><HindiCalendar /></Suspense>} />
-                  <Route path="/hindi-calendar/:id" element={<Suspense><HindiCalendarDetail /></Suspense>} />
-                  <Route path="/puja-kare" element={<Suspense><PujaKare /></Suspense>} />
-                  <Route path="/puja-kare/:id" element={<Suspense><PujaKareDetail /></Suspense>} />
-                  <Route path="/chalisa" element={<Suspense><Chalisa /></Suspense>} />
-                  <Route path="/chalisa/:id" element={<Suspense><ChalisaDetail /></Suspense>} />
-                  <Route path="/login" element={<Suspense><Login /></Suspense>} />
-                  <Route path="/verify-otp" element={<Suspense><VerifyOtp /></Suspense>} />
-                  <Route path="/termsAndConditions" element={<Suspense><TermsAndConditions /></Suspense>} />
-                  <Route path="/privacyPolicy" element={<Suspense><PrivacyPolicy /></Suspense>} />
-                  <Route path="/aboutUs" element={<Suspense><AboutUs /></Suspense>} />
-                  <Route path="/profile" element={<Suspense><Profile /></Suspense>} />
-                  <Route path="/edit-profile" element={<Suspense><EditProfile /></Suspense>} />
-                  <Route path="/payment" element={<Suspense><Payment /></Suspense>} />
-                  <Route path="/transactions" element={<Suspense><Transactions /></Suspense>} />
-                  <Route path="/paymentPage" element={<Suspense><PaymentPage /></Suspense>} />
-                  <Route path="/kundli" element={<Suspense><Kundli /></Suspense>} />
-                  <Route path="/parsad" element={<Suspense><ParsadPage /></Suspense>} />
-                  <Route path="/winners" element={<Suspense><WinnersList /></Suspense>} />
-                  <Route path="/blogs" element={<Suspense><Blogs /></Suspense>} />
-                  <Route path="/payment-complete" element={<Suspense><PaymentComplete /></Suspense>} />
-                  <Route path="/contact-us" element={<Suspense><ContactUs /></Suspense>} />
-                </Routes>
-                <GlobalAudioPlayer />
-              </PujaKareProvider>
-            </PaymentProvider>
-          </KathaProvider>
-        </LanguageProvider>
-      </AudioProvider>
-    </AuthProvider>
+    <HelmetProvider>
+      <AuthProvider>
+        <AudioProvider>
+          <LanguageProvider>
+            <KathaProvider>
+              <PaymentProvider>
+                <PujaKareProvider>
+                  <Routes>
+                    {/* Home is directly imported — no Suspense, no loader, instant render */}
+                    <Route path="/" element={<Home />} />
+                    {/* All other routes are lazy-loaded with Suspense (no fallback loader) */}
+                    <Route path="/vrat-katha" element={<Suspense><VratKatha /></Suspense>} />
+                    <Route path="/vrat-katha/:id" element={<Suspense><VratKathaDetail /></Suspense>} />
+                    <Route path="/vrat-katha/:id/date/:date" element={<Suspense><VratKathaDetail /></Suspense>} />
+                    <Route path="/vrat-katha/categoryDetails/:id" element={<Suspense><VratKathaCategoryDetails /></Suspense>} />
+                    <Route path="/jaap-mala" element={<Suspense><JaapMala /></Suspense>} />
+                    <Route path="/jaapmala/:id" element={<Suspense><JaapMalaDetail /></Suspense>} />
+                    <Route path="/mantra" element={<Suspense><Mantra /></Suspense>} />
+                    <Route path="/mantra/:id" element={<Suspense><MantraDetail /></Suspense>} />
+                    <Route path="/aarti" element={<Suspense><Aarti /></Suspense>} />
+                    <Route path="/aarti/:id" element={<Suspense><AartiDetail /></Suspense>} />
+                    <Route path="/wallpaper" element={<Suspense><Wallpaper /></Suspense>} />
+                    <Route path="/wallpaper/:id" element={<Suspense><WallpaperDetail /></Suspense>} />
+                    <Route path="/rashifal" element={<Suspense><Rashifal /></Suspense>} />
+                    <Route path="/hindi-calendar" element={<Suspense><HindiCalendar /></Suspense>} />
+                    <Route path="/hindi-calendar/:id" element={<Suspense><HindiCalendarDetail /></Suspense>} />
+                    <Route path="/puja-kare" element={<Suspense><PujaKare /></Suspense>} />
+                    <Route path="/puja-kare/:id" element={<Suspense><PujaKareDetail /></Suspense>} />
+                    <Route path="/chalisa" element={<Suspense><Chalisa /></Suspense>} />
+                    <Route path="/chalisa/:id" element={<Suspense><ChalisaDetail /></Suspense>} />
+                    <Route path="/login" element={<Suspense><Login /></Suspense>} />
+                    <Route path="/verify-otp" element={<Suspense><VerifyOtp /></Suspense>} />
+                    <Route path="/termsAndConditions" element={<Suspense><TermsAndConditions /></Suspense>} />
+                    <Route path="/privacyPolicy" element={<Suspense><PrivacyPolicy /></Suspense>} />
+                    <Route path="/aboutUs" element={<Suspense><AboutUs /></Suspense>} />
+                    <Route path="/profile" element={<Suspense><Profile /></Suspense>} />
+                    <Route path="/edit-profile" element={<Suspense><EditProfile /></Suspense>} />
+                    <Route path="/payment" element={<Suspense><Payment /></Suspense>} />
+                    <Route path="/transactions" element={<Suspense><Transactions /></Suspense>} />
+                    <Route path="/paymentPage" element={<Suspense><PaymentPage /></Suspense>} />
+                    <Route path="/kundli" element={<Suspense><Kundli /></Suspense>} />
+                    <Route path="/parsad" element={<Suspense><ParsadPage /></Suspense>} />
+                    <Route path="/winners" element={<Suspense><WinnersList /></Suspense>} />
+                    <Route path="/blogs" element={<Suspense><Blogs /></Suspense>} />
+                    <Route path="/payment-complete" element={<Suspense><PaymentComplete /></Suspense>} />
+                    <Route path="/contact-us" element={<Suspense><ContactUs /></Suspense>} />
+                  </Routes>
+                  <GlobalAudioPlayer />
+                </PujaKareProvider>
+              </PaymentProvider>
+            </KathaProvider>
+          </LanguageProvider>
+        </AudioProvider>
+      </AuthProvider>
+    </HelmetProvider>
   );
 }
 

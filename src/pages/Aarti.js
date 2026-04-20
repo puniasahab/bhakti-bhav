@@ -9,6 +9,7 @@ import { cachedFetch } from "../utils/apiCache";
 import { GA4Events } from "../utils/ga4Events.enum";
 import useGA4BaseParams from "../hooks/useGA4BaseParams";
 import useGA4Tracker from "../hooks/useGA4Tracker";
+import SEO from "../components/SEO";
 
 export default function Aarti() {
   const [items, setItems] = useState([]);
@@ -30,21 +31,21 @@ export default function Aarti() {
       try {
         if (currentPage === 1) setLoading(true);
         else setLoadingMore(true);
-        
+
         // Use cached fetch for better performance
         const json = await cachedFetch(
           `https://api.bhaktibhav.app/frontend/all-artis-v1?page=${currentPage}&limit=${limit}`,
           {},
           5 * 60 * 1000 // Cache for 5 minutes
         );
-        
+
         if (json?.status === "success") {
           if (currentPage === 1) {
             setItems(json.data || []);
           } else {
             setItems(prevItems => [...prevItems, ...(json.data || [])]);
           }
-          
+
           // Check if there are more items to load
           if (!json.data || json.data.length < limit) {
             setHasMore(false);
@@ -73,10 +74,10 @@ export default function Aarti() {
   // Infinite scroll handler with throttling
   useEffect(() => {
     let ticking = false;
-    
+
     const handleScroll = () => {
       if (loadingMore || !hasMore) return;
-      
+
       if (!ticking) {
         window.requestAnimationFrame(() => {
           const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
@@ -97,7 +98,7 @@ export default function Aarti() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [loadingMore, hasMore]);
 
-  
+
   // Memoized navigation handler
   const handleNavigate = useCallback((id, accessType) => {
     if (isSubscribed) {
@@ -117,7 +118,7 @@ export default function Aarti() {
     return <p className="text-center py-10 theme_text">❌ No items found</p>;
   return (
     <>
-
+      <SEO title="Aarti App Download – लक्ष्मी, वैष्णो देवी, सत्यनारायण आरती | भक्ति भाव" description="सभी देवी-देवताओं की आरती पढ़ने और सुनने के लिए Aarti App डाउनलोड करें – विष्णु, लक्ष्मी, संतोषी माता, सरस्वती और सत्यनारायण। | भक्ति भाव" canonical="https://bhaktibhav.app/aarti" />
       <Header pageName={{ hi: "vkjrh", en: "Aarti" }} />
 
       <PageTitleCard

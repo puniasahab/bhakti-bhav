@@ -8,6 +8,7 @@ import { getSubscriptionStatusFromLS, getTokenFromLS } from "../commonFunctions"
 import { cachedFetch } from "../utils/apiCache";
 import useGA4BaseParams from "../hooks/useGA4BaseParams";
 import useGA4Tracker from "../hooks/useGA4Tracker";
+import SEO from "../components/SEO";
 
 export default function Chalisa() {
   const [chalisa, setChalisa] = useState([]);
@@ -34,7 +35,7 @@ export default function Chalisa() {
       try {
         if (currentPage === 1) setLoading(true);
         else setLoadingMore(true);
-        
+
         // Use cached fetch for better performance
         const json = await cachedFetch(
           `https://api.bhaktibhav.app/frontend/all-Chalisas-v1?page=${currentPage}&limit=${limit}`,
@@ -48,7 +49,7 @@ export default function Chalisa() {
           } else {
             setChalisa(prevChalisa => [...prevChalisa, ...json.data]);
           }
-          
+
           // Check if there are more items to load
           if (json.data.length < limit) {
             setHasMore(false);
@@ -77,10 +78,10 @@ export default function Chalisa() {
   // Infinite scroll handler with throttling
   useEffect(() => {
     let ticking = false;
-    
+
     const handleScroll = () => {
       if (loadingMore || !hasMore) return;
-      
+
       if (!ticking) {
         window.requestAnimationFrame(() => {
           const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
@@ -119,15 +120,16 @@ export default function Chalisa() {
 
   return (
     <>
+      <SEO title="Download Chalisa App – Hanuman, Shani Dev, Lakshmi, Kali Chalisa | भक्ति भाव" description="Get all Chalisa in one app – Hanuman, Shiv, Durga, Ganesh, Lakshmi, Kali & Shani Chalisa with path guide. Simple, fast & devotional experience. Download now! | भक्ति भाव" canonical="https://bhaktibhav.app/chalisa" />
       <Header pageName={{ hi: "pkyhlk", en: "Chalisa" }} />
-      <div className= "h-1"></div>
+      <div className="h-1"></div>
       <PageTitleCard
         titleHi={"चालीसा"}
         titleEn={"Chalisa"}
         customFontSize={"18px"}
         customEngFontSize={"13px"}
-        
-      /> 
+
+      />
 
       {/* Katha Grid */}
       <div className="container mx-auto px-4 mt-4">
@@ -137,7 +139,7 @@ export default function Chalisa() {
               <Link
                 to={handleNavigate(chalisa._id, chalisa.accessType)}
                 className="theme_bg bg-white rounded-xl shadow hover:bg-yellow-50 transition block overflow-hidden"
-              > 
+              >
                 <div className="w-full h-40 flex items-center justify-center">
                   <img
                     src={chalisa.imagethumb?.startsWith("http")
@@ -149,7 +151,7 @@ export default function Chalisa() {
                     loading="lazy"
                     decoding="async"
                   />
-                </div> 
+                </div>
 
                 <div className="px-3 py-4">
                   {chalisa.name?.hi && (
@@ -159,7 +161,7 @@ export default function Chalisa() {
                   )}
                   {chalisa.name?.en && (
                     <p className={`text-sm truncate font-eng ${isSubscribed ? "" : chalisa.accessType === "paid" ? "blur-sm" : ""}`}>{chalisa.name.en}</p>
-                  )} 
+                  )}
                 </div>
               </Link>
             </li>
@@ -182,7 +184,7 @@ export default function Chalisa() {
         </div>
       )} */}
 
-      
+
     </>
   );
 }

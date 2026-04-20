@@ -6,6 +6,7 @@ import PageTitleCard from "../components/PageTitleCard";
 import useGA4BaseParams from "../hooks/useGA4BaseParams";
 import useGA4Tracker from "../hooks/useGA4Tracker";
 import { GA4Events } from "../utils/ga4Events.enum";
+import SEO from "../components/SEO";
 
 function Rashifal() {
   const [rashis, setRashis] = useState([]);
@@ -136,6 +137,8 @@ const replacements = {
   };
   return (
     <>
+
+      <SEO title = "Daily Horoscope Hindi, Today Rashifal, Weekly & Monthly Rashifal | भक्ति भाव" description="Get today rashifal in Hindi, daily horoscope updates, and weekly & monthly zodiac predictions for all signs – Bhakti Bhav." canonical="https://bhaktibhav.app/rashifal"/>
       <Header pageName={{ hi: "jkf'kQy", en: "Rashifal" }} />
 
       <PageTitleCard

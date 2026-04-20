@@ -16,6 +16,7 @@ import homeCache from "../utils/homeCache";
 import useGA4BaseParams from "../hooks/useGA4BaseParams";
 import useGA4Tracker from "../hooks/useGA4Tracker";
 import { GA4Events } from "../utils/ga4Events.enum";
+import SEO from "../components/SEO";
 
 function Home() {
 
@@ -275,6 +276,11 @@ function Home() {
 
     return (
         <>
+            <SEO
+            title = "Best Hindu Devotional App for Daily Puja, Mantras & Aarti | भक्ति भाव"
+            description = "Experience devotion with our Hinduism app offering daily devotional content, bhajans, aarti, and online Hindu services. Connect with divine energy every day."
+            canonical = "https://bhaktibhav.app/"
+            />
             <Header />
             <div className="container mx-auto mt-4 flex flex-col px-4 md:px-0">
                 <section className="bg-[#FFFAF4] rounded-xl text-sm space-y-1 shadow-md">
