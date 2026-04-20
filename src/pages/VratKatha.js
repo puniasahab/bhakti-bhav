@@ -13,6 +13,7 @@ import SEO from "../components/SEO";
 import useGA4BaseParams from "../hooks/useGA4BaseParams";
 import useGA4Tracker from "../hooks/useGA4Tracker";
 import { GA4Events } from "../utils/ga4Events.enum";
+import { homeSchema } from "../seo/schemas";
 
 
 export default function VratKatha() {
@@ -468,7 +469,7 @@ export default function VratKatha() {
   return (
     <>
 
-      <SEO title="Complete Hindu Vrat Katha Collection in Hindi | All Vrat Stories | भक्ति भाव" description="Explore complete Hindu vrat katha collection including Ekadashi, Pradosh, Purnima, and more with pooja vidhi and benefits in Hindi" canonical="https://bhaktibhav.app/vrat-katha" />
+      <SEO title="Complete Hindu Vrat Katha Collection in Hindi | All Vrat Stories | भक्ति भाव" description="Explore complete Hindu vrat katha collection including Ekadashi, Pradosh, Purnima, and more with pooja vidhi and benefits in Hindi" canonical="https://bhaktibhav.app/vrat-katha" schema={homeSchema}/>
       <Header />
 
       <PageTitleCard

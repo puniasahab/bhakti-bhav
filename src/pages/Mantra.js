@@ -11,6 +11,7 @@ import { GA4Events } from "../utils/ga4Events.enum";
 import useGA4BaseParams from "../hooks/useGA4BaseParams";
 import useGA4Tracker from "../hooks/useGA4Tracker";
 import SEO from "../components/SEO";
+import { homeSchema } from "../seo/schemas";
 
 
 export default function Mantra() {
@@ -115,7 +116,7 @@ export default function Mantra() {
 
   return (
     <>
-    <SEO title = "Mantra App Free Download – Hindu Mantras & Meditation | भक्ति भाव" description="Install free mantra app for meditation, stress relief & inner peace. Explore Hindu mantra chanting in Hindi with powerful daily mantras. Start your spiritual journey with Bhakti Bhav." canonical="https://bhaktibhav.app/mantra"/>
+    <SEO title = "Mantra App Free Download – Hindu Mantras & Meditation | भक्ति भाव" description="Install free mantra app for meditation, stress relief & inner peace. Explore Hindu mantra chanting in Hindi with powerful daily mantras. Start your spiritual journey with Bhakti Bhav." canonical="https://bhaktibhav.app/mantra" schema={homeSchema}/>
     <div className="bg-[url('../img/home_bg.png')] bg-cover bg-top bg-no-repeat min-h-screen w-full font-hindi text-white">
       <Header />
 

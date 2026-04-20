@@ -1,7 +1,7 @@
 // src/components/SEO.jsx
 import { Helmet } from 'react-helmet-async'
 
-export default function SEO({ title, description, canonical }) {
+export default function SEO({ title, description, canonical, schema }) {
   return (
     <Helmet>
       <title>{title}</title>
@@ -16,6 +16,12 @@ export default function SEO({ title, description, canonical }) {
       <meta name="twitter:title" content={title} />
       <meta name="twitter:description" content={description} />
       <meta name="twitter:card" content="summary" />
+      {/* ✅ Schema Markup */}
+      {schema && (
+        <script type="application/ld+json">
+          {JSON.stringify(schema)}
+        </script>
+      )}
     </Helmet>
   )
 }

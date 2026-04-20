@@ -10,6 +10,7 @@ import { GA4Events } from "../utils/ga4Events.enum";
 import useGA4BaseParams from "../hooks/useGA4BaseParams";
 import useGA4Tracker from "../hooks/useGA4Tracker";
 import SEO from "../components/SEO";
+import { homeSchema } from "../seo/schemas";
 
 export default function Aarti() {
   const [items, setItems] = useState([]);
@@ -118,7 +119,7 @@ export default function Aarti() {
     return <p className="text-center py-10 theme_text">❌ No items found</p>;
   return (
     <>
-      <SEO title="Aarti App Download – लक्ष्मी, वैष्णो देवी, सत्यनारायण आरती | भक्ति भाव" description="सभी देवी-देवताओं की आरती पढ़ने और सुनने के लिए Aarti App डाउनलोड करें – विष्णु, लक्ष्मी, संतोषी माता, सरस्वती और सत्यनारायण। | भक्ति भाव" canonical="https://bhaktibhav.app/aarti" />
+      <SEO title="Aarti App Download – लक्ष्मी, वैष्णो देवी, सत्यनारायण आरती | भक्ति भाव" description="सभी देवी-देवताओं की आरती पढ़ने और सुनने के लिए Aarti App डाउनलोड करें – विष्णु, लक्ष्मी, संतोषी माता, सरस्वती और सत्यनारायण। | भक्ति भाव" canonical="https://bhaktibhav.app/aarti" schema={homeSchema} />
       <Header pageName={{ hi: "vkjrh", en: "Aarti" }} />
 
       <PageTitleCard

@@ -6,6 +6,7 @@ import TodayThoughts from "../components/TodayThoughts";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination, Autoplay } from "swiper/modules";
 import { useNavigate } from "react-router-dom";
+import { homeSchema } from "../seo/schemas";
 
 import "swiper/css";
 import "swiper/css/pagination";
@@ -280,6 +281,7 @@ function Home() {
             title = "Best Hindu Devotional App for Daily Puja, Mantras & Aarti | भक्ति भाव"
             description = "Experience devotion with our Hinduism app offering daily devotional content, bhajans, aarti, and online Hindu services. Connect with divine energy every day."
             canonical = "https://bhaktibhav.app/"
+            schema = {homeSchema}
             />
             <Header />
             <div className="container mx-auto mt-4 flex flex-col px-4 md:px-0">

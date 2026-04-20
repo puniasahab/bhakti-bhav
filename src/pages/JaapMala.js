@@ -10,6 +10,7 @@ import { GA4Events } from "../utils/ga4Events.enum";
 import useGA4BaseParams from "../hooks/useGA4BaseParams";
 import useGA4Tracker from "../hooks/useGA4Tracker";
 import SEO from "../components/SEO";
+import { homeSchema } from "../seo/schemas";
 
 function JaapMala() {
   const [data, setData] = useState([]);
@@ -144,7 +145,7 @@ function JaapMala() {
 
   return (
     <>
-    <SEO title = "Best Jaap Mala Counter App – Digital Chanting Beads & Jap | भक्ति भाव" description="Track your mantra chanting with a digital mala jap app. Supports 5 mukhi, 9 mukhi Rudraksha, Tulsi mala and more. Simple, accurate and भक्तिमय experience." canonical="https://bhaktibhav.app/jaap-mala" />
+    <SEO title = "Best Jaap Mala Counter App – Digital Chanting Beads & Jap | भक्ति भाव" description="Track your mantra chanting with a digital mala jap app. Supports 5 mukhi, 9 mukhi Rudraksha, Tulsi mala and more. Simple, accurate and भक्तिमय experience." canonical="https://bhaktibhav.app/jaap-mala" schema={homeSchema} />
       <Header pageName={{ hi: "tkkp ekyk", en: "Jaap mala" }} />
       <PageTitleCard
         titleHi={"tki ekyk"}

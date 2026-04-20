@@ -9,6 +9,7 @@ import { cachedFetch } from "../utils/apiCache";
 import useGA4BaseParams from "../hooks/useGA4BaseParams";
 import useGA4Tracker from "../hooks/useGA4Tracker";
 import SEO from "../components/SEO";
+import { homeSchema } from "../seo/schemas";
 
 export default function Chalisa() {
   const [chalisa, setChalisa] = useState([]);
@@ -120,7 +121,7 @@ export default function Chalisa() {
 
   return (
     <>
-      <SEO title="Download Chalisa App – Hanuman, Shani Dev, Lakshmi, Kali Chalisa | भक्ति भाव" description="Get all Chalisa in one app – Hanuman, Shiv, Durga, Ganesh, Lakshmi, Kali & Shani Chalisa with path guide. Simple, fast & devotional experience. Download now! | भक्ति भाव" canonical="https://bhaktibhav.app/chalisa" />
+      <SEO title="Download Chalisa App – Hanuman, Shani Dev, Lakshmi, Kali Chalisa | भक्ति भाव" description="Get all Chalisa in one app – Hanuman, Shiv, Durga, Ganesh, Lakshmi, Kali & Shani Chalisa with path guide. Simple, fast & devotional experience. Download now! | भक्ति भाव" canonical="https://bhaktibhav.app/chalisa" schema={homeSchema} />
       <Header pageName={{ hi: "pkyhlk", en: "Chalisa" }} />
       <div className="h-1"></div>
       <PageTitleCard
