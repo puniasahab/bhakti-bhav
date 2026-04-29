@@ -65,7 +65,8 @@ export default function PaymentDrop() {
         const verifyPayment = async () => {
           try {
             const resp = await paymentApis.verifyPayments({
-              order_id: paymentResponse.data.cashfree.order_id
+              order_id: paymentResponse.data.cashfree.order_id,
+              source: "web",
             });
             console.log("Payment verification response:", resp);
             

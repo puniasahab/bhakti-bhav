@@ -52,6 +52,7 @@ const Kundli = lazy(() => import("./pages/kundli"));
 const ParsadPage = lazy(() => import("./pages/ParsadPage"));
 const WinnersList = lazy(() => import("./pages/WinnersList"));
 const Blogs = lazy(() => import("./pages/Blogs"));
+const BlogDetail = lazy(() => import("./pages/BlogDetail"));
 const PaymentComplete = lazy(() => import("./pages/PaymentComplete"));
 const ContactUs = lazy(() => import("./pages/ContactUs"));
 
@@ -151,6 +152,7 @@ function App() {
                     <Route path="/parsad" element={<Suspense><ParsadPage /></Suspense>} />
                     <Route path="/winners" element={<Suspense><WinnersList /></Suspense>} />
                     <Route path="/blogs" element={<Suspense><Blogs /></Suspense>} />
+                    <Route path="/blogs/:id" element={<Suspense><BlogDetail /></Suspense>} />
                     <Route path="/payment-complete" element={<Suspense><PaymentComplete /></Suspense>} />
                     <Route path="/contact-us" element={<Suspense><ContactUs /></Suspense>} />
                   </Routes>

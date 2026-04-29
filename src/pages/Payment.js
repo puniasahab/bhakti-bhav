@@ -174,7 +174,7 @@ export default function Payment() {
     );
 
     const res = await paymentApis.makePayment(
-      { planId: planDetails[0]._id, amount: planDetails[0].price, name: profile.name, email: profile.email, phone: profile.mobileNumber }
+      { planId: planDetails[0]._id, amount: planDetails[0].price, name: profile.name, email: profile.email, phone: profile.mobileNumber, source: "web" }
     );
 
     if(res.success) {

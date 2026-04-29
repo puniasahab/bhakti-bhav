@@ -9,7 +9,6 @@ export default function Blogs() {
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selected, setSelected] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -30,92 +29,6 @@ export default function Blogs() {
   }, []);
 
   if (loading) return <Loader message="🙏 Loading Blogs 🙏" size={200} />;
-
-  // ── Blog Detail Page ────────────────────────────────────────────────────────
-  if (selected) {
-    return (
-      <>
-        {/* Reuse the same app Header with back button */}
-        <Header pageName={{ hi: "CykWx", en: "Blogs" }} />
-
-        <div className="min-h-screen pb-24" style={{ backgroundColor: "#FFFAF4" }}>
-
-          {/* Hero image — full width, rounded corners, respects container */}
-          {selected?.blog_images && selected.blog_images.length > 0 && (
-            <div className="container mx-auto px-4 pt-4">
-              <div className="w-full rounded-2xl overflow-hidden shadow-md">
-                <img
-                  src={selected.blog_images[0].url}
-                  alt={selected.blog_images[0].alt || selected.title}
-                  className="w-full h-auto object-contain"
-                />
-              </div>
-            </div>
-          )}
-
-          <div className="container mx-auto px-4 pt-5 pb-10">
-
-            {/* Title */}
-            <h2 className="font-eng font-bold text-[#9A283D] text-xl leading-snug mb-1">
-              {selected.title}
-            </h2>
-
-            {/* Gradient underline accent */}
-            <div
-              className="w-12 h-[3px] rounded-full mb-4"
-              style={{ background: "linear-gradient(to right, #9A283D, #F5A418)" }}
-            />
-
-            {/* Description — short summary, styled as intro */}
-            {/* {selected.description && (
-              <p className="font-eng text-sm font-medium text-[#9A283D]/80 leading-relaxed bg-[#9A283D]/5 border-l-4 border-[#9A283D]/40 pl-3 py-2 rounded-r-xl mb-5">
-                {selected.description}
-              </p>
-            )} */}
-
-            {/* Body — full HTML content from API */}
-            {selected.body_html && (
-              <div
-                className="blog-body"
-                dangerouslySetInnerHTML={{
-                  __html: selected.body_html
-                    .replace(/&amp;nbsp;/g, "\u00a0")
-                    .replace(/&nbsp;/g, "\u00a0"),
-                }}
-              />
-            )}
-
-            {/* Remaining blog images (index 1 onwards) */}
-            {selected?.blog_images && selected.blog_images.length > 1 && (
-              <div className="mt-5 space-y-3">
-                {selected.blog_images.slice(1).map((img, idx) => (
-                  <div key={idx} className="w-full rounded-2xl overflow-hidden shadow-sm">
-                    <img
-                      src={img.url}
-                      alt={img.alt || `Blog image ${idx + 2}`}
-                      className="w-full h-auto object-contain"
-                      loading="lazy"
-                    />
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Back to Blogs — fixed at bottom */}
-        <div className="fixed bottom-0 left-0 right-0 z-40 flex justify-center pb-4 pt-2 bg-gradient-to-t from-[#FFFAF4]/90 to-transparent pointer-events-none">
-          <button
-            onClick={() => { setSelected(null); window.scrollTo(0, 0); }}
-            className="font-eng font-bold text-white py-3 px-8 rounded-full shadow-lg pointer-events-auto"
-            style={{ backgroundColor: "#9A283D" }}
-          >
-            ← Back to Blogs
-          </button>
-        </div>
-      </>
-    );
-  }
 
   // ── Blog List Page ──────────────────────────────────────────────────────────
   return (
@@ -148,7 +61,7 @@ export default function Blogs() {
             return (
               <div
                 key={blog.id}
-                onClick={() => { setSelected(blog); window.scrollTo(0, 0); }}
+                onClick={() => { navigate(`/blogs/${blog.id}`); window.scrollTo(0, 0); }}
                 className="flex gap-3 bg-[rgba(255,250,244,0.92)] rounded-2xl shadow-md overflow-hidden cursor-pointer active:scale-[0.98] transition-transform"
                 style={{ border: "1.5px solid #E9B9C5" }}
               >

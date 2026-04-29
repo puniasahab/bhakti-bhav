@@ -279,6 +279,26 @@ console.log("Consoling line response:", data);
       throw error;
     }
   },
+
+  getBlogById: async (id) => {
+    try {
+      const url  = `https://drupal.df3.club/api/blogs?blog_uuid=${id}`;
+      const response = await fetch(url, {
+        headers: {
+          "Accept": "application/vnd.api+json",
+          "Content-Type": "application/vnd.api+json",
+          "User-Agent": "Mozilla/5.0" // ✅ Helps bypass basic bot detection
+        }
+      });
+
+      const data = await response.json();
+      console.log("Consoling line response:", data);
+      return data;
+    } catch (error) {
+      console.error("Error fetching blog by ID:", error);
+      throw error;
+    }
+  }
 };
 
 export const contactUsApis = {
