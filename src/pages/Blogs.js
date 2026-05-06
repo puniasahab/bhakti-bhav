@@ -84,7 +84,14 @@ export default function Blogs() {
                   </h3>
                   {blog.description && (
                     <p className="font-eng text-xs text-gray-600 mt-1 line-clamp-2 leading-relaxed">
-                      {blog.description}
+                      {blog.description && (
+                        <div
+                          className="blog-body"
+                          dangerouslySetInnerHTML={{
+                            __html: blog.description
+                          }}
+                        />
+                      )}
                     </p>
                   )}
                   <span className="font-eng text-xs text-[#9A283D] font-semibold mt-1.5">

@@ -89,8 +89,6 @@ export default function BlogDetail() {
               className="blog-body"
               dangerouslySetInnerHTML={{
                 __html: blog.description
-                  .replace(/&amp;nbsp;/g, "\u00a0")
-                  .replace(/&nbsp;/g, "\u00a0"),
               }}
             />
           )}
