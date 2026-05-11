@@ -66,6 +66,22 @@ const preloadCommonRoutes = () => {
   }, 2000);
 };
 
+// Wrapper that marks the login flow source when /home-v1 is accessed
+function HomeV1Wrapper() {
+  useEffect(() => {
+    sessionStorage.setItem("loginSource", "home-v1");
+  }, []);
+  return <Home />;
+}
+
+// Wrapper for the regular home — clears any previous home-v1 source
+function HomeWrapper() {
+  useEffect(() => {
+    sessionStorage.removeItem("loginSource");
+  }, []);
+  return <Home />;
+}
+
 function App() {
 
   const FIREBASE_DEBUG_MODE = true;
@@ -117,7 +133,8 @@ function App() {
                 <PujaKareProvider>
                   <Routes>
                     {/* Home is directly imported — no Suspense, no loader, instant render */}
-                    <Route path="/" element={<Home />} />
+                    <Route path="/" element={<HomeWrapper />} />
+                    <Route path="/home-v1" element={<HomeV1Wrapper />} />
                     {/* All other routes are lazy-loaded with Suspense (no fallback loader) */}
                     <Route path="/vrat-katha" element={<Suspense><VratKatha /></Suspense>} />
                     <Route path="/vrat-katha/:id" element={<Suspense><VratKathaDetail /></Suspense>} />

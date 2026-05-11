@@ -11,6 +11,8 @@ function Login() {
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
+    const loginSource = sessionStorage.getItem("loginSource") || "home"; // "home-v1" or "home"
+
     const baseParams = useGA4BaseParams("Login Screen");
     const { trackEvent } = useGA4Tracker(baseParams);
 
@@ -76,7 +78,7 @@ function Login() {
             setMobileNoInLS(mobile)
         }
 
-        navigate("/verify-otp", { state: { mobile } });
+        navigate("/verify-otp", { state: { mobile, loginSource } });
     };
 
     useEffect(() => {
@@ -131,6 +133,17 @@ function Login() {
                             >
                                 Send OTP
                             </button>
+
+                            {/* Skip button — only shown when coming from /home-v1 */}
+                            {loginSource === "home-v1" && (
+                                <button
+                                    type="button"
+                                    onClick={() => navigate("/")}
+                                    className="w-full mt-3 text-[#9A283D] md:text-base text-xl py-2 rounded-lg border border-[#9A283D] hover:bg-[#9A283D]/5 transition font-eng"
+                                >
+                                    Skip
+                                </button>
+                            )}
                         </form>
 
 

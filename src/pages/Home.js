@@ -505,7 +505,15 @@ function Home() {
                         <div className="px-5 pt-4 pb-5 bg-[#F5E6C8]">
                             <div className="flex gap-3 mb-3">
                                 <button
-                                    onClick={() => { setShowLoginModal(false); trackEvent(GA4Events.free_login_cta_clicked, { event_label: "free_login_skipped" }); }}
+                                    onClick={() => {
+                                        setShowLoginModal(false);
+                                        trackEvent(GA4Events.free_login_cta_clicked, { event_label: "free_login_skipped" });
+                                        // If user arrived via /home-v1, redirect to "/" on skip
+                                        if (sessionStorage.getItem("loginSource") === "home-v1") {
+                                            sessionStorage.removeItem("loginSource");
+                                            navigate("/");
+                                        }
+                                    }}
                                     className="flex-1 bg-white text-[#9A283D] font-eng font-semibold py-3 rounded-2xl shadow"
                                 >
                                     Skip

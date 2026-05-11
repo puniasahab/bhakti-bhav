@@ -10,6 +10,7 @@ function VerifyOtp() {
     const location = useLocation();
     const navigate = useNavigate();
     const phone = location.state?.phone || "";
+    const loginSource = location.state?.loginSource || sessionStorage.getItem("loginSource") || "home";
 
     const otpScreenOpenedTracker = useRef(false);
 
@@ -129,7 +130,13 @@ function VerifyOtp() {
 
             if (data && data?.token?.length > 0) {
                 setTokenInLS(data.token);
-                navigate(-2); // redirect to home/dashboard
+                // Redirect based on which home flow triggered the login
+                if (loginSource === "home-v1") {
+                    sessionStorage.removeItem("loginSource");
+                    navigate("/payment");
+                } else {
+                    navigate(-2); // default: go back to where login was triggered
+                }
             }
         } catch (error) {
             console.error("Verify API Error:", error);

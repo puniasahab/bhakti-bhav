@@ -19,6 +19,7 @@ function Splash() {
     }
   }, []);
 
+  
   return (
    <div className="flex items-center justify-center h-screen relative">
       <div className="absolute inset-0 top-0 md:w-[15%] md:left-[35%]">
