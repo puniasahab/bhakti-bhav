@@ -5,9 +5,8 @@ import rupeesIcon from "../assets/img/rupees_icon.png";
 import userIcon from "../assets/img/hd_user_icon.png";
 import logo from "../assets/img/logo.png";
 import backBtn from "../assets/img/back_icon.svg";
-import { ReceiptText } from "lucide-react";
+import { Check, ChevronLeft, Download, Eye, Globe2, Heart, LogOut, MoreVertical, Pencil, ReceiptText } from "lucide-react";
 import { LanguageContext } from "../contexts/LanguageContext";
-import { Download, Eye, Heart, Pencil, MoreVertical, LogOut } from "lucide-react";
 import { getTokenFromLS, removeMobileNoFromLS, removeSubscriptionStatusFromLS, removeTokenFromLS, formatNumber, removeUserName, removeUserIdFromLS } from "../commonFunctions";
 import useGA4Tracker from "../hooks/useGA4Tracker";
 import { GA4Events } from "../utils/ga4Events.enum";
@@ -31,8 +30,18 @@ function Header({
 }) {
     const { pathname } = useLocation();
     const navigate = useNavigate();
-    const { language, setLanguage, fontSize, setFontSize } = useContext(LanguageContext);
+    const {
+        language,
+        setLanguage,
+        languages,
+        languageLoading,
+        languageError,
+        fetchLanguages,
+        setFontSize
+    } = useContext(LanguageContext);
     const [showDropdown, setShowDropdown] = useState(false);
+    const [showLanguageModal, setShowLanguageModal] = useState(false);
+    const [pendingLanguage, setPendingLanguage] = useState(language);
     const dropdownRef = useRef(null);
 
     const baseParams = useGA4BaseParams("Header Component");
@@ -98,6 +107,46 @@ function Header({
         navigate("/");
     };
 
+    const openLanguageModal = () => {
+        setPendingLanguage(language);
+        setShowLanguageModal(true);
+        if (!languages.length && !languageLoading) {
+            fetchLanguages();
+        }
+    };
+
+    const handleLanguageSelect = (code) => {
+        setPendingLanguage(code);
+        setLanguage(code);
+    };
+
+    const closeLanguageModal = () => {
+        setPendingLanguage(language);
+        setShowLanguageModal(false);
+    };
+
+    const handleLanguageContinue = () => {
+        setLanguage(pendingLanguage);
+        setShowLanguageModal(false);
+    };
+
+    const getLanguageImageUrl = (imageUrl) => {
+        if (!imageUrl) return "";
+        return imageUrl.startsWith("http://") ? imageUrl.replace("http://", "https://") : imageUrl;
+    };
+
+    const renderLanguageButton = (className = "") => (
+        <button
+            type="button"
+            onClick={openLanguageModal}
+            className={`bg-white rounded-full p-2 shadow-md border border-gray-200 hover:bg-gray-50 transition-colors ${className}`}
+            title="Select language"
+            aria-label="Select language"
+        >
+            <Globe2 size={20} className="text-[#9A283D]" />
+        </button>
+    );
+
 
     return (
         <>
@@ -117,6 +166,8 @@ function Header({
 
                             {/* Three Dots Menu */}
                             <div className="flex items-center gap-3">
+                                {renderLanguageButton()}
+
                                 {/* Edit Icon - Only show if not hidden */}
                                 {!hideEditIcon && (
                                     <button className="bg-white rounded-full p-2 shadow-md border border-gray-200 hover:bg-gray-50 transition-colors" onClick={() => { navigate("/edit-profile"); }}>
@@ -188,12 +239,7 @@ function Header({
 
                     {hindiFontSize && (
                         <div className="flex space-x-2 theme_text text-lg font-eng ml-auto max-[374px]:space-x-1 max-[374px]:text-sm">
-                            <button
-                                onClick={() => setLanguage(language === "hi" ? "en" : "hi")}
-                                className="px-2 border-[#9A283D] border rounded-lg max-[374px]:px-1 max-[374px]:py-1 max-[374px]:text-xs"
-                            >
-                                {language === "hi" ? "En" : "हिं"}
-                            </button>
+                            {renderLanguageButton("max-[374px]:p-1.5")}
                             <button
                                 onClick={() => setFontSize("text-base")}
                                 className="px-2 border-[#9A283D] border rounded-lg max-[374px]:px-1 max-[374px]:py-1 max-[374px]:text-xs"
@@ -210,6 +256,7 @@ function Header({
                     )}
                     {fontSizeOption && (
                         <div className="flex space-x-2 theme_text text-lg font-eng ml-auto">
+                            {renderLanguageButton()}
                             <button
                                 onClick={() => setFontSize("text-base")}
                                 className="px-2 border-[#9A283D] border rounded-lg"
@@ -225,6 +272,12 @@ function Header({
                         </div>
                     )}
 
+                    {!isHomeRoute && !showProfileHeader && !hindiFontSize && !fontSizeOption && (
+                        <div className="ml-auto">
+                            {renderLanguageButton()}
+                        </div>
+                    )}
+
                     {isHomeRoute && (
                         <>
                             <h1 className="text-lg font-bold">
@@ -234,6 +287,7 @@ function Header({
                             </h1>
 
                             <div className="flex items-center md:space-x-6 space-x-4 text-xl ms-auto">
+                                {renderLanguageButton("shadow-none border-0 p-0")}
                                 <button onClick={() => { trackEvent(GA4Events.rupees_icon_clicked, {event_label: "rupees_icon_clicked_from_home_screen"}); handlePaymentNavigation(); }}>
                                     <img src={rupeesIcon} alt="₹" width="22" height="22" />
                                 </button>
@@ -252,6 +306,103 @@ function Header({
         </header>
         {/* Spacer div to prevent content overlap */}
         <div className="h-20 w-full"></div>
+        {showLanguageModal && (
+            <div className="fixed inset-0 z-[60] flex justify-end bg-black bg-opacity-40" onClick={closeLanguageModal}>
+                <div
+                    className="h-full w-full max-w-md bg-white shadow-2xl flex flex-col"
+                    onClick={(event) => event.stopPropagation()}
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="language-modal-title"
+                >
+                    <div className="relative flex items-center justify-center px-6 pt-8 pb-7">
+                        <button
+                            type="button"
+                            onClick={closeLanguageModal}
+                            className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full p-2 hover:bg-gray-100 transition-colors"
+                            aria-label="Close language modal"
+                        >
+                            <ChevronLeft size={32} strokeWidth={2.8} className="text-black" />
+                        </button>
+                        <h2 id="language-modal-title" className="font-eng text-2xl font-bold tracking-normal text-black">
+                            Select Language
+                        </h2>
+                    </div>
+
+                    <div className="flex-1 overflow-y-auto px-5 pb-6">
+                        {languageLoading && (
+                            <p className="font-eng text-base text-gray-500">Loading languages...</p>
+                        )}
+
+                        {!languageLoading && languageError && (
+                            <div className="font-eng text-sm text-red-600">
+                                <p>{languageError}</p>
+                                <button
+                                    type="button"
+                                    onClick={fetchLanguages}
+                                    className="mt-3 rounded-xl border border-[#AA273F] px-4 py-2 text-[#AA273F]"
+                                >
+                                    Try again
+                                </button>
+                            </div>
+                        )}
+
+                        {!languageLoading && !languageError && (
+                            <div className="space-y-5">
+                                {languages.map((item) => {
+                                    const isSelected = item.code === pendingLanguage;
+                                    const languageImageUrl = getLanguageImageUrl(item.imageUrl);
+
+                                    return (
+                                        <button
+                                            key={item._id || item.code}
+                                            type="button"
+                                            onClick={() => handleLanguageSelect(item.code)}
+                                            className={`w-full flex items-center gap-4 rounded-2xl border px-4 py-4 text-left transition-colors ${
+                                                isSelected
+                                                    ? "border-[#AA273F] bg-[#EBD5DA] shadow-[0_8px_24px_rgba(170,39,63,0.22)]"
+                                                    : "border-[#E9C9B8] bg-white hover:border-[#AA273F]/70"
+                                            }`}
+                                        >
+                                            <div className="w-12 h-12 rounded-2xl bg-gray-100 flex items-center justify-center overflow-hidden shrink-0">
+                                                {languageImageUrl ? (
+                                                    <img src={languageImageUrl} crossOrigin = "anonoymous" alt={item.name} className="w-full h-full object-cover" />
+                                                ) : (
+                                                    <span className="w-8 h-8 rounded-full bg-[#FF9F2E] text-white flex items-center justify-center font-eng text-lg font-bold">
+                                                        !
+                                                    </span>
+                                                )}
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <p className={`font-eng text-2xl font-bold truncate ${isSelected ? "text-[#AA273F]" : "text-[#222222]"}`}>
+                                                    {item.name}
+                                                </p>
+                                            </div>
+                                            <span className={`w-9 h-9 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                                                isSelected ? "border-[#AA273F] bg-[#AA273F]" : "border-[#B9B9B9] bg-white"
+                                            }`}>
+                                                {isSelected && <Check size={24} strokeWidth={2.8} className="text-white" />}
+                                            </span>
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="px-5 pb-6 pt-3 bg-white">
+                        <button
+                            type="button"
+                            onClick={handleLanguageContinue}
+                            disabled={languageLoading || Boolean(languageError) || !languages.length}
+                            className="w-full rounded-2xl bg-[#AA273F] py-5 font-eng text-2xl font-bold text-white shadow-[0_8px_18px_rgba(0,0,0,0.18)] disabled:opacity-60"
+                        >
+                            Continue
+                        </button>
+                    </div>
+                </div>
+            </div>
+        )}
         </>
     );
 }

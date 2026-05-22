@@ -16,4 +16,7 @@ export const endPoints = {
     banner: 'banners',
     wallpaperCategories: 'wallpaper-categories',
     contactUs: "contact-us",
+    lang: "lang",
+    splashScreen: "analytics/app-install/open",
+    featureCategory: 'feature-category',
 }

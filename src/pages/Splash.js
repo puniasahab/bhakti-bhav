@@ -1,9 +1,51 @@
 import React, { useEffect, useRef } from "react";
 
-import {GA4Events} from "../utils/ga4Events.enum";
+import { GA4Events } from "../utils/ga4Events.enum";
+import { splashScreenApi } from "../api";
+import { AUTH_TOKEN_KEY, getDeviceId, getDeviceTokenFromLS, getFirebaseAppInstanceIdFromLS, getTokenFromLS, setTokenInLS, setUserIdInLS } from "../commonFunctions";
 
 import useGA4BaseParams from "../hooks/useGA4BaseParams";
 import useGA4Tracker from "../hooks/useGA4Tracker";
+
+const getSplashPlatform = () => {
+  const userAgent = navigator.userAgent || navigator.vendor || window.opera || "";
+  if (/iPad|iPhone|iPod/.test(userAgent)) return "ios";
+  if (/android/i.test(userAgent)) return "android";
+  return "web";
+};
+
+const getSplashCountryCode = () => {
+  const language = navigator.language || "";
+  return language.toLowerCase().includes("-in") ? "91" : "91";
+};
+
+const getSplashAuthData = (response) => {
+  const queue = [response];
+  const visited = new Set();
+  let token = null;
+  let userId = null;
+
+  while (queue.length > 0 && (!token || !userId)) {
+    const item = queue.shift();
+    if (!item || typeof item !== "object" || visited.has(item)) continue;
+
+    visited.add(item);
+
+    token = token || item.token || item.accessToken || item.authToken || item.jwt;
+    userId = userId || item.userId || item._id || item.id;
+
+    Object.values(item).forEach((value) => {
+      if (value && typeof value === "object") {
+        queue.push(value);
+      }
+    });
+  }
+
+  return {
+    token,
+    userId
+  };
+};
 
 function Splash() {
 
@@ -13,11 +55,46 @@ function Splash() {
   const hasTrackedRef = useRef(false);
 
   useEffect(() => {
+    const fetchSplashScreenData = async () => {
+      try {
+        const deviceId = getDeviceId();
+        const payload = {
+          firebaseAppInstanceId: getFirebaseAppInstanceIdFromLS(),
+          deviceId,
+          deviceToken: getDeviceTokenFromLS(),
+          appVersion: process.env.REACT_APP_VERSION || "testversion",
+          platform: getSplashPlatform(),
+          countryCode: getSplashCountryCode()
+        };
+
+        const response = await splashScreenApi.getSplashScreenData("v1", payload);
+        const { token, userId } = getSplashAuthData(response);
+
+        if (userId) {
+          setUserIdInLS(userId);
+        }
+
+        if (token) {
+          const savedToken = setTokenInLS(token);
+          console.log(`Splash token saved in localStorage key "${AUTH_TOKEN_KEY}":`, !!savedToken, getTokenFromLS());
+          console.log(getTokenFromLS(), " got token saved inside local storage at", new Date().toLocaleTimeString());
+        } else {
+          console.warn("Splash screen API response does not include token:", response);
+        }
+
+        console.log("Splash screen API response:", response);
+      } catch (error) {
+        console.error("Error fetching splash screen API response:", error);
+      }
+    };
+
+    fetchSplashScreenData();
+
     if (!hasTrackedRef.current) {
       trackEvent(GA4Events.website_splash_screen_displayed);
       hasTrackedRef.current = true;
     }
-  }, []);
+  }, [trackEvent]);
 
   
   return (

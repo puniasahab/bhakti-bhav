@@ -1,11 +1,46 @@
 // const wallpaper = require('wallpaper');
 
+export const AUTH_TOKEN_KEY = 'bhaktiBhav:authToken';
+const LEGACY_AUTH_TOKEN_KEYS = ['authToken', 'token', 'bhaktiBhav:userToken'];
+
+const normalizeTokenValue = (token) => {
+    if (typeof token === 'string') {
+        const trimmedToken = token.trim();
+        return trimmedToken && trimmedToken !== 'undefined' && trimmedToken !== 'null' ? trimmedToken : null;
+    }
+
+    if (token && typeof token === 'object') {
+        return normalizeTokenValue(token.token || token.accessToken || token.authToken || token.value);
+    }
+
+    return null;
+};
+
 export const setTokenInLS = (token) => {
-    localStorage.setItem('authToken', token);
+    const normalizedToken = normalizeTokenValue(token);
+    if (!normalizedToken) {
+        console.warn('setTokenInLS skipped because token is missing or invalid:', token);
+        return null;
+    }
+
+    localStorage.setItem(AUTH_TOKEN_KEY, normalizedToken);
+    return normalizedToken;
 }
 
 export const getTokenFromLS = () => {
-    return localStorage.getItem('authToken');
+    const token = normalizeTokenValue(localStorage.getItem(AUTH_TOKEN_KEY));
+    if (token) return token;
+
+    for (const key of LEGACY_AUTH_TOKEN_KEYS) {
+        const legacyToken = normalizeTokenValue(localStorage.getItem(key));
+        if (legacyToken) {
+            setTokenInLS(legacyToken);
+            localStorage.removeItem(key);
+            return legacyToken;
+        }
+    }
+
+    return null;
 }
 
 
@@ -23,7 +58,8 @@ export const removeSubscriptionStatusFromLS = () => {
 }
 
 export const removeTokenFromLS = () => {
-    localStorage.removeItem('authToken');
+    localStorage.removeItem(AUTH_TOKEN_KEY);
+    LEGACY_AUTH_TOKEN_KEYS.forEach((key) => localStorage.removeItem(key));
 }
 
 export const isAuthenticated = () => {
@@ -59,14 +95,67 @@ export const formatNumber = (num) => {
 
 // ── Analytics helpers ──────────────────────────────────────────────────────
 
-/** Persist & retrieve a stable device fingerprint for this browser profile */
+const DEVICE_ID_KEY = "deviceId";
+const DEVICE_TOKEN_KEY = "deviceToken";
+const FIREBASE_APP_INSTANCE_ID_KEY = "firebaseAppInstanceId";
+
+const createUuid = () => {
+  if (typeof crypto !== "undefined" && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (char) => {
+    const random = Math.random() * 16 | 0;
+    const value = char === "x" ? random : ((random & 0x3) | 0x8);
+    return value.toString(16);
+  });
+};
+
+const isUuid = (value) => {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value || "");
+};
+
+export const setDeviceIdInLS = (deviceId) => {
+  localStorage.setItem(DEVICE_ID_KEY, deviceId);
+};
+
+/** Persist & retrieve a stable UUID device ID for this browser profile */
 export const getDeviceId = () => {
-  let deviceId = localStorage.getItem("deviceId");
-  if (!deviceId) {
-    deviceId = "dev_" + Math.random().toString(36).slice(2) + Date.now().toString(36);
-    localStorage.setItem("deviceId", deviceId);
+  let deviceId = localStorage.getItem(DEVICE_ID_KEY);
+  if (!isUuid(deviceId)) {
+    deviceId = createUuid();
+    setDeviceIdInLS(deviceId);
   }
   return deviceId;
+};
+
+export const getDeviceIdFromLS = getDeviceId;
+
+export const setDeviceTokenInLS = (deviceToken) => {
+  localStorage.setItem(DEVICE_TOKEN_KEY, deviceToken);
+};
+
+export const getDeviceTokenFromLS = () => {
+  let deviceToken = localStorage.getItem(DEVICE_TOKEN_KEY);
+  if (!deviceToken) {
+    deviceToken = getDeviceId();
+    setDeviceTokenInLS(deviceToken);
+  }
+  return deviceToken;
+};
+
+export const setFirebaseAppInstanceIdInLS = (firebaseAppInstanceId) => {
+  localStorage.setItem(FIREBASE_APP_INSTANCE_ID_KEY, firebaseAppInstanceId);
+};
+
+export const getFirebaseAppInstanceIdFromLS = () => {
+  const deviceId = getDeviceId();
+  let firebaseAppInstanceId = localStorage.getItem(FIREBASE_APP_INSTANCE_ID_KEY);
+  if (!firebaseAppInstanceId || !firebaseAppInstanceId.startsWith(`${deviceId}_`)) {
+    firebaseAppInstanceId = `${deviceId}_${createUuid()}`;
+    setFirebaseAppInstanceIdInLS(firebaseAppInstanceId);
+  }
+  return firebaseAppInstanceId;
 };
 
 /** New session ID each time the app is opened (stored in sessionStorage) */
@@ -81,13 +170,13 @@ export const getSessionId = () => {
 
 /** Store user ID (backend _id) after login */
 export const setUserIdInLS = (id) => {
-  localStorage.setItem("userId", id);
+  localStorage.setItem("bhaktiBhav:userId", id);
 };
 export const getUserIdFromLS = () => {
-  return localStorage.getItem("userId");
+  return localStorage.getItem("bhaktiBhav:userId");
 };
 export const removeUserIdFromLS = () => {
-  localStorage.removeItem("userId");
+  localStorage.removeItem("bhaktiBhav:userId");
 };
 
 

@@ -10,8 +10,8 @@ import { homeSchema } from "../seo/schemas";
 
 import "swiper/css";
 import "swiper/css/pagination";
-import { profileApis, wallpaperApis } from "../api";
-import { removeTokenFromLS, getMobileNoFromLS, setUserIdInLS, setUserName, removeSubscriptionStatusFromLS, setSubscriptionStatusInLS, getTokenFromLS, getDeviceId, getSessionId, getBrowserName, getSubscriptionStatusFromLS, getUserIdFromLS, getSubscriptionPlanFromLS } from "../commonFunctions";
+import { homeCategoryApis, profileApis, wallpaperApis } from "../api";
+import { getMobileNoFromLS, setUserIdInLS, setUserName, removeSubscriptionStatusFromLS, setSubscriptionStatusInLS, getTokenFromLS, getSubscriptionStatusFromLS } from "../commonFunctions";
 import homeCache from "../utils/homeCache";
 // import { trackEventCommonFunction } from "../utils/eventCommonFunctions";
 import useGA4BaseParams from "../hooks/useGA4BaseParams";
@@ -55,8 +55,67 @@ function Home() {
     });
     const [bannersData, setBannersData] = useState(() => homeCache.get("bannersData") || []);
     const [wallpaperImage, setWallpaperImage] = useState(() => homeCache.get("wallpaperImage") || "");
+    const [homeCategories, setHomeCategories] = useState(() => homeCache.get("homeCategories") || []);
     const hasFetchedBanners = useRef(false);
     const hasTrackedScreenView = useRef(false);
+
+    const fallbackHomeCategories = [
+        { _id: "hindi-calendar", imageUrl: "./img/icon_2.png", url: "hindi-calendar", title: "fgUnh dySaMj" },
+        { _id: "vrat-katha", imageUrl: "./img/icon_3.png", url: "vrat-katha", title: "ozr dFkk" },
+        { _id: "jaap-mala", imageUrl: "./img/icon_4.png", url: "jaap-mala", title: "tki ekyk" },
+        { _id: "mantra", imageUrl: "./img/icon_5.png", url: "mantra", title: "ea=" },
+        { _id: "chalisa", imageUrl: "./img/icon_1.png", url: "chalisa", title: "pkyhlk" },
+        { _id: "aarti", imageUrl: "./img/icon_6.png", url: "aarti", title: "vkjrh" }
+    ];
+
+    const categoryRouteMap = {
+        arti: "aarti",
+        "japp-mala": "jaap-mala",
+        108: "jaap-mala"
+    };
+
+    const categoryEventMap = {
+        "hindi-calendar": {
+            eventName: GA4Events.hindi_calendar_widget_clicked,
+            event_label: "hindi_calendar_card_clicked_on_home_screen"
+        },
+        "vrat-katha": {
+            eventName: GA4Events.vrat_katha_widget_clicked,
+            event_label: "vrat_katha_card_clicked_on_home_screen"
+        },
+        "jaap-mala": {
+            eventName: GA4Events.jaap_mala_widget_clicked,
+            event_label: "jaap_mala_card_clicked_on_home_screen"
+        },
+        mantra: {
+            eventName: GA4Events.mantra_widget_clicked,
+            event_label: "mantra_card_clicked_on_home_screen"
+        },
+        chalisa: {
+            eventName: GA4Events.chalisa_widget_clicked,
+            event_label: "chalisa_card_clicked_on_home_screen"
+        },
+        aarti: {
+            eventName: GA4Events.aarti_widget_clicked,
+            event_label: "aarti_card_clicked_on_home_screen"
+        },
+        wallpaper: {
+            eventName: GA4Events.wallpaper_widget_clicked,
+            event_label: "wallpaper_card_clicked_on_home_screen"
+        }
+    };
+
+    const getCategoryRoute = (category) => {
+        const url = String(category?.url || "").replace(/^\/+/, "");
+        return `/${categoryRouteMap[url] || url}`;
+    };
+
+    const getHomeCategoriesFromResponse = (response) => {
+        if (Array.isArray(response)) return response;
+        if (Array.isArray(response?.data)) return response.data;
+        if (Array.isArray(response?.categories)) return response.categories;
+        return [];
+    };
 
     // Helper to format raw panchang data into React elements
     const formatPanchangData = (rawData) => [
@@ -159,47 +218,51 @@ function Home() {
     const phoneNumber = getMobileNoFromLS();
 
     useEffect(() => {
+        let isMounted = true;
 
-        const fetchProfileData = async () => {
-            try {
-                const resp = await profileApis.getProfile();
-                if (resp) {
-
-                    setSubscriptionStatusInLS(resp.hasActivePlan)
-                    setUserIdInLS(resp._id);
-                    setUserName(resp.name === "New User" ? "" : resp.name || "");
-                    // Handle successful response
-                    console.log("Profile data:", resp);
-                }
-            } catch (error) {
-                removeTokenFromLS();
-                removeSubscriptionStatusFromLS();
-                console.error("Error fetching profile data:", error);
-            }
-        }
-        fetchProfileData();
-
-        // Skip banner fetch if we already have cached data
-        if (hasFetchedBanners.current && bannersData.length > 0) return;
-
-        // Check cache first for instant render
+        // Check cache first for instant render, but continue fetching other home APIs.
         const cachedBanners = homeCache.get("bannersData");
         const cachedWallpaper = homeCache.get("wallpaperImage");
+        const shouldUseCachedBanners = cachedBanners && cachedBanners.length > 0;
 
-        if (cachedBanners && cachedBanners.length > 0) {
+        if (shouldUseCachedBanners) {
             setBannersData(cachedBanners);
             setWallpaperImage(cachedWallpaper || "");
             hasFetchedBanners.current = true;
-            return;
         }
 
-        const fetchBanners = async () => {
-            try {
-                const banners = await wallpaperApis.getBanners();
+        const shouldFetchBanners = !shouldUseCachedBanners && !hasFetchedBanners.current;
+        const selectedLanguage = localStorage.getItem("bhakti_bhav_language") || "hi";
+
+        const homeApiPromises = [
+            profileApis.getProfile(),
+            shouldFetchBanners ? wallpaperApis.getBanners() : Promise.resolve(null),
+            homeCategoryApis.fetchHomeCategories(selectedLanguage)
+        ];
+
+        Promise.allSettled(homeApiPromises).then(([profileResult, bannersResult, homeCategoriesResult]) => {
+            if (!isMounted) return;
+
+            if (profileResult.status === "fulfilled") {
+                const resp = profileResult.value;
+                if (resp) {
+                    setSubscriptionStatusInLS(resp.hasActivePlan);
+                    setUserIdInLS(resp._id);
+                    setUserName(resp.name === "New User" ? "" : resp.name || "");
+                    console.log("Profile data:", resp);
+                }
+            } else {
+                // removeTokenFromLS();
+                removeSubscriptionStatusFromLS();
+                console.error("Error fetching profile data:", profileResult.reason);
+            }
+
+            if (bannersResult.status === "fulfilled" && bannersResult.value) {
+                const banners = bannersResult.value;
                 console.log("Banners:", banners);
 
-                const homeBanners = banners?.data.filter(b => b.pageName === "home") || [];
-                const wpImage = banners?.data.find(b => b.pageName === "homewallapaper" && b.imageUrl)?.imageUrl || "";
+                const homeBanners = banners?.data?.filter(b => b.pageName === "home") || [];
+                const wpImage = banners?.data?.find(b => b.pageName === "homewallapaper" && b.imageUrl)?.imageUrl || "";
 
                 setBannersData(homeBanners);
                 setWallpaperImage(wpImage);
@@ -208,12 +271,26 @@ function Home() {
                 homeCache.set("bannersData", homeBanners);
                 homeCache.set("wallpaperImage", wpImage);
                 hasFetchedBanners.current = true;
-            } catch (error) {
-                console.error("Error fetching banners:", error);
+            } else if (bannersResult.status === "rejected") {
+                console.error("Error fetching banners:", bannersResult.reason);
             }
-        };
 
-        fetchBanners();
+            if (homeCategoriesResult.status === "fulfilled") {
+                const categories = getHomeCategoriesFromResponse(homeCategoriesResult.value);
+                console.log("Home categories:", homeCategoriesResult.value);
+
+                if (categories.length > 0) {
+                    setHomeCategories(categories);
+                    homeCache.set("homeCategories", categories);
+                }
+            } else {
+                console.error("Error fetching home categories:", homeCategoriesResult.reason);
+            }
+        });
+
+        return () => {
+            isMounted = false;
+        };
     }, [phoneNumber])
 
     const requireLogin = (e) => {
@@ -224,54 +301,29 @@ function Home() {
         }
         return false;
     };
-    const handleHindiCalendarClicked = (e) => {
-        if (requireLogin(e)) return;
-        trackEvent(GA4Events.hindi_calendar_widget_clicked, {
-            event_label: "hindi_calendar_card_clicked_on_home_screen"
-        });
-    };
-
-    const handleVratKathaClicked = (e) => {
-        if (requireLogin(e)) return;
-        trackEvent(GA4Events.vrat_katha_widget_clicked, {
-            event_label: "vrat_katha_card_clicked_on_home_screen"
-        });
-    };
-
-    const handleJaapMalaClicked = (e) => {
-        if (requireLogin(e)) return;
-        trackEvent(GA4Events.jaap_mala_widget_clicked, {
-            event_label: "jaap_mala_card_clicked_on_home_screen"
-        });
-    };
-
-    const handleMantraClicked = (e) => {
-        if (requireLogin(e)) return;
-        trackEvent(GA4Events.mantra_widget_clicked, {
-            event_label: "mantra_card_clicked_on_home_screen"
-        });
-    };
-
-    const handleChalisaClicked = (e) => {
-        if (requireLogin(e)) return;
-        trackEvent(GA4Events.chalisa_widget_clicked, {
-            event_label: "chalisa_card_clicked_on_home_screen"
-        });
-    };
-
-    const handleAartiClicked = (e) => {
-        if (requireLogin(e)) return;
-        trackEvent(GA4Events.aarti_widget_clicked, {
-            event_label: "aarti_card_clicked_on_home_screen"
-        });
-    };
-
     const handleWallpaperClicked = (e) => {
         if (requireLogin(e)) return;
         trackEvent(GA4Events.wallpaper_widget_clicked, {
             event_label: "wallpaper_card_clicked_on_home_screen"
         });
     };
+
+    const handleHomeCategoryClicked = (category, e) => {
+        if (!category?.isWithoutLoginFree && requireLogin(e)) return;
+
+        const route = getCategoryRoute(category).replace(/^\//, "");
+        const eventConfig = categoryEventMap[route];
+
+        if (eventConfig?.eventName) {
+            trackEvent(eventConfig.eventName, {
+                event_label: eventConfig.event_label,
+                id: category?._id,
+                title: category?.title
+            });
+        }
+    };
+
+    const categoriesToShow = homeCategories.length > 0 ? homeCategories : fallbackHomeCategories;
 
 
 
@@ -357,14 +409,14 @@ function Home() {
                         }}
                         className="theme_bg bg-white rounded-xl shadow md:p-6 p-3 text-center hover:bg-yellow-50 transition w-auto flex">
                         <div className="mx-auto flex md:flex-row flex-col items-center space-y-3 md:space-y-0">
-                            <img src="./img/icon_1.png" alt="" width="36" height="36" className="md:mr-3" />
+                            <img crossOrigin = 'anonymous' src="./img/icon_1.png" alt="" width="36" height="36" className="md:mr-3" />
                             <p className="md:text-2xl text-lg font-normal leading-[20px]">vkt dk jkf'kQy <br /><span className="font-eng text-xs">(Aaj Ka Rashifal)</span></p>
                         </div>
                     </Link>
                     <button onClick={(e) => { setIsOpen(true) }}
                         className="theme_bg bg-white rounded-xl shadow md:p-6 p-3 text-center hover:bg-yellow-50 transition w-auto flex">
                         <div className="mx-auto flex md:flex-row flex-col items-center space-y-3 md:space-y-0">
-                            <img src="./img/icon_5.png" alt="" width="36" height="36" className="md:mr-3" />
+                            <img  crossOrigin = 'anonymous' src="./img/icon_5.png" alt="" width="36" height="36" className="md:mr-3" />
                             <p className="md:text-2xl text-lg font-normal leading-[20px]">iapkx <br /><span className="font-eng text-xs">(Panchang)</span></p>
                         </div>
                     </button>
@@ -372,56 +424,26 @@ function Home() {
 
 
                 <div className="grid grid-cols-3 md:gap-4 gap-2 mt-3 text-center font-medium">
-
-                    <Link to="/hindi-calendar" onClick={handleHindiCalendarClicked}
-                        className="theme_bg bg-white rounded-xl shadow md:p-6 p-3 text-center hover:bg-yellow-50 transition w-auto flex">
-                        <div className="mx-auto flex flex-col items-center space-y-3 md:space-y-0">
-                            <img src="./img/icon_2.png" alt="" width="36" height="36" className="md:mr-3" />
-                            <p className="md:text-2xl text-lg font-normal leading-[20px]">fgUnh dySaMj <br /><span className="font-eng text-xs">(Hindi Calender)</span></p>
-                        </div>
-                    </Link>
-                    <Link to="/vrat-katha" onClick={handleVratKathaClicked}
-                        className="theme_bg bg-white rounded-xl shadow md:p-6 p-3 text-center hover:bg-yellow-50 transition w-auto flex">
-                        <div className="mx-auto flex flex-col items-center space-y-3 md:space-y-0">
-                            <img src="./img/icon_3.png" alt="" width="36" height="36" className="md:mr-3" />
-                            <p className="md:text-2xl text-lg font-normal leading-[20px]">ozr dFkk <br /><span className="font-eng text-xs">(Vrat Katha)</span></p>
-
-                        </div>
-
-                    </Link>
-                    <Link to="/jaap-mala" onClick={handleJaapMalaClicked}
-                        className="theme_bg bg-white rounded-xl shadow md:p-6 p-3 text-center hover:bg-yellow-50 transition w-auto flex">
-                        <div className="mx-auto flex flex-col items-center space-y-3 md:space-y-0">
-                            <img src="./img/icon_4.png" alt="" width="36" height="36" className="md:mr-3" />
-                            <p className="md:text-2xl text-lg font-normal leading-[20px]"> tki ekyk <br /><span className="font-eng text-xs">(Jaap Mala)</span></p>
-                        </div>
-                    </Link>
-                </div>
-                <div className="grid grid-cols-3 md:gap-4 gap-2 mt-3 text-center font-medium">
-
-                    <Link to="/mantra" onClick={handleMantraClicked}
-                        className="theme_bg bg-white rounded-xl shadow md:p-6 p-3 text-center hover:bg-yellow-50 transition w-auto flex">
-                        <div className="mx-auto flex flex-col items-center space-y-3 md:space-y-0">
-                            <img src="./img/icon_5.png" alt="" width="36" height="36" className="md:mr-3" />
-                            <p className="md:text-2xl text-lg font-normal leading-[20px]">ea=<br /><span className="font-eng text-xs">(Mantra)</span></p>
-                        </div>
-                    </Link>
-                    <Link to="/chalisa" onClick={handleChalisaClicked}
-                        className="theme_bg bg-white rounded-xl shadow md:p-6 p-3 text-center hover:bg-yellow-50 transition w-auto flex">
-                        <div className="mx-auto flex flex-col items-center space-y-3 md:space-y-0">
-                            <img src="./img/icon_1.png" alt="" width="36" height="36" className="md:mr-3" />
-                            <p className="md:text-2xl text-lg font-normal leading-[20px]"> pkyhlk  <br /><span className="font-eng text-xs">(Chalisa)</span></p>
-
-                        </div>
-
-                    </Link>
-                    <Link to="/aarti" onClick={handleAartiClicked}
-                        className="theme_bg bg-white rounded-xl shadow md:p-6 p-3 text-center hover:bg-yellow-50 transition w-auto flex">
-                        <div className="mx-auto flex flex-col items-center space-y-3 md:space-y-0">
-                            <img src="./img/icon_6.png" alt="" width="36" height="36" className="md:mr-3" />
-                            <p className="md:text-2xl text-lg font-normal leading-[20px]"> vkjrh <br /><span className="font-eng text-xs">(Aarti)</span></p>
-                        </div>
-                    </Link>
+                    {categoriesToShow.map((category) => (
+                        <Link
+                            key={category._id || category.url || category.title}
+                            to={getCategoryRoute(category)}
+                            onClick={(e) => handleHomeCategoryClicked(category, e)}
+                            className="theme_bg bg-white rounded-xl shadow md:p-6 p-3 text-center hover:bg-yellow-50 transition w-auto flex"
+                        >
+                            <div className="mx-auto flex flex-col items-center space-y-3 md:space-y-0">
+                                <img
+                                    src={category.imageUrl}
+                                    alt={category.title || ""}
+                                    width="36"
+                                    crossOrigin = 'anonymous'
+                                    height="36"
+                                    className="md:mr-3 w-9 h-9 object-cover rounded-md"
+                                />
+                                <p className="md:text-2xl text-lg font-normal leading-[20px]">{category.title}</p>
+                            </div>
+                        </Link>
+                    ))}
                 </div>
 
                 <div className="mt-6">
@@ -436,7 +458,7 @@ function Home() {
                         <span className="relative z-10 flex items-center">
                             <span className="text-3xl font-normal leading-[20px]">okWyisij <br /><span className="font-eng text-xs">(Wallpaper)</span></span>
                         </span> */}
-                        <img src={wallpaperImage} alt="Wallpaper" width="100%" height="100%" className="max-w-full h-auto" />
+                        <img crossOrigin = 'anonymous' src={wallpaperImage} alt="Wallpaper" width="100%" height="100%" className="max-w-full h-auto" />
                     </Link>
                 </div>
 
@@ -444,7 +466,7 @@ function Home() {
                     <TodayThoughts />
                     <div className="md:basis-[40%] basis-[40%] flex flex-col justify-between items-center md:p-4 theme_text">
                         <span className="font-semibold md:text-3xl text-2xl">iwtk djs!</span>
-                        <div className="my-4"><img src="./img/puja_bgs.png" alt="" width="150" height="120" className="max-w-full h-auto" /></div>
+                        <div className="my-4"><img crossOrigin = 'anonymous' src="./img/puja_bgs.png" alt="" width="150" height="120" className="max-w-full h-auto" /></div>
                         <Link to="/puja-kare" onClick={() => {
                             trackEvent(GA4Events.pooja_karein_widget_clicked, {
                                 event_label: "pooja_kare_card_clicked_on_home_screen"
@@ -497,6 +519,7 @@ function Home() {
                         {/* Top image — fills full width, contains bell + title + Hindi text */}
                         <img
                             src="/img/popup.png"
+                            crossOrigin = 'anonymous'
                             alt="Unlock Bhakti Bhav Plus"
                             className="w-full h-auto block rounded-t-3xl"
                             style={{ width: "100%", display: "block", marginTop: "-12px", }}

@@ -3,6 +3,7 @@ import { getTokenFromLS } from './commonFunctions';
 import { endPoints } from './endpoints';
 
 const BASEURL = process.env.REACT_APP_API_BASE_URL || 'https://api.bhaktibhav.app/frontend/';
+const CORE_API_BASE_URL = process.env.REACT_APP_CORE_API_BASE_URL || 'https://stagingapi.bhaktibhav.app/api/v1/';
 console.log("API Base URL:", BASEURL);
 const api = axios.create({
   baseURL: BASEURL,
@@ -33,7 +34,7 @@ export const wallpaperApis = {
       const response = await api.get(`${endPoints.downloadWallpaper}/${id}`);
       return response.data;
     }
-    catch(error) {
+    catch (error) {
       console.error("Error downloading wallpaper:", error);
       throw error;
     }
@@ -43,7 +44,7 @@ export const wallpaperApis = {
       const response = await api.get(endPoints.banner);
       return response.data;
     }
-    catch(error) {
+    catch (error) {
       console.error("Error fetching banners:", error);
       throw error;
     }
@@ -111,7 +112,7 @@ export const hinduCalendarApis = {
 
 
 export const subscriptionApis = {
-   getSubscriptionPlans: async () => {
+  getSubscriptionPlans: async () => {
     try {
       const response = await api.get(endPoints.getSubscriptionPlans);
       return response.data;
@@ -149,7 +150,7 @@ export const paymentApis = {
       return response.data;
 
     }
-    catch(error) {
+    catch (error) {
       console.log("Error Verifying payment:", error);
       throw error;
     }
@@ -162,7 +163,7 @@ export const paymentApis = {
     } catch (error) {
       console.error("Error fetching transactions:", error);
       throw error;
-    } 
+    }
   }
 }
 export const loginApis = {
@@ -183,7 +184,7 @@ export const loginApis = {
     try {
 
       debugger;
-      const response = await api.post(endPoints.verifyOtp, {mobileNumber: mobile, otp: otp, source: "web"});
+      const response = await api.post(endPoints.verifyOtp, { mobileNumber: mobile, otp: otp, source: "web" });
       return response.data;
     } catch (error) {
       console.error("Error verifying OTP:", error);
@@ -203,7 +204,7 @@ export const pujaKareApis = {
       throw error;
     }
   },
-  
+
   getPujaKareDetailsFromId: async (id) => {
     try {
       const response = await api.get(`${endPoints.pujaKarein}/${id}`);
@@ -230,14 +231,14 @@ export const profileApis = {
     try {
       // Create a custom config for FormData requests
       const config = {};
-      
+
       // If data is FormData, don't set Content-Type header - let browser set it
       if (data instanceof FormData) {
         config.headers = {
           'Content-Type': 'multipart/form-data'
         };
       }
-      
+
       const response = await api.put(endPoints.updateProfile, data, config);
       return response.data;
     } catch (error) {
@@ -254,16 +255,16 @@ export const blogApis = {
       // https://drupal.df3.club/jsonapi/node/blog?filter[field_portal.id]=7d43c493-6d43-4e6d-a7fd-052ac5fff8d2&page[limit]=25
       const url = `https://drupal.df3.club/api/blogs?portal_uuid=${process.env.REACT_APP_DRUPAL_BHAKTI_BHAV_PORTAL_UUID}&category_uuid=${process.env.REACT_APP_DRUPAL_BHAKTI_BHAV_CATEGORY_UUID}&limit=25`;
       const response = await fetch(url, {
-  headers: {
-    "Accept": "application/vnd.api+json",
-    "Content-Type": "application/vnd.api+json",
-    "User-Agent": "Mozilla/5.0" // ✅ Helps bypass basic bot detection
-  }
-});
+        headers: {
+          "Accept": "application/vnd.api+json",
+          "Content-Type": "application/vnd.api+json",
+          "User-Agent": "Mozilla/5.0" // ✅ Helps bypass basic bot detection
+        }
+      });
 
-const data = await response.json();
+      const data = await response.json();
 
-console.log("Consoling line response:", data);
+      console.log("Consoling line response:", data);
       // Route through /drupal-api proxy to avoid CORS (see src/setupProxy.js)
       // const response = await axios.get(
       //   "/drupal-api/jsonapi/node/blog?filter[field_portal.id][value]=7d43c493-6d43-4e6d-a7fd-052ac5fff8d2&page[limit]=10&page[offset]=0&include=field_blog_image,field_category,field_portal",
@@ -282,7 +283,7 @@ console.log("Consoling line response:", data);
 
   getBlogById: async (id) => {
     try {
-      const url  = `https://drupal.df3.club/api/blogs?blog_uuid=${id}`;
+      const url = `https://drupal.df3.club/api/blogs?blog_uuid=${id}`;
       const response = await fetch(url, {
         headers: {
           "Accept": "application/vnd.api+json",
@@ -319,5 +320,290 @@ export const contactUsApis = {
     }
   }
 };
+
+const coreApi = axios.create({
+  baseURL: CORE_API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+export const languageApis = {
+  getLanguages: async () => {
+    try {
+      const response = await coreApi.get(endPoints.lang);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching languages:", error);
+      throw error;
+    }
+  }
+};
+
+
+export const homePageAPis = {
+  fetchCategoriesList: async () => {
+    try {
+      const response = await api.get(endPoints.homeCategories);
+      return response.data;
+    }
+    catch (error) {
+      console.error("Error fetching home page categories", error);
+      throw error;
+    }
+  },
+
+  fetchBannersData: async () => {
+    try {
+      const response = await api.get(endPoints.homeBanners);
+      return response.data;
+    }
+    catch (error) {
+      console.error("Error fetching home page banners", error);
+      throw error;
+    }
+  },
+
+  fetchProfiledata: async () => {
+    try {
+      const response = await api.get(endPoints.getProfile);
+      return response.data;
+    }
+    catch (error) {
+      console.error("Error fetching profile data for home page", error);
+      throw error;
+    }
+  },
+
+}
+
+// vrat-katha-apis
+export const vratKathaApis = {
+  fetchVratKathaData: async () => {
+    try {
+      const response = await api.get(endPoints.vratKatha);
+      return response.data;
+    }
+    catch (error) {
+      console.error("Error fetching Vrat Katha data", error);
+      throw error;
+    }
+  },
+
+  fetchSingleVratKathaData: async (id) => {
+    try {
+      const response = await api.get(`${endPoints.vratKatha}/${id}`);
+      return response.data;
+    }
+    catch (error) {
+      console.error("Error fetching single Vrat Katha data", error);
+      throw error;
+    }
+  },
+
+  fetchVratKathaCategoryData: async (categoryId) => {
+    try {
+      const response = await api.get(`${endPoints.vratKatha}?category=${categoryId}`);
+      return response.data;
+    }
+    catch (error) {
+      console.error("Error fetching Vrat Katha category data", error);
+      throw error;
+    }
+  }
+}
+
+
+export const homeCategoryApis = {
+  fetchHomeCategories: async (lang) => {
+    try {
+      console.log("Fetching home categories for language with api url: ", `${endPoints.featureCategory}?lang=${lang}`);
+      const response = await coreApi.get(`${endPoints.featureCategory}?lang=${lang}`);
+      return response.data;
+    }
+    catch(error) {
+      console.error("Error fetching home categories", error);
+      throw error;
+    }
+  }
+}
+// catgory-content-apis
+export const categoryContentApis = {
+  fetchCategoryContent: async (categoryId, contentType) => {
+    try {
+      const response = await api.get(`${endPoints.categoryContent}?category=${categoryId}&type=${contentType}`);
+      return response.data;
+    }
+    catch (error) {
+      console.error("Error fetching category content", error);
+      throw error;
+    }
+  },
+
+  fetchContentDataById: async (contentId) => {
+    try {
+      const response = await api.get(`${endPoints.categoryContent}/${contentId}`);
+      return response.data;
+    }
+    catch (error) {
+      console.error("Error fetching content data by ID", error);
+      throw error;
+    }
+  }
+}
+
+// rashifal-apis
+export const rashifalApis = {
+  getRashifal: async (date) => {
+    try {
+      const response = await api.get(`${endPoints.rashifal}?date=${date}`);
+      return response.data;
+    }
+    catch (error) {
+      console.error("Error fetching Rashifal data", error);
+      throw error;
+    }
+  }
+};
+
+export const hindiCalendarApis = {
+  getHindiCalendarData: async (date) => {
+    try {
+      const response = await api.get(`${endPoints.hindiCalendar}?date=${date}`);
+      return response.data;
+    }
+    catch (error) {
+      console.error("Error fetching Hindi Calendar data", error);
+      throw error;
+    }
+  },
+
+  getHindiCalendarDataForCurrentMonth: async () => {
+    try {
+      const response = await api.get(`${endPoints.hindiCalendar}?month=current`);
+      return response.data;
+    }
+    catch (error) {
+      console.error("Error fetching Hindi Calendar data for current month", error);
+      throw error;
+    }
+  },
+
+
+};
+
+
+// chalisa-apis
+export const chalisaApis = {
+  getChalisas: async () => {
+    try {
+      const response = await api.get(endPoints.chalisa);
+      return response.data;
+    }
+    catch (error) {
+      console.error("Error fetching Chalisas", error);
+      throw error;
+    }
+  },
+
+  getChalisaById: async (id) => {
+    try {
+      const response = await api.get(`${endPoints.chalisa}/${id}`);
+      return response.data;
+    }
+    catch (error) {
+      console.error("Error fetching chalisa by ID", error);
+      throw error;
+    }
+  }
+};
+
+// aarti-apis
+export const aartiApis = {
+  getAartis: async () => {
+    try {
+      const response = await api.get(endPoints.aarti);
+      return response.data;
+    }
+    catch(error){
+      console.error("Error fetching Aartis", error);
+      throw error;
+    }
+  },
+
+  getAartiById: async (id) => {
+    try {
+      const response = await api.get(`${endPoints.aarti}/${id}`);
+      return response.data;
+    }
+    catch(error){
+      console.error("Error fetching Aarti by ID", error);
+      throw error;  
+    }
+  }
+}
+
+// mantra-apis
+export const mantrApis = {
+  getMantras: async () => {
+    try {
+      const response = await api.get(endPoints.mantras);
+      return response.data;
+    }
+    catch(error){
+      console.error("Error fetching Mantras", error);
+      throw error;
+    }
+  },
+
+  getMantraById: async (id) => {
+    try {
+      const response = await api.get(`${endPoints.mantras}/${id}`);
+      return response.data;
+    }
+    catch(error){
+      console.error("Error fetching Mantra by ID", error);
+      throw error;
+    }
+  }
+}
+
+// pooja apis
+export const poojaApis = {
+  getPoojaList: async () => {
+    try {
+      const response = await api.get(endPoints.poojaList);
+      return response.data;
+    }
+    catch(error){
+      console.error("Error fetching Pooja list", error);
+      throw error;
+    }
+  },
+
+  getPoojaDetailsById: async (id) => {
+    try {
+      const response = await api.get(`${endPoints.poojaList}/${id}`);
+      return response.data;
+    }
+    catch(error){
+      console.error("Error fetching Pooja details by ID", error);
+      throw error;
+    }
+  } 
+}
+
+export const splashScreenApi = {
+  getSplashScreenData: async (version, data) => {
+    try {
+      const response = await coreApi.post(`${endPoints.splashScreen}-${version}`, data);
+      return response.data;
+    }
+    catch (error) {
+      console.error("Error fetching Splash Screen data", error);
+      throw error;
+    }
+  }
+}
 
 export default api;

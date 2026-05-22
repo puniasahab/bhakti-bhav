@@ -125,9 +125,9 @@ function App() {
 
   return (
     <HelmetProvider>
-      <AuthProvider>
-        <AudioProvider>
-          <LanguageProvider>
+      <LanguageProvider>
+        <AuthProvider>
+          <AudioProvider>
             <KathaProvider>
               <PaymentProvider>
                 <PujaKareProvider>
@@ -177,9 +177,9 @@ function App() {
                 </PujaKareProvider>
               </PaymentProvider>
             </KathaProvider>
-          </LanguageProvider>
-        </AudioProvider>
-      </AuthProvider>
+          </AudioProvider>
+        </AuthProvider>
+      </LanguageProvider>
     </HelmetProvider>
   );
 }
