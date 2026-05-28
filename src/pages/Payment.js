@@ -10,6 +10,7 @@ import { getTokenFromLS } from "../commonFunctions";
 import useGA4Tracker  from "../hooks/useGA4Tracker";
 import { GA4Events } from "../utils/ga4Events.enum";
 import useGA4BaseParams from "../hooks/useGA4BaseParams";
+import { trackCustomEvent } from "../utils/metaPixel";
 
 
 export default function Payment() {
@@ -37,6 +38,10 @@ export default function Payment() {
   const { setPaymentData } = usePayment();
 
   const paymentScreenViewTracker = useRef(false);
+
+  const handlePaymentOptionSelected = (planDetails) => {
+    trackCustomEvent("PaymentOptionSelected", { planDetails });
+  }
 
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -283,7 +288,7 @@ export default function Payment() {
           {plans && plans.length > 0 && (
             <button
               className="w-full bg-[#9A283D] text-white py-4 rounded-full shadow-lg text-lg font-semibold hover:bg-[#7a1f30] transition-all duration-200"
-              onClick={() => {trackEvent(GA4Events.subscription_plan_selected, {event_label: "payment_button_clicked_from_payment_screen", selectedPlan: plans.find((x) => x._id === selectedPlan).name}); makePayment(selectedPlan)}}
+              onClick={() => {trackEvent(GA4Events.subscription_plan_selected, {event_label: "payment_button_clicked_from_payment_screen", selectedPlan: plans.find((x) => x._id === selectedPlan).name}); handlePaymentOptionSelected(selectedPlan); makePayment(selectedPlan)}}
             >
               <span className="font-hindi">प्रारंभ करें</span>{" "}
               <span className="font-eng text-sm">(Start Now)</span>

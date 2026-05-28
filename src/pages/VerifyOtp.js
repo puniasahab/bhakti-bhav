@@ -5,6 +5,9 @@ import { loginApis } from "../api";
 import useGA4BaseParams from "../hooks/useGA4BaseParams";
 import useGA4Tracker from "../hooks/useGA4Tracker";
 import { GA4Events } from "../utils/ga4Events.enum";
+import { PIXEL_STANDARD_EVENTS } from "../utils/pixelEvents";
+import { trackCustomEvent } from "../utils/metaPixel";
+import { trackCustom } from "react-facebook-pixel";
 
 function VerifyOtp() {
     const location = useLocation();
@@ -27,6 +30,7 @@ function VerifyOtp() {
     const generateOtp = async () => {
         try {
             const mobileNumber = getMobileNoFromLS();
+            trackCustomEvent(PIXEL_STANDARD_EVENTS.OTP_CLICKED_VERIFY_OTP_SCREEN, { mobileNumber });
             let deviceId = localStorage.getItem('deviceId');
             if (!deviceId) {
                 // Generate a unique device ID if it doesn't exist
@@ -103,7 +107,8 @@ function VerifyOtp() {
             alert("Please enter a valid 4-digit OTP");
             return;
         }
-
+        
+        trackCustomEvent(PIXEL_STANDARD_EVENTS.VERIFY_OTP_BUTTON_CLICKED, {mobileNumber: getMobileNoFromLS()})
         setLoading(true);
         try {
             let deviceId = localStorage.getItem('deviceId');
@@ -112,7 +117,6 @@ function VerifyOtp() {
                 deviceId = crypto.randomUUID()
                 localStorage.setItem('deviceId', deviceId);
             }
-
             trackEvent(GA4Events.verify_otp_clicked, { event_label: "verify_otp_btn_clicked" });
             const res = await fetch("https://api.bhaktibhav.app/frontend/verify-otp", {
                 method: "POST",
@@ -124,11 +128,13 @@ function VerifyOtp() {
             console.log("data", data);
 
             if (res.status === 400) {
+                trackCustomEvent(PIXEL_STANDARD_EVENTS.LOGIN_FAILED, {message: data.message || "OTP verification failed"});
                 alert(data.message || "OTP verification failed");
                 return;
             }
 
             if (data && data?.token?.length > 0) {
+                trackCustomEvent(PIXEL_STANDARD_EVENTS.LOGIN_SUCCESSFUL, { message: `Login Successful for Mobile Number: ${getMobileNoFromLS()}` })
                 setTokenInLS(data.token);
                 // Redirect based on which home flow triggered the login
                 if (loginSource === "home-v1") {
@@ -140,6 +146,7 @@ function VerifyOtp() {
             }
         } catch (error) {
             console.error("Verify API Error:", error);
+            trackCustomEvent(PIXEL_STANDARD_EVENTS.LOGIN_FAILED, {message: error?.message});
             alert("Network error occurred. Please try again.");
         } finally {
             setLoading(false);

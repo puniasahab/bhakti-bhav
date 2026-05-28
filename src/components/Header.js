@@ -7,10 +7,12 @@ import logo from "../assets/img/logo.png";
 import backBtn from "../assets/img/back_icon.svg";
 import { Check, ChevronLeft, Download, Eye, Globe2, Heart, LogOut, MoreVertical, Pencil, ReceiptText } from "lucide-react";
 import { LanguageContext } from "../contexts/LanguageContext";
-import { getTokenFromLS, removeMobileNoFromLS, removeSubscriptionStatusFromLS, removeTokenFromLS, formatNumber, removeUserName, removeUserIdFromLS } from "../commonFunctions";
+import { getTokenFromLS, removeMobileNoFromLS, removeSubscriptionStatusFromLS, removeTokenFromLS, formatNumber, removeUserName, removeUserIdFromLS, getMobileNoFromLS } from "../commonFunctions";
 import useGA4Tracker from "../hooks/useGA4Tracker";
 import { GA4Events } from "../utils/ga4Events.enum";
 import useGA4BaseParams from "../hooks/useGA4BaseParams";
+import { trackCustom } from "react-facebook-pixel";
+import { PIXEL_STANDARD_EVENTS } from "../utils/pixelEvents";
 
 
 function Header({
@@ -43,6 +45,8 @@ function Header({
     const [showLanguageModal, setShowLanguageModal] = useState(false);
     const [pendingLanguage, setPendingLanguage] = useState(language);
     const dropdownRef = useRef(null);
+    const showHindiFontControls = hindiFontSize === true || hindiFontSize === "true";
+    const showFontSizeControls = fontSizeOption === true || fontSizeOption === "true";
 
     const baseParams = useGA4BaseParams("Header Component");
     const { trackEvent } = useGA4Tracker(baseParams);
@@ -96,6 +100,7 @@ function Header({
     }
 
     const handleLogout = () => {
+        trackCustom(PIXEL_STANDARD_EVENTS.LOGOUT, {message: "Logout button Clicked", mobileNumber: getMobileNoFromLS()})
         trackEvent(GA4Events.logout_clicked, { event_label: "logout_clicked_from_header_on_edit_profile_screen" });
         removeTokenFromLS();    
         removeUserName();
@@ -139,13 +144,49 @@ function Header({
         <button
             type="button"
             onClick={openLanguageModal}
-            className={`bg-white rounded-full p-2 shadow-md border border-gray-200 hover:bg-gray-50 transition-colors ${className}`}
+            className={`bg-transparent rounded-full transition-colors ${className}`}
             title="Select language"
             aria-label="Select language"
         >
-            <Globe2 size={20} className="text-[#9A283D]" />
+            <Globe2 size={20} className="text-[#9A283D]" fill="none" />
         </button>
     );
+
+    const getPageTitle = () => {
+        if (!pageName) return null;
+
+        if (language === "hi" && pageName.hi) {
+            return {
+                text: pageName.hi,
+                className: "font-hindi text-xl"
+            };
+        }
+
+        if (language !== "hi" && pageName.en) {
+            return {
+                text: pageName.en,
+                className: "font-eng text-base"
+            };
+        }
+
+        if (pageName.hi) {
+            return {
+                text: pageName.hi,
+                className: "font-hindi text-xl"
+            };
+        }
+
+        if (pageName.en) {
+            return {
+                text: pageName.en,
+                className: "font-eng text-base"
+            };
+        }
+
+        return null;
+    };
+
+    const pageTitle = getPageTitle();
 
 
     return (
@@ -166,7 +207,6 @@ function Header({
 
                             {/* Three Dots Menu */}
                             <div className="flex items-center gap-3">
-                                {renderLanguageButton()}
 
                                 {/* Edit Icon - Only show if not hidden */}
                                 {!hideEditIcon && (
@@ -213,10 +253,9 @@ function Header({
                                 <img src={backBtn} alt="Back" width={window.innerWidth < 375 ? "22" : "24"} height={window.innerWidth < 375 ? "22" : "24"} />
                             </button>
 
-                            {pageName && (
+                            {pageTitle && (
                                 <div className="flex flex-row theme_text items-center">
-                                    <span className="font-hindi text-xl">{pageName.hi}</span>
-                                    <span className="font-eng text-sm ml-0.5">({pageName.en})</span>
+                                    <span className={pageTitle.className}>{pageTitle.text}</span>
                                 </div>
                             )}
                         </div>
@@ -237,9 +276,8 @@ function Header({
                         </div>
                     )}
 
-                    {hindiFontSize && (
+                    {showHindiFontControls && (
                         <div className="flex space-x-2 theme_text text-lg font-eng ml-auto max-[374px]:space-x-1 max-[374px]:text-sm">
-                            {renderLanguageButton("max-[374px]:p-1.5")}
                             <button
                                 onClick={() => setFontSize("text-base")}
                                 className="px-2 border-[#9A283D] border rounded-lg max-[374px]:px-1 max-[374px]:py-1 max-[374px]:text-xs"
@@ -254,9 +292,8 @@ function Header({
                             </button>
                         </div>
                     )}
-                    {fontSizeOption && (
+                    {showFontSizeControls && (
                         <div className="flex space-x-2 theme_text text-lg font-eng ml-auto">
-                            {renderLanguageButton()}
                             <button
                                 onClick={() => setFontSize("text-base")}
                                 className="px-2 border-[#9A283D] border rounded-lg"
@@ -272,9 +309,8 @@ function Header({
                         </div>
                     )}
 
-                    {!isHomeRoute && !showProfileHeader && !hindiFontSize && !fontSizeOption && (
+                    {!isHomeRoute && !showProfileHeader && !showHindiFontControls && !showFontSizeControls && (
                         <div className="ml-auto">
-                            {renderLanguageButton()}
                         </div>
                     )}
 

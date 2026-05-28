@@ -2,8 +2,8 @@ import axios from 'axios';
 import { getTokenFromLS } from './commonFunctions';
 import { endPoints } from './endpoints';
 
-const BASEURL = process.env.REACT_APP_API_BASE_URL || 'https://api.bhaktibhav.app/frontend/';
-const CORE_API_BASE_URL = process.env.REACT_APP_CORE_API_BASE_URL || 'https://stagingapi.bhaktibhav.app/api/v1/';
+const BASEURL = process.env.REACT_APP_API_BASE_URL || 'https://api.bhaktibhav.app/api/v1/frontend/';
+const CORE_API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'https://stagingapi.bhaktibhav.app/api/v1/';
 console.log("API Base URL:", BASEURL);
 const api = axios.create({
   baseURL: BASEURL,
@@ -60,27 +60,27 @@ export const wallpaperApis = {
     }
   }
 }
-export const mantraApis = {
-  getAllMantras: async () => {
-    try {
-      const response = await api.get(endPoints.getAllMantras);
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching mantras:", error);
-      throw error;
-    }
-  },
+// export const mantraApis = {
+//   getAllMantras: async () => {
+//     try {
+//       const response = await api.get(endPoints.getAllMantras);
+//       return response.data;
+//     } catch (error) {
+//       console.error("Error fetching mantras:", error);
+//       throw error;
+//     }
+//   },
 
-  getMantraById: async (id) => {
-    try {
-      const response = await api.get(`${endPoints.getMantraById}/${id}`);
-      return response.data;
-    } catch (error) {
-      console.error(`Error fetching mantra with ID ${id}:`, error);
-      throw error;
-    }
-  }
-}
+//   getMantraById: async (id) => {
+//     try {
+//       const response = await api.get(`${endPoints.getMantraById}/${id}`);
+//       return response.data;
+//     } catch (error) {
+//       console.error(`Error fetching mantra with ID ${id}:`, error);
+//       throw error;
+//     }
+//   }
+// }
 
 
 export const hinduCalendarApis = {
@@ -322,16 +322,30 @@ export const contactUsApis = {
 };
 
 const coreApi = axios.create({
-  baseURL: CORE_API_BASE_URL,
+  baseURL: BASEURL,
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
+coreApi.interceptors.request.use(
+  (config) => {
+    const token = getTokenFromLS();
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
 export const languageApis = {
   getLanguages: async () => {
     try {
-      const response = await coreApi.get(endPoints.lang);
+      const response = await coreApi.get("https://api.bhaktibhav.app/api/v1/lang")
+// g");
       return response.data;
     } catch (error) {
       console.error("Error fetching languages:", error);
@@ -430,6 +444,7 @@ export const homeCategoryApis = {
 // catgory-content-apis
 export const categoryContentApis = {
   fetchCategoryContent: async (categoryId, contentType) => {
+    console.log("Fetching category content for categoryId:", categoryId, contentType);
     try {
       const response = await api.get(`${endPoints.categoryContent}?category=${categoryId}&type=${contentType}`);
       return response.data;
@@ -440,13 +455,24 @@ export const categoryContentApis = {
     }
   },
 
-  fetchContentDataById: async (contentId) => {
+  fetchContentDataByCategoryId: async (categoryId, lang, currentPage, limit) => {
     try {
-      const response = await api.get(`${endPoints.categoryContent}/${contentId}`);
+      const response = await coreApi.get(`${endPoints.featureCategoryContent}?lang=${lang}&catgeoryId=${categoryId}&page=${currentPage}&limit=${limit}`);
       return response.data;
     }
     catch (error) {
       console.error("Error fetching content data by ID", error);
+      throw error;
+    }
+  },
+
+  fetchContentDetailsByContentId: async (contentId, lang) => {
+    try {
+      const response = await coreApi.get(`${endPoints.content}/${contentId}?lang=${lang}`);
+      return response.data;
+    }
+    catch (error) {
+      console.error("Error fetching content details by ID", error);
       throw error;
     }
   }
@@ -544,10 +570,10 @@ export const aartiApis = {
 }
 
 // mantra-apis
-export const mantrApis = {
-  getMantras: async () => {
+export const mantraApis = {
+  getMantras: async (version, currentPage, limit, lang) => {
     try {
-      const response = await api.get(endPoints.mantras);
+      const response = await api.get(`${endPoints.mantras}-${version}?page=${currentPage}&limit=${limit}&lang=${lang}`);
       return response.data;
     }
     catch(error){
@@ -556,9 +582,9 @@ export const mantrApis = {
     }
   },
 
-  getMantraById: async (id) => {
+  getMantraById: async (version, id, lang) => {
     try {
-      const response = await api.get(`${endPoints.mantras}/${id}`);
+      const response = await api.get(`${endPoints.getSingleMantra}-${version}/${id}?lang=${lang}`);
       return response.data;
     }
     catch(error){
@@ -601,6 +627,69 @@ export const splashScreenApi = {
     }
     catch (error) {
       console.error("Error fetching Splash Screen data", error);
+      throw error;
+    }
+  }
+}
+
+export const wallpaperDeepLinkingApi = {
+  getWallpaperDeepLinkingData: async (lang) => {
+    try {
+      const response = await coreApi.get(`https://api.bhaktibhav.app/api/v1/wallpaper/wallpaper-deeplinking?lang=${lang}`);
+      return response.data;
+    }
+    catch(error) {
+      console.error("Error fetching wallpaper deep linking data", error);
+      throw error;
+    }
+  }
+};
+
+
+export const newJaapMalaApis = {
+  getJaapMalaCount: async (id, getCounterBoolean = true) => {
+    try {
+      const response = await api.get(`${endPoints.jaapMalaCount}/${id}?getCounter=${getCounterBoolean}`);
+      return response.data;
+    }
+    catch (error) {
+      console.error("Error fetching Jaap Mala count", error);
+      throw error;
+    }
+  },
+
+  updateJaapMalaCount: async (id, count) => {
+    try {
+      const response = await api.post(`${endPoints.jaapMalaCount}/${id}/jaap`, {count});
+      return response.data;
+    }
+
+    catch(error) {
+      console.log("Error updating Jaap Mala count", error);
+      throw error;
+    }
+  }
+}
+
+export const naamJaap = {
+  getNaamJaapData: async (vsersion, currentPage, limit, lang) => {
+    try {
+      const response = await api.get(`${endPoints.naamJaap}-${vsersion}?page=${currentPage}&limit=${limit}&lang=${lang}`);
+      return response.data;
+    }
+    catch(error) {
+      console.error("Error fetching Naam Jaap data", error);
+      throw error;
+    }
+  },
+
+  getNaamJaapById: async(version, id, lang) => {
+    try {
+      const response = await api.get(`${endPoints.getSingleNaamJaap}-${version}/${id}?lang=${lang}`);
+      return response.data;
+    }
+    catch(error) {
+      console.error("Error fetching Naam Jaap by ID", error);
       throw error;
     }
   }

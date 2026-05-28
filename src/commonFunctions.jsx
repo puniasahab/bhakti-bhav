@@ -217,3 +217,69 @@ export const getBrowserName = () => {
   if (/Trident\//.test(ua)) return "IE";
   return "Unknown";
 };
+
+
+export const replaceSpecialChars = (text) => {
+  if(typeof text != 'string') return text;
+  // const updatedText = text
+  //   .replace(/[？؟¿�]/g, "?")
+  //   .replace(/[（﹙｟¼]/g, "(")
+  //   .replace(/[）﹚｠½]/g, ")");
+  return text.replace(/&amp;/g, '&')
+             .replace(/&lt;/g, '<')
+             .replace(/&gt;/g, '>')
+             .replace(/&quot;/g, '"')
+             .replace(/[？؟¿�]/g, "?")
+             .replace(/[（﹙｟¼]/g, "(")
+             .replace(/[）﹚｠½]/g, ")")
+             .replace(/&#39;/g, "'")
+             .replace(/\.\.\./g, "---")
+             .replace(/\./g, "-")
+             .replace(/\.\.\.\./g, "----")
+             .replace(/\.\./g, "--")
+             .replace(/,/g, "]")
+             .replace(/^'(.*)'$/, "“$1”")
+             .replace(/-/g, " ")
+             .replace(/\:/g, "ः")
+             .replace(/\;/g, " ")
+             .replace(/[؛ꣾ]/g, ";")
+             .replace(/``|''/g, "”")
+            //  .replace(/“/g, "").replace(/”/g, "")
+            //  .replace(/,/g, "]")
+            //  .replace(/\(/g, "¼").replace(/\)/g, "½").replace(/\:/g, "%").replace(/:/g, "ः")         // Replace colon with visarga
+            //                     .replace(/ँ/g, "ं")          // Normalize chandrabindu if misencoded
+            //                     .replace(/\u200D|\u200C/g, "  ").replace(/[.,;!?'"“”‘’]/g, " ")    // Remove English punctuation
+            //                     .replace(/[\[\]{}()]/g, "")       // Remove brackets and parentheses
+            //                     .replace(/[*/\\#%^+=_|<>~`@$₹]/g, " ").replace(/[^\u0900-\u097F\s।॥]/g, "") // remove non-Devanagari chars except space & punctuation
+            //                     .replace(/\u00A0/g, " ") // replace non-breaking space with normal space
+            //                     .replace(/\u200B|\u200C|\u200D/g, " ") // remove zero-width chars
+            //                     .replace(/\s+/g, " ")
+                                // .normalize("NFC")
+                                // .replace(/[०-९]/g, digit => hindiToEnglishMap[digit])// Remove zero-width joiners
+
+};
+
+/**
+ * Fixes KrutiDev font rendering issues in HTML content.
+ * KrutiDev is a legacy ASCII-mapped font where standard ASCII characters
+ * render as different Devanagari glyphs. This remaps problematic characters
+ * ONLY inside text nodes (not inside HTML tag attributes).
+ *
+ * KrutiDev mappings for common problem chars:
+ *   (  →  ¼   (renders as left parenthesis in KrutiDev)
+ *   )  →  ½   (renders as right parenthesis in KrutiDev)
+ *   ?  →  \   (renders as question mark in KrutiDev)
+ */
+export const fixKrutiDevHtml = (html) => {
+  if (!html || typeof html !== "string") return html;
+
+  // Replace only inside text nodes — skip content inside < > HTML tags
+  return html.replace(/(<[^>]*>)|([^<]+)/g, (match, tag, text) => {
+    if (tag) return tag;
+    if (!text) return match;
+    return text
+      .replace(/\(/g, "¼")
+      .replace(/\)/g, "½")
+      .replace(/\?/g, "\\");
+  });
+};

@@ -8,6 +8,7 @@ import PageTitleCard from "../components/PageTitleCard";
 import useGA4BaseParams from "../hooks/useGA4BaseParams";
 import useGA4Tracker from "../hooks/useGA4Tracker";
 import { GA4Events } from "../utils/ga4Events.enum";
+import { mantraApis } from "../api";
 
 export default function MantraDetail() {
   const { id } = useParams();
@@ -23,8 +24,7 @@ export default function MantraDetail() {
   useEffect(() => {
     async function fetchMantras() {
       try {
-        const res = await fetch(`https://api.bhaktibhav.app/api/v1/frontend/mantra/${id}`);
-        const json = await res.json();
+        const json = await mantraApis.getMantraById("v3", id, language);
         setDetail(json.data || null);
       } catch (error) {
         console.error("API Error:", error);
@@ -34,7 +34,7 @@ export default function MantraDetail() {
       }
     }
     fetchMantras();
-  }, [id]);
+  }, [id, language]);
 
   // Monitor audio state changes to clear loop when audio stops
   useEffect(() => {
@@ -49,7 +49,7 @@ export default function MantraDetail() {
   // Monitor track changes to clear loop when switching tracks
   useEffect(() => {
     if (currentTrack && currentLoopMantra) {
-      const currentLoopUrl = detail?.mantras?.find(m => (m._id || detail.mantras.indexOf(m)) === currentLoopMantra)?.audioUrl?.hi;
+      const currentLoopUrl = detail?.mantras?.find(m => (m._id || detail.mantras.indexOf(m)) === currentLoopMantra)?.audioUrl;
       if (currentTrack !== currentLoopUrl) {
         setCurrentLoopMantra(null);
         if (audioRef.current) {
@@ -76,7 +76,7 @@ export default function MantraDetail() {
     }
     
     play(url);
-    localStorage.setItem('currentTrackName', `${detail.name?.hi} मंत्र`);
+    localStorage.setItem('currentTrackName', `${detail.name} मंत्र`);
   };
 
   const toggleLoop = (mantraId, audioUrl) => {
@@ -98,7 +98,7 @@ export default function MantraDetail() {
     } else {
       play(audioUrl);
       setCurrentLoopMantra(mantraId);
-      localStorage.setItem('currentTrackName', `${detail.name?.hi} मंत्र`);
+      localStorage.setItem('currentTrackName', `${detail.name} मंत्र`);
       
       setTimeout(() => {
         if (audioRef.current) {
@@ -127,8 +127,8 @@ export default function MantraDetail() {
       <Header pageName={{ hi: "ea=", en: "Mantra" }} fontSizeOption="true" />
       <div className="h-2"></div>
       <PageTitleCard
-        titleHi={detail.name.hi}
-        titleEn={detail.name.en} 
+        titleHi={language === "hi" ? detail.name : ""}
+        titleEn={language === "hi" ? "" : detail.name}
         customEngFontSize={"13px"}
         customFontSize={"19px"}
       /> 
@@ -141,7 +141,7 @@ export default function MantraDetail() {
                 ? detail.imageUrl
                 : `https://api.bhaktibhav.app${detail.imageUrl}`
             }
-            alt={detail.name?.hi || detail.name?.en}
+            alt={detail.name || ""}
             className="max-w-[300px] max-h-[300px] rounded-xl shadow-lg"
           />
         </div>
@@ -149,8 +149,8 @@ export default function MantraDetail() {
         <div className="space-y-4">
           {detail.mantras
             ?.sort((a, b) => {
-              const lengthA = a.text?.hi?.length || 0;
-              const lengthB = b.text?.hi?.length || 0;
+              const lengthA = a.text?.length || 0;
+              const lengthB = b.text?.length || 0;
               return lengthA - lengthB;
             })
             ?.map((item, index) => {
@@ -165,7 +165,7 @@ export default function MantraDetail() {
                   <p
                     className={`theme_text text-[21px] font-semibold font-hindi ${fontSize}`}
                   >
-                    {item.text?.hi
+                    {(item.text || "")
                       .replace(/:/g, "ः")
                       .replace(/ँ/g, "ं")
                       .replace(/,/g, "]")
@@ -175,29 +175,29 @@ export default function MantraDetail() {
 
                   <div className="mt-8 mb-2 w-full flex items-center justify-center">
                     <button
-                      onClick={() => {trackEvent(GA4Events.mantra_played, { event_label: "mantra_played_from_mantra_detail_page", mantraName: item.name?.hi, mantraId }); handlePlay(item.audioUrl?.hi, mantraId)}}
-                      disabled={!item.audioUrl?.hi}
+                      onClick={() => {trackEvent(GA4Events.mantra_played, { event_label: "mantra_played_from_mantra_detail_page", mantraId }); handlePlay(item.audioUrl, mantraId)}}
+                      disabled={!item.audioUrl}
                       className={`p-2 flex items-center justify-center rounded-full 
                       transition font-hindi 
-                      ${!item.audioUrl?.hi
+                      ${!item.audioUrl
                           ? "bg-[#9A283D]/50 text-gray-500 cursor-not-allowed"
-                          : currentTrack === item.audioUrl?.hi && isPlaying
+                          : currentTrack === item.audioUrl && isPlaying
                             ? "bg_theme text-white"
                             : "bg_theme text-white"
                         }`}
                     >
-                      {currentTrack === item.audioUrl?.hi && isPlaying ? (
-                        <span onClick={() => {trackEvent(GA4Events.audio_pause, { event_label: "audio_pause_from_mantra_detail_page", mantraName: item.name?.hi, mantraId }); }} className="audio_pause_icon"></span>
+                      {currentTrack === item.audioUrl && isPlaying ? (
+                        <span onClick={() => {trackEvent(GA4Events.audio_pause, { event_label: "audio_pause_from_mantra_detail_page", mantraId }); }} className="audio_pause_icon"></span>
                       ) : (
                         <span className="audio_icon"></span>
                       )}
                     </button>
 
                     <button
-                      onClick={() => {trackEvent(GA4Events.mantra_loop_toggled, { event_label: "mantra_loop_toggled_from_mantra_detail_page", mantraName: item.name?.hi, mantraId }); toggleLoop(mantraId, item.audioUrl?.hi)}}
-                      disabled={!item.audioUrl?.hi}
+                      onClick={() => {trackEvent(GA4Events.mantra_loop_toggled, { event_label: "mantra_loop_toggled_from_mantra_detail_page", mantraId }); toggleLoop(mantraId, item.audioUrl)}}
+                      disabled={!item.audioUrl}
                       className={`ml-3 p-2 flex items-center justify-center rounded-full transition font-hindi 
-                      ${!item.audioUrl?.hi
+                      ${!item.audioUrl
                           ? "bg-[#9A283D]/50 text-gray-500 cursor-not-allowed"
                           : isCurrentlyLooping
                             ? "bg-green-600 text-white"

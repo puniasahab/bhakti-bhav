@@ -1,6 +1,7 @@
 import { useState, useEffect, Suspense, lazy } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { HelmetProvider } from 'react-helmet-async'
+import { pageView } from './utils/metaPixel';
 
 // ── Firebase debug mode ───────────────────────────────────────────────────
 // Set debug_mode = "true" in localStorage to enable Firebase DebugView.
@@ -24,6 +25,8 @@ const VratKatha = lazy(() => import("./pages/VratKatha"));
 const VratKathaDetail = lazy(() => import("./pages/VratKathaDetail"));
 const VratKathaCategoryDetails = lazy(() => import("./pages/VratKathaCategoryDetails"));
 const JaapMala = lazy(() => import("./pages/JaapMala"));
+const NewJaapMala = lazy(() => import("./pages/NewJaapMala"));
+const NewJaapMalaDetails = lazy(() => import("./pages/NewJaapMalaDetails"));
 const JaapMalaDetail = lazy(() => import("./pages/JaapMalaDetail"));
 const Mantra = lazy(() => import("./pages/Mantra"));
 const MantraDetail = lazy(() => import("./pages/MantraDetail"));
@@ -55,6 +58,8 @@ const Blogs = lazy(() => import("./pages/Blogs"));
 const BlogDetail = lazy(() => import("./pages/BlogDetail"));
 const PaymentComplete = lazy(() => import("./pages/PaymentComplete"));
 const ContactUs = lazy(() => import("./pages/ContactUs"));
+const Kahaniya = lazy(() => import("./pages/Kahaniya"));
+const KahaniyaDetails = lazy(() => import("./pages/KahaniyaDetails"));
 
 // Preload commonly accessed routes after initial render
 const preloadCommonRoutes = () => {
@@ -63,6 +68,8 @@ const preloadCommonRoutes = () => {
     import("./pages/Chalisa");
     import("./pages/Mantra");
     import("./pages/JaapMala");
+    import("./pages/NewJaapMala");
+    import("./pages/NewJaapMalaDetails");
   }, 2000);
 };
 
@@ -123,6 +130,16 @@ function App() {
   // Only show splash on home page
   if (loading && (location.pathname === "/" || location.pathname === "")) return <Splash />;
 
+  function RouteTracker() {
+    const location = useLocation();
+
+    useEffect(() => {
+      pageView(); // Fires on every route change
+    }, [location.pathname]);
+
+    return null;
+  }
+
   return (
     <HelmetProvider>
       <LanguageProvider>
@@ -131,6 +148,7 @@ function App() {
             <KathaProvider>
               <PaymentProvider>
                 <PujaKareProvider>
+                  <RouteTracker />
                   <Routes>
                     {/* Home is directly imported — no Suspense, no loader, instant render */}
                     <Route path="/" element={<HomeWrapper />} />
@@ -141,6 +159,10 @@ function App() {
                     <Route path="/vrat-katha/:id/date/:date" element={<Suspense><VratKathaDetail /></Suspense>} />
                     <Route path="/vrat-katha/categoryDetails/:id" element={<Suspense><VratKathaCategoryDetails /></Suspense>} />
                     <Route path="/jaap-mala" element={<Suspense><JaapMala /></Suspense>} />
+                    <Route path="/newjaapMaala" element={<Suspense><NewJaapMala /></Suspense>} />
+                    <Route path="/newjaapMaala/:categoryId" element={<Suspense><NewJaapMala /></Suspense>} />
+                    <Route path="/newJaapMaala-details/:id" element={<Suspense><NewJaapMalaDetails /></Suspense>} />
+                    <Route path="/newjaapMaala-details/:id" element={<Suspense><NewJaapMalaDetails /></Suspense>} />
                     <Route path="/jaapmala/:id" element={<Suspense><JaapMalaDetail /></Suspense>} />
                     <Route path="/mantra" element={<Suspense><Mantra /></Suspense>} />
                     <Route path="/mantra/:id" element={<Suspense><MantraDetail /></Suspense>} />
@@ -172,6 +194,9 @@ function App() {
                     <Route path="/blogs/:id" element={<Suspense><BlogDetail /></Suspense>} />
                     <Route path="/payment-complete" element={<Suspense><PaymentComplete /></Suspense>} />
                     <Route path="/contact-us" element={<Suspense><ContactUs /></Suspense>} />
+                    <Route path="/kahaniya" element={<Suspense><Kahaniya /></Suspense>} />
+                    <Route path="/kahaniya/:categoryId" element={<Suspense><Kahaniya /></Suspense>} />
+                    <Route path="/kahaniya-details/:contentId" element={<Suspense><KahaniyaDetails /></Suspense>} />
                   </Routes>
                   <GlobalAudioPlayer />
                 </PujaKareProvider>

@@ -6,6 +6,9 @@ import useGA4BaseParams from "../hooks/useGA4BaseParams";
 import useGA4Tracker from "../hooks/useGA4Tracker";
 import { GA4Events } from "../utils/ga4Events.enum";
 
+import { trackCustomEvent } from "../utils/metaPixel";
+import { PIXEL_STANDARD_EVENTS } from "../utils/pixelEvents";
+
 function Login() {
     const [mobile, setMobile] = useState("");
     const [loading, setLoading] = useState(false);
@@ -21,6 +24,9 @@ function Login() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+
+        trackCustomEvent(PIXEL_STANDARD_EVENTS.OTP_CLICKED_LOGIN_SCREEN, { mobile });
 
         if (!mobile || mobile.length !== 10) {
             alert("Please enter a valid 10-digit phone number");

@@ -1,17 +1,18 @@
-import React, { useEffect, useState, useMemo, useCallback } from "react";
+import React, { useEffect, useState, useMemo, useCallback, useContext } from "react";
 import { Link } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Loader from "../components/Loader";
 import PageTitleCard from "../components/PageTitleCard";
 import { getTokenFromLS, getSubscriptionStatusFromLS } from "../commonFunctions";
-import { cachedFetch } from "../utils/apiCache";
 
 import { GA4Events } from "../utils/ga4Events.enum";
 import useGA4BaseParams from "../hooks/useGA4BaseParams";
 import useGA4Tracker from "../hooks/useGA4Tracker";
 import SEO from "../components/SEO";
 import { homeSchema } from "../seo/schemas";
+import { mantraApis } from "../api";
+import { LanguageContext } from "../contexts/LanguageContext";
 
 
 export default function Mantra() {
@@ -22,6 +23,7 @@ export default function Mantra() {
   const [hasMore, setHasMore] = useState(true);
   const limit = 10;
 
+  const { language } = useContext(LanguageContext);
   const baseParams = useGA4BaseParams("Mantra Screen");
   const { trackEvent } = useGA4Tracker(baseParams);
 
@@ -34,23 +36,21 @@ export default function Mantra() {
       try {
         if (currentPage === 1) setLoading(true);
         else setLoadingMore(true);
-        
-        // Use cached fetch for better performance
-        const json = await cachedFetch(
-          `https://api.bhaktibhav.app/frontend/all-mantras-v1?page=${currentPage}&limit=${limit}`,
-          {},
-          5 * 60 * 1000 // Cache for 5 minutes
-        );
-        
-        if (json.status === "success" && Array.isArray(json.data)) {
+
+        const json = await mantraApis.getMantras("v3", currentPage, limit, language);
+
+        const dataArray = Array.isArray(json.data?.data) ? json.data.data : Array.isArray(json.data) ? json.data : [];
+        const totalPages = json.pagination?.totalPages ?? 1;
+
+        if (json.status === "success" && dataArray.length >= 0) {
           if (currentPage === 1) {
-            setItems(json.data);
+            setItems(dataArray);
           } else {
-            setItems(prevItems => [...prevItems, ...json.data]);
+            setItems(prevItems => [...prevItems, ...dataArray]);
           }
-          
-          // Check if there's more data
-          if (json.data.length < limit) {
+
+          // Check if there's more data using pagination info
+          if (currentPage >= totalPages || dataArray.length < limit) {
             setHasMore(false);
           }
         } else {
@@ -72,7 +72,14 @@ export default function Mantra() {
     }
 
     fetchItems();
-  }, [currentPage]);
+  }, [currentPage, language]);
+
+  // Reset list when language changes
+  useEffect(() => {
+    setItems([]);
+    setCurrentPage(1);
+    setHasMore(true);
+  }, [language]);
 
   // Infinite scroll handler with throttling for better performance
   useEffect(() => {
@@ -124,7 +131,7 @@ export default function Mantra() {
         titleHi={"ea="}
         titleEn={"Mantra"}
         customEngFontSize={"13px"}
-        customFontSize={"23px"}
+        customFontSize={"18px"}
 
       />
 
@@ -135,22 +142,22 @@ export default function Mantra() {
               <Link
 
                 to={handleNavigation(item._id, item.accessType)}
-                onClick = {() => handleTrackEvent(item._id, item.name?.en)}
+                onClick = {() => handleTrackEvent(item._id, item.name)}
                 className="theme_bg bg-white rounded-xl shadow p-4 text-center hover:bg-yellow-50 transition flex flex-col"
               >
                 <div className={`w-full h-36 flex items-center justify-center ${isSubscribed ? "" : item.accessType === "paid" ? "blur" : ""}`}>
                   <img
                     src={item.imagethumb || "/img/default-mantra.png"}
-                    alt={item.title}
+                    alt={item.name || ""}
                     className="w-auto rounded-md max-h-[100%] md:max-h-[100%]"
                     loading="lazy"
                     decoding="async"
                   />
                 </div>
                 <div className="p-2">
-                  <h2 className={`md:text-lg text-lg font-semibold truncate font-hindi mt-1 ${isSubscribed ? "" : item.accessType === "paid" ? "blur" : ""}`}>{item.name.hi}</h2>
-                  <p className={`md:text-md text-sm font-semibold truncate font-eng ${isSubscribed ? "" : item.accessType === "paid" ? "blur-sm" : ""}`}>({item.name.en})</p>
-
+                  <h2 className={`font-semibold mt-1 text-center leading-snug ${language === "hi" ? "font-hindi text-lg" : "font-eng text-sm"} ${isSubscribed ? "" : item.accessType === "paid" ? "blur" : ""}`}>
+                    {item.name}
+                  </h2>
                 </div>
               </Link>
             </li>

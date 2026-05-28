@@ -30,6 +30,10 @@ const homeCache = {
   has(key) {
     return this.get(key) !== null;
   },
+
+  delete(key) {
+    delete this._store[key];
+  },
 };
 
 export default homeCache;

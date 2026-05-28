@@ -19,4 +19,10 @@ export const endPoints = {
     lang: "lang",
     splashScreen: "analytics/app-install/open",
     featureCategory: 'feature-category',
+    featureCategoryContent: "feature-category/content",
+    wallpaperDeepLinking: 'wallpaper/wallpaper-deeplinking',
+    content: 'feature-category/content',
+    jaapMalaCount: "feature-category/content",
+    mantras: "all-mantras",
+    getSingleMantra: "mantra",
 }

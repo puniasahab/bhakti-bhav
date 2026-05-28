@@ -19,6 +19,7 @@
   src: url('./assets/fonts/Kruti_Dev_714_Normal.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
+  unicode-range: U+0000-00FF;
 }
 
 @font-face {
@@ -47,7 +48,7 @@ html, body {
 }
 
 body {
-  font-family: 'KrutiDev', sans-serif;
+  font-family: 'KrutiDev', 'Noto Sans Devanagari', 'Mangal', sans-serif;
   background-color: #fff;
   margin: 0;
   padding: 0px;
@@ -90,7 +91,11 @@ body::before {
 }
 
 .font-hindi {
-  font-family: 'KrutiDev', sans-serif;
+  font-family: 'KrutiDev', 'Noto Sans Devanagari', 'Mangal', sans-serif;
+}
+
+.font-devanagari {
+  font-family: 'Noto Sans Devanagari', 'Mangal', sans-serif;
 }
 
 .font-eng {
@@ -248,6 +253,335 @@ body::before {
   animation: rotateUp 3s ease-in-out forwards;
 }
 
+.new-jaap-screen {
+  height: 100vh;
+  padding: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.new-jaap-fixed-content {
+  position: fixed;
+  top: 82px;
+  left: 50%;
+  z-index: 20;
+  width: min(100%, 520px);
+  max-height: calc(100vh - 292px);
+  transform: translateX(-50%);
+  overflow: hidden;
+}
+
+.new-jaap-main {
+  width: min(100%, 520px);
+  margin: 58px auto 0;
+  padding: 0 18px;
+}
+
+.new-jaap-image-frame {
+  width: min(80%, 300px);
+  margin: 0 auto;
+  border-radius: 18px;
+  overflow: hidden;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.new-jaap-devta-image {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: contain;
+  border-radius: 18px;
+}
+
+.new-jaap-title-scroll {
+  width: min(100%, 382px);
+  max-height: clamp(56px, 12vh, 104px);
+  margin: 16px auto 0;
+  padding: 8px 14px;
+  overflow-y: auto;
+  color: #9a283d;
+  font-size: clamp(11px, 3.2vw, 16px);
+  line-height: 1.45;
+  font-weight: 600;
+  text-align: center;
+  scrollbar-width: thin;
+}
+
+.new-jaap-title-scroll span {
+  display: inline;
+}
+
+.new-jaap-title-scroll span::after {
+  content: " ";
+}
+
+.new-jaap-bottom-panel {
+  position: fixed;
+  left: 50%;
+  bottom: 0;
+  z-index: 30;
+  width: min(100%, 520px);
+  min-height: 202px;
+  transform: translateX(-50%);
+  display: grid;
+  grid-template-columns: minmax(94px, 1fr) minmax(152px, 184px) minmax(94px, 1fr);
+  align-items: center;
+  justify-items: center;
+  gap: 10px;
+  padding: 28px 14px 18px;
+  border-radius: 34px 34px 0 0;
+  background: rgba(255, 255, 255, 0.97);
+  box-shadow: 0 -16px 34px rgba(56, 37, 31, 0.18);
+}
+
+.new-jaap-stat {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+  color: #9a283d;
+  text-align: center;
+}
+
+.new-jaap-temple-circle {
+  width: clamp(72px, 22vw, 110px);
+  aspect-ratio: 1 / 1;
+  display: grid;
+  place-items: center;
+  border: 3px solid #9a283d;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.new-jaap-temple-circle img {
+  width: 46%;
+  height: 46%;
+  object-fit: contain;
+}
+
+.new-jaap-stat p {
+  margin: 13px 0 3px;
+  font-size: clamp(18px, 4.8vw, 25px);
+  line-height: 1.1;
+  font-weight: 600;
+}
+
+.new-jaap-stat strong {
+  font-size: clamp(28px, 7vw, 39px);
+  line-height: 1;
+  font-family: "PoppinsBold";
+}
+
+.new-jaap-mala-button {
+  position: relative;
+  width: clamp(152px, 40vw, 184px);
+  aspect-ratio: 1 / 1;
+  display: grid;
+  place-items: center;
+  border: 5px solid rgba(154, 40, 61, 0.52);
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 24px rgba(154, 40, 61, 0.36);
+  color: #9a283d;
+  overflow: hidden;
+  touch-action: manipulation;
+}
+
+.new-jaap-mala-video {
+  position: absolute;
+  inset: 6px;
+  width: calc(100% - 12px);
+  height: calc(100% - 12px);
+  border-radius: 50%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.new-jaap-mala-text {
+  position: relative;
+  z-index: 1;
+  width: 58%;
+  min-height: 76px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  color: #9a283d;
+  font-family: "PoppinsSemiBold";
+  font-size: clamp(12px, 3.2vw, 15px);
+  line-height: 1.22;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.76);
+  border-radius: 999px;
+}
+
+.new-jaap-mala-text small {
+  color: #161616;
+  font-family: "PoppinsRegular";
+  font-size: clamp(13px, 3.5vw, 17px);
+}
+
+.new-jaap-mala-text b {
+  color: #111;
+  font-family: "PoppinsBold";
+  font-size: clamp(22px, 6.6vw, 34px);
+  line-height: 1.04;
+  white-space: nowrap;
+}
+
+.new-jaap-mala-title {
+  color: #9a283d;
+  font-size: clamp(10px, 2.8vw, 13px);
+  line-height: 1.1;
+  font-weight: 600;
+  text-align: center;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.new-jaap-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  display: grid;
+  place-items: center;
+  padding: 22px;
+  background: rgba(0, 0, 0, 0.52);
+}
+
+.new-jaap-complete-modal {
+  position: relative;
+  width: min(100%, 390px);
+  padding: 70px 28px 42px;
+  border-radius: 32px;
+  background: linear-gradient(135deg, #fff9ec 0%, #ffe3ad 100%);
+  box-shadow: 0 22px 42px rgba(66, 43, 31, 0.26);
+  text-align: center;
+}
+
+.new-jaap-complete-modal h2 {
+  margin: 0;
+  color: #9a283d;
+  font-family: "PoppinsBold";
+  font-size: clamp(22px, 6vw, 31px);
+  line-height: 1.18;
+}
+
+.new-jaap-modal-copy {
+  margin: 24px 0 20px;
+  color: #3b3b3b;
+  font-family: "PoppinsBold";
+  font-size: clamp(21px, 5.5vw, 30px);
+  line-height: 1.18;
+}
+
+.new-jaap-total-pill {
+  width: min(100%, 280px);
+  min-height: 74px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  border-radius: 999px;
+  color: #fff;
+  background: linear-gradient(135deg, #b32343 0%, #c14d68 100%);
+  box-shadow: 0 10px 20px rgba(154, 40, 61, 0.32);
+  font-family: "PoppinsBold";
+  font-size: clamp(21px, 5.5vw, 29px);
+}
+
+.new-jaap-blessing {
+  margin: 40px 0 42px;
+  color: rgba(68, 68, 68, 0.7);
+  font-family: "PoppinsRegular";
+  font-size: clamp(17px, 4.6vw, 23px);
+  font-style: italic;
+}
+
+.new-jaap-next-button {
+  width: min(100%, 300px);
+  min-height: 72px;
+  border-radius: 999px;
+  color: #fff;
+  background: #ad243f;
+  box-shadow: 0 10px 16px rgba(87, 54, 44, 0.33);
+  font-family: "PoppinsBold";
+  font-size: clamp(20px, 5.2vw, 28px);
+}
+
+.new-jaap-confetti {
+  position: fixed;
+  inset: 0;
+  z-index: 65;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.new-jaap-confetti span {
+  position: absolute;
+  top: -54px;
+  left: var(--left);
+  width: 42px;
+  height: 25px;
+  border-radius: 70% 12% 70% 12%;
+  background: #d0a022;
+  opacity: 0.9;
+  animation: newJaapPetalFall var(--duration) linear var(--delay) forwards;
+}
+
+.new-jaap-confetti span:nth-child(3n) {
+  width: 34px;
+  height: 34px;
+  border-radius: 70% 18% 70% 18%;
+  background: #9a2a65;
+}
+
+.new-jaap-confetti span:nth-child(4n) {
+  background: #c54f38;
+}
+
+.new-jaap-confetti span:nth-child(5n) {
+  background: #e4bd2e;
+}
+
+@keyframes newJaapPetalFall {
+  0% {
+    transform: translate3d(0, -60px, 0) rotate(0deg);
+  }
+
+  100% {
+    transform: translate3d(var(--drift), 112vh, 0) rotate(520deg);
+  }
+}
+
+@media (max-width: 380px) {
+  .new-jaap-fixed-content {
+    max-height: calc(100vh - 276px);
+  }
+
+  .new-jaap-bottom-panel {
+    grid-template-columns: minmax(82px, 1fr) minmax(138px, 156px) minmax(82px, 1fr);
+    gap: 6px;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .new-jaap-main {
+    margin-top: 42px;
+  }
+
+  .new-jaap-title-scroll {
+    max-height: 58px;
+  }
+}
+
 @keyframes shakeUp {
   0% {
     transform: translateY(0px) rotate(0deg);
@@ -334,13 +668,13 @@ body::before {
   content: '';
   position: absolute;
   max-height: 70px;
-  height: 70px;
-  top: 50%;
-  max-width: 80%;
+  height: 35px;
+  top: 70%;
+  max-width: 95%;
   width: 100%;
   margin: auto;
-  border-radius: 15px;
-  bottom: 20%;
+  border-radius: 10px;
+  bottom: 10%;
   background: rgba(255, 255, 255, 0.7);
   z-index: 9;
   left: 0;

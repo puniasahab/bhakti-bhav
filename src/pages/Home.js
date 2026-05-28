@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { Link } from "react-router-dom";
@@ -10,7 +10,7 @@ import { homeSchema } from "../seo/schemas";
 
 import "swiper/css";
 import "swiper/css/pagination";
-import { homeCategoryApis, profileApis, wallpaperApis } from "../api";
+import { homeCategoryApis, profileApis, wallpaperApis, wallpaperDeepLinkingApi } from "../api";
 import { getMobileNoFromLS, setUserIdInLS, setUserName, removeSubscriptionStatusFromLS, setSubscriptionStatusInLS, getTokenFromLS, getSubscriptionStatusFromLS } from "../commonFunctions";
 import homeCache from "../utils/homeCache";
 // import { trackEventCommonFunction } from "../utils/eventCommonFunctions";
@@ -18,11 +18,13 @@ import useGA4BaseParams from "../hooks/useGA4BaseParams";
 import useGA4Tracker from "../hooks/useGA4Tracker";
 import { GA4Events } from "../utils/ga4Events.enum";
 import SEO from "../components/SEO";
+import { LanguageContext } from "../contexts/LanguageContext";
 
 function Home() {
 
 
     const navigate = useNavigate();
+    const { language } = useContext(LanguageContext);
     const baseParams = useGA4BaseParams("Home Screen");
     const { trackEvent } = useGA4Tracker(baseParams);
     // Initialize state from cache if available (instant render on back-navigation)
@@ -56,13 +58,14 @@ function Home() {
     const [bannersData, setBannersData] = useState(() => homeCache.get("bannersData") || []);
     const [wallpaperImage, setWallpaperImage] = useState(() => homeCache.get("wallpaperImage") || "");
     const [homeCategories, setHomeCategories] = useState(() => homeCache.get("homeCategories") || []);
+    const [wallpaperDeepLinks, setWallpaperDeepLinks] = useState(() => homeCache.get("wallpaperDeepLinks") || []);
     const hasFetchedBanners = useRef(false);
     const hasTrackedScreenView = useRef(false);
 
     const fallbackHomeCategories = [
         { _id: "hindi-calendar", imageUrl: "./img/icon_2.png", url: "hindi-calendar", title: "fgUnh dySaMj" },
         { _id: "vrat-katha", imageUrl: "./img/icon_3.png", url: "vrat-katha", title: "ozr dFkk" },
-        { _id: "jaap-mala", imageUrl: "./img/icon_4.png", url: "jaap-mala", title: "tki ekyk" },
+        { _id: "jaap-mala", imageUrl: "./img/icon_4.png", url: "newjaapMaala", title: "tki ekyk" },
         { _id: "mantra", imageUrl: "./img/icon_5.png", url: "mantra", title: "ea=" },
         { _id: "chalisa", imageUrl: "./img/icon_1.png", url: "chalisa", title: "pkyhlk" },
         { _id: "aarti", imageUrl: "./img/icon_6.png", url: "aarti", title: "vkjrh" }
@@ -70,8 +73,9 @@ function Home() {
 
     const categoryRouteMap = {
         arti: "aarti",
-        "japp-mala": "jaap-mala",
-        108: "jaap-mala"
+        "jaap-mala": "newjaapMaala",
+        "japp-mala": "newjaapMaala",
+        108: "newjaapMaala"
     };
 
     const categoryEventMap = {
@@ -84,6 +88,10 @@ function Home() {
             event_label: "vrat_katha_card_clicked_on_home_screen"
         },
         "jaap-mala": {
+            eventName: GA4Events.jaap_mala_widget_clicked,
+            event_label: "jaap_mala_card_clicked_on_home_screen"
+        },
+        newjaapMaala: {
             eventName: GA4Events.jaap_mala_widget_clicked,
             event_label: "jaap_mala_card_clicked_on_home_screen"
         },
@@ -107,7 +115,18 @@ function Home() {
 
     const getCategoryRoute = (category) => {
         const url = String(category?.url || "").replace(/^\/+/, "");
-        return `/${categoryRouteMap[url] || url}`;
+        const route = categoryRouteMap[url] || url;
+        const categoryId = category?.categoryId || category?._id;
+
+        if (route === "kahaniya" && categoryId) {
+            return `/kahaniya/${categoryId}`;
+        }
+
+        if (route === "newjaapMaala" && categoryId) {
+            return `/newjaapMaala/${categoryId}`;
+        }
+
+        return `/${route}`;
     };
 
     const getHomeCategoriesFromResponse = (response) => {
@@ -115,6 +134,55 @@ function Home() {
         if (Array.isArray(response?.data)) return response.data;
         if (Array.isArray(response?.categories)) return response.categories;
         return [];
+    };
+
+    const getWallpaperDeepLinksFromResponse = (response) => {
+        if (Array.isArray(response)) return response;
+        if (Array.isArray(response?.data)) return response.data;
+        return [];
+    };
+
+
+    const redirection = {
+        "katha": "/vrat-katha",
+        "kahaniya": "/kahaniya-details",
+        "wallpaper": "/wallpaper",
+        "chalisa": "/chalisa",
+        "arti": "/aarti",
+        "jaapmala": "/jaapmala",
+        "mantra": "/mantra"
+
+    }
+
+    const getWallpaperDeepLinkRoute = (item) => {
+        // if (item?.categoryRedirect === "katha" && item?.categoryId) {
+        //     return `/vrat-katha/categoryDetails/${item.categoryId}`;
+        // }
+
+        // else if(item?.categoryRedirect === 'kahaniya' && item?.categoryId) {
+        //     return 
+        // }
+
+        // else if(item?.categoryRedirect === '') {
+
+        // }
+        
+
+
+        // if (item?.categoryRedirect === "wallpaper" && item?._id) {
+        //     return `/wallpaper/${item._id}`;
+        // }
+
+        let route = "";
+
+        if(item?.categoryRedirect && item?.categoryId) {
+                 route = `${redirection[item.categoryRedirect]}/${item.categoryId}`;
+        }
+        else if(item?.categoryRedirect) {
+            route = `${redirection[item.categoryRedirect]}`;
+        }
+
+        return route || "/payment";
     };
 
     // Helper to format raw panchang data into React elements
@@ -220,6 +288,10 @@ function Home() {
     useEffect(() => {
         let isMounted = true;
 
+        // On language change, clear language-sensitive cache and reset categories state
+        homeCache.delete("homeCategories");
+        setHomeCategories([]);
+
         // Check cache first for instant render, but continue fetching other home APIs.
         const cachedBanners = homeCache.get("bannersData");
         const cachedWallpaper = homeCache.get("wallpaperImage");
@@ -232,15 +304,15 @@ function Home() {
         }
 
         const shouldFetchBanners = !shouldUseCachedBanners && !hasFetchedBanners.current;
-        const selectedLanguage = localStorage.getItem("bhakti_bhav_language") || "hi";
 
         const homeApiPromises = [
             profileApis.getProfile(),
             shouldFetchBanners ? wallpaperApis.getBanners() : Promise.resolve(null),
-            homeCategoryApis.fetchHomeCategories(selectedLanguage)
+            homeCategoryApis.fetchHomeCategories(language),
+            wallpaperDeepLinkingApi.getWallpaperDeepLinkingData(language)
         ];
 
-        Promise.allSettled(homeApiPromises).then(([profileResult, bannersResult, homeCategoriesResult]) => {
+        Promise.allSettled(homeApiPromises).then(([profileResult, bannersResult, homeCategoriesResult, wallpaperDeepLinksResult]) => {
             if (!isMounted) return;
 
             if (profileResult.status === "fulfilled") {
@@ -286,12 +358,24 @@ function Home() {
             } else {
                 console.error("Error fetching home categories:", homeCategoriesResult.reason);
             }
+
+            if (wallpaperDeepLinksResult.status === "fulfilled") {
+                const deepLinks = getWallpaperDeepLinksFromResponse(wallpaperDeepLinksResult.value);
+                console.log("Wallpaper deep linking data:", wallpaperDeepLinksResult.value);
+
+                if (deepLinks.length > 0) {
+                    setWallpaperDeepLinks(deepLinks);
+                    homeCache.set("wallpaperDeepLinks", deepLinks);
+                }
+            } else {
+                console.error("Error fetching wallpaper deep linking data:", wallpaperDeepLinksResult.reason);
+            }
         });
 
         return () => {
             isMounted = false;
         };
-    }, [phoneNumber])
+    }, [phoneNumber, language])
 
     const requireLogin = (e) => {
         if (!getTokenFromLS()) {
@@ -308,10 +392,21 @@ function Home() {
         });
     };
 
+    const handleWallpaperDeepLinkClicked = (item, e) => {
+        if (!item?.isWithoutLoginFree && requireLogin(e)) return;
+
+        trackEvent(GA4Events.wallpaper_widget_clicked, {
+            event_label: "wallpaper_deep_linking_card_clicked_on_home_screen",
+            id: item?._id,
+            categoryId: item?.categoryId,
+            categoryRedirect: item?.categoryRedirect
+        });
+    };
+
     const handleHomeCategoryClicked = (category, e) => {
         if (!category?.isWithoutLoginFree && requireLogin(e)) return;
 
-        const route = getCategoryRoute(category).replace(/^\//, "");
+        const route = getCategoryRoute(category).replace(/^\//, "").split("/")[0];
         const eventConfig = categoryEventMap[route];
 
         if (eventConfig?.eventName) {
@@ -336,7 +431,7 @@ function Home() {
             schema = {homeSchema}
             />
             <Header />
-            <div className="container mx-auto mt-4 flex flex-col px-4 md:px-0">
+            <div className="container mx-auto mt-8 flex flex-col px-4 md:px-0">
                 <section className="bg-[#FFFAF4] rounded-xl text-sm space-y-1 shadow-md">
                     <div className="relative w-full h-[20vh] md:h-[60vh] overflow-hidden">
                         <Swiper
@@ -410,7 +505,7 @@ function Home() {
                         className="theme_bg bg-white rounded-xl shadow md:p-6 p-3 text-center hover:bg-yellow-50 transition w-auto flex">
                         <div className="mx-auto flex md:flex-row flex-col items-center space-y-3 md:space-y-0">
                             <img crossOrigin = 'anonymous' src="./img/icon_1.png" alt="" width="36" height="36" className="md:mr-3" />
-                            <p className="md:text-2xl text-lg font-normal leading-[20px]">vkt dk jkf'kQy <br /><span className="font-eng text-xs">(Aaj Ka Rashifal)</span></p>
+                            <p className="md:text-2xl text-sm font-normal leading-[14px]">आज का राशिफल <br /><span className="font-eng text-xs">(Aaj Ka Rashifal)</span></p>
                         </div>
                     </Link>
                     <button onClick={(e) => { setIsOpen(true) }}
@@ -428,38 +523,77 @@ function Home() {
                         <Link
                             key={category._id || category.url || category.title}
                             to={getCategoryRoute(category)}
+                            state={{
+                                categoryId: category?.categoryId || category?._id,
+                                categoryTitle: category?.title
+                            }}
                             onClick={(e) => handleHomeCategoryClicked(category, e)}
-                            className="theme_bg bg-white rounded-xl shadow md:p-6 p-3 text-center hover:bg-yellow-50 transition w-auto flex"
+                            className="theme_bg bg-white rounded-xl shadow md:p-6 p-3 text-center hover:bg-yellow-50 transition w-auto flex justify-center"
                         >
-                            <div className="mx-auto flex flex-col items-center space-y-3 md:space-y-0">
+                            <div className="mx-auto flex w-full flex-col items-center justify-center space-y-3 md:space-y-0">
                                 <img
                                     src={category.imageUrl}
                                     alt={category.title || ""}
                                     width="36"
                                     crossOrigin = 'anonymous'
                                     height="36"
-                                    className="md:mr-3 w-9 h-9 object-cover rounded-md"
+                                    className="w-9 h-9 object-cover rounded-md"
                                 />
-                                <p className="md:text-2xl text-lg font-normal leading-[20px]">{category.title}</p>
+                                <p className={`${language === "hi" ? "font-hindi" : "font-eng"} md:text-2xl text-sm font-normal leading-[14px] text-center w-full mx-auto`}>{category.title}</p>
                             </div>
                         </Link>
                     ))}
                 </div>
 
                 <div className="mt-6">
+                    {/* Previous wallpaper module code kept for reference as requested.
                     <Link to="/wallpaper" onClick={handleWallpaperClicked} className="relative theme_bg hd_bg rounded-xl flex items-center justify-center rounded-xl font-semibold overflow-hidden 
           hover:bg-yellow-50 transition">
 
-                        {/* <span className="absolute left-[30px] top-[50%] -translate-y-1/2 
-                  bg-[url('/img/icon_7.png')] bg-no-repeat bg-cover w-[70px] h-[70px]"></span>
+                        <span className="absolute left-[30px] top-[50%] -translate-y-1/2 
+	                  bg-[url('/img/icon_7.png')] bg-no-repeat bg-cover w-[70px] h-[70px]"></span>
                         <span className="absolute right-[30px] top-[45%] -translate-y-1/2 
-                  bg-[url('/img/icon_8.png')] bg-no-repeat bg-cover  w-[46px] h-[46px]"></span>
+	                  bg-[url('/img/icon_8.png')] bg-no-repeat bg-cover  w-[46px] h-[46px]"></span>
 
                         <span className="relative z-10 flex items-center">
                             <span className="text-3xl font-normal leading-[20px]">okWyisij <br /><span className="font-eng text-xs">(Wallpaper)</span></span>
-                        </span> */}
+                        </span>
                         <img crossOrigin = 'anonymous' src={wallpaperImage} alt="Wallpaper" width="100%" height="100%" className="max-w-full h-auto" />
                     </Link>
+                    */}
+
+                    {wallpaperDeepLinks.length > 0 ? (
+                        <Swiper
+                            modules={[Pagination, Autoplay]}
+                            pagination={{ clickable: true }}
+                            autoplay={{ delay: 2500, disableOnInteraction: false }}
+                            loop={wallpaperDeepLinks.length > 1}
+                            className="w-full rounded-xl"
+                        >
+                            {wallpaperDeepLinks.map((item) => (
+                                <SwiperSlide key={item._id}>
+                                    <Link
+                                        to={getWallpaperDeepLinkRoute(item)}
+                                        onClick={(e) => handleWallpaperDeepLinkClicked(item, e)}
+                                        className="relative theme_bg hd_bg rounded-xl flex items-center justify-center font-semibold overflow-hidden hover:bg-yellow-50 transition block"
+                                    >
+                                        <img
+                                            crossOrigin="anonymous"
+                                            src={item.image || item.imagethumb}
+                                            alt="Wallpaper"
+                                            width="100%"
+                                            height="100%"
+                                            className="max-w-full h-auto"
+                                        />
+                                    </Link>
+                                </SwiperSlide>
+                            ))}
+                        </Swiper>
+                    ) : (
+                        <Link to="/wallpaper" onClick={handleWallpaperClicked} className="relative theme_bg hd_bg rounded-xl flex items-center justify-center font-semibold overflow-hidden hover:bg-yellow-50 transition">
+                            <img crossOrigin="anonymous" src={wallpaperImage} alt="Wallpaper" width="100%" height="100%" className="max-w-full h-auto" />
+                        </Link>
+                    )}
                 </div>
 
                 <div className="mt-6 flex gap-4 flex-row">
