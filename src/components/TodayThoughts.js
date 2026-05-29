@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useContext } from "react";
 import { Link } from "react-router-dom";
 import Loader from "./Loader";
 import jsPDF from 'jspdf';
@@ -8,6 +8,8 @@ import "../pages/style.css";
 import useGA4BasePrams from "../hooks/useGA4BaseParams";
 import useGA4Tracker from "../hooks/useGA4Tracker";
 import { GA4Events } from "../utils/ga4Events.enum";
+import { dailyThoughtsApis } from "../api";
+import { LanguageContext } from "../contexts/LanguageContext";
 
 function TodayThoughts() {
   const [thoughtData, setThoughtData] = useState(() => homeCache.get("todayThought") || null);
@@ -15,6 +17,14 @@ function TodayThoughts() {
   const shareTemplateRef = useRef(null);
   const baseParams = useGA4BasePrams("Thoughts Section");
   const {trackEvent} = useGA4Tracker(baseParams);
+  const { language } = useContext(LanguageContext);
+
+  // Clear cache and reset when language changes so it refetches in the new language
+  useEffect(() => {
+    homeCache.delete("todayThought");
+    setThoughtData(null);
+    setLoading(true);
+  }, [language]);
 
   useEffect(() => {
     // If cached data exists, skip fetch
@@ -24,8 +34,8 @@ function TodayThoughts() {
       return;
     }
 
-    fetch("https://api.bhaktibhav.app/frontend/daythoughts")
-      .then((res) => res.json())
+    setLoading(true);
+    dailyThoughtsApis.getDailyThought("v3", language)
       .then((data) => {
         if (data?.status === "success" && data.data) {
           setThoughtData(data.data);
@@ -38,7 +48,7 @@ function TodayThoughts() {
         console.error("Error fetching thought:", err);
         setLoading(false);
       });
-  }, []);
+  }, [language]);
 
   // if (loading) return (
   //   <div className="md:basis-[60%] basis-[60%] animate-pulse">
@@ -59,7 +69,7 @@ function TodayThoughts() {
   }
 
 
-  const shareText = `🌸 Today's Thought 🌸\n\n"${thoughtData.thought.hi}"\n– ${thoughtData.author.hi}`;
+  const shareText = `🌸 Today's Thought 🌸\n\n"${thoughtData.thought}"\n– ${thoughtData.author}`;
 
   const generateShareTemplate = async () => {
     const canvas = document.createElement('canvas');
@@ -147,7 +157,7 @@ function TodayThoughts() {
     ctx.textAlign = 'center';
     
     // Word wrap for the thought with proper spacing
-    const words = thoughtData.thought.hi.split(' ');
+    const words = thoughtData.thought.split(' ');
     let line = '';
     let y = contentStartY + 60;
     const maxWidth = canvas.width - 80; // px-6 equivalent padding
@@ -171,7 +181,7 @@ function TodayThoughts() {
     // Author name - matching mt-4 text-base font-medium
     ctx.font = '18px serif';
     ctx.fillStyle = '#5D4037'; // Darker color for author
-    ctx.fillText(`– ${thoughtData.author.hi}`, canvas.width / 2, y + 50);
+    ctx.fillText(`– ${thoughtData.author}`, canvas.width / 2, y + 50);
     
     // Bottom branding section - matching mt-auto mb-6
     const brandingY = canvas.height - 80; // mb-6 equivalent
@@ -327,11 +337,11 @@ function TodayThoughts() {
         <h2 className="mb-2 text-lg mt-[30px]">vkt dk lqfopkj</h2>
 
         <p className="md:text-3xl font-bold text-md mt-[30px]">
-          ^^{thoughtData.thought.hi.replace(/,/g, ']')}**
+          ^^{thoughtData.thought.replace(/,/g, ']')}**
         </p> 
 
         <p className="mt-5 text-sm">
-          &ndash; {thoughtData.author.hi} 
+          &ndash; {thoughtData.author} 
         </p>
       </div>
 

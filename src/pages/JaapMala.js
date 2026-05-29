@@ -158,8 +158,8 @@ function JaapMala() {
       <PageTitleCard
         titleHi={"tki ekyk"}
         titleEn={"Jaap mala"}
-        customEngFontSize={"13px"}
-        customFontSize={"21px"}
+        customEngFontSize={"18px"}
+        customFontSize={"23px"}
       />
 
       <div className="container mx-auto px-4">

@@ -97,8 +97,8 @@ export default function HindiCalendar() {
       <PageTitleCard
         titleHi={"fgUnh dySaMj"}
         titleEn={"Hindi Calender"}
-        customEngFontSize={"13px"}
-        customFontSize={"21px"}
+        customEngFontSize={"18px"}
+        customFontSize={"23px"}
 
       />
 

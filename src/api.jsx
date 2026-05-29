@@ -695,4 +695,17 @@ export const naamJaapApis = {
   }
 }
 
+
+export const dailyThoughtsApis = {
+  getDailyThought: async (version, lang) => {
+    try {
+      const response = await api.get(`${endPoints.todaysThought}-${version}?lang=${lang}`);
+      return response.data;
+    }
+    catch (error) {
+      console.error("Error fetching Daily Thought", error);
+      throw error;
+    }
+  }
+}
 export default api;

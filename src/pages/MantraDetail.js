@@ -129,7 +129,7 @@ export default function MantraDetail() {
       <PageTitleCard
         titleHi={language === "hi" ? detail.name : ""}
         titleEn={language === "hi" ? "" : detail.name}
-        customEngFontSize={"13px"}
+        customEngFontSize={"16px"}
         customFontSize={"19px"}
       /> 
 

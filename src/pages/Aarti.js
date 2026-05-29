@@ -135,7 +135,7 @@ export default function Aarti() {
       <PageTitleCard
         titleHi={"vkjrh"}
         titleEn={"Aarti"}
-        customEngFontSize={"14px"}
+        customEngFontSize={"18px"}
         customFontSize={"23px"}
       />
 
@@ -169,7 +169,7 @@ export default function Aarti() {
                           ? item.name
                           : (isHindi ? (item.name?.hi || item.name?.en || "") : (item.name?.en || item.name?.hi || ""));
                         return (
-                          <h2 className={`text-xl font-bold ${isHindi ? "font-hindi" : "font-eng text-sm"}`}>
+                          <h2 className={`text-lg font-bold ${isHindi ? "font-hindi" : "font-eng text-sm"}`}>
                             {displayName}
                           </h2>
                         );

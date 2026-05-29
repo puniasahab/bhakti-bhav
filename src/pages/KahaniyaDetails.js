@@ -141,8 +141,8 @@ export default function KahaniyaDetails() {
       <PageTitleCard
         titleHi={language === "hi" ? replaceSpecialChars(title) : ""}
         titleEn={language === "hi" ? "" : title}
-        customEngFontSize="13px"
-        customFontSize="14px"
+        customEngFontSize="16px"
+        customFontSize="19px"
       />
 
       <div className="container mx-auto px-4 mt-4 pb-20">

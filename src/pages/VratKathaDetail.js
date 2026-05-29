@@ -322,10 +322,18 @@ function VratKathaDetail() {
             <Header pageName={{ hi: "ozr dFkk", en: "Vrat Katha" }} hindiFontSize="true" />
             <div className="h-2"></div>
             <PageTitleCard
-                titleHi={detail.name.hi.replace(/\//g, "|").replace(/\|/g, "।")}
+                titleHi={detail.name.hi.replace(/\//g, "|").replace(/\|/g, "।").replace(/,/g, "]").replace(/\(/g, "¼").replace(/\)/g, "½").replace(/\:/g, "%").replace(/:/g, "ः")         // Replace colon with visarga
+                                .replace(/ँ/g, "ं")          // Normalize chandrabindu if misencoded
+                                .replace(/\u200D|\u200C/g, "  ").replace(/[.,;!?'"“”‘’]/g, " ")    // Remove English punctuation
+                                .replace(/[\[\]{}()]/g, "")       // Remove brackets and parentheses
+                                .replace(/[*/\\#%^+=_|<>~`@$₹]/g, " ").replace(/[^\u0900-\u097F\s।॥]/g, "") // remove non-Devanagari chars except space & punctuation
+                                .replace(/\u00A0/g, " ") // replace non-breaking space with normal space
+                                .replace(/\u200B|\u200C|\u200D/g, " ") // remove zero-width chars
+                                .replace(/\s+/g, " ").replace(/[०-९]/g, digit => hindiToEnglishMap[digit])// Remove zero-width joiners
+                                .normalize("NFC")}
                 titleEn={detail.name.en}
-                customEngFontSize={"13px"}
-                customFontSize={"18px"}
+                customEngFontSize={detail?.name?.en?.length > 30 ? "14px" : detail?.name?.en?.length > 20 ? "15px" : "16px"}
+                customFontSize={"19px"}
 
             />
 

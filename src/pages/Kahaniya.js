@@ -246,8 +246,8 @@ export default function Kahaniya() {
       <PageTitleCard
         titleHi="कहानियां"
         titleEn="Kahaniya"
-        customEngFontSize="14px"
-        customFontSize="14px"
+        customEngFontSize="16px"
+        customFontSize="19px"
       />
 
       {content}

@@ -19,6 +19,7 @@ import useGA4Tracker from "../hooks/useGA4Tracker";
 import { GA4Events } from "../utils/ga4Events.enum";
 import SEO from "../components/SEO";
 import { LanguageContext } from "../contexts/LanguageContext";
+import translation from "../utils/translation.json";
 
 function Home() {
 
@@ -34,6 +35,7 @@ function Home() {
         // Rebuild from cached raw data if available
         const cachedRaw = homeCache.get("panchangRawData");
         if (cachedRaw) {
+            // language not yet available in lazy init, default to "hi"
             return [
                 {
                     side: "left",
@@ -58,6 +60,7 @@ function Home() {
     const [bannersData, setBannersData] = useState(() => homeCache.get("bannersData") || []);
     const [wallpaperImage, setWallpaperImage] = useState(() => homeCache.get("wallpaperImage") || "");
     const [homeCategories, setHomeCategories] = useState(() => homeCache.get("homeCategories") || []);
+    const [categoriesLoading, setCategoriesLoading] = useState(() => !homeCache.has("homeCategories"));
     const [wallpaperDeepLinks, setWallpaperDeepLinks] = useState(() => homeCache.get("wallpaperDeepLinks") || []);
     const hasFetchedBanners = useRef(false);
     const hasTrackedScreenView = useRef(false);
@@ -174,13 +177,17 @@ function Home() {
         // }
 
         let route = "";
-
-        if(item?.categoryRedirect && item?.categoryId) {
+        console.log("GET SUbscription status from LS", getSubscriptionStatusFromLS());
+        if(getSubscriptionStatusFromLS()) {
+                if(item?.categoryRedirect && item?.categoryId) {
                  route = `${redirection[item.categoryRedirect]}/${item.categoryId}`;
         }
         else if(item?.categoryRedirect) {
             route = `${redirection[item.categoryRedirect]}`;
         }
+        }
+
+        
 
         return route || "/payment";
     };
@@ -291,6 +298,7 @@ function Home() {
         // On language change, clear language-sensitive cache and reset categories state
         homeCache.delete("homeCategories");
         setHomeCategories([]);
+        setCategoriesLoading(true);
 
         // Check cache first for instant render, but continue fetching other home APIs.
         const cachedBanners = homeCache.get("bannersData");
@@ -355,8 +363,10 @@ function Home() {
                     setHomeCategories(categories);
                     homeCache.set("homeCategories", categories);
                 }
+                setCategoriesLoading(false);
             } else {
                 console.error("Error fetching home categories:", homeCategoriesResult.reason);
+                setCategoriesLoading(false);
             }
 
             if (wallpaperDeepLinksResult.status === "fulfilled") {
@@ -434,7 +444,46 @@ function Home() {
 
     const categoriesToShow = homeCategories.length > 0 ? homeCategories : fallbackHomeCategories;
 
+    // Full-page shimmer skeleton shown while categories (and other home data) are loading
+    const PageShimmer = () => (
+        <div className="container mx-auto mt-8 flex flex-col px-4 md:px-0 animate-pulse">
+            {/* Banner shimmer */}
+            <div className="bg-gray-200 rounded-xl h-[20vh] md:h-[60vh] w-full mb-4" />
 
+            {/* Rashifal + Panchang row shimmer */}
+            <div className="grid grid-cols-2 gap-3 mb-3">
+                {[0, 1].map(i => (
+                    <div key={i} className="bg-white rounded-xl shadow p-3 md:p-6 flex justify-center">
+                        <div className="flex flex-col items-center space-y-3 w-full">
+                            <div className="w-9 h-9 bg-gray-200 rounded-md" />
+                            <div className="h-3 w-3/4 bg-gray-200 rounded" />
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            {/* Category cards shimmer — 6 cards */}
+            <div className="grid grid-cols-3 md:gap-4 gap-2 mb-6">
+                {Array.from({ length: 6 }).map((_, i) => (
+                    <div key={i} className="bg-white rounded-xl shadow p-3 md:p-6 flex justify-center">
+                        <div className="flex flex-col items-center space-y-3 w-full">
+                            <div className="w-9 h-9 bg-gray-200 rounded-md" />
+                            <div className="h-3 w-3/4 bg-gray-200 rounded" />
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            {/* Wallpaper banner shimmer */}
+            <div className="bg-gray-200 rounded-xl h-32 w-full mb-6" />
+
+            {/* Today's Thought + Puja row shimmer */}
+            <div className="flex gap-4 flex-row">
+                <div className="basis-[60%] md:basis-[70%] bg-gray-200 rounded-xl h-40" />
+                <div className="basis-[40%] md:basis-[30%] bg-gray-200 rounded-xl h-40" />
+            </div>
+        </div>
+    );
 
     return (
         <>
@@ -445,7 +494,11 @@ function Home() {
             schema = {homeSchema}
             />
             <Header />
-            <div className="container mx-auto mt-8 flex flex-col px-4 md:px-0">
+
+            {/* Show full-page shimmer while loading, swap to real content once ready */}
+            {categoriesLoading ? <PageShimmer /> : null}
+
+            <div className={`container mx-auto mt-8 flex flex-col px-4 md:px-0 ${categoriesLoading ? "hidden" : ""}`}>
                 <section className="bg-[#FFFAF4] rounded-xl text-sm space-y-1 shadow-md">
                     <div className="relative w-full h-[20vh] md:h-[60vh] overflow-hidden">
                         <Swiper
@@ -520,14 +573,14 @@ function Home() {
                         className="theme_bg bg-white rounded-xl shadow md:p-6 p-3 text-center hover:bg-yellow-50 transition w-auto flex">
                         <div className="mx-auto flex md:flex-row flex-col items-center space-y-3 md:space-y-0">
                             <img crossOrigin = 'anonymous' src="./img/icon_1.png" alt="" width="36" height="36" className="md:mr-3" />
-                            <p className="md:text-2xl text-sm font-normal leading-[14px]">आज का राशिफल <br /><span className="font-eng text-xs">(Aaj Ka Rashifal)</span></p>
+                            <p className={`${language === "hi" ? "font-hindi" : "font-eng"} md:text-2xl text-sm font-normal leading-[14px]`}>{translation[language]?.aajKaRashifal} <br /></p>
                         </div>
                     </Link>
                     <button onClick={(e) => { setIsOpen(true) }}
                         className="theme_bg bg-white rounded-xl shadow md:p-6 p-3 text-center hover:bg-yellow-50 transition w-auto flex">
                         <div className="mx-auto flex md:flex-row flex-col items-center space-y-3 md:space-y-0">
                             <img  crossOrigin = 'anonymous' src="./img/icon_5.png" alt="" width="36" height="36" className="md:mr-3" />
-                            <p className="md:text-2xl text-lg font-normal leading-[20px]">iapkx <br /><span className="font-eng text-xs">(Panchang)</span></p>
+                            <p className={`${language === "hi" ? "font-hindi" : "font-eng"} md:text-2xl text-sm font-normal leading-[14px]`}>{translation[language]?.panchang} <br /></p>
                         </div>
                     </button>
                 </div>
@@ -535,29 +588,30 @@ function Home() {
 
                 <div className="grid grid-cols-3 md:gap-4 gap-2 mt-3 text-center font-medium">
                     {categoriesToShow.map((category) => (
-                        <Link
-                            key={category._id || category.url || category.title}
-                            to={getCategoryRoute(category)}
-                            state={{
-                                categoryId: category?.categoryId || category?._id,
-                                categoryTitle: category?.title
-                            }}
-                            onClick={(e) => handleHomeCategoryClicked(category, e)}
-                            className="theme_bg bg-white rounded-xl shadow md:p-6 p-3 text-center hover:bg-yellow-50 transition w-auto flex justify-center"
-                        >
-                            <div className="mx-auto flex w-full flex-col items-center justify-center space-y-3 md:space-y-0">
-                                <img
-                                    src={category.imageUrl}
-                                    alt={category.title || ""}
-                                    width="36"
-                                    crossOrigin = 'anonymous'
-                                    height="36"
-                                    className="w-9 h-9 object-cover rounded-md"
-                                />
-                                <p className={`${language === "hi" ? "font-hindi" : "font-eng"} md:text-2xl text-sm font-normal leading-[14px] text-center w-full mx-auto`}>{category.title}</p>
-                            </div>
-                        </Link>
-                    ))}
+                            <Link
+                                key={category._id || category.url || category.title}
+                                to={getCategoryRoute(category)}
+                                state={{
+                                    categoryId: category?.categoryId || category?._id,
+                                    categoryTitle: category?.title
+                                }}
+                                onClick={(e) => handleHomeCategoryClicked(category, e)}
+                                className="theme_bg bg-white rounded-xl shadow md:p-6 p-3 text-center hover:bg-yellow-50 transition w-auto flex justify-center"
+                            >
+                                <div className="mx-auto flex w-full flex-col items-center justify-center space-y-3 md:space-y-0">
+                                    <img
+                                        src={category.imageUrl}
+                                        alt={category.title || ""}
+                                        width="36"
+                                        crossOrigin = 'anonymous'
+                                        height="36"
+                                        className="w-9 h-9 object-cover rounded-md"
+                                    />
+                                    <p className={`${language === "hi" ? "font-hindi" : "font-eng"} md:text-2xl text-sm font-normal leading-[14px] text-center w-full mx-auto`}>{category.title}</p>
+                                </div>
+                            </Link>
+                        ))
+                    }
                 </div>
 
                 <div className="mt-6">

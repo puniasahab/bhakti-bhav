@@ -8,7 +8,8 @@ const PageTitleCard = ({
   language, 
   fontEnglish = false,
   textSize = "text-xl", 
-  customFontSize, // Font size in pixels for main title
+  customFontSize,    // Font size in pixels for Hindi title
+  customEngFontSize, // Font size in pixels for English title
   isFromJaapMala = false // New prop to indicate if it's from JaapMala
 }) => {
   const { language: selectedLanguage } = useContext(LanguageContext);
@@ -59,13 +60,16 @@ const PageTitleCard = ({
   };
 
   const titleData = getTitleData();
+  const appliedFontSize = activeLanguage === "hi"
+    ? customFontSize
+    : (customEngFontSize || customFontSize);
 
   return (
     <div className="flex justify-center items-center mt-1 mb-3">
       <p
-        className={`mb-0 w-auto py-1 px-4 bg-[rgba(255,250,244,0.6)] rounded-b-xl mx-auto theme_text font-[500] shadow-md text-center ${!customFontSize ? textSize : ''}`}
+        className={`mb-0 w-auto py-1 px-4 bg-[rgba(255,250,244,0.6)] rounded-b-xl mx-auto theme_text font-[500] shadow-md text-center ${!appliedFontSize ? textSize : ''}`}
         style={{
-          ...(customFontSize ? { fontSize: customFontSize } : {}),
+          ...(appliedFontSize ? { fontSize: appliedFontSize } : {}),
           borderLeft: "2px solid #f76009ff",
           borderRight: "2px solid #f76009ff",
           borderBottom: "2px solid #f76009ff",

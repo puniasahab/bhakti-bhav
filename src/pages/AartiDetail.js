@@ -117,7 +117,7 @@ function AartiDetail() {
       <PageTitleCard
         titleHi={detail.name.hi}
         titleEn={detail.name.en} 
-        customEngFontSize={"13px"}
+        customEngFontSize={"16px"}
         customFontSize={"19px"}
         
       />

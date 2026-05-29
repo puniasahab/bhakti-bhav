@@ -31,4 +31,5 @@ export const endPoints = {
     getSingleChalisa: "chalisa",
     aarti:'all-artis',
     getSingleAarti: 'arti',
+    todaysThought: 'daythoughts'
 }
