@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginApis } from "../api";
-import { setMobileNoInLS } from "../commonFunctions";
+import { getUserIdFromLS, setMobileNoInLS, setUserIdInLS } from "../commonFunctions";
 import useGA4BaseParams from "../hooks/useGA4BaseParams";
 import useGA4Tracker from "../hooks/useGA4Tracker";
 import { GA4Events } from "../utils/ga4Events.enum";
 
 import { trackCustomEvent } from "../utils/metaPixel";
 import { PIXEL_STANDARD_EVENTS } from "../utils/pixelEvents";
+import { setUserId } from "firebase/analytics";
 
 function Login() {
     const [mobile, setMobile] = useState("");
@@ -75,10 +76,13 @@ function Login() {
             localStorage.setItem('deviceId', deviceId);
         }
 
+        let userId = getUserIdFromLS();
+
         trackEvent(GA4Events.login_otp_requested, { event_label: "send_otp_button_clicked_on_login_screen" });
 
-        const response = await loginApis.generateOtp(mobileNumber, deviceId);
+        const response = await loginApis.generateOtp(mobileNumber, deviceId, userId);
         console.log("OTP Response:", response);
+        setUserIdInLS(response?.userId);
         setLoading(false);
         if (response.success) {
             setMobileNoInLS(mobile)

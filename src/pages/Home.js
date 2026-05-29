@@ -11,7 +11,7 @@ import { homeSchema } from "../seo/schemas";
 import "swiper/css";
 import "swiper/css/pagination";
 import { homeCategoryApis, profileApis, wallpaperApis, wallpaperDeepLinkingApi } from "../api";
-import { getMobileNoFromLS, setUserIdInLS, setUserName, removeSubscriptionStatusFromLS, setSubscriptionStatusInLS, getTokenFromLS, getSubscriptionStatusFromLS } from "../commonFunctions";
+import { getMobileNoFromLS, setUserIdInLS, setUserName, removeSubscriptionStatusFromLS, setSubscriptionStatusInLS, getTokenFromLS, getSubscriptionStatusFromLS, getIsLoggedIn } from "../commonFunctions";
 import homeCache from "../utils/homeCache";
 // import { trackEventCommonFunction } from "../utils/eventCommonFunctions";
 import useGA4BaseParams from "../hooks/useGA4BaseParams";
@@ -65,7 +65,7 @@ function Home() {
     const fallbackHomeCategories = [
         { _id: "hindi-calendar", imageUrl: "./img/icon_2.png", url: "hindi-calendar", title: "fgUnh dySaMj" },
         { _id: "vrat-katha", imageUrl: "./img/icon_3.png", url: "vrat-katha", title: "ozr dFkk" },
-        { _id: "jaap-mala", imageUrl: "./img/icon_4.png", url: "newjaapMaala", title: "tki ekyk" },
+        { _id: "jaap-mala", imageUrl: "./img/icon_4.png", url: "jaap-mala", title: "tki ekyk" },
         { _id: "mantra", imageUrl: "./img/icon_5.png", url: "mantra", title: "ea=" },
         { _id: "chalisa", imageUrl: "./img/icon_1.png", url: "chalisa", title: "pkyhlk" },
         { _id: "aarti", imageUrl: "./img/icon_6.png", url: "aarti", title: "vkjrh" }
@@ -75,7 +75,7 @@ function Home() {
         arti: "aarti",
         "jaap-mala": "newjaapMaala",
         "japp-mala": "newjaapMaala",
-        108: "newjaapMaala"
+        108: "jaap-mala"
     };
 
     const categoryEventMap = {
@@ -404,7 +404,21 @@ function Home() {
     };
 
     const handleHomeCategoryClicked = (category, e) => {
-        if (!category?.isWithoutLoginFree && requireLogin(e)) return;
+        // If isWithoutLoginFree is explicitly false, always show login modal (even if logged in)
+        // If isWithoutLoginFree is true or key is absent, require only a valid token
+        const isLoggedIn = getIsLoggedIn();
+        // needsLogin is true only when:
+        // - user is NOT logged in, AND
+        // - category explicitly requires login (isWithoutLoginFree === false) OR has no token
+        const needsLogin = !isLoggedIn && (
+            category?.isWithoutLoginFree === false || !getTokenFromLS()
+        );
+
+        if (needsLogin) {
+            e?.preventDefault();
+            setShowLoginModal(true);
+            return;
+        }
 
         const route = getCategoryRoute(category).replace(/^\//, "").split("/")[0];
         const eventConfig = categoryEventMap[route];
@@ -498,6 +512,7 @@ function Home() {
 
                     <Link to="/Rashifal"
                         onClick={() => {
+
                             trackEvent(GA4Events.rashifal_tab_clicked, {
                                 event_label: "rashifal_card_clicked_on_home_screen"
                             })

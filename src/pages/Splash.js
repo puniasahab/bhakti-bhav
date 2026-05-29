@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from "react";
 
 import { GA4Events } from "../utils/ga4Events.enum";
 import { splashScreenApi } from "../api";
-import { AUTH_TOKEN_KEY, getDeviceId, getDeviceTokenFromLS, getFirebaseAppInstanceIdFromLS, getTokenFromLS, setTokenInLS, setUserIdInLS } from "../commonFunctions";
+import { AUTH_TOKEN_KEY, getDeviceId, getDeviceTokenFromLS, getFirebaseAppInstanceIdFromLS, getTokenFromLS, getUserIdFromLS, setTokenInLS, setUserIdInLS } from "../commonFunctions";
 
 import useGA4BaseParams from "../hooks/useGA4BaseParams";
 import useGA4Tracker from "../hooks/useGA4Tracker";
@@ -58,7 +58,8 @@ function Splash() {
     const fetchSplashScreenData = async () => {
       try {
         const deviceId = getDeviceId();
-        const payload = {
+
+        let payload = {
           firebaseAppInstanceId: getFirebaseAppInstanceIdFromLS(),
           deviceId,
           deviceToken: getDeviceTokenFromLS(),
@@ -66,7 +67,10 @@ function Splash() {
           platform: getSplashPlatform(),
           countryCode: getSplashCountryCode()
         };
-
+        const newUserId = getUserIdFromLS();
+        if (!newUserId) {
+          payload.userId = newUserId
+        }
         const response = await splashScreenApi.getSplashScreenData("v1", payload);
         const { token, userId } = getSplashAuthData(response);
 
@@ -96,9 +100,9 @@ function Splash() {
     }
   }, [trackEvent]);
 
-  
+
   return (
-   <div className="flex items-center justify-center h-screen relative">
+    <div className="flex items-center justify-center h-screen relative">
       <div className="absolute inset-0 top-0 md:w-[15%] md:left-[35%]">
         <div className="w-[90%] h-[45%] md:w-[100%] md:h-[30%] 
         bg-[url('https://bhaktibhav.app/img/bell-img.png')]
@@ -113,7 +117,7 @@ function Splash() {
           className="w-[192px] h-[184px] mb-4"
         />
         <div className="flex justify-center items-center theme_text font-hindi bg-[url('./img/border_bg.png')] bg-no-repeat splash_bg pb-3">
-          <p className="p-6 text-3xl ">fgUnh dySaMj] iapkax frfFk] <br/> R;ksgkj] ozr dFkk] pkyhlk]<br/> vkjrh laxzg] ea=] tkiekyk</p> 
+          <p className="p-6 text-3xl ">fgUnh dySaMj] iapkax frfFk] <br /> R;ksgkj] ozr dFkk] pkyhlk]<br /> vkjrh laxzg] ea=] tkiekyk</p>
         </div>
       </div>
     </div>

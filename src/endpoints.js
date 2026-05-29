@@ -25,4 +25,10 @@ export const endPoints = {
     jaapMalaCount: "feature-category/content",
     mantras: "all-mantras",
     getSingleMantra: "mantra",
+    naamJaap: "all-jaapmala",
+    getSingleNaamJaap: 'jaapmala',
+    chalisa: "all-chalisas",
+    getSingleChalisa: "chalisa",
+    aarti:'all-artis',
+    getSingleAarti: 'arti',
 }

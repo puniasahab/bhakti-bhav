@@ -7,6 +7,9 @@ import { useNavigate } from "react-router-dom";
 import { getTokenFromLS, getSubscriptionStatusFromLS, setUserName, setUserIdInLS
 } from "../commonFunctions";
 
+import { trackCustomEvent } from "../utils/metaPixel";
+import { PIXEL_STANDARD_EVENTS } from "../utils/pixelEvents";
+
 const Profile = () => {
     const navigate = useNavigate();
     const [profile, setProfile] = useState({
@@ -20,6 +23,7 @@ const Profile = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        trackCustomEvent(PIXEL_STANDARD_EVENTS.PROFILE_PAGE_VISITED, { message: "User visited profile page", mobileNumber: getTokenFromLS() ? "Yes" : "No" });
         const fetchProfileData = async () => {
             try {
                 const res = await profileApis.getProfile();

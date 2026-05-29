@@ -5,6 +5,9 @@ import logo from "../assets/img/logo.png";
 import useGA4BaseParams from "../hooks/useGA4BaseParams";
 import useGA4Tracker from "../hooks/useGA4Tracker";
 import { GA4Events } from "../utils/ga4Events.enum";
+import { trackCustomEvent } from "../utils/metaPixel";
+import { PIXEL_STANDARD_EVENTS } from "../utils/pixelEvents";
+import { getMobileNoFromLS } from "../commonFunctions";
 
 export default function PaymentComplete() {
   const navigate = useNavigate();
@@ -44,10 +47,12 @@ export default function PaymentComplete() {
   useEffect(() => {
     if (!isSuccess) {
       trackEvent(GA4Events.subscription_payment_failed, { event_label: "subscription_failed_screen_viewed_from_payment_complete_screen" });
+      trackCustomEvent(PIXEL_STANDARD_EVENTS.PAYMENT_FAILED, { orderId, orderStatus, mobileNo: getMobileNoFromLS() });
       return;
     }
 
     trackEvent(GA4Events.subscription_payment_success, { event_label: "subscription_success_screen_viewed_from_payment_complete_screen" });
+    trackCustomEvent(PIXEL_STANDARD_EVENTS.PAYMENT_SUCCESSFUL, { orderId, mobileNo: getMobileNoFromLS() });
     const interval = setInterval(() => {
       setCountdown((prev) => {
         if (prev <= 1) {

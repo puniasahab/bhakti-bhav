@@ -1,16 +1,17 @@
-import React, { useState, useEffect, useMemo, useCallback } from "react";
+import React, { useState, useEffect, useMemo, useCallback, useContext } from "react";
 import { Link } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Loader from "../components/Loader";
 import PageTitleCard from "../components/PageTitleCard";
 import { getTokenFromLS, getSubscriptionStatusFromLS } from "../commonFunctions";
-import { cachedFetch } from "../utils/apiCache";
 import { GA4Events } from "../utils/ga4Events.enum";
 import useGA4BaseParams from "../hooks/useGA4BaseParams";
 import useGA4Tracker from "../hooks/useGA4Tracker";
 import SEO from "../components/SEO";
 import { homeSchema } from "../seo/schemas";
+import { naamJaapApis } from "../api";
+import { LanguageContext } from "../contexts/LanguageContext";
 
 function JaapMala() {
   const [data, setData] = useState([]);
@@ -24,6 +25,8 @@ function JaapMala() {
   const isSubscribed = useMemo(() => getSubscriptionStatusFromLS(), []);
   const hasToken = useMemo(() => getTokenFromLS(), []);
 
+  const { language } = useContext(LanguageContext);
+
   const baseParams = useGA4BaseParams("Jaap Mala Screen");
   const { trackEvent } = useGA4Tracker(baseParams);
 
@@ -33,22 +36,20 @@ function JaapMala() {
         if (currentPage === 1) setLoading(true);
         else setLoadingMore(true);
         
-        // Use cached fetch for better performance
-        const result = await cachedFetch(
-          `https://api.bhaktibhav.app/frontend/all-jaapmala-v1?page=${currentPage}&limit=${limit}`,
-          {},
-          5 * 60 * 1000 // Cache for 5 minutes
-        );
-        
-        if (result.status === "success" && Array.isArray(result.data)) {
+        // Use naamJaapApis for fetching
+        const result = await naamJaapApis.getNaamJaapData("v3", currentPage, limit, language);
+
+        const dataArray = Array.isArray(result.data?.items) ? result.data.items : Array.isArray(result.data?.data) ? result.data.data : Array.isArray(result.data) ? result.data : [];
+        const totalPages = result.pagination?.totalPages ?? 1;
+
+        if (result.status === "success" && dataArray.length >= 0) {
           if (currentPage === 1) {
-            setData(result.data);
+            setData(dataArray);
           } else {
-            setData(prevData => [...prevData, ...result.data]);
+            setData(prevData => [...prevData, ...dataArray]);
           }
-          
-          // Check if there's more data
-          if (result.data.length < limit) {
+
+          if (currentPage >= totalPages || dataArray.length < limit) {
             setHasMore(false);
           }
         } else {
@@ -70,7 +71,14 @@ function JaapMala() {
     };
 
     fetchJaapMalaData();
-  }, [currentPage]);
+  }, [currentPage, language]);
+
+  // Reset list when language changes
+  useEffect(() => {
+    setData([]);
+    setCurrentPage(1);
+    setHasMore(true);
+  }, [language]);
 
   // Infinite scroll handler with throttling
   useEffect(() => {
@@ -161,7 +169,7 @@ function JaapMala() {
             <li key={item._id}>
               <Link
                 to={handleNavigate(item._id, item.accessType)}
-                onClick={() => { handleTrackEvent(item._id, item.title.en, item.accessType); }}
+                onClick={() => { handleTrackEvent(item._id, item.title, item.accessType); }}
                 className="relative block rounded-xl overflow-hidden shadow-lg  "
               >
                 <div className={`overflow_bg`}>
@@ -172,17 +180,16 @@ function JaapMala() {
                         ? item.imageUrl
                         : `https://api.bhaktibhav.app${item.imageUrl}`
                     }
-                    alt={item.title.en}
+                    alt={item.title || ""}
                     className={`w-full rounded-md max-h-[150px] md:max-h-[150px] object-cover ${isSubscribed ? "" : item.accessType === "paid" ? "blur-sm" : ""}`}
                     loading="lazy"
                     decoding="async"
                   />
-                  <div className={`absolute inset-0 theme_text flex flex-col items-center justify-center text-center px-4 z-10 top-[35%] ${isSubscribed ? "" : item.accessType === "paid" ? "blur-sm" : ""}`}>
-                    {/* <h2 className="text-xl font-bold" 
-                    // style={{fontFamily: "KrutiDev"}}>
-                      >{item.title.hi}</h2> */}
-                      {HindiWithEnglishNumbers(item.title.hi)}
-                    <p className="text-sm font-eng" style={{fontSize: '13px'}}>{item.title.en}</p>
+                  <div className={`absolute inset-0 theme_text flex flex-col items-center justify-center text-center px-4 z-10 top-[60%] ${isSubscribed ? "" : item.accessType === "paid" ? "blur-sm" : ""}`}>
+                    {language === "hi"
+                      ? HindiWithEnglishNumbers(item.title)
+                      : <h2 className="text-sm font-eng leading-snug">{item.title}</h2>
+                    }
                   </div>
                 </div>
               </Link>

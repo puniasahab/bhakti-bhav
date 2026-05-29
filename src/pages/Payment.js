@@ -11,6 +11,8 @@ import useGA4Tracker  from "../hooks/useGA4Tracker";
 import { GA4Events } from "../utils/ga4Events.enum";
 import useGA4BaseParams from "../hooks/useGA4BaseParams";
 import { trackCustomEvent } from "../utils/metaPixel";
+import { PIXEL_STANDARD_EVENTS } from "../utils/pixelEvents";
+import { getMobileNoFromLS } from "../commonFunctions";
 
 
 export default function Payment() {
@@ -161,6 +163,7 @@ export default function Payment() {
   const makePayment = async (selectedPlan) => {
     if(!selectedPlan) {
       alert("No valid plan is selected for payment.");
+      trackCustomEvent(PIXEL_STANDARD_EVENTS.PAYMENT_FAILED, { message: "No valid plan selected", mobileNumber: getMobileNoFromLS() });
       navigate("/payment");
     }
     else {
@@ -178,18 +181,25 @@ export default function Payment() {
     console.log({ planId: planDetails[0]._id, amount: planDetails[0].price, name: profile.name, email: profile.email, phone: profile.mobileNumber }
     );
 
-    const res = await paymentApis.makePayment(
-      { planId: planDetails[0]._id, amount: planDetails[0].price, name: profile.name, email: profile.email, phone: profile.mobileNumber, source: "web" }
-    );
+    try {
+      const res = await paymentApis.makePayment(
+        { planId: planDetails[0]._id, amount: planDetails[0].price, name: profile.name, email: profile.email, phone: profile.mobileNumber, source: "web" }
+      );
 
-    if(res.success) {
-      // Store payment data in context before navigation
-      setPaymentData(res, planDetails[0], profile);
-      navigate("/paymentPage");
+      if(res.success) {
+        // Store payment data in context before navigation
+        setPaymentData(res, planDetails[0], profile);
+        navigate("/paymentPage");
+      } else {
+        // API responded but payment initiation failed
+        trackCustomEvent(PIXEL_STANDARD_EVENTS.PAYMENT_FAILED, { message: res?.message || "Payment initiation failed", mobileNumber: getMobileNoFromLS(), planId: planDetails[0]._id });
+      }
+      console.log(res, "Payment Response");
+    } catch (paymentError) {
+      console.error("Error making payment:", paymentError);
+      trackCustomEvent(PIXEL_STANDARD_EVENTS.PAYMENT_FAILED, { message: paymentError?.message || "Network error during payment initiation", mobileNumber: getMobileNoFromLS(), planId: planDetails[0]?._id });
     }
-    console.log(res, "Payment Response");
     }
-    
   }
 
   return (
@@ -288,7 +298,7 @@ export default function Payment() {
           {plans && plans.length > 0 && (
             <button
               className="w-full bg-[#9A283D] text-white py-4 rounded-full shadow-lg text-lg font-semibold hover:bg-[#7a1f30] transition-all duration-200"
-              onClick={() => {trackEvent(GA4Events.subscription_plan_selected, {event_label: "payment_button_clicked_from_payment_screen", selectedPlan: plans.find((x) => x._id === selectedPlan).name}); handlePaymentOptionSelected(selectedPlan); makePayment(selectedPlan)}}
+              onClick={() => {trackEvent(GA4Events.subscription_plan_selected, {event_label: "payment_button_clicked_from_payment_screen", selectedPlan: plans.find((x) => x._id === selectedPlan).name}); handlePaymentOptionSelected({selectedPlan: plans.find((x) => x._id === selectedPlan)}); makePayment(selectedPlan)}}
             >
               <span className="font-hindi">प्रारंभ करें</span>{" "}
               <span className="font-eng text-sm">(Start Now)</span>
@@ -296,7 +306,7 @@ export default function Payment() {
           )}
           <button
             className="text-[#9A283D] font-eng text-base hover:text-[#9A283D] transition-colors py-1"
-            onClick={() => navigate("/")}
+            onClick={() => {trackCustomEvent(PIXEL_STANDARD_EVENTS.PAYMENT_SKIPPED, { message: "User skipped payment", mobileNumber: getMobileNoFromLS() }); navigate("/")}}
           >
             Skip
           </button>

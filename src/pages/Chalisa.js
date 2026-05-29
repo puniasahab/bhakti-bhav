@@ -1,15 +1,16 @@
-import React, { useEffect, useState, useMemo, useCallback } from "react";
+import React, { useEffect, useState, useMemo, useCallback, useContext } from "react";
 import { Link } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Loader from "../components/Loader";
 import PageTitleCard from "../components/PageTitleCard";
 import { getSubscriptionStatusFromLS, getTokenFromLS } from "../commonFunctions";
-import { cachedFetch } from "../utils/apiCache";
 import useGA4BaseParams from "../hooks/useGA4BaseParams";
 import useGA4Tracker from "../hooks/useGA4Tracker";
 import SEO from "../components/SEO";
 import { homeSchema } from "../seo/schemas";
+import { chalisaApis } from "../api";
+import { LanguageContext } from "../contexts/LanguageContext";
 
 export default function Chalisa() {
   const [chalisa, setChalisa] = useState([]);
@@ -22,6 +23,8 @@ export default function Chalisa() {
   // Memoize subscription status to prevent re-computation on each render
   const isSubscribed = useMemo(() => getSubscriptionStatusFromLS(), []);
   const hasToken = useMemo(() => getTokenFromLS(), []);
+
+  const { language } = useContext(LanguageContext);
 
   const baseParams = useGA4BaseParams("Chalisa Screen");
   const { trackEvent } = useGA4Tracker(baseParams);
@@ -37,22 +40,22 @@ export default function Chalisa() {
         if (currentPage === 1) setLoading(true);
         else setLoadingMore(true);
 
-        // Use cached fetch for better performance
-        const json = await cachedFetch(
-          `https://api.bhaktibhav.app/frontend/all-Chalisas-v1?page=${currentPage}&limit=${limit}`,
-          {},
-          5 * 60 * 1000 // Cache for 5 minutes
-        );
+        // Use chalisaApis for fetching
+        const json = await chalisaApis.getChalisas("v3", currentPage, limit, language);
 
-        if (json.status === "success" && Array.isArray(json.data)) {
+        const dataArray = Array.isArray(json.data?.items) ? json.data.items
+          : Array.isArray(json.data?.data) ? json.data.data
+          : Array.isArray(json.data) ? json.data : [];
+        const totalPages = json.pagination?.totalPages ?? 1;
+
+        if (json.status === "success" && dataArray.length >= 0) {
           if (currentPage === 1) {
-            setChalisa(json.data);
+            setChalisa(dataArray);
           } else {
-            setChalisa(prevChalisa => [...prevChalisa, ...json.data]);
+            setChalisa(prevChalisa => [...prevChalisa, ...dataArray]);
           }
 
-          // Check if there are more items to load
-          if (json.data.length < limit) {
+          if (currentPage >= totalPages || dataArray.length < limit) {
             setHasMore(false);
           }
         } else {
@@ -74,7 +77,14 @@ export default function Chalisa() {
     }
 
     fetchChalisa();
-  }, [currentPage]);
+  }, [currentPage, language]);
+
+  // Reset list when language changes
+  useEffect(() => {
+    setChalisa([]);
+    setCurrentPage(1);
+    setHasMore(true);
+  }, [language]);
 
   // Infinite scroll handler with throttling
   useEffect(() => {
@@ -147,7 +157,7 @@ export default function Chalisa() {
                       ? chalisa.imagethumb
                       : `https://api.bhaktibhav.app${chalisa.imagethumb}`
                     }
-                    alt={chalisa.name?.hi || chalisa.name?.en}
+                    alt={typeof chalisa.name === "string" ? chalisa.name : (chalisa.name?.hi || chalisa.name?.en || "")}
                     className={`w-auto rounded-md max-h-[100%] md:max-h-[100%] ${isSubscribed ? "" : chalisa.accessType === "paid" ? "blur-sm" : ""}`}
                     loading="lazy"
                     decoding="async"
@@ -155,14 +165,17 @@ export default function Chalisa() {
                 </div>
 
                 <div className="px-3 py-4">
-                  {chalisa.name?.hi && (
-                    <h2 className={`md:text-lg text-lg font-semibold truncate font-hindi pt-2 ${isSubscribed ? "" : chalisa.accessType === "paid" ? "blur-sm" : ""}`}>
-                      {chalisa.name.hi}
-                    </h2>
-                  )}
-                  {chalisa.name?.en && (
-                    <p className={`text-sm truncate font-eng ${isSubscribed ? "" : chalisa.accessType === "paid" ? "blur-sm" : ""}`}>{chalisa.name.en}</p>
-                  )}
+                  {(() => {
+                    const isHindi = language === "hi";
+                    const displayName = typeof chalisa.name === "string"
+                      ? chalisa.name
+                      : (isHindi ? (chalisa.name?.hi || chalisa.name?.en || "") : (chalisa.name?.en || chalisa.name?.hi || ""));
+                    return (
+                      <h2 className={`md:text-lg text-lg font-semibold truncate pt-2 ${isHindi ? "font-hindi" : "font-eng text-sm"} ${isSubscribed ? "" : chalisa.accessType === "paid" ? "blur-sm" : ""}`}>
+                        {displayName}
+                      </h2>
+                    );
+                  })()}
                 </div>
               </Link>
             </li>

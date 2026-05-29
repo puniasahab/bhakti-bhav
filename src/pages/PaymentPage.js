@@ -9,6 +9,9 @@ import PageTitleCard from "../components/PageTitleCard";
 import useGA4BaseParams from "../hooks/useGA4BaseParams";
 import useGA4Tracker from "../hooks/useGA4Tracker";
 import { GA4Events } from "../utils/ga4Events.enum";
+import { trackCustomEvent } from "../utils/metaPixel";
+import { PIXEL_STANDARD_EVENTS } from "../utils/pixelEvents";
+import { getMobileNoFromLS } from "../commonFunctions";
 
 export default function PaymentDrop() {
   const { paymentResponse, selectedPlanData, userProfile } = usePayment();
@@ -47,7 +50,7 @@ export default function PaymentDrop() {
     try {
       setLoading(true);
       setError(null);
-
+      trackCustomEvent(PIXEL_STANDARD_EVENTS.PAYMENT_INITIATED, { message: "User initiated payment", mobileNumber: getMobileNoFromLS });
       trackEvent(GA4Events.subscription_start_cta_clicked, { event_label: "subscription_start_cta_clicked_from_payment_drop_screen" });
       
       const sessionId = getSessionId();
@@ -83,11 +86,13 @@ export default function PaymentDrop() {
               });
             } else {
               // Payment verification failed
+              trackCustomEvent(PIXEL_STANDARD_EVENTS.PAYMENT_FAILED, { message: "Payment verification failed", orderId: paymentResponse.data.cashfree.order_id, mobileNumber: getMobileNoFromLS() });
               setError("Payment verification failed. Please contact support.");
               setPaymentProcessing(false);
             }
           } catch (verifyError) {
             console.error("Payment verification error:", verifyError);
+            trackCustomEvent(PIXEL_STANDARD_EVENTS.PAYMENT_FAILED, { message: verifyError?.message || "Payment verification API error", orderId: paymentResponse.data.cashfree.order_id, mobileNumber: getMobileNoFromLS() });
             setError("Unable to verify payment. Please contact support if amount was deducted.");
             setPaymentProcessing(false);
           }
@@ -96,6 +101,7 @@ export default function PaymentDrop() {
         verifyPayment();
       }).catch((checkoutError) => {
         console.error("Checkout error:", checkoutError);
+        trackCustomEvent(PIXEL_STANDARD_EVENTS.PAYMENT_FAILED, { message: checkoutError?.message || "Cashfree checkout failed or dismissed", orderId: paymentResponse.data.cashfree.order_id, mobileNumber: getMobileNoFromLS() });
         setError("Payment process failed. Please try again.");
         setLoading(false);
         setPaymentProcessing(false);
@@ -103,6 +109,7 @@ export default function PaymentDrop() {
     }
     catch (error) {
       console.error("Payment initiation error:", error);
+      trackCustomEvent(PIXEL_STANDARD_EVENTS.PAYMENT_FAILED, { message: error?.message || "Failed to initiate payment", mobileNumber: getMobileNoFromLS() });
       setError("Failed to initiate payment. Please try again.");
       setLoading(false);
       setPaymentProcessing(false);

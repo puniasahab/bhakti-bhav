@@ -60,6 +60,7 @@ export const removeSubscriptionStatusFromLS = () => {
 export const removeTokenFromLS = () => {
     localStorage.removeItem(AUTH_TOKEN_KEY);
     LEGACY_AUTH_TOKEN_KEYS.forEach((key) => localStorage.removeItem(key));
+    removeIsLoggedIn();
 }
 
 export const isAuthenticated = () => {
@@ -178,6 +179,19 @@ export const getUserIdFromLS = () => {
 export const removeUserIdFromLS = () => {
   localStorage.removeItem("bhaktiBhav:userId");
 };
+
+export const setIsLoggedIn = () => {
+  localStorage.setItem("bhaktiBhav:isLoggedIn", "true");
+}
+
+export const getIsLoggedIn = () => {
+  return localStorage.getItem("bhaktiBhav:isLoggedIn") === "true";
+}
+
+export const removeIsLoggedIn = () => {
+  localStorage.removeItem("bhaktiBhav:isLoggedIn");
+}
+
 
 
 export const setUserName = (name) => {

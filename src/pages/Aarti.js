@@ -1,16 +1,17 @@
-import { useEffect, useState, useMemo, useCallback } from "react";
+import { useEffect, useState, useMemo, useCallback, useContext } from "react";
 import { Link } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Loader from "../components/Loader";
 import PageTitleCard from "../components/PageTitleCard";
 import { getTokenFromLS, getSubscriptionStatusFromLS } from "../commonFunctions";
-import { cachedFetch } from "../utils/apiCache";
 import { GA4Events } from "../utils/ga4Events.enum";
 import useGA4BaseParams from "../hooks/useGA4BaseParams";
 import useGA4Tracker from "../hooks/useGA4Tracker";
 import SEO from "../components/SEO";
 import { homeSchema } from "../seo/schemas";
+import { aartiApis } from "../api";
+import { LanguageContext } from "../contexts/LanguageContext";
 
 export default function Aarti() {
   const [items, setItems] = useState([]);
@@ -27,28 +28,30 @@ export default function Aarti() {
   const isSubscribed = useMemo(() => getSubscriptionStatusFromLS(), []);
   const hasToken = useMemo(() => getTokenFromLS(), []);
 
+  const { language } = useContext(LanguageContext);
+
   useEffect(() => {
     async function fetchItems() {
       try {
         if (currentPage === 1) setLoading(true);
         else setLoadingMore(true);
 
-        // Use cached fetch for better performance
-        const json = await cachedFetch(
-          `https://api.bhaktibhav.app/frontend/all-artis-v1?page=${currentPage}&limit=${limit}`,
-          {},
-          5 * 60 * 1000 // Cache for 5 minutes
-        );
+        // Use aartiApis for fetching
+        const json = await aartiApis.getAartis("v3", currentPage, limit, language);
+
+        const dataArray = Array.isArray(json.data?.items) ? json.data.items
+          : Array.isArray(json.data?.data) ? json.data.data
+          : Array.isArray(json.data) ? json.data : [];
+        const totalPages = json.pagination?.totalPages ?? 1;
 
         if (json?.status === "success") {
           if (currentPage === 1) {
-            setItems(json.data || []);
+            setItems(dataArray);
           } else {
-            setItems(prevItems => [...prevItems, ...(json.data || [])]);
+            setItems(prevItems => [...prevItems, ...dataArray]);
           }
 
-          // Check if there are more items to load
-          if (!json.data || json.data.length < limit) {
+          if (currentPage >= totalPages || dataArray.length < limit) {
             setHasMore(false);
           }
         } else {
@@ -70,7 +73,14 @@ export default function Aarti() {
     }
 
     fetchItems();
-  }, [currentPage]);
+  }, [currentPage, language]);
+
+  // Reset list when language changes
+  useEffect(() => {
+    setItems([]);
+    setCurrentPage(1);
+    setHasMore(true);
+  }, [language]);
 
   // Infinite scroll handler with throttling
   useEffect(() => {
@@ -147,20 +157,23 @@ export default function Aarti() {
                   <div className={`overflow_bg`}>
                     <img
                       src={imgSrc}
-                      alt={item.name?.en || item.name?.hi || "Aarti"}
+                      alt={typeof item.name === "string" ? item.name : (language === "hi" ? (item.name?.hi || item.name?.en || "Aarti") : (item.name?.en || item.name?.hi || "Aarti"))}
                       className={`w-full rounded-md max-h-[150px] md:max-h-[150px] object-cover ${isSubscribed ? "" : item.accessType === "paid" ? "blur" : ""}`}
                       loading="lazy"
                       decoding="async"
                     />
-                    <div className={`absolute inset-0 theme_text flex flex-col items-center justify-center text-center px-4 z-10 top-[35%] ${isSubscribed ? "" : item.accessType === "paid" ? "blur-sm" : ""}`}>
-                      {item.name?.hi && (
-                        <h2 className="text-xl font-bold font-hindi">
-                          {item.name.hi}
-                        </h2>
-                      )}
-                      {item.name?.en && (
-                        <p className="text-sm font-eng">{item.name.en}</p>
-                      )}
+                    <div className={`absolute inset-0 theme_text flex flex-col items-center justify-center text-center px-4 z-10 top-[60%] ${isSubscribed ? "" : item.accessType === "paid" ? "blur-sm" : ""}`}>
+                      {(() => {
+                        const isHindi = language === "hi";
+                        const displayName = typeof item.name === "string"
+                          ? item.name
+                          : (isHindi ? (item.name?.hi || item.name?.en || "") : (item.name?.en || item.name?.hi || ""));
+                        return (
+                          <h2 className={`text-xl font-bold ${isHindi ? "font-hindi" : "font-eng text-sm"}`}>
+                            {displayName}
+                          </h2>
+                        );
+                      })()}
                     </div>
                   </div>
                 </Link>

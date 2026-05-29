@@ -13,6 +13,7 @@ import { GA4Events } from "../utils/ga4Events.enum";
 import useGA4BaseParams from "../hooks/useGA4BaseParams";
 import { trackCustom } from "react-facebook-pixel";
 import { PIXEL_STANDARD_EVENTS } from "../utils/pixelEvents";
+import { trackCustomEvent } from "../utils/metaPixel";
 
 
 function Header({
@@ -100,7 +101,7 @@ function Header({
     }
 
     const handleLogout = () => {
-        trackCustom(PIXEL_STANDARD_EVENTS.LOGOUT, {message: "Logout button Clicked", mobileNumber: getMobileNoFromLS()})
+        trackCustomEvent(PIXEL_STANDARD_EVENTS.LOGOUT, {message: "Logout button Clicked", mobileNumber: getMobileNoFromLS()})
         trackEvent(GA4Events.logout_clicked, { event_label: "logout_clicked_from_header_on_edit_profile_screen" });
         removeTokenFromLS();    
         removeUserName();

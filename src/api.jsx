@@ -167,10 +167,10 @@ export const paymentApis = {
   }
 }
 export const loginApis = {
-  generateOtp: async (mobileNumber, deviceId) => {
+  generateOtp: async (mobileNumber, deviceId, userId) => {
     try {
       console.log("Generating OTP for data:", mobileNumber, deviceId);
-      const response = await api.post(endPoints.generateOtp, { mobileNumber, source: "web", deviceId });
+      const response = await api.post(endPoints.generateOtp, { mobileNumber, source: "web", deviceId, userId });
       return response.data;
     } catch (error) {
       console.error("Error generating OTP:", error);
@@ -521,9 +521,9 @@ export const hindiCalendarApis = {
 
 // chalisa-apis
 export const chalisaApis = {
-  getChalisas: async () => {
+  getChalisas: async (version, currentPage, limit, lang) => {
     try {
-      const response = await api.get(endPoints.chalisa);
+      const response = await api.get(`${endPoints.chalisa}?version-${version}&page=${currentPage}&limit=${limit}&lang=${lang}`);
       return response.data;
     }
     catch (error) {
@@ -532,9 +532,9 @@ export const chalisaApis = {
     }
   },
 
-  getChalisaById: async (id) => {
+  getChalisaById: async (version, id, lang) => {
     try {
-      const response = await api.get(`${endPoints.chalisa}/${id}`);
+      const response = await api.get(`${endPoints.getSingleChalisa}-version=${version}/id?lang=${lang}`);
       return response.data;
     }
     catch (error) {
@@ -546,9 +546,9 @@ export const chalisaApis = {
 
 // aarti-apis
 export const aartiApis = {
-  getAartis: async () => {
+  getAartis: async (version, currentPage, limit, lang) => {
     try {
-      const response = await api.get(endPoints.aarti);
+      const response = await api.get(`${endPoints.aarti}-${version}?page=${currentPage}&limit=${limit}&lang=${lang}`);
       return response.data;
     }
     catch(error){
@@ -557,9 +557,9 @@ export const aartiApis = {
     }
   },
 
-  getAartiById: async (id) => {
+  getAartiById: async (version, id, lang) => {
     try {
-      const response = await api.get(`${endPoints.aarti}/${id}`);
+      const response = await api.get(`${endPoints.aarti}-${version}/${id}?lang=${lang}`);
       return response.data;
     }
     catch(error){
@@ -622,7 +622,7 @@ export const poojaApis = {
 export const splashScreenApi = {
   getSplashScreenData: async (version, data) => {
     try {
-      const response = await coreApi.post(`${endPoints.splashScreen}-${version}`, data);
+      const response = await coreApi.post(`https://api.bhaktibhav.app/api/v1/analytics/app-install/open-${version}`, data);
       return response.data;
     }
     catch (error) {
@@ -671,7 +671,7 @@ export const newJaapMalaApis = {
   }
 }
 
-export const naamJaap = {
+export const naamJaapApis = {
   getNaamJaapData: async (vsersion, currentPage, limit, lang) => {
     try {
       const response = await api.get(`${endPoints.naamJaap}-${vsersion}?page=${currentPage}&limit=${limit}&lang=${lang}`);

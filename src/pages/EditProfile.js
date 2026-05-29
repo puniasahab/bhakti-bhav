@@ -6,6 +6,8 @@ import { profileApis } from "../api";
 import { getTokenFromLS } from "../commonFunctions";
 import kundaliBanner from "../assets/img/kundali_banner.png";
 import { useNavigate } from "react-router-dom";
+import { trackCustomEvent } from "../utils/metaPixel";
+import { PIXEL_STANDARD_EVENTS } from "../utils/pixelEvents";
 
 function EditProfile() {
   const navigate = useNavigate();
@@ -135,8 +137,9 @@ function EditProfile() {
         console.log("Sending FormData to API...");
         const response = await profileApis.updateProfile(submitFormData);
         console.log("Profile updated successfully:", response);
-        
+        trackCustomEvent(PIXEL_STANDARD_EVENTS.PROFILE_UPDATED, { message: "User updated profile successfully", mobileNumber: formData.mobileNumber });
         alert("Profile saved successfully!");
+
         navigate("/");
       } catch (error) {
         console.error("Error updating profile:", error);

@@ -8,6 +8,7 @@ import { GA4Events } from "../utils/ga4Events.enum";
 import { PIXEL_STANDARD_EVENTS } from "../utils/pixelEvents";
 import { trackCustomEvent } from "../utils/metaPixel";
 import { trackCustom } from "react-facebook-pixel";
+import { getUserIdFromLS, setUserIdInLS, setIsLoggedIn } from "../commonFunctions";
 
 function VerifyOtp() {
     const location = useLocation();
@@ -37,8 +38,11 @@ function VerifyOtp() {
                 deviceId = crypto.randomUUID()
                 localStorage.setItem('deviceId', deviceId);
             }
-            const response = await loginApis.generateOtp(mobileNumber, deviceId);
+            const userId = getUserIdFromLS();
+            const response = await loginApis.generateOtp(mobileNumber, deviceId, userId);
+            
             console.log("OTP Response:", response);
+            setUserIdInLS(response?.userId);
         }
         catch (error) {
             console.error("Error generating OTP:", error);
@@ -136,6 +140,7 @@ function VerifyOtp() {
             if (data && data?.token?.length > 0) {
                 trackCustomEvent(PIXEL_STANDARD_EVENTS.LOGIN_SUCCESSFUL, { message: `Login Successful for Mobile Number: ${getMobileNoFromLS()}` })
                 setTokenInLS(data.token);
+                setIsLoggedIn();
                 // Redirect based on which home flow triggered the login
                 if (loginSource === "home-v1") {
                     sessionStorage.removeItem("loginSource");
