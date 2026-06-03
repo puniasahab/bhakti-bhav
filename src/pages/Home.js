@@ -169,7 +169,7 @@ function Home() {
         // else if(item?.categoryRedirect === '') {
 
         // }
-        
+
 
 
         // if (item?.categoryRedirect === "wallpaper" && item?._id) {
@@ -178,17 +178,20 @@ function Home() {
 
         let route = "";
         console.log("GET SUbscription status from LS", getSubscriptionStatusFromLS());
-        if(getSubscriptionStatusFromLS()) {
-                if(item?.categoryRedirect && item?.categoryId) {
-                 route = `${redirection[item.categoryRedirect]}/${item.categoryId}`;
+        // logged in check in cas user is not logged in
+        if (getIsLoggedIn()) {
+            if (getSubscriptionStatusFromLS()) {
+                if (item?.categoryRedirect && item?.categoryId) {
+                    route = `${redirection[item.categoryRedirect]}/${item.categoryId}`;
+                }
+                else if (item?.categoryRedirect) {
+                    route = `${redirection[item.categoryRedirect]}`;
+                }
+            }
         }
-        else if(item?.categoryRedirect) {
-            route = `${redirection[item.categoryRedirect]}`;
+        else {
+            route = "/login"
         }
-        }
-
-        
-
         return route || "/payment";
     };
 
@@ -488,10 +491,10 @@ function Home() {
     return (
         <>
             <SEO
-            title = "Best Hindu Devotional App for Daily Puja, Mantras & Aarti | भक्ति भाव"
-            description = "Experience devotion with our Hinduism app offering daily devotional content, bhajans, aarti, and online Hindu services. Connect with divine energy every day."
-            canonical = "https://bhaktibhav.app/"
-            schema = {homeSchema}
+                title="Best Hindu Devotional App for Daily Puja, Mantras & Aarti | भक्ति भाव"
+                description="Experience devotion with our Hinduism app offering daily devotional content, bhajans, aarti, and online Hindu services. Connect with divine energy every day."
+                canonical="https://bhaktibhav.app/"
+                schema={homeSchema}
             />
             <Header />
 
@@ -572,14 +575,14 @@ function Home() {
                         }}
                         className="theme_bg bg-white rounded-xl shadow md:p-6 p-3 text-center hover:bg-yellow-50 transition w-auto flex">
                         <div className="mx-auto flex md:flex-row flex-col items-center space-y-3 md:space-y-0">
-                            <img crossOrigin = 'anonymous' src="./img/icon_1.png" alt="" width="36" height="36" className="md:mr-3" />
+                            <img crossOrigin='anonymous' src="./img/icon_1.png" alt="" width="36" height="36" className="md:mr-3" />
                             <p className={`${language === "hi" ? "font-hindi" : "font-eng"} md:text-2xl text-sm font-normal leading-[14px]`}>{translation[language]?.aajKaRashifal} <br /></p>
                         </div>
                     </Link>
                     <button onClick={(e) => { setIsOpen(true) }}
                         className="theme_bg bg-white rounded-xl shadow md:p-6 p-3 text-center hover:bg-yellow-50 transition w-auto flex">
                         <div className="mx-auto flex md:flex-row flex-col items-center space-y-3 md:space-y-0">
-                            <img  crossOrigin = 'anonymous' src="./img/icon_5.png" alt="" width="36" height="36" className="md:mr-3" />
+                            <img crossOrigin='anonymous' src="./img/icon_5.png" alt="" width="36" height="36" className="md:mr-3" />
                             <p className={`${language === "hi" ? "font-hindi" : "font-eng"} md:text-2xl text-sm font-normal leading-[14px]`}>{translation[language]?.panchang} <br /></p>
                         </div>
                     </button>
@@ -588,29 +591,29 @@ function Home() {
 
                 <div className="grid grid-cols-3 md:gap-4 gap-2 mt-3 text-center font-medium">
                     {categoriesToShow.map((category) => (
-                            <Link
-                                key={category._id || category.url || category.title}
-                                to={getCategoryRoute(category)}
-                                state={{
-                                    categoryId: category?.categoryId || category?._id,
-                                    categoryTitle: category?.title
-                                }}
-                                onClick={(e) => handleHomeCategoryClicked(category, e)}
-                                className="theme_bg bg-white rounded-xl shadow md:p-6 p-3 text-center hover:bg-yellow-50 transition w-auto flex justify-center"
-                            >
-                                <div className="mx-auto flex w-full flex-col items-center justify-center space-y-3 md:space-y-0">
-                                    <img
-                                        src={category.imageUrl}
-                                        alt={category.title || ""}
-                                        width="36"
-                                        crossOrigin = 'anonymous'
-                                        height="36"
-                                        className="w-9 h-9 object-cover rounded-md"
-                                    />
-                                    <p className={`${language === "hi" ? "font-hindi" : "font-eng"} md:text-2xl text-sm font-normal leading-[14px] text-center w-full mx-auto`}>{category.title}</p>
-                                </div>
-                            </Link>
-                        ))
+                        <Link
+                            key={category._id || category.url || category.title}
+                            to={getCategoryRoute(category)}
+                            state={{
+                                categoryId: category?.categoryId || category?._id,
+                                categoryTitle: category?.title
+                            }}
+                            onClick={(e) => handleHomeCategoryClicked(category, e)}
+                            className="theme_bg bg-white rounded-xl shadow md:p-6 p-3 text-center hover:bg-yellow-50 transition w-auto flex justify-center"
+                        >
+                            <div className="mx-auto flex w-full flex-col items-center justify-center space-y-3 md:space-y-0">
+                                <img
+                                    src={category.imageUrl}
+                                    alt={category.title || ""}
+                                    width="36"
+                                    crossOrigin='anonymous'
+                                    height="36"
+                                    className="w-9 h-9 object-cover rounded-md"
+                                />
+                                <p className={`${language === "hi" ? "font-hindi" : "font-eng"} md:text-2xl text-sm font-normal leading-[14px] text-center w-full mx-auto`}>{category.title}</p>
+                            </div>
+                        </Link>
+                    ))
                     }
                 </div>
 
@@ -669,7 +672,7 @@ function Home() {
                     <TodayThoughts />
                     <div className="md:basis-[40%] basis-[40%] flex flex-col justify-between items-center md:p-4 theme_text">
                         <span className="font-semibold md:text-3xl text-2xl">iwtk djs!</span>
-                        <div className="my-4"><img crossOrigin = 'anonymous' src="./img/puja_bgs.png" alt="" width="150" height="120" className="max-w-full h-auto" /></div>
+                        <div className="my-4"><img crossOrigin='anonymous' src="./img/puja_bgs.png" alt="" width="150" height="120" className="max-w-full h-auto" /></div>
                         <Link to="/puja-kare" onClick={() => {
                             trackEvent(GA4Events.pooja_karein_widget_clicked, {
                                 event_label: "pooja_kare_card_clicked_on_home_screen"
@@ -722,7 +725,7 @@ function Home() {
                         {/* Top image — fills full width, contains bell + title + Hindi text */}
                         <img
                             src="/img/popup.png"
-                            crossOrigin = 'anonymous'
+                            crossOrigin='anonymous'
                             alt="Unlock Bhakti Bhav Plus"
                             className="w-full h-auto block rounded-t-3xl"
                             style={{ width: "100%", display: "block", marginTop: "-12px", }}

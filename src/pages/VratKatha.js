@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
@@ -6,9 +6,9 @@ import Loader from "../components/Loader";
 import PageTitleCard from "../components/PageTitleCard";
 import { useKatha } from "../contexts/KathaContext";
 import { getSubscriptionStatusFromLS, getTokenFromLS } from "../commonFunctions";
-// import { useNavigate } from "react-router-dom";
-import { cachedFetch } from "../utils/apiCache";
+import { vratKathaApis } from "../api";
 import SEO from "../components/SEO";
+import { LanguageContext } from "../contexts/LanguageContext";
 
 import useGA4BaseParams from "../hooks/useGA4BaseParams";
 import useGA4Tracker from "../hooks/useGA4Tracker";
@@ -31,8 +31,15 @@ export default function VratKatha() {
   // Memoryize subscription status to prevent re-computation on each render
   const isSubscribed = useMemo(() => getSubscriptionStatusFromLS(), []);
   const hasToken = useMemo(() => getTokenFromLS(), []);
-  // const navigate = useNavigate();
   const { setCategoryData } = useKatha();
+  const { language } = useContext(LanguageContext);
+
+  // Reset list when language changes
+  useEffect(() => {
+    setKathas([]);
+    setCurrentPage(1);
+    setHasMore(true);
+  }, [language]);
 
   const processRawData = useCallback((categories = [], uncategorizedKathas = []) => {
     const newData = [
@@ -125,11 +132,7 @@ export default function VratKatha() {
         if (currentPage === 1) setLoading(true);
         else setLoadingMore(true);
 
-        const json = await cachedFetch(
-          `https://api.bhaktibhav.app/api/v1/frontend/katha-categories?page=${currentPage}&limit=${limit}`,
-          {},
-          5 * 60 * 1000 // Cache for 5 minutes
-        );
+        const json = await vratKathaApis.fetchVratKathaData("v3", currentPage, limit, language);
 
         if (json.status === 'success') {
           const categories = json?.categories || [];
@@ -164,8 +167,7 @@ export default function VratKatha() {
           // const processedNewData = processRawData(categories, uncategorizedKathas);
 
           // if (currentPage === 1) {
-          // First page - just set the sorted data
-          // const sortedData = sortData(processedNewData);
+          // const sortedData = getSortedData(json);
           // setKathas(sortedData);
           // } 
 
@@ -304,7 +306,7 @@ export default function VratKatha() {
     }
 
     fetchKathas();
-  }, [currentPage]);
+  }, [currentPage, language]);
 
 
   useEffect(() => {
@@ -475,8 +477,8 @@ export default function VratKatha() {
       <PageTitleCard
         titleHi={"ozr dFkk"}
         titleEn={"Vrat Katha"}
-        customEngFontSize={"14px"}
-        customFontSize={"24px"}
+        customEngFontSize={"18px"}
+        customFontSize={"23px"}
 
       />
 
@@ -492,20 +494,31 @@ export default function VratKatha() {
                   <img
 
                     src={`${katha.imagethumb}`}
-                    alt={katha.name?.hi || katha.name?.en}
+                    alt={katha.name || ""}
                     className={`w-auto rounded-md max-h-[100%] md:max-h-[100%] ${getSubscriptionStatusFromLS() ? "" : getPaidLogic(katha)}`}
                   />
                 </div>
                 <div className="p-2">
-                  {katha.name?.hi && (
-                    <h2 className={`md:text-xl text-lg font-semibold truncate font-hindi pt-3 ${getSubscriptionStatusFromLS() ? "" : getPaidLogic(katha)}`}>
-                      {katha.name.hi.replace(/\//g, "|").replace(/\|/g, "।")}
+                  {katha.name && (
+                    <h2 className={`md:text-xl text-lg font-semibold truncate pt-3 ${language === "hi" ? "font-hindi" : "font-eng text-sm"} ${getSubscriptionStatusFromLS() ? "" : getPaidLogic(katha)}`}>
+                      {language === "hi"
+                        ? katha.name
+                            .replace(/\//g, "|").replace(/\|/g, "।")
+                            .replace(/,/g, "]").replace(/\(/g, "¼").replace(/\)/g, "½")
+                            .replace(/\:/g, "%").replace(/:/g, "ः")
+                            .replace(/ँ/g, "ं")
+                            .replace(/\u200D|\u200C/g, "  ")
+                            .replace(/[.,;!?'"""'']/g, " ")
+                            .replace(/[\[\]{}()]/g, "")
+                            .replace(/[*/\\#%^+=_|<>~`@$₹]/g, " ")
+                            .replace(/[^\u0900-\u097F\s।॥]/g, "")
+                            .replace(/\u00A0/g, " ")
+                            .replace(/\u200B|\u200C|\u200D/g, " ")
+                            .replace(/\s+/g, " ")
+                            .normalize("NFC")
+                        : katha.name}
                     </h2>
                   )}
-                  {katha.name?.en && (
-                    <p className={`text-sm truncate font-eng ${getSubscriptionStatusFromLS() ? "" : getPaidLogic(katha)}`}>{katha.name.en}</p>
-                  )}
-
                 </div>
               </div>
             </li>

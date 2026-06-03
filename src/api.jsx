@@ -392,10 +392,19 @@ export const homePageAPis = {
 }
 
 // vrat-katha-apis
+const vratKathaCache = new Map();
+
 export const vratKathaApis = {
-  fetchVratKathaData: async () => {
+  fetchVratKathaData: async (version, currentPage, limit, lang) => {
+    const cacheKey = `vratKatha_${version}_${currentPage}_${limit}_${lang}`;
+    const TTL = 5 * 60 * 1000; // 5 minutes
+    const cached = vratKathaCache.get(cacheKey);
+    if (cached && Date.now() - cached.timestamp < TTL) {
+      return cached.data;
+    }
     try {
-      const response = await api.get(endPoints.vratKatha);
+      const response = await api.get(`${endPoints.vratKathaList}-${version}?page=${currentPage}&limit=${limit}&lang=${lang}`);
+      vratKathaCache.set(cacheKey, { data: response.data, timestamp: Date.now() });
       return response.data;
     }
     catch (error) {
@@ -404,9 +413,10 @@ export const vratKathaApis = {
     }
   },
 
-  fetchSingleVratKathaData: async (id) => {
+  fetchSingleVratKathaData: async (version, id, lang, date) => {
     try {
-      const response = await api.get(`${endPoints.vratKatha}/${id}`);
+      const dateParam = date ? `&date=${date}` : "";
+      const response = await api.get(`${endPoints.vratKathaById}-${version}/${id}?lang=${lang}${dateParam}`);
       return response.data;
     }
     catch (error) {
@@ -415,9 +425,9 @@ export const vratKathaApis = {
     }
   },
 
-  fetchVratKathaCategoryData: async (categoryId) => {
+  fetchVratKathaCategoryData: async (version, categoryId, lang) => {
     try {
-      const response = await api.get(`${endPoints.vratKatha}?category=${categoryId}`);
+      const response = await api.get(`${endPoints.vratKathaCategoryList}-${version}/${categoryId}?lang=${lang}`);
       return response.data;
     }
     catch (error) {

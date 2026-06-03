@@ -11,6 +11,7 @@ import useGA4BaseParams from "../hooks/useGA4BaseParams";
 import useGA4Tracker from "../hooks/useGA4Tracker";
 import { GA4Events } from "../utils/ga4Events.enum";
 import { useLocation } from "react-router-dom";
+import { vratKathaApis } from "../api";
 
 function VratKathaDetail() {
     const { id, date } = useParams();
@@ -28,8 +29,8 @@ function VratKathaDetail() {
         console.log("Fetching katha with id:", id);
         console.log("Date parameter:", date);
 
-        fetch(date ? `https://api.bhaktibhav.app/api/v1/frontend/katha/${id}?date=${date}` : `https://api.bhaktibhav.app/api/v1/frontend/katha/${id}`)
-            .then((res) => res.json())
+        setLoading(true);
+        vratKathaApis.fetchSingleVratKathaData("v3", id, language, date)
             .then((resJson) => {
                 if (resJson.status === "success" && resJson.data) {
                     let parsed = { ...resJson.data };
@@ -53,7 +54,7 @@ function VratKathaDetail() {
                 setDetail(null);
                 setLoading(false);
             });
-    }, [id, date]);
+    }, [id, date, language]);
 
     const redirectToAartiPage = (artiId) => {
         if (!artiId) {
@@ -72,7 +73,7 @@ function VratKathaDetail() {
             pause();
         } else {
             // Store katha name for the global player
-            localStorage.setItem('currentTrackName', `${detail.name?.hi || detail.name?.en} कथा`);
+            localStorage.setItem('currentTrackName', `${typeof detail.name === "string" ? detail.name : (detail.name?.hi || detail.name?.en)} कथा`);
             play(url);
         }
     };
@@ -116,7 +117,7 @@ function VratKathaDetail() {
     // Direct text-only sharing function using navigator.share
     const handleNativeShare = async () => {
         try {
-            const kathaName = detail.name?.hi || detail.name?.en || "व्रत कथा";
+            const kathaName = typeof detail.name === "string" ? detail.name : (detail.name?.hi || detail.name?.en || "व्रत कथा");
             const currentUrl = window.location.href;
 
             // Create share message exactly like the selected text
@@ -322,19 +323,13 @@ function VratKathaDetail() {
             <Header pageName={{ hi: "ozr dFkk", en: "Vrat Katha" }} hindiFontSize="true" />
             <div className="h-2"></div>
             <PageTitleCard
-                titleHi={detail.name.hi.replace(/\//g, "|").replace(/\|/g, "।").replace(/,/g, "]").replace(/\(/g, "¼").replace(/\)/g, "½").replace(/\:/g, "%").replace(/:/g, "ः")         // Replace colon with visarga
-                                .replace(/ँ/g, "ं")          // Normalize chandrabindu if misencoded
-                                .replace(/\u200D|\u200C/g, "  ").replace(/[.,;!?'"“”‘’]/g, " ")    // Remove English punctuation
-                                .replace(/[\[\]{}()]/g, "")       // Remove brackets and parentheses
-                                .replace(/[*/\\#%^+=_|<>~`@$₹]/g, " ").replace(/[^\u0900-\u097F\s।॥]/g, "") // remove non-Devanagari chars except space & punctuation
-                                .replace(/\u00A0/g, " ") // replace non-breaking space with normal space
-                                .replace(/\u200B|\u200C|\u200D/g, " ") // remove zero-width chars
-                                .replace(/\s+/g, " ").replace(/[०-९]/g, digit => hindiToEnglishMap[digit])// Remove zero-width joiners
-                                .normalize("NFC")}
-                titleEn={detail.name.en}
-                customEngFontSize={detail?.name?.en?.length > 30 ? "14px" : detail?.name?.en?.length > 20 ? "15px" : "16px"}
+                titleHi={(() => {
+                    const n = typeof detail.name === "string" ? detail.name : (detail.name?.hi || "");
+                    return n.replace(/\//g, "|").replace(/\|/g, "।").replace(/,/g, "]").replace(/\(/g, "¼").replace(/\)/g, "½").replace(/\:/g, "%").replace(/:/g, "ः").replace(/ँ/g, "ं").replace(/\u200D|\u200C/g, "  ").replace(/[.,;!?'"""'']/g, " ").replace(/[\[\]{}()]/g, "").replace(/[*/\\#%^+=_|<>~`@$₹]/g, " ").replace(/[^\u0900-\u097F\s।॥]/g, "").replace(/\u00A0/g, " ").replace(/\u200B|\u200C|\u200D/g, " ").replace(/\s+/g, " ").replace(/[०-९]/g, digit => hindiToEnglishMap[digit]).normalize("NFC");
+                })()}
+                titleEn={typeof detail.name === "string" ? detail.name : (detail.name?.en || "")}
+                customEngFontSize={(() => { const n = typeof detail.name === "string" ? detail.name : (detail.name?.en || ""); return n.length > 30 ? "14px" : n.length > 20 ? "15px" : "16px"; })()}
                 customFontSize={"19px"}
-
             />
 
             <div className="container mx-auto px-4 pb-24 theme_text">
@@ -342,12 +337,13 @@ function VratKathaDetail() {
                     <div className="flex justify-center mt-4">
                         <img
                             src={`${detail.imageUrl}`}
-                            alt={detail.name?.en}
+                            alt={typeof detail.name === "string" ? detail.name : (detail.name?.en || "")}
                             className="w-60 h-60 object-cover rounded-xl shadow-lg border-4 border-white bg-[#690016]"
                         />
                     </div>
                 )}
 
+                {detail.time && detail.time.start && detail.time.end && (
                 <div className="flex justify-center mt-4">
                     <div className="bg-[rgba(255,250,244,0.6)] shadow rounded-lg px-6 py-3 md:flex-row gap-4 text-center border border-[#9A283D]">
                         <div className="flex justify-center items-center">
@@ -360,173 +356,112 @@ function VratKathaDetail() {
                         </div>
                     </div>
                 </div>
+                )}
 
                 <div className="flex justify-center gap-4">
                     <div className="mt-4">
-
                         <button className={`bg-[#9A283D] text-white px-6 py-2 rounded-full shadow flex items-center ${language === "hi" ? "font-hindi" : "font-eng"}`} onClick={() => {trackEvent(GA4Events.vrat_katha_shared, { vratKathaId: detail._id, event_label: "vrat_katha_shared_button_clicked" }); handleNativeShare() }}>
                             <img src="../img/share_icon.png" alt="" className="w-[15px] h-[15px] mr-2" /> {language === "hi" ? jsonFile.share.hi : jsonFile.share.en}
                         </button>
                     </div>
-
-
                     <div className="mt-4">
                         <button
                             onClick={() => {trackEvent(GA4Events.vrat_katha_hear_cta_clicked, { vratKathaId: detail._id, event_label: "vrat_katha_hear_btn_clicked" }); handlePlay(detail.audioUrl)}}
                             disabled={!detail.audioUrl}
-                            className={`px-6 py-2 flex items-center justify-center rounded-full 
-                             transition ${language === "hi" ? "font-hindi" : "font-eng"} ${!detail.audioUrl
-                                    ? "bg-[#9A283D]/50 text-white cursor-not-allowed"
-                                    : (isPlaying && currentTrack === detail.audioUrl)
-                                        ? "bg-red-600 text-white"
-                                        : "bg_theme text-white"
-                                }`}
+                            className={`px-6 py-2 flex items-center justify-center rounded-full transition ${language === "hi" ? "font-hindi" : "font-eng"} ${!detail.audioUrl ? "bg-[#9A283D]/50 text-white cursor-not-allowed" : (isPlaying && currentTrack === detail.audioUrl) ? "bg-red-600 text-white" : "bg_theme text-white"}`}
                         >
                             {(isPlaying && currentTrack === detail.audioUrl) ? (
-                                <>
-                                    <span className="audio_pause_icon mr-2"></span> {language === "hi" ? jsonFile.pause.hi : jsonFile.pause.en}
-                                </>
+                                <><span className="audio_pause_icon mr-2"></span> {language === "hi" ? jsonFile.pause.hi : jsonFile.pause.en}</>
                             ) : (
-                                <>
-                                    <span className="audio_icon mr-2"></span> {language === "hi" ? jsonFile.listen.hi : jsonFile.listen.en}
-                                </>
+                                <><span className="audio_icon mr-2"></span> {language === "hi" ? jsonFile.listen.hi : jsonFile.listen.en}</>
                             )}
                         </button>
-
                     </div>
                 </div>
+
+                {/* Mantra */}
                 <div className="text-center my-8 text-xl">
-                    <p className={`${language === "hi" ? " font-hindi" : "hidden"} text-[#9A283D] ${fontSize}`}>
-                        {detail.mantra?.hi?.replace(/"/g, '').replace(/:/g, "ः")           // English colon → Devanagari visarga
-                            .replace(/-/g, " ")           // Replace dash with space
-                            .replace(/\//g, " ")          // Replace slash with space
-                            .replace(/[(){}\[\]]/g, "")   // Remove brackets
-                            .replace(/[.,;]/g, " ")       // Replace English punctuation
-                            .replace(/[|]/g, "॥")         // Replace single danda bar | with Hindi double danda
-                            .replace(/[^\u0900-\u097F\s।॥ः]/g, "").replace(/[०-९]/g, digit => hindiToEnglishMap[digit]) // Remove non-Devanagari chars
-                            .normalize("NFC")}
-                    </p>
-                    <p className={`${language === "en" ? " font-eng" : "hidden"} text-[#9A283D] ${fontSize}`}>
-                        {detail.mantra?.hi?.replace(/:/g, "ः")           // English colon → Devanagari visarga
-                            .replace(/-/g, " ")           // Replace dash with space
-                            .replace(/\//g, " ")          // Replace slash with space
-                            .replace(/[(){}\[\]]/g, "")   // Remove brackets
-                            .replace(/[.,;]/g, " ")       // Replace English punctuation
-                            .replace(/[|]/g, "॥")         // Replace single danda bar | with Hindi double danda
-                            .replace(/[^\u0900-\u097F\s।॥ः]/g, "").replace(/[०-९]/g, digit => hindiToEnglishMap[digit]) // Remove non-Devanagari chars
-                            .normalize("NFC")}
-                    </p>
+                    {(() => {
+                        const mantraText = typeof detail.mantra === "string" ? detail.mantra : (language === "hi" ? detail.mantra?.hi : detail.mantra?.en) || "";
+                        const cleaned = mantraText.replace(/"/g, '').replace(/:/g, "ः").replace(/-/g, " ").replace(/\//g, " ").replace(/[(){}\[\]]/g, "").replace(/[.,;]/g, " ").replace(/[|]/g, "॥").replace(/[^\u0900-\u097F\s।॥ः]/g, "").replace(/[०-९]/g, digit => hindiToEnglishMap[digit]).normalize("NFC");
+                        return (
+                            <p className={`${language === "hi" ? "font-hindi" : "font-eng"} text-[#9A283D] ${fontSize}`}>{cleaned}</p>
+                        );
+                    })()}
                 </div>
 
+                {/* Prarambh */}
                 <div className="mb-4">
-                    <p className={`${language === "hi" ? " font-hindi" : "hidden"} text-[rgba(0,0,0,0.7)] ${fontSize}`}>{detail.prarambh?.hi}</p>
-                    <p className={`${language === "en" ? " font-eng" : "hidden"} text-[rgba(0,0,0,0.7)] ${fontSize}`}>{detail.prarambh?.en}</p>
-
+                    {(() => {
+                        const text = typeof detail.prarambh === "string" ? detail.prarambh : (language === "hi" ? detail.prarambh?.hi : detail.prarambh?.en) || "";
+                        return <p className={`${language === "hi" ? "font-hindi" : "font-eng"} text-[rgba(0,0,0,0.7)] ${fontSize}`}>{text}</p>;
+                    })()}
                 </div>
 
+                {/* Samapt */}
                 <div className="mb-4">
-                    <p className={`${language === "hi" ? " font-hindi" : "hidden"} text-[rgba(0,0,0,0.7)] ${fontSize}`}>{detail.samapt?.hi}</p>
-                    <p className={`${language === "en" ? " font-eng" : "hidden"} text-[rgba(0,0,0,0.7)] ${fontSize}`}>{detail.samapt?.en}</p>
+                    {(() => {
+                        const text = typeof detail.samapt === "string" ? detail.samapt : (language === "hi" ? detail.samapt?.hi : detail.samapt?.en) || "";
+                        return <p className={`${language === "hi" ? "font-hindi" : "font-eng"} text-[rgba(0,0,0,0.7)] ${fontSize}`}>{text}</p>;
+                    })()}
                 </div>
 
+                {/* Puja Vidhi */}
                 <div className="mb-4">
-                    <h2 className={`text-xl font-semibold mb-4 ${fontSize} `}>
-                        {language === "hi" ? (
-                            <span className="font-hindi text-2xl">iwtk fof/k </span>
-                        ) : (
-                            <span className="font-eng"> Puja Vidhi </span>
-
-                        )}
+                    <h2 className={`text-xl font-semibold mb-4 ${fontSize}`}>
+                        {language === "hi" ? <span className="font-hindi text-2xl">iwtk fof/k </span> : <span className="font-eng"> Puja Vidhi </span>}
                     </h2>
-
-                    {language === "hi"
-                        ? detail.pujaVidhi?.hi?.split("\n").map((line, idx) => (
-                            <p key={idx} className={`font-hindi text-[rgba(0,0,0,0.7)] ${fontSize}`}>
-                                {HighlightNumbers(line)}
+                    {(() => {
+                        const raw = typeof detail.pujaVidhi === "string" ? detail.pujaVidhi : (language === "hi" ? detail.pujaVidhi?.hi : detail.pujaVidhi?.en) || "";
+                        return raw.split("\n").map((line, idx) => (
+                            <p key={idx} className={`${language === "hi" ? "font-hindi" : "font-eng"} text-[rgba(0,0,0,0.7)] ${fontSize}`}>
+                                {language === "hi" ? HighlightNumbers(line) : line}
                             </p>
-                        ))
-                        : detail.pujaVidhi?.en?.split("\n").map((line, idx) => (
-                            <p key={idx} className={`font-eng text-[rgba(0,0,0,0.7)] ${fontSize}`}>
-                                {line}
-                            </p>
-                        ))}
-
+                        ));
+                    })()}
                 </div>
 
+                {/* Puja Samagri */}
                 <div className="mb-4">
-                    <h2 className={`text-xl font-semibold mb-4 ${fontSize} `}>
-                        {language === "hi" ? (
-                            <span className="font-hindi text-2xl">iwtk lkexzh</span>
-                        ) : (
-                            <span className="font-eng">Puja Samagri</span>
-                        )}
-
+                    <h2 className={`text-xl font-semibold mb-4 ${fontSize}`}>
+                        {language === "hi" ? <span className="font-hindi text-2xl">iwtk lkexzh</span> : <span className="font-eng">Puja Samagri</span>}
                     </h2>
-                    <ul className={`list-inside text-[rgba(0,0,0,0.7)] ${fontSize} `}>
-                        {language === "hi"
-                            ? Array.isArray(detail.pujaSamagri?.hi)
-                                ? detail.pujaSamagri.hi.map((item, i) => (
-                                    <li key={`hi-${i}`} className="font-hindi">
-                                        {HighlightNumbersPujaSamagiri(item)}
-                                    </li>
-                                ))
-                                : detail.pujaSamagri?.hi
-                                    ?.split(/\n|,/)
-                                    .map((item, i) => (
-                                        <li key={`hi-${i}`} className="font-hindi">
-                                            {HighlightNumbersPujaSamagiri(item.trim())}
-                                        </li>
-                                    ))
-                            : Array.isArray(detail.pujaSamagri?.en)
-                                ? detail.pujaSamagri.en.map((item, i) => (
-                                    <li key={`en-${i}`} className="font-eng">
-                                        {item.replace(/,/g, ",")}
-                                    </li>
-                                ))
-                                : detail.pujaSamagri?.en
-                                    ?.split(/\n|,/)
-                                    .map((item, i) => (
-                                        <li key={`en-${i}`} className="font-eng">
-                                            {item.trim().replace(/,/g, ",")}
-                                        </li>
-                                    ))}
-
+                    <ul className={`list-inside text-[rgba(0,0,0,0.7)] ${fontSize}`}>
+                        {(() => {
+                            const raw = typeof detail.pujaSamagri === "string"
+                                ? detail.pujaSamagri
+                                : Array.isArray(detail.pujaSamagri)
+                                    ? detail.pujaSamagri.join(", ")
+                                    : (language === "hi" ? (Array.isArray(detail.pujaSamagri?.hi) ? detail.pujaSamagri.hi.join(", ") : detail.pujaSamagri?.hi) : (Array.isArray(detail.pujaSamagri?.en) ? detail.pujaSamagri.en.join(", ") : detail.pujaSamagri?.en)) || "";
+                            return raw.split(/\n/).map((item, i) => (
+                                <li key={i} className={language === "hi" ? "font-hindi" : "font-eng"}>
+                                    {language === "hi" ? HighlightNumbersPujaSamagiri(item.trim()) : item.trim()}
+                                </li>
+                            ));
+                        })()}
                     </ul>
-
-
                 </div>
 
+                {/* Katha / PujaMahatva */}
                 <div className="mb-4">
-                    <h2 className={`text-xl font-semibold mb-4 ${fontSize} `} >
-                        {language === "hi" ? (
-                            <span className="font-hindi text-2xl"> dFkk </span>
-                        ) : (
-                            <span className="font-eng">Katha</span>
-                        )}
-
+                    <h2 className={`text-xl font-semibold mb-4 ${fontSize}`}>
+                        {language === "hi" ? <span className="font-hindi text-2xl"> dFkk </span> : <span className="font-eng">Katha</span>}
                     </h2>
-                    {language === "hi"
-                        ? <div className={`font-hindi text-[rgba(0,0,0,0.7)] ${fontSize} break-words  w-full`} dangerouslySetInnerHTML={{
-                            __html: detail.pujaMahatva?.hi.replace(/,/g, "]").replace(/\(/g, "¼").replace(/\)/g, "½").replace(/\:/g, "%").replace(/:/g, "ः")         // Replace colon with visarga
-                                .replace(/ँ/g, "ं")          // Normalize chandrabindu if misencoded
-                                .replace(/\u200D|\u200C/g, "  ").replace(/[.,;!?'"“”‘’]/g, " ")    // Remove English punctuation
-                                .replace(/[\[\]{}()]/g, "")       // Remove brackets and parentheses
-                                .replace(/[*/\\#%^+=_|<>~`@$₹]/g, " ").replace(/[^\u0900-\u097F\s।॥]/g, "") // remove non-Devanagari chars except space & punctuation
-                                .replace(/\u00A0/g, " ") // replace non-breaking space with normal space
-                                .replace(/\u200B|\u200C|\u200D/g, " ") // remove zero-width chars
-                                .replace(/\s+/g, " ").replace(/[०-९]/g, digit => hindiToEnglishMap[digit])// Remove zero-width joiners
-                                .normalize("NFC")
-                        }} />
-                        : <div className={`font-eng text-[rgba(0,0,0,0.7)] ${fontSize} break-words w-full`} dangerouslySetInnerHTML={{ __html: detail.pujaMahatva?.en }} />
-                    }
+                    {(() => {
+                        const raw = typeof detail.pujaMahatva === "string" ? detail.pujaMahatva : (language === "hi" ? detail.pujaMahatva?.hi : detail.pujaMahatva?.en) || "";
+                        if (language === "hi") {
+                            const cleaned = raw.replace(/,/g, "]").replace(/\(/g, "¼").replace(/\)/g, "½").replace(/\:/g, "%").replace(/:/g, "ः").replace(/ँ/g, "ं").replace(/\u200D|\u200C/g, "  ").replace(/[.,;!?'"""'']/g, " ").replace(/[\[\]{}()]/g, "").replace(/[*/\\#%^+=_|<>~`@$₹]/g, " ").replace(/[^\u0900-\u097F\s।॥]/g, "").replace(/\u00A0/g, " ").replace(/\u200B|\u200C|\u200D/g, " ").replace(/\s+/g, " ").replace(/[०-९]/g, digit => hindiToEnglishMap[digit]).normalize("NFC");
+                            return <div className={`font-hindi text-[rgba(0,0,0,0.7)] ${fontSize} break-words w-full`} dangerouslySetInnerHTML={{ __html: cleaned }} />;
+                        }
+                        return <div className={`font-eng text-[rgba(0,0,0,0.7)] ${fontSize} break-words w-full`} dangerouslySetInnerHTML={{ __html: raw }} />;
+                    })()}
                 </div>
 
-                <div className="mt-4 w-full text-center" onClick = {() => {
+                <div className="mt-4 w-full text-center" onClick={() => {
                     trackEvent(GA4Events.aarti_cta_tapped_on_vrat_katha, {
                         event_label: `aarti_cta_tapped_on_vrat_katha || "no_arti_id"}`,
                         aartiId: detail.artiId || "no_arti_id",
-                    })
-                   
+                    });
                 }}>
                     <a href={redirectToAartiPage(detail.artiId)}
                         className={`bg-[#9A283D] text-white px-6 py-2 rounded-full shadow inline-flex items-center ${language === "hi" ? "font-hindi" : "font-eng"}`}

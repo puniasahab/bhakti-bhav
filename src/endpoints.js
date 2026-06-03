@@ -31,5 +31,8 @@ export const endPoints = {
     getSingleChalisa: "chalisa",
     aarti:'all-artis',
     getSingleAarti: 'arti',
-    todaysThought: 'daythoughts'
+    todaysThought: 'daythoughts',
+    vratKathaList: 'katha-categories',
+    vratKathaCategoryList: 'katha-category',
+    vratKathaById: 'katha',
 }
