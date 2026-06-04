@@ -8,9 +8,9 @@ import useGA4BaseParams from "../hooks/useGA4BaseParams";
 import useGA4Tracker from "../hooks/useGA4Tracker";
 
 const getSplashPlatform = () => {
-  const userAgent = navigator.userAgent || navigator.vendor || window.opera || "";
-  if (/iPad|iPhone|iPod/.test(userAgent)) return "ios";
-  if (/android/i.test(userAgent)) return "android";
+  // const userAgent = navigator.userAgent || navigator.vendor || window.opera || "";
+  // if (/iPad|iPhone|iPod/.test(userAgent)) return "ios";
+  // if (/android/i.test(userAgent)) return "android";
   return "web";
 };
 
