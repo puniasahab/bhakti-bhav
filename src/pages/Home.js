@@ -7,6 +7,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination, Autoplay } from "swiper/modules";
 import { useNavigate } from "react-router-dom";
 import { homeSchema } from "../seo/schemas";
+import { useAppStoreRedirect } from "../hooks/useAppStoreRedirect";
 
 import "swiper/css";
 import "swiper/css/pagination";
@@ -28,6 +29,8 @@ function Home() {
     const { language } = useContext(LanguageContext);
     const baseParams = useGA4BaseParams("Home Screen");
     const { trackEvent } = useGA4Tracker(baseParams);
+
+    const { deviceType, redirectToStore, storeUrls } = useAppStoreRedirect();
     // Initialize state from cache if available (instant render on back-navigation)
     const [isOpen, setIsOpen] = useState(false);
     const [showLoginModal, setShowLoginModal] = useState(false);
@@ -177,8 +180,8 @@ function Home() {
         // }
 
         let route = "";
-        console.log("GET SUbscription status from LS", getSubscriptionStatusFromLS());
-        // logged in check in cas user is not logged in
+        // Never call setShowLoginModal here — this function runs during render (as `to` prop).
+        // Login modal is handled in the onClick handler (handleWallpaperDeepLinkClicked).
         if (getIsLoggedIn()) {
             if (getSubscriptionStatusFromLS()) {
                 if (item?.categoryRedirect && item?.categoryId) {
@@ -188,9 +191,6 @@ function Home() {
                     route = `${redirection[item.categoryRedirect]}`;
                 }
             }
-        }
-        else {
-            route = "/login"
         }
         return route || "/payment";
     };
@@ -405,8 +405,20 @@ function Home() {
         });
     };
 
+    const handleBannerRedirectionClick = (banner, e) => {
+        e.stopPropagation(); // prevent outer div onClick from firing
+        console.log("button clicked");
+        if (deviceType === 'ios' || deviceType === 'android') {
+            redirectToStore();
+        } else {
+            console.log('Desktop user — show both store buttons');
+        }
+    };
+
     const handleWallpaperDeepLinkClicked = (item, e) => {
-        if (!item?.isWithoutLoginFree && requireLogin(e)) return;
+        // Always require login for deep link items, regardless of isWithoutLoginFree.
+        // setShowLoginModal is safe here (onClick handler, not during render).
+        if (requireLogin(e)) return;
 
         trackEvent(GA4Events.wallpaper_widget_clicked, {
             event_label: "wallpaper_deep_linking_card_clicked_on_home_screen",
@@ -540,10 +552,15 @@ function Home() {
                                                 navigate(relativePath);
 
                                             }}
-                                            className="h-[20vh] md:h-[60vh] bg-cover bg-center flex items-center justify-center"
+                                            className="relative h-[20vh] md:h-[60vh] bg-cover bg-center flex items-center justify-center"
                                             style={{ backgroundImage: `url(${banner.imageUrl})` }}
                                         >
-                                            {/* <h2 className="text-white text-lg font-bold">{banner.title}</h2> */}
+                                            <button
+                                                onClick={(e) => handleBannerRedirectionClick(banner, e)}
+                                                className="absolute bottom-1.5 right-1.5 sm:bottom-2 sm:right-2 md:bottom-3 md:right-3 bg-[#9A283D] text-white font-eng text-[9px] sm:text-xs md:text-sm font-semibold px-2 py-1 sm:px-2.5 sm:py-1 md:px-3 md:py-1.5 rounded-full shadow-md hover:bg-[#7a1f30] transition"
+                                            >
+                                                Click here
+                                            </button>
                                         </div>
                                     </SwiperSlide>
                                 )
