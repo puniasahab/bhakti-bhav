@@ -6,7 +6,7 @@ import { Check } from "lucide-react";
 import { paymentApis, subscriptionApis, profileApis, wallpaperApis } from "../api";
 import { useNavigate } from "react-router-dom";
 import { usePayment } from "../contexts/PaymentContext";
-import { getTokenFromLS } from "../commonFunctions";
+import { getIsLoggedIn, getTokenFromLS } from "../commonFunctions";
 import useGA4Tracker  from "../hooks/useGA4Tracker";
 import { GA4Events } from "../utils/ga4Events.enum";
 import useGA4BaseParams from "../hooks/useGA4BaseParams";
@@ -298,7 +298,15 @@ export default function Payment() {
           {plans && plans.length > 0 && (
             <button
               className="w-full bg-[#9A283D] text-white py-4 rounded-full shadow-lg text-lg font-semibold hover:bg-[#7a1f30] transition-all duration-200"
-              onClick={() => {trackEvent(GA4Events.subscription_plan_selected, {event_label: "payment_button_clicked_from_payment_screen", selectedPlan: plans.find((x) => x._id === selectedPlan).name}); handlePaymentOptionSelected({selectedPlan: plans.find((x) => x._id === selectedPlan)}); makePayment(selectedPlan)}}
+              onClick={() => {
+                if (!getIsLoggedIn()) {
+                  navigate("/login");
+                  return;
+                }
+                trackEvent(GA4Events.subscription_plan_selected, {event_label: "payment_button_clicked_from_payment_screen", selectedPlan: plans.find((x) => x._id === selectedPlan).name});
+                handlePaymentOptionSelected({selectedPlan: plans.find((x) => x._id === selectedPlan)});
+                makePayment(selectedPlan);
+              }}
             >
               <span className="font-hindi">प्रारंभ करें</span>{" "}
               <span className="font-eng text-sm">(Start Now)</span>

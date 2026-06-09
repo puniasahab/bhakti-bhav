@@ -557,7 +557,13 @@ function Home() {
                                         >
                                             <button
                                                 onClick={(e) => handleBannerRedirectionClick(banner, e)}
-                                                className="absolute bottom-1.5 right-1.5 sm:bottom-2 sm:right-2 md:bottom-3 md:right-3 bg-[#9A283D] text-white font-eng text-[9px] sm:text-xs md:text-sm font-semibold px-2 py-1 sm:px-2.5 sm:py-1 md:px-3 md:py-1.5 rounded-full shadow-md hover:bg-[#7a1f30] transition"
+                                                className="absolute bg-[#9A283D] text-white font-eng font-bold rounded-full shadow-md hover:bg-[#7a1f30] transition"
+                                                style={{
+                                                    bottom: '5%',
+                                                    right: '3%',
+                                                    fontSize: 'clamp(12px, 2.8vw, 18px)',
+                                                    padding: 'clamp(5px, 0.8vw, 10px) clamp(12px, 2.2vw, 20px)',
+                                                }}
                                             >
                                                 Click here
                                             </button>
@@ -753,22 +759,23 @@ function Home() {
                                 <button
                                     onClick={() => {
                                         setShowLoginModal(false);
-                                        trackEvent(GA4Events.free_login_cta_clicked, { event_label: "free_login_skipped" });
-                                        // If user arrived via /home-v1, redirect to "/" on skip
-                                        if (sessionStorage.getItem("loginSource") === "home-v1") {
-                                            sessionStorage.removeItem("loginSource");
-                                            navigate("/");
-                                        }
+                                        trackEvent(GA4Events.free_login_cta_clicked, { event_label: "free_login_clicked" });
+                                        navigate("/login");
                                     }}
                                     className="flex-1 bg-white text-[#9A283D] font-eng font-semibold py-3 rounded-2xl shadow"
                                 >
-                                    Skip
+                                    Free Login
                                 </button>
                                 <button
-                                    onClick={() => { setShowLoginModal(false); trackEvent(GA4Events.free_login_cta_clicked, { event_label: "free_login_clicked" }); navigate("/login"); }}
+                                    onClick={() => {
+                                        setShowLoginModal(false);
+                                        trackEvent(GA4Events.free_login_cta_clicked, { event_label: "start_now_clicked" });
+                                        sessionStorage.setItem("loginSource", "home-v1");
+                                        navigate("/login");
+                                    }}
                                     className="flex-1 bg-[#9A283D] text-white font-eng font-semibold py-3 rounded-2xl shadow"
                                 >
-                                    Free Login
+                                    Start Now
                                 </button>
                             </div>
                             <p className="text-center text-[#9A283D] font-eng text-sm font-medium">
