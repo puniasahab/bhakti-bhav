@@ -16,7 +16,8 @@ import { getMobileNoFromLS } from "../commonFunctions";
 
 
 export default function Payment() {
-
+git add .
+git comit -m "Updated"
   const [plans, setPlans] = useState([]);
    const [profile, setProfile] = useState({
           name: "",
