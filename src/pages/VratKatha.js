@@ -9,6 +9,8 @@ import { getSubscriptionStatusFromLS, getTokenFromLS } from "../commonFunctions"
 import { vratKathaApis } from "../api";
 import SEO from "../components/SEO";
 import { LanguageContext } from "../contexts/LanguageContext";
+import { vratKathaSchema } from "../schemas/pageSchemas";
+import SchemaMarkup from "../components/SchemaMarkup";
 
 import useGA4BaseParams from "../hooks/useGA4BaseParams";
 import useGA4Tracker from "../hooks/useGA4Tracker";
@@ -470,7 +472,7 @@ export default function VratKatha() {
   }
   return (
     <>
-
+      <SchemaMarkup schema={vratKathaSchema} />
       <SEO title="Complete Hindu Vrat Katha Collection in Hindi | All Vrat Stories | भक्ति भाव" description="Explore complete Hindu vrat katha collection including Ekadashi, Pradosh, Purnima, and more with pooja vidhi and benefits in Hindi" canonical="https://bhaktibhav.app/vrat-katha" schema={homeSchema}/>
       <Header />
 

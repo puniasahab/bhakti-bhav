@@ -9,6 +9,8 @@ import { LanguageContext } from "../contexts/LanguageContext";
 import { useAudio } from "../contexts/AudioContext";
 import { homeSchema } from "../seo/schemas";
 import { replaceSpecialChars, fixKrutiDevHtml } from "../commonFunctions";
+import SchemaMarkup from "../components/SchemaMarkup";
+import { getKahaniyaDetailSchema, getKahaniyaSchema } from "../schemas/pageSchemas";
 
 const normalizeAssetUrl = (url) => {
   if (!url) return "";
@@ -128,8 +130,25 @@ export default function KahaniyaDetails() {
     );
   }
 
+  function formatDate(date) {
+    const pad = n => String(n).padStart(2, '0');
+
+    return (
+        date.getFullYear() + '-' +
+        pad(date.getMonth() + 1) + '-' +
+        pad(date.getDate()) + 'T' +
+        pad(date.getHours()) + ':' +
+        pad(date.getMinutes()) + ':' +
+        pad(date.getSeconds()) +
+        '+05:30'
+    );
+}
+
+const datePublished = formatDate(new Date());
+
   return (
     <>
+    <SchemaMarkup schema={getKahaniyaSchema(id, datePublished)} />
       <SEO
         title={`${title} | भक्ति भाव`}
         description={title}

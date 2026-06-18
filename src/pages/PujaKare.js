@@ -9,6 +9,7 @@ import { usePujaKare } from "../contexts/PujaKareContext";
 import useGA4BaseParams from "../hooks/useGA4BaseParams";
 import useGA4Tracker from "../hooks/useGA4Tracker";
 import { GA4Events } from "../utils/ga4Events.enum";
+import SchemaMarkup from "../components/SchemaMarkup";
 
 export default function PujaKare() {
   const [items, setItems] = useState([]);
@@ -84,6 +85,7 @@ export default function PujaKare() {
 
   return (
     <>
+    <SchemaMarkup schema={pujaKareSchema} />
       <Header pageName={{ hi: "iwtk djs", en: "Puja kare" }} />
       <div className="h-1"></div>
       <PageTitleCard

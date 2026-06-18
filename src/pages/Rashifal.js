@@ -8,6 +8,8 @@ import useGA4Tracker from "../hooks/useGA4Tracker";
 import { GA4Events } from "../utils/ga4Events.enum";
 import SEO from "../components/SEO";
 import { homeSchema } from "../seo/schemas";
+import { rashifalSchema } from "../schemas/pageSchemas";
+import SchemaMarkup from "../components/SchemaMarkup";
 
 function Rashifal() {
   const [rashis, setRashis] = useState([]);
@@ -138,7 +140,7 @@ const replacements = {
   };
   return (
     <>
-
+      <SchemaMarkup schema={rashifalSchema} />
       <SEO title = "Daily Horoscope Hindi, Today Rashifal, Weekly & Monthly Rashifal | भक्ति भाव" description="Get today rashifal in Hindi, daily horoscope updates, and weekly & monthly zodiac predictions for all signs – Bhakti Bhav." canonical="https://bhaktibhav.app/rashifal" schema = {homeSchema}/>
       <Header pageName={{ hi: "jkf'kQy", en: "Rashifal" }} />
 

@@ -8,6 +8,8 @@ import { getSubscriptionStatusFromLS, getTokenFromLS, replaceSpecialChars, fixKr
 import { LanguageContext } from "../contexts/LanguageContext";
 import { categoryContentApis, homeCategoryApis } from "../api";
 import { homeSchema } from "../seo/schemas";
+import SchemaMarkup from "../components/SchemaMarkup";
+import { getKahaniyaSchema } from "../schemas/pageSchemas";
 
 const contentCache = new Map();
 const CACHE_TTL = 5 * 60 * 1000;
@@ -235,6 +237,8 @@ export default function Kahaniya() {
 
   const renderPageShell = (content) => (
     <>
+
+    {/* <SchemaMarkup schema={getKahaniyaSchema(categoryId)} /> */}
       <SEO
         title="Kahaniya | भक्ति भाव"
         description="Read devotional kahaniya on Bhakti Bhav."

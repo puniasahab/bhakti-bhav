@@ -9,6 +9,8 @@ import { categoryContentApis, newJaapMalaApis } from "../api";
 import { replaceSpecialChars } from "../commonFunctions";
 import { LanguageContext } from "../contexts/LanguageContext";
 import { homeSchema } from "../seo/schemas";
+import SchemaMarkup from "../components/SchemaMarkup";
+import { newJaapMalaSchema } from "../schemas/pageSchemas";
 
 const CACHE_TTL = 5 * 60 * 1000;
 const detailCache = new Map();
@@ -59,6 +61,7 @@ export default function NewJaapMalaDetails() {
   const [showCompletionModal, setShowCompletionModal] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const [jaapStats, setJaapStats] = useState(null);
+  
 
   useEffect(() => {
     let isActive = true;
@@ -193,6 +196,7 @@ export default function NewJaapMalaDetails() {
 
   return (
     <>
+    <SchemaMarkup schema={newJaapMalaSchema(id)} />
       <SEO
         title={`${title} | भक्ति भाव`}
         description={title}

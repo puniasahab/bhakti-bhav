@@ -10,6 +10,8 @@ import { cachedFetch } from "../utils/apiCache";
 import { GA4Events } from "../utils/ga4Events.enum";
 import useGA4BaseParams from "../hooks/useGA4BaseParams";
 import useGA4Tracker from "../hooks/useGA4Tracker";
+import SchemaMarkup from "../components/SchemaMarkup";
+import { wallpaperSchema } from "../schemas/pageSchemas";
 
 export default function Wallpaper() {
   const [wallpapers, setWallpapers] = useState([]);
@@ -148,6 +150,7 @@ export default function Wallpaper() {
 
   return (
     <>
+    <SchemaMarkup schema={wallpaperSchema} />
       <Header />                                                                                                       
  
       <div className="flex gap-3 justify-start px-4 mt-4 mb-6 overflow-x-auto scrollbar-hide">

@@ -12,6 +12,8 @@ import SEO from "../components/SEO";
 import { homeSchema } from "../seo/schemas";
 import { naamJaapApis } from "../api";
 import { LanguageContext } from "../contexts/LanguageContext";
+import { jaapMalaSchema } from "../schemas/pageSchemas";
+import SchemaMarkup from "../components/SchemaMarkup";
 
 function JaapMala() {
   const [data, setData] = useState([]);
@@ -153,6 +155,9 @@ function JaapMala() {
 
   return (
     <>
+
+
+    <SchemaMarkup schema={jaapMalaSchema} />
     <SEO title = "Best Jaap Mala Counter App – Digital Chanting Beads & Jap | भक्ति भाव" description="Track your mantra chanting with a digital mala jap app. Supports 5 mukhi, 9 mukhi Rudraksha, Tulsi mala and more. Simple, accurate and भक्तिमय experience." canonical="https://bhaktibhav.app/jaap-mala" schema={homeSchema} />
       <Header pageName={{ hi: "tkkp ekyk", en: "Jaap mala" }} />
       <PageTitleCard

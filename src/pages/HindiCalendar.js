@@ -11,6 +11,8 @@ import useGA4BaseParams from "../hooks/useGA4BaseParams";
 import useGA4Tracker from "../hooks/useGA4Tracker";
 import SEO from "../components/SEO";
 import { homeSchema } from "../seo/schemas";
+import { hindiCalendarSchema } from "../schemas/pageSchemas";
+import SchemaMarkup from "../components/SchemaMarkup";
 
 export default function HindiCalendar() {
   const [months, setMonths] = useState([]);
@@ -90,6 +92,7 @@ export default function HindiCalendar() {
 
   return (
     <>
+    <SchemaMarkup schema={hindiCalendarSchema} />
     <SEO title="Best Hindu Calendar App | हिंदी पंचांग कैलेंडर डाउनलोड | भक्ति भाव"  description="Hindi Calendar 2026 और Hindu Panchang ऐप डाउनलोड करें। सभी व्रत, त्योहार, शुभ मुहूर्त और चंद्र कैलेंडर की जानकारी एक जगह | भक्ति भाव" canonical="https://bhaktibhav.app/hindi-calendar" schema={homeSchema}/>
     <div className="bg-[url('../img/home_bg.png')] bg-cover bg-top bg-no-repeat min-h-screen w-full text-white font-kruti">
       <Header />

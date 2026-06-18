@@ -13,6 +13,8 @@ import useGA4BaseParams from "../hooks/useGA4BaseParams";
 import useGA4Tracker from "../hooks/useGA4Tracker";
 import { homeSchema } from "../seo/schemas";
 import { GA4Events } from "../utils/ga4Events.enum";
+import { newJaapMalaSchema } from "../schemas/pageSchemas";
+import SchemaMarkup from "../components/SchemaMarkup";
 
 const API_BASE_URL = "https://api.bhaktibhav.app";
 const CACHE_TTL = 5 * 60 * 1000;
@@ -235,7 +237,9 @@ export default function NewJaapMala() {
   );
 
   const renderPageShell = (content) => (
+
     <>
+    {/* <SchemaMarkup schema={newJaapMalaSchema} /> */}
       <SEO
         title="Best Jaap Mala Counter App - Digital Chanting Beads & Jap | भक्ति भाव"
         description="Track your mantra chanting with a digital mala jap app. Supports Rudraksha, Tulsi mala and more."

@@ -442,7 +442,7 @@ export const homeCategoryApis = {
   fetchHomeCategories: async (lang) => {
     try {
       console.log("Fetching home categories for language with api url: ", `${endPoints.featureCategory}?lang=${lang}`);
-      const response = await coreApi.get(`${endPoints.featureCategory}?lang=${lang}`);
+      const response = await coreApi.get(`https://api.bhaktibhav.app/api/v1/frontend/${endPoints.featureCategory}?lang=${lang}`);
       return response.data;
     }
     catch(error) {
