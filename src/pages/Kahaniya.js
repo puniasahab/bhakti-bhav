@@ -264,8 +264,25 @@ export default function Kahaniya() {
     return renderPageShell(<p className="text-center py-10 theme_text">❌ No items found</p>);
   }
 
+   function formatDate(date) {
+    const pad = n => String(n).padStart(2, '0');
+
+    return (
+        date.getFullYear() + '-' +
+        pad(date.getMonth() + 1) + '-' +
+        pad(date.getDate()) + 'T' +
+        pad(date.getHours()) + ':' +
+        pad(date.getMinutes()) + ':' +
+        pad(date.getSeconds()) +
+        '+05:30'
+    );
+}
+
+const datePublished = formatDate(new Date());
+
   return renderPageShell(
     <>
+    <SchemaMarkup schema={getKahaniyaSchema(categoryId, datePublished)} />
       <div className="container mx-auto px-4 mt-6">
         <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
           {items.map((item, idx) => {

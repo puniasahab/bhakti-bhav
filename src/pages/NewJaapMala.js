@@ -239,7 +239,7 @@ export default function NewJaapMala() {
   const renderPageShell = (content) => (
 
     <>
-    {/* <SchemaMarkup schema={newJaapMalaSchema} /> */}
+    <SchemaMarkup schema={newJaapMalaSchema(categoryId)} />
       <SEO
         title="Best Jaap Mala Counter App - Digital Chanting Beads & Jap | भक्ति भाव"
         description="Track your mantra chanting with a digital mala jap app. Supports Rudraksha, Tulsi mala and more."

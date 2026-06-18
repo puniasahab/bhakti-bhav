@@ -196,7 +196,7 @@ export default function NewJaapMalaDetails() {
 
   return (
     <>
-    <SchemaMarkup schema={newJaapMalaSchema(id)} />
+    {/* <SchemaMarkup schema={newJaapMalaSchema(id)} /> */}
       <SEO
         title={`${title} | भक्ति भाव`}
         description={title}
