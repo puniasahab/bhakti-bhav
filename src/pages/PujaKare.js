@@ -10,6 +10,7 @@ import useGA4BaseParams from "../hooks/useGA4BaseParams";
 import useGA4Tracker from "../hooks/useGA4Tracker";
 import { GA4Events } from "../utils/ga4Events.enum";
 import SchemaMarkup from "../components/SchemaMarkup";
+import { pujaKareSchema } from "../schemas/pageSchemas";
 
 export default function PujaKare() {
   const [items, setItems] = useState([]);

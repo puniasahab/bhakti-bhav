@@ -148,7 +148,7 @@ const datePublished = formatDate(new Date());
 
   return (
     <>
-    <SchemaMarkup schema={getKahaniyaSchema(id, datePublished)} />
+    <SchemaMarkup schema={getKahaniyaSchema(contentId, datePublished)} />
       <SEO
         title={`${title} | भक्ति भाव`}
         description={title}
