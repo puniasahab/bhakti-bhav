@@ -11,11 +11,58 @@ import { homeSchema } from "../seo/schemas";
 import { rashifalSchema } from "../schemas/pageSchemas";
 import SchemaMarkup from "../components/SchemaMarkup";
 
+const RASHIFAL_CACHE_TTL = 5 * 60 * 1000;
+const RASHI_LIST_CACHE_KEY = "rashifal:rashi-list";
+const rashifalCache = new Map();
+const pendingRashifalRequests = new Map();
+
+const getValidCachedRashifal = (cacheKey) => {
+  const cached = rashifalCache.get(cacheKey);
+
+  if (cached && Date.now() - cached.timestamp < RASHIFAL_CACHE_TTL) {
+    return cached.data;
+  }
+
+  rashifalCache.delete(cacheKey);
+  return null;
+};
+
+const getCachedRashifal = async (cacheKey, fetcher) => {
+  const cached = getValidCachedRashifal(cacheKey);
+
+  if (cached) {
+    return cached;
+  }
+
+  if (pendingRashifalRequests.has(cacheKey)) {
+    return pendingRashifalRequests.get(cacheKey);
+  }
+
+  const request = fetcher()
+    .then((data) => {
+      rashifalCache.set(cacheKey, {
+        data,
+        timestamp: Date.now(),
+      });
+      return data;
+    })
+    .finally(() => {
+      pendingRashifalRequests.delete(cacheKey);
+    });
+
+  pendingRashifalRequests.set(cacheKey, request);
+  return request;
+};
+
+const getRashiList = (response) =>
+  response?.status === "success" && Array.isArray(response.data) ? response.data : [];
+
 function Rashifal() {
-  const [rashis, setRashis] = useState([]);
+  const cachedRashiList = getValidCachedRashifal(RASHI_LIST_CACHE_KEY);
+  const [rashis, setRashis] = useState(() => getRashiList(cachedRashiList));
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedRashi, setSelectedRashi] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!cachedRashiList);
 
   const baseParams = useGA4BaseParams("Rashifal Screen");
   const { trackEvent } = useGA4Tracker(baseParams);
@@ -36,12 +83,19 @@ function Rashifal() {
   };
 
   useEffect(() => {
-    fetch("https://api.bhaktibhav.app/frontend/all-rashis")
-      .then((res) => res.json())
+    if (!getValidCachedRashifal(RASHI_LIST_CACHE_KEY)) {
+      setLoading(true);
+    }
+
+    getCachedRashifal(RASHI_LIST_CACHE_KEY, () =>
+      fetch("https://api.bhaktibhav.app/frontend/all-rashis").then((res) => res.json())
+    )
       .then((resJson) => {
-        if (resJson.status === "success" && Array.isArray(resJson.data)) {
-          setRashis(resJson.data);
-          console.log("Fetched rashis:", resJson.data);
+        const nextRashis = getRashiList(resJson);
+
+        if (nextRashis.length) {
+          setRashis(nextRashis);
+          console.log("Fetched rashis:", nextRashis);
         } else {
           setRashis([]);
         }
@@ -68,10 +122,10 @@ function Rashifal() {
 
 
     try {
-      const res = await fetch(
-        `https://api.bhaktibhav.app/frontend/today/${rashi._id}`
+      const data = await getCachedRashifal(
+        `rashifal:today:${rashi._id}`,
+        () => fetch(`https://api.bhaktibhav.app/frontend/today/${rashi._id}`).then((res) => res.json())
       );
-      const data = await res.json();
       console.log("API response:", data);
 
       const todayData = Array.isArray(data) ? data[0] : null;

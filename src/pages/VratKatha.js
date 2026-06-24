@@ -17,15 +17,70 @@ import useGA4Tracker from "../hooks/useGA4Tracker";
 import { GA4Events } from "../utils/ga4Events.enum";
 import { homeSchema } from "../seo/schemas";
 
+const VRAT_KATHA_CACHE_TTL = 5 * 60 * 1000;
+const vratKathaPageCache = new Map();
+const pendingVratKathaRequests = new Map();
+
+const getVratKathaCacheKey = (version, page, limit, language) =>
+  `vrat-katha:${version}:${language}:${page}:${limit}`;
+
+const getValidCachedVratKatha = (cacheKey) => {
+  const cached = vratKathaPageCache.get(cacheKey);
+
+  if (cached && Date.now() - cached.timestamp < VRAT_KATHA_CACHE_TTL) {
+    return cached.data;
+  }
+
+  vratKathaPageCache.delete(cacheKey);
+  return null;
+};
+
+const getCachedVratKatha = async (cacheKey, fetcher) => {
+  const cached = getValidCachedVratKatha(cacheKey);
+
+  if (cached) {
+    return cached;
+  }
+
+  if (pendingVratKathaRequests.has(cacheKey)) {
+    return pendingVratKathaRequests.get(cacheKey);
+  }
+
+  const request = fetcher()
+    .then((data) => {
+      vratKathaPageCache.set(cacheKey, {
+        data,
+        timestamp: Date.now(),
+      });
+      return data;
+    })
+    .finally(() => {
+      pendingVratKathaRequests.delete(cacheKey);
+    });
+
+  pendingVratKathaRequests.set(cacheKey, request);
+  return request;
+};
+
+const getVratKathaItems = (json) => (Array.isArray(json?.data) ? json.data : []);
+
+const hasMoreVratKatha = (json, limit) => getVratKathaItems(json).length >= limit;
+
 
 export default function VratKatha() {
   const navigate = useNavigate();
-  const [kathas, setKathas] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const limit = 10;
+  const { language } = useContext(LanguageContext);
+  const firstPageCacheKey = getVratKathaCacheKey("v3", 1, limit, language);
+  const cachedFirstPage = getValidCachedVratKatha(firstPageCacheKey);
+  const cachedFirstPageItems = getVratKathaItems(cachedFirstPage);
+  const [kathas, setKathas] = useState(cachedFirstPageItems);
+  const [loading, setLoading] = useState(!cachedFirstPage);
   const [loadingMore, setLoadingMore] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
-  const limit = 10;
+  const [hasMore, setHasMore] = useState(() =>
+    cachedFirstPage ? hasMoreVratKatha(cachedFirstPage, limit) : true
+  );
 
   const baseParams = useGA4BaseParams("Vrat Katha Screen");
   const { trackEvent } = useGA4Tracker(baseParams);
@@ -34,14 +89,16 @@ export default function VratKatha() {
   const isSubscribed = useMemo(() => getSubscriptionStatusFromLS(), []);
   const hasToken = useMemo(() => getTokenFromLS(), []);
   const { setCategoryData } = useKatha();
-  const { language } = useContext(LanguageContext);
 
   // Reset list when language changes
   useEffect(() => {
-    setKathas([]);
+    const cachedResponse = getValidCachedVratKatha(firstPageCacheKey);
+
+    setKathas(getVratKathaItems(cachedResponse));
     setCurrentPage(1);
-    setHasMore(true);
-  }, [language]);
+    setHasMore(cachedResponse ? hasMoreVratKatha(cachedResponse, limit) : true);
+    setLoading(!cachedResponse);
+  }, [firstPageCacheKey, limit]);
 
   const processRawData = useCallback((categories = [], uncategorizedKathas = []) => {
     const newData = [
@@ -131,10 +188,16 @@ export default function VratKatha() {
     async function fetchKathas() {
       try {
         /// all-kathas
-        if (currentPage === 1) setLoading(true);
+        const version = "v3";
+        const cacheKey = getVratKathaCacheKey(version, currentPage, limit, language);
+        const hasCachedResponse = Boolean(getValidCachedVratKatha(cacheKey));
+
+        if (currentPage === 1) setLoading(!hasCachedResponse);
         else setLoadingMore(true);
 
-        const json = await vratKathaApis.fetchVratKathaData("v3", currentPage, limit, language);
+        const json = await getCachedVratKatha(cacheKey, () =>
+          vratKathaApis.fetchVratKathaData(version, currentPage, limit, language)
+        );
 
         if (json.status === 'success') {
           const categories = json?.categories || [];

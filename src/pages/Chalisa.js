@@ -12,6 +12,42 @@ import { homeSchema } from "../seo/schemas";
 import { chalisaApis } from "../api";
 import { LanguageContext } from "../contexts/LanguageContext";
 
+const CHALISA_CACHE_TTL = 5 * 60 * 1000;
+const chalisaCache = new Map();
+const pendingChalisaRequests = new Map();
+
+const getChalisaCacheKey = (version, page, limit, language) =>
+  `chalisa:${version}:${language}:${page}:${limit}`;
+
+const getCachedChalisas = async (cacheKey, fetcher) => {
+  const cached = chalisaCache.get(cacheKey);
+
+  if (cached && Date.now() - cached.timestamp < CHALISA_CACHE_TTL) {
+    return cached.data;
+  }
+
+  chalisaCache.delete(cacheKey);
+
+  if (pendingChalisaRequests.has(cacheKey)) {
+    return pendingChalisaRequests.get(cacheKey);
+  }
+
+  const request = fetcher()
+    .then((data) => {
+      chalisaCache.set(cacheKey, {
+        data,
+        timestamp: Date.now(),
+      });
+      return data;
+    })
+    .finally(() => {
+      pendingChalisaRequests.delete(cacheKey);
+    });
+
+  pendingChalisaRequests.set(cacheKey, request);
+  return request;
+};
+
 export default function Chalisa() {
   const [chalisa, setChalisa] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -40,8 +76,11 @@ export default function Chalisa() {
         if (currentPage === 1) setLoading(true);
         else setLoadingMore(true);
 
-        // Use chalisaApis for fetching
-        const json = await chalisaApis.getChalisas("v3", currentPage, limit, language);
+        const version = "v3";
+        const cacheKey = getChalisaCacheKey(version, currentPage, limit, language);
+        const json = await getCachedChalisas(cacheKey, () =>
+          chalisaApis.getChalisas(version, currentPage, limit, language)
+        );
 
         const dataArray = Array.isArray(json.data?.items) ? json.data.items
           : Array.isArray(json.data?.data) ? json.data.data

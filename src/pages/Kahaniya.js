@@ -12,6 +12,7 @@ import SchemaMarkup from "../components/SchemaMarkup";
 import { getKahaniyaSchema } from "../schemas/pageSchemas";
 
 const contentCache = new Map();
+const pendingContentRequests = new Map();
 const CACHE_TTL = 5 * 60 * 1000;
 
 const getCachedContent = async (cacheKey, fetcher) => {
@@ -21,13 +22,37 @@ const getCachedContent = async (cacheKey, fetcher) => {
     return cached.data;
   }
 
-  const data = await fetcher();
-  contentCache.set(cacheKey, {
-    data,
-    timestamp: Date.now()
-  });
+  contentCache.delete(cacheKey);
 
-  return data;
+  if (pendingContentRequests.has(cacheKey)) {
+    return pendingContentRequests.get(cacheKey);
+  }
+
+  const request = fetcher()
+    .then((data) => {
+      contentCache.set(cacheKey, {
+        data,
+        timestamp: Date.now()
+      });
+      return data;
+    })
+    .finally(() => {
+      pendingContentRequests.delete(cacheKey);
+    });
+
+  pendingContentRequests.set(cacheKey, request);
+  return request;
+};
+
+const getValidCachedContent = (cacheKey) => {
+  const cached = contentCache.get(cacheKey);
+
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+    return cached.data;
+  }
+
+  contentCache.delete(cacheKey);
+  return null;
 };
 
 const getContentItems = (response) => {
@@ -38,6 +63,16 @@ const getContentItems = (response) => {
 };
 
 const getPagination = (response) => response?.data?.pagination || response?.pagination || null;
+
+const hasMoreContent = (response, items, page, limit) => {
+  const pagination = getPagination(response);
+
+  if (pagination?.totalPages) {
+    return page < pagination.totalPages;
+  }
+
+  return items.length >= limit;
+};
 
 const getTitle = (item, language) => {
   if (typeof item?.title === "string") return item.title;
@@ -64,17 +99,12 @@ export default function Kahaniya() {
   const { categoryId: categoryIdParam, id } = useParams();
   const location = useLocation();
   const { language } = useContext(LanguageContext);
-  const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [resolvingCategory, setResolvingCategory] = useState(false);
-  const [resolvedCategoryId, setResolvedCategoryId] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
   const limit = 10;
 
   const isSubscribed = useMemo(() => getSubscriptionStatusFromLS(), []);
   const hasToken = useMemo(() => getTokenFromLS(), []);
+  const [resolvingCategory, setResolvingCategory] = useState(false);
+  const [resolvedCategoryId, setResolvedCategoryId] = useState("");
 
   const queryParams = useMemo(() => new URLSearchParams(location.search), [location.search]);
   const routeCategoryId =
@@ -85,6 +115,16 @@ export default function Kahaniya() {
     location.state?._id ||
     "";
   const categoryId = routeCategoryId || resolvedCategoryId;
+  const firstPageCacheKey = categoryId ? `kahaniya:${categoryId}:${language}:1:${limit}` : "";
+  const initialCachedResponse = firstPageCacheKey ? getValidCachedContent(firstPageCacheKey) : null;
+  const initialCachedItems = getContentItems(initialCachedResponse);
+  const [items, setItems] = useState(initialCachedItems);
+  const [loading, setLoading] = useState(!initialCachedResponse);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasMore, setHasMore] = useState(() =>
+    initialCachedResponse ? hasMoreContent(initialCachedResponse, initialCachedItems, 1, limit) : true
+  );
 
   useEffect(() => {
     let isActive = true;
@@ -132,10 +172,14 @@ export default function Kahaniya() {
   }, [language, routeCategoryId]);
 
   useEffect(() => {
-    setItems([]);
+    const cachedResponse = firstPageCacheKey ? getValidCachedContent(firstPageCacheKey) : null;
+    const cachedItems = getContentItems(cachedResponse);
+
+    setItems(cachedItems);
     setCurrentPage(1);
-    setHasMore(true);
-  }, [categoryId, language]);
+    setHasMore(cachedResponse ? hasMoreContent(cachedResponse, cachedItems, 1, limit) : true);
+    setLoading(!cachedResponse);
+  }, [firstPageCacheKey, limit]);
 
   useEffect(() => {
     let isActive = true;
@@ -153,28 +197,24 @@ export default function Kahaniya() {
       try {
         if (resolvingCategory) return;
 
+        const cacheKey = `kahaniya:${categoryId}:${language}:${currentPage}:${limit}`;
+        const hasCachedResponse = Boolean(getValidCachedContent(cacheKey));
+
         if (currentPage === 1) {
-          setLoading(true);
+          setLoading(!hasCachedResponse);
         } else {
           setLoadingMore(true);
         }
 
-        const cacheKey = `kahaniya:${categoryId}:${language}:${currentPage}:${limit}`;
         const response = await getCachedContent(cacheKey, () =>
           categoryContentApis.fetchContentDataByCategoryId(categoryId, language, currentPage, limit)
         );
         const nextItems = getContentItems(response);
-        const pagination = getPagination(response);
 
         if (!isActive) return;
 
         setItems((prevItems) => (currentPage === 1 ? nextItems : [...prevItems, ...nextItems]));
-
-        if (pagination?.totalPages) {
-          setHasMore(currentPage < pagination.totalPages);
-        } else {
-          setHasMore(nextItems.length >= limit);
-        }
+        setHasMore(hasMoreContent(response, nextItems, currentPage, limit));
       } catch (error) {
         if (!isActive) return;
         console.error("Kahaniya API Error:", error);

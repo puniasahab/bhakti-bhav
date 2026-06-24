@@ -12,13 +12,66 @@ import { GA4Events } from "../utils/ga4Events.enum";
 import SchemaMarkup from "../components/SchemaMarkup";
 import { pujaKareSchema } from "../schemas/pageSchemas";
 
+const PUJA_KARE_CACHE_TTL = 5 * 60 * 1000;
+const pujaKarePageCache = new Map();
+const pendingPujaKareRequests = new Map();
+
+const getPujaKareCacheKey = (page, limit) => `puja-kare:${page}:${limit}`;
+
+const getValidCachedPujaKare = (cacheKey) => {
+  const cached = pujaKarePageCache.get(cacheKey);
+
+  if (cached && Date.now() - cached.timestamp < PUJA_KARE_CACHE_TTL) {
+    return cached.data;
+  }
+
+  pujaKarePageCache.delete(cacheKey);
+  return null;
+};
+
+const getCachedPujaKare = async (cacheKey, fetcher) => {
+  const cached = getValidCachedPujaKare(cacheKey);
+
+  if (cached) {
+    return cached;
+  }
+
+  if (pendingPujaKareRequests.has(cacheKey)) {
+    return pendingPujaKareRequests.get(cacheKey);
+  }
+
+  const request = fetcher()
+    .then((data) => {
+      pujaKarePageCache.set(cacheKey, {
+        data,
+        timestamp: Date.now(),
+      });
+      return data;
+    })
+    .finally(() => {
+      pendingPujaKareRequests.delete(cacheKey);
+    });
+
+  pendingPujaKareRequests.set(cacheKey, request);
+  return request;
+};
+
+const getPujaKareItems = (response) => (Array.isArray(response?.data) ? response.data : []);
+
+const hasMorePujaKare = (response, limit) => getPujaKareItems(response).length >= limit;
+
 export default function PujaKare() {
-  const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const limit = 10;
+  const firstPageCacheKey = getPujaKareCacheKey(1, limit);
+  const cachedFirstPage = getValidCachedPujaKare(firstPageCacheKey);
+  const cachedFirstPageItems = getPujaKareItems(cachedFirstPage);
+  const [items, setItems] = useState(cachedFirstPageItems);
+  const [loading, setLoading] = useState(!cachedFirstPage);
   const [loadingMore, setLoadingMore] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
-  const limit = 10;
+  const [hasMore, setHasMore] = useState(() =>
+    cachedFirstPage ? hasMorePujaKare(cachedFirstPage, limit) : true
+  );
   const { updatePujaKareItems } = usePujaKare();
 
   const baseParams = useGA4BaseParams("Puja Kare Screen");
@@ -27,11 +80,16 @@ export default function PujaKare() {
   useEffect(() => {
     async function fetchItems() {
       try {
-        if (currentPage === 1) setLoading(true);
+        const cacheKey = getPujaKareCacheKey(currentPage, limit);
+        const hasCachedResponse = Boolean(getValidCachedPujaKare(cacheKey));
+
+        if (currentPage === 1) setLoading(!hasCachedResponse);
         else setLoadingMore(true);
         
-        const res = await pujaKareApis.getPujaKareItems(currentPage, limit);
-        const itemsData = res.data || [];
+        const res = await getCachedPujaKare(cacheKey, () =>
+          pujaKareApis.getPujaKareItems(currentPage, limit)
+        );
+        const itemsData = getPujaKareItems(res);
         
         if (currentPage === 1) {
           setItems(itemsData);
@@ -40,9 +98,7 @@ export default function PujaKare() {
         }
         
         // Check if there's more data
-        if (itemsData.length < limit) {
-          setHasMore(false);
-        }
+        setHasMore(hasMorePujaKare(res, limit));
         
         // Update context with the fetched data
         updatePujaKareItems(itemsData);

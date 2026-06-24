@@ -14,6 +14,41 @@ import { homeSchema } from "../seo/schemas";
 import { mantraApis } from "../api";
 import { LanguageContext } from "../contexts/LanguageContext";
 
+const MANTRA_CACHE_TTL = 5 * 60 * 1000;
+const mantraCache = new Map();
+const pendingMantraRequests = new Map();
+
+const getMantraCacheKey = (version, page, limit, language) =>
+  `mantra:${version}:${language}:${page}:${limit}`;
+
+const getCachedMantras = async (cacheKey, fetcher) => {
+  const cached = mantraCache.get(cacheKey);
+
+  if (cached && Date.now() - cached.timestamp < MANTRA_CACHE_TTL) {
+    return cached.data;
+  }
+
+  mantraCache.delete(cacheKey);
+
+  if (pendingMantraRequests.has(cacheKey)) {
+    return pendingMantraRequests.get(cacheKey);
+  }
+
+  const request = fetcher()
+    .then((data) => {
+      mantraCache.set(cacheKey, {
+        data,
+        timestamp: Date.now(),
+      });
+      return data;
+    })
+    .finally(() => {
+      pendingMantraRequests.delete(cacheKey);
+    });
+
+  pendingMantraRequests.set(cacheKey, request);
+  return request;
+};
 
 export default function Mantra() {
   const [items, setItems] = useState([]);
@@ -37,7 +72,11 @@ export default function Mantra() {
         if (currentPage === 1) setLoading(true);
         else setLoadingMore(true);
 
-        const json = await mantraApis.getMantras("v3", currentPage, limit, language);
+        const version = "v3";
+        const cacheKey = getMantraCacheKey(version, currentPage, limit, language);
+        const json = await getCachedMantras(cacheKey, () =>
+          mantraApis.getMantras(version, currentPage, limit, language)
+        );
 
         const dataArray = Array.isArray(json.data?.data) ? json.data.data : Array.isArray(json.data) ? json.data : [];
         const totalPages = json.pagination?.totalPages ?? 1;

@@ -19,6 +19,7 @@ import SchemaMarkup from "../components/SchemaMarkup";
 const API_BASE_URL = "https://api.bhaktibhav.app";
 const CACHE_TTL = 5 * 60 * 1000;
 const contentCache = new Map();
+const pendingContentRequests = new Map();
 
 const getCachedContent = async (cacheKey, fetcher) => {
   const cached = contentCache.get(cacheKey);
@@ -27,13 +28,37 @@ const getCachedContent = async (cacheKey, fetcher) => {
     return cached.data;
   }
 
-  const data = await fetcher();
-  contentCache.set(cacheKey, {
-    data,
-    timestamp: Date.now()
-  });
+  contentCache.delete(cacheKey);
 
-  return data;
+  if (pendingContentRequests.has(cacheKey)) {
+    return pendingContentRequests.get(cacheKey);
+  }
+
+  const request = fetcher()
+    .then((data) => {
+      contentCache.set(cacheKey, {
+        data,
+        timestamp: Date.now()
+      });
+      return data;
+    })
+    .finally(() => {
+      pendingContentRequests.delete(cacheKey);
+    });
+
+  pendingContentRequests.set(cacheKey, request);
+  return request;
+};
+
+const getValidCachedContent = (cacheKey) => {
+  const cached = contentCache.get(cacheKey);
+
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+    return cached.data;
+  }
+
+  contentCache.delete(cacheKey);
+  return null;
 };
 
 const getContentItems = (response) => {
@@ -45,6 +70,16 @@ const getContentItems = (response) => {
 };
 
 const getPagination = (response) => response?.data?.pagination || response?.pagination || null;
+
+const hasMoreContent = (response, items, page, limit) => {
+  const pagination = getPagination(response);
+
+  if (pagination?.totalPages) {
+    return page < pagination.totalPages;
+  }
+
+  return items.length >= limit;
+};
 
 const getTitle = (item, language) => {
   if (typeof item?.title === "string") return item.title;
@@ -63,17 +98,7 @@ export default function NewJaapMala() {
   const location = useLocation();
   const { categoryId: categoryIdParam } = useParams();
   const { language } = useContext(LanguageContext);
-  const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
   const limit = 10;
-
-  const isSubscribed = useMemo(() => getSubscriptionStatusFromLS(), []);
-  const hasToken = useMemo(() => getTokenFromLS(), []);
-  const baseParams = useGA4BaseParams("New Jaap Mala Screen");
-  const { trackEvent } = useGA4Tracker(baseParams);
   const queryParams = useMemo(() => new URLSearchParams(location.search), [location.search]);
   const categoryId =
     categoryIdParam ||
@@ -81,12 +106,32 @@ export default function NewJaapMala() {
     location.state?.categoryId ||
     location.state?._id ||
     "";
+  const firstPageCacheKey = `new-jaap-mala:${categoryId}:${language}:1:${limit}`;
+  const initialCachedResponse = getValidCachedContent(firstPageCacheKey);
+  const initialCachedItems = getContentItems(initialCachedResponse);
+
+  const [items, setItems] = useState(initialCachedItems);
+  const [loading, setLoading] = useState(!initialCachedResponse);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasMore, setHasMore] = useState(() =>
+    initialCachedResponse ? hasMoreContent(initialCachedResponse, initialCachedItems, 1, limit) : true
+  );
+
+  const isSubscribed = useMemo(() => getSubscriptionStatusFromLS(), []);
+  const hasToken = useMemo(() => getTokenFromLS(), []);
+  const baseParams = useGA4BaseParams("New Jaap Mala Screen");
+  const { trackEvent } = useGA4Tracker(baseParams);
 
   useEffect(() => {
-    setItems([]);
+    const cachedResponse = getValidCachedContent(firstPageCacheKey);
+    const cachedItems = getContentItems(cachedResponse);
+
+    setItems(cachedItems);
     setCurrentPage(1);
-    setHasMore(true);
-  }, [categoryId, language]);
+    setHasMore(cachedResponse ? hasMoreContent(cachedResponse, cachedItems, 1, limit) : true);
+    setLoading(!cachedResponse);
+  }, [firstPageCacheKey, limit]);
 
   useEffect(() => {
     let isActive = true;
@@ -102,29 +147,24 @@ export default function NewJaapMala() {
       }
 
       try {
+        const cacheKey = `new-jaap-mala:${categoryId}:${language}:${currentPage}:${limit}`;
+        const hasCachedResponse = Boolean(getValidCachedContent(cacheKey));
+
         if (currentPage === 1) {
-          setLoading(true);
+          setLoading(!hasCachedResponse);
         } else {
           setLoadingMore(true);
         }
 
-        const cacheKey = `new-jaap-mala:${categoryId}:${language}:${currentPage}:${limit}`;
         const response = await getCachedContent(cacheKey, () =>
           categoryContentApis.fetchContentDataByCategoryId(categoryId, language, currentPage, limit)
         );
 
         const nextItems = getContentItems(response);
-        const pagination = getPagination(response);
-
         if (!isActive) return;
 
         setItems((prevItems) => (currentPage === 1 ? nextItems : [...prevItems, ...nextItems]));
-
-        if (pagination?.totalPages) {
-          setHasMore(currentPage < pagination.totalPages);
-        } else {
-          setHasMore(nextItems.length >= limit);
-        }
+        setHasMore(hasMoreContent(response, nextItems, currentPage, limit));
       } catch (error) {
         if (!isActive) return;
         console.error("New Jaap Mala API Error:", error);

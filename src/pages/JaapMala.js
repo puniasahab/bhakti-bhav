@@ -15,6 +15,42 @@ import { LanguageContext } from "../contexts/LanguageContext";
 import { jaapMalaSchema } from "../schemas/pageSchemas";
 import SchemaMarkup from "../components/SchemaMarkup";
 
+const JAAP_MALA_CACHE_TTL = 5 * 60 * 1000;
+const jaapMalaCache = new Map();
+const pendingJaapMalaRequests = new Map();
+
+const getJaapMalaCacheKey = (version, page, limit, language) =>
+  `jaap-mala:${version}:${language}:${page}:${limit}`;
+
+const getCachedJaapMalaData = async (cacheKey, fetcher) => {
+  const cached = jaapMalaCache.get(cacheKey);
+
+  if (cached && Date.now() - cached.timestamp < JAAP_MALA_CACHE_TTL) {
+    return cached.data;
+  }
+
+  jaapMalaCache.delete(cacheKey);
+
+  if (pendingJaapMalaRequests.has(cacheKey)) {
+    return pendingJaapMalaRequests.get(cacheKey);
+  }
+
+  const request = fetcher()
+    .then((data) => {
+      jaapMalaCache.set(cacheKey, {
+        data,
+        timestamp: Date.now(),
+      });
+      return data;
+    })
+    .finally(() => {
+      pendingJaapMalaRequests.delete(cacheKey);
+    });
+
+  pendingJaapMalaRequests.set(cacheKey, request);
+  return request;
+};
+
 function JaapMala() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -38,8 +74,11 @@ function JaapMala() {
         if (currentPage === 1) setLoading(true);
         else setLoadingMore(true);
         
-        // Use naamJaapApis for fetching
-        const result = await naamJaapApis.getNaamJaapData("v3", currentPage, limit, language);
+        const version = "v3";
+        const cacheKey = getJaapMalaCacheKey(version, currentPage, limit, language);
+        const result = await getCachedJaapMalaData(cacheKey, () =>
+          naamJaapApis.getNaamJaapData(version, currentPage, limit, language)
+        );
 
         const dataArray = Array.isArray(result.data?.items) ? result.data.items : Array.isArray(result.data?.data) ? result.data.data : Array.isArray(result.data) ? result.data : [];
         const totalPages = result.pagination?.totalPages ?? 1;

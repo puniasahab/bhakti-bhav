@@ -14,9 +14,62 @@ import { homeSchema } from "../seo/schemas";
 import { hindiCalendarSchema } from "../schemas/pageSchemas";
 import SchemaMarkup from "../components/SchemaMarkup";
 
+const HINDI_CALENDAR_CACHE_KEY = "hindi-calendar:panchang-calendar";
+const HINDI_CALENDAR_CACHE_TTL = 5 * 60 * 1000;
+const hindiCalendarCache = new Map();
+const pendingHindiCalendarRequests = new Map();
+
+const getValidCachedCalendar = () => {
+  const cached = hindiCalendarCache.get(HINDI_CALENDAR_CACHE_KEY);
+
+  if (cached && Date.now() - cached.timestamp < HINDI_CALENDAR_CACHE_TTL) {
+    return cached.data;
+  }
+
+  hindiCalendarCache.delete(HINDI_CALENDAR_CACHE_KEY);
+  return null;
+};
+
+const fetchCachedCalendar = async () => {
+  const cached = getValidCachedCalendar();
+
+  if (cached) {
+    return cached;
+  }
+
+  if (pendingHindiCalendarRequests.has(HINDI_CALENDAR_CACHE_KEY)) {
+    return pendingHindiCalendarRequests.get(HINDI_CALENDAR_CACHE_KEY);
+  }
+
+  const request = fetch("https://api.bhaktibhav.app/frontend/panchang-calendar")
+    .then((res) => res.json())
+    .then((json) => {
+      hindiCalendarCache.set(HINDI_CALENDAR_CACHE_KEY, {
+        data: json,
+        timestamp: Date.now()
+      });
+      return json;
+    })
+    .finally(() => {
+      pendingHindiCalendarRequests.delete(HINDI_CALENDAR_CACHE_KEY);
+    });
+
+  pendingHindiCalendarRequests.set(HINDI_CALENDAR_CACHE_KEY, request);
+  return request;
+};
+
+const getCalendarMonths = (json) => {
+  if (json?.status === "success" && json.data && Array.isArray(json.data.data)) {
+    return json.data.data;
+  }
+
+  return [];
+};
+
 export default function HindiCalendar() {
-  const [months, setMonths] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const cachedCalendar = getValidCachedCalendar();
+  const [months, setMonths] = useState(() => getCalendarMonths(cachedCalendar));
+  const [loading, setLoading] = useState(!cachedCalendar);
   const navigate = useNavigate();
 
   const baseParams = useGA4BaseParams("Hindi Calendar Screen");
@@ -24,15 +77,14 @@ export default function HindiCalendar() {
   useEffect(() => {
     async function fetchCalendar() {
       try {
-        const res = await fetch("https://api.bhaktibhav.app/frontend/panchang-calendar");
-        const json = await res.json();
+        if (!getValidCachedCalendar()) {
+          setLoading(true);
+        }
+
+        const json = await fetchCachedCalendar();
         console.log("Calendar data", json);
 
-        if (json.status === "success" && json.data && Array.isArray(json.data.data)) {
-          setMonths(json.data.data);
-        } else {
-          setMonths([]);
-        }
+        setMonths(getCalendarMonths(json));
       } catch (error) {
         console.error("API Error:", error);
         setMonths([]);

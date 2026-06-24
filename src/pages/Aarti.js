@@ -13,6 +13,42 @@ import { homeSchema } from "../seo/schemas";
 import { aartiApis } from "../api";
 import { LanguageContext } from "../contexts/LanguageContext";
 
+const AARTI_CACHE_TTL = 5 * 60 * 1000;
+const aartiCache = new Map();
+const pendingAartiRequests = new Map();
+
+const getAartiCacheKey = (version, page, limit, language) =>
+  `aarti:${version}:${language}:${page}:${limit}`;
+
+const getCachedAartis = async (cacheKey, fetcher) => {
+  const cached = aartiCache.get(cacheKey);
+
+  if (cached && Date.now() - cached.timestamp < AARTI_CACHE_TTL) {
+    return cached.data;
+  }
+
+  aartiCache.delete(cacheKey);
+
+  if (pendingAartiRequests.has(cacheKey)) {
+    return pendingAartiRequests.get(cacheKey);
+  }
+
+  const request = fetcher()
+    .then((data) => {
+      aartiCache.set(cacheKey, {
+        data,
+        timestamp: Date.now(),
+      });
+      return data;
+    })
+    .finally(() => {
+      pendingAartiRequests.delete(cacheKey);
+    });
+
+  pendingAartiRequests.set(cacheKey, request);
+  return request;
+};
+
 export default function Aarti() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -36,8 +72,11 @@ export default function Aarti() {
         if (currentPage === 1) setLoading(true);
         else setLoadingMore(true);
 
-        // Use aartiApis for fetching
-        const json = await aartiApis.getAartis("v3", currentPage, limit, language);
+        const version = "v3";
+        const cacheKey = getAartiCacheKey(version, currentPage, limit, language);
+        const json = await getCachedAartis(cacheKey, () =>
+          aartiApis.getAartis(version, currentPage, limit, language)
+        );
 
         const dataArray = Array.isArray(json.data?.items) ? json.data.items
           : Array.isArray(json.data?.data) ? json.data.data

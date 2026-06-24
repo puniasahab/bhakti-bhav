@@ -12,6 +12,53 @@ const api = axios.create({
   },
 });
 
+const pendingGetRequests = new Map();
+
+const normalizeRequestPart = (value) => {
+  if (!value || typeof value !== "object") return value || null;
+
+  return Object.keys(value)
+    .sort()
+    .reduce((acc, key) => {
+      acc[key] = value[key];
+      return acc;
+    }, {});
+};
+
+const getPendingRequestKey = (client, url, config = {}) => {
+  const token = getTokenFromLS();
+
+  return JSON.stringify({
+    baseURL: config.baseURL || client.defaults.baseURL,
+    url,
+    params: normalizeRequestPart(config.params),
+    token: token || "",
+  });
+};
+
+const addGetRequestDeduplication = (client) => {
+  const originalGet = client.get.bind(client);
+
+  client.get = (url, config = {}) => {
+    const requestKey = getPendingRequestKey(client, url, config);
+
+    if (pendingGetRequests.has(requestKey)) {
+      return pendingGetRequests.get(requestKey);
+    }
+
+    const request = originalGet(url, config).finally(() => {
+      pendingGetRequests.delete(requestKey);
+    });
+
+    pendingGetRequests.set(requestKey, request);
+    return request;
+  };
+
+  return client;
+};
+
+addGetRequestDeduplication(api);
+
 
 api.interceptors.request.use(
   (config) => {
@@ -327,6 +374,8 @@ const coreApi = axios.create({
     'Content-Type': 'application/json',
   },
 });
+
+addGetRequestDeduplication(coreApi);
 
 coreApi.interceptors.request.use(
   (config) => {

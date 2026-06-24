@@ -13,15 +13,82 @@ import useGA4Tracker from "../hooks/useGA4Tracker";
 import SchemaMarkup from "../components/SchemaMarkup";
 import { wallpaperSchema } from "../schemas/pageSchemas";
 
+const WALLPAPER_CACHE_TTL = 5 * 60 * 1000;
+const wallpaperPageCache = new Map();
+const pendingWallpaperRequests = new Map();
+const WALLPAPER_CATEGORIES_CACHE_KEY = "wallpaper:categories";
+
+const getWallpaperApiUrl = (category, page, limit) =>
+  category === "All"
+    ? `https://api.bhaktibhav.app/frontend/wallpapers?page=${page}&limit=${limit}`
+    : `https://api.bhaktibhav.app/frontend/wallpapers?categoryId=${category}&page=${page}&limit=${limit}`;
+
+const getWallpaperCacheKey = (category, page, limit) =>
+  `wallpaper:${category}:${page}:${limit}`;
+
+const getValidWallpaperCache = (cacheKey) => {
+  const cached = wallpaperPageCache.get(cacheKey);
+
+  if (cached && Date.now() - cached.timestamp < WALLPAPER_CACHE_TTL) {
+    return cached.data;
+  }
+
+  wallpaperPageCache.delete(cacheKey);
+  return null;
+};
+
+const setWallpaperCache = (cacheKey, data) => {
+  wallpaperPageCache.set(cacheKey, {
+    data,
+    timestamp: Date.now(),
+  });
+};
+
+const getCachedWallpapers = async (cacheKey, apiUrl) => {
+  const cached = getValidWallpaperCache(cacheKey);
+
+  if (cached) {
+    return cached;
+  }
+
+  if (pendingWallpaperRequests.has(cacheKey)) {
+    return pendingWallpaperRequests.get(cacheKey);
+  }
+
+  const request = cachedFetch(apiUrl, {}, WALLPAPER_CACHE_TTL)
+    .then((data) => {
+      setWallpaperCache(cacheKey, data);
+      return data;
+    })
+    .finally(() => {
+      pendingWallpaperRequests.delete(cacheKey);
+    });
+
+  pendingWallpaperRequests.set(cacheKey, request);
+  return request;
+};
+
+const getWallpaperItems = (response) =>
+  response?.status === "success" && Array.isArray(response.data) ? response.data : [];
+
+const hasMoreWallpapers = (response, limit) => getWallpaperItems(response).length >= limit;
+
 export default function Wallpaper() {
-  const [wallpapers, setWallpapers] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
   const limit = 10;
   const [activeCategory, setActiveCategory] = useState("All");
-  const [categories, setCategories] = useState([]);
+  const firstPageCacheKey = getWallpaperCacheKey(activeCategory, 1, limit);
+  const cachedFirstPage = getValidWallpaperCache(firstPageCacheKey);
+  const [wallpapers, setWallpapers] = useState(() => getWallpaperItems(cachedFirstPage));
+  const [loading, setLoading] = useState(!cachedFirstPage);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasMore, setHasMore] = useState(() =>
+    cachedFirstPage ? hasMoreWallpapers(cachedFirstPage, limit) : true
+  );
+  const cachedCategories = getValidWallpaperCache(WALLPAPER_CATEGORIES_CACHE_KEY);
+  const [categories, setCategories] = useState(
+    () => cachedCategories || [{ _id: "All", name: { en: "All" } }]
+  );
 
   // Memoize subscription status to prevent re-computation on each render
   const isSubscribed = useMemo(() => getSubscriptionStatusFromLS(), []);
@@ -33,15 +100,14 @@ export default function Wallpaper() {
   useEffect(() => {
     const fetchWallpapers = async () => {
       try {
-        if (currentPage === 1) setLoading(true);
+        const cacheKey = getWallpaperCacheKey(activeCategory, currentPage, limit);
+        const apiUrl = getWallpaperApiUrl(activeCategory, currentPage, limit);
+        const hasCachedResponse = Boolean(getValidWallpaperCache(cacheKey));
+
+        if (currentPage === 1) setLoading(!hasCachedResponse);
         else setLoadingMore(true);
-        
-        let apiUrl = activeCategory === "All"
-          ? `https://api.bhaktibhav.app/frontend/wallpapers?page=${currentPage}&limit=${limit}`
-          : `https://api.bhaktibhav.app/frontend/wallpapers?categoryId=${activeCategory}&page=${currentPage}&limit=${limit}`;
-        
-        // Use cached fetch for better performance
-        const resJson = await cachedFetch(apiUrl, {}, 5 * 60 * 1000);
+
+        const resJson = await getCachedWallpapers(cacheKey, apiUrl);
         
         if (resJson.status === "success" && Array.isArray(resJson.data)) {
           setLoading(false);
@@ -84,15 +150,29 @@ export default function Wallpaper() {
     if (currentPage !== 1) {
       setCurrentPage(1);
     }
-    setHasMore(true);
+    const cacheKey = getWallpaperCacheKey(activeCategory, 1, limit);
+    const cachedResponse = getValidWallpaperCache(cacheKey);
+
+    setWallpapers(getWallpaperItems(cachedResponse));
+    setHasMore(cachedResponse ? hasMoreWallpapers(cachedResponse, limit) : true);
+    setLoading(!cachedResponse);
   }, [activeCategory]);
 
   // Fetch categories
   useEffect(() => {
     const getData = async () => {
       try {
+        const cached = getValidWallpaperCache(WALLPAPER_CATEGORIES_CACHE_KEY);
+
+        if (cached) {
+          setCategories(cached);
+          return;
+        }
+
         const data = await wallpaperApis.getWallpaperCategories();
-        setCategories([{ _id: "All", name: { en: "All" } }, ...data.data]);
+        const nextCategories = [{ _id: "All", name: { en: "All" } }, ...data.data];
+        setWallpaperCache(WALLPAPER_CATEGORIES_CACHE_KEY, nextCategories);
+        setCategories(nextCategories);
       } catch (error) {
         console.error("Error fetching wallpaper categories:", error);
       }

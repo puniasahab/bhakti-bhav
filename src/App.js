@@ -1,4 +1,4 @@
-import { useState, useEffect, Suspense, lazy } from "react";
+import { useState, useEffect } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { HelmetProvider } from 'react-helmet-async'
 import { pageView } from './utils/metaPixel';
@@ -20,58 +20,45 @@ import Splash from "./pages/Splash";
 // should never show a loader when navigating back from other screens
 import Home from "./pages/Home";
 
-// Lazy load all other pages for code splitting
-const VratKatha = lazy(() => import("./pages/VratKatha"));
-const VratKathaDetail = lazy(() => import("./pages/VratKathaDetail"));
-const VratKathaCategoryDetails = lazy(() => import("./pages/VratKathaCategoryDetails"));
-const JaapMala = lazy(() => import("./pages/JaapMala"));
-const NewJaapMala = lazy(() => import("./pages/NewJaapMala"));
-const NewJaapMalaDetails = lazy(() => import("./pages/NewJaapMalaDetails"));
-const JaapMalaDetail = lazy(() => import("./pages/JaapMalaDetail"));
-const Mantra = lazy(() => import("./pages/Mantra"));
-const MantraDetail = lazy(() => import("./pages/MantraDetail"));
-const Aarti = lazy(() => import("./pages/Aarti"));
-const AartiDetail = lazy(() => import("./pages/AartiDetail"));
-const Wallpaper = lazy(() => import("./pages/Wallpaper"));
-const WallpaperDetail = lazy(() => import("./pages/WallpaperDetail"));
-const Rashifal = lazy(() => import("./pages/Rashifal"));
-const HindiCalendar = lazy(() => import("./pages/HindiCalendar"));
-const HindiCalendarDetail = lazy(() => import("./pages/HindiCalendarDetail"));
-const PujaKare = lazy(() => import("./pages/PujaKare"));
-const PujaKareDetail = lazy(() => import("./pages/PujaKareDetail"));
-const Chalisa = lazy(() => import("./pages/Chalisa"));
-const ChalisaDetail = lazy(() => import("./pages/ChalisaDetail"));
-const Login = lazy(() => import("./pages/Login"));
-const VerifyOtp = lazy(() => import("./pages/VerifyOtp"));
-const TermsAndConditions = lazy(() => import("./pages/TermsPolicy"));
-const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
-const AboutUs = lazy(() => import("./pages/AboutUs"));
-const EditProfile = lazy(() => import("./pages/EditProfile"));
-const Profile = lazy(() => import("./pages/Profile"));
-const Payment = lazy(() => import("./pages/Payment"));
-const Transactions = lazy(() => import("./pages/transactions"));
-const PaymentPage = lazy(() => import("./pages/PaymentPage"));
-const Kundli = lazy(() => import("./pages/kundli"));
-const ParsadPage = lazy(() => import("./pages/ParsadPage"));
-const WinnersList = lazy(() => import("./pages/WinnersList"));
-const Blogs = lazy(() => import("./pages/Blogs"));
-const BlogDetail = lazy(() => import("./pages/BlogDetail"));
-const PaymentComplete = lazy(() => import("./pages/PaymentComplete"));
-const ContactUs = lazy(() => import("./pages/ContactUs"));
-const Kahaniya = lazy(() => import("./pages/Kahaniya"));
-const KahaniyaDetails = lazy(() => import("./pages/KahaniyaDetails"));
-
-// Preload commonly accessed routes after initial render
-const preloadCommonRoutes = () => {
-  setTimeout(() => {
-    import("./pages/Aarti");
-    import("./pages/Chalisa");
-    import("./pages/Mantra");
-    import("./pages/JaapMala");
-    import("./pages/NewJaapMala");
-    import("./pages/NewJaapMalaDetails");
-  }, 2000);
-};
+import VratKatha from "./pages/VratKatha";
+import VratKathaDetail from "./pages/VratKathaDetail";
+import VratKathaCategoryDetails from "./pages/VratKathaCategoryDetails";
+import JaapMala from "./pages/JaapMala";
+import NewJaapMala from "./pages/NewJaapMala";
+import NewJaapMalaDetails from "./pages/NewJaapMalaDetails";
+import JaapMalaDetail from "./pages/JaapMalaDetail";
+import Mantra from "./pages/Mantra";
+import MantraDetail from "./pages/MantraDetail";
+import Aarti from "./pages/Aarti";
+import AartiDetail from "./pages/AartiDetail";
+import Wallpaper from "./pages/Wallpaper";
+import WallpaperDetail from "./pages/WallpaperDetail";
+import Rashifal from "./pages/Rashifal";
+import HindiCalendar from "./pages/HindiCalendar";
+import HindiCalendarDetail from "./pages/HindiCalendarDetail";
+import PujaKare from "./pages/PujaKare";
+import PujaKareDetail from "./pages/PujaKareDetail";
+import Chalisa from "./pages/Chalisa";
+import ChalisaDetail from "./pages/ChalisaDetail";
+import Login from "./pages/Login";
+import VerifyOtp from "./pages/VerifyOtp";
+import TermsAndConditions from "./pages/TermsPolicy";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import AboutUs from "./pages/AboutUs";
+import EditProfile from "./pages/EditProfile";
+import Profile from "./pages/Profile";
+import Payment from "./pages/Payment";
+import Transactions from "./pages/transactions";
+import PaymentPage from "./pages/PaymentPage";
+import Kundli from "./pages/kundli";
+import ParsadPage from "./pages/ParsadPage";
+import WinnersList from "./pages/WinnersList";
+import Blogs from "./pages/Blogs";
+import BlogDetail from "./pages/BlogDetail";
+import PaymentComplete from "./pages/PaymentComplete";
+import ContactUs from "./pages/ContactUs";
+import Kahaniya from "./pages/Kahaniya";
+import KahaniyaDetails from "./pages/KahaniyaDetails";
 
 // Wrapper that marks the login flow source when /home-v1 is accessed
 function HomeV1Wrapper() {
@@ -91,8 +78,6 @@ function HomeWrapper() {
 
 function App() {
 
-  const FIREBASE_DEBUG_MODE = true;
-  localStorage.setItem("debug_mode", String(FIREBASE_DEBUG_MODE));
   const location = useLocation();
   const [loading, setLoading] = useState(() => {
     // Only show splash on first visit to home page, never again in this session
@@ -102,10 +87,17 @@ function App() {
   });
 
   useEffect(() => {
+    if (process.env.REACT_APP_FIREBASE_DEBUG_MODE === "true") {
+      localStorage.setItem("debug_mode", "true");
+    } else {
+      localStorage.removeItem("debug_mode");
+    }
+  }, []);
+
+  useEffect(() => {
     // If splash was already shown, never show it again
     if (sessionStorage.getItem("splashShown")) {
       setLoading(false);
-      preloadCommonRoutes();
       return;
     }
 
@@ -115,13 +107,11 @@ function App() {
       const timer = setTimeout(() => {
         setLoading(false);
         sessionStorage.setItem("splashShown", "true");
-        preloadCommonRoutes();
       }, 600);
       return () => clearTimeout(timer);
     } else {
       setLoading(false);
       sessionStorage.setItem("splashShown", "true");
-      preloadCommonRoutes();
     }
     // Only run once on mount — do NOT re-run on location changes
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -153,50 +143,49 @@ function App() {
                     {/* Home is directly imported — no Suspense, no loader, instant render */}
                     <Route path="/" element={<HomeWrapper />} />
                     <Route path="/home-v1" element={<HomeV1Wrapper />} />
-                    {/* All other routes are lazy-loaded with Suspense (no fallback loader) */}
-                    <Route path="/vrat-katha" element={<Suspense><VratKatha /></Suspense>} />
-                    <Route path="/vrat-katha/:id" element={<Suspense><VratKathaDetail /></Suspense>} />
-                    <Route path="/vrat-katha/:id/date/:date" element={<Suspense><VratKathaDetail /></Suspense>} />
-                    <Route path="/vrat-katha/categoryDetails/:id" element={<Suspense><VratKathaCategoryDetails /></Suspense>} />
-                    <Route path="/jaap-mala" element={<Suspense><JaapMala /></Suspense>} />
-                    <Route path="/newjaapMaala" element={<Suspense><NewJaapMala /></Suspense>} />
-                    <Route path="/newjaapMaala/:categoryId" element={<Suspense><NewJaapMala /></Suspense>} />
-                    <Route path="/newJaapMaala-details/:id" element={<Suspense><NewJaapMalaDetails /></Suspense>} />
-                    <Route path="/newjaapMaala-details/:id" element={<Suspense><NewJaapMalaDetails /></Suspense>} />
-                    <Route path="/jaapmala/:id" element={<Suspense><JaapMalaDetail /></Suspense>} />
-                    <Route path="/mantra" element={<Suspense><Mantra /></Suspense>} />
-                    <Route path="/mantra/:id" element={<Suspense><MantraDetail /></Suspense>} />
-                    <Route path="/aarti" element={<Suspense><Aarti /></Suspense>} />
-                    <Route path="/aarti/:id" element={<Suspense><AartiDetail /></Suspense>} />
-                    <Route path="/wallpaper" element={<Suspense><Wallpaper /></Suspense>} />
-                    <Route path="/wallpaper/:id" element={<Suspense><WallpaperDetail /></Suspense>} />
-                    <Route path="/rashifal" element={<Suspense><Rashifal /></Suspense>} />
-                    <Route path="/hindi-calendar" element={<Suspense><HindiCalendar /></Suspense>} />
-                    <Route path="/hindi-calendar/:id" element={<Suspense><HindiCalendarDetail /></Suspense>} />
-                    <Route path="/puja-kare" element={<Suspense><PujaKare /></Suspense>} />
-                    <Route path="/puja-kare/:id" element={<Suspense><PujaKareDetail /></Suspense>} />
-                    <Route path="/chalisa" element={<Suspense><Chalisa /></Suspense>} />
-                    <Route path="/chalisa/:id" element={<Suspense><ChalisaDetail /></Suspense>} />
-                    <Route path="/login" element={<Suspense><Login /></Suspense>} />
-                    <Route path="/verify-otp" element={<Suspense><VerifyOtp /></Suspense>} />
-                    <Route path="/termsAndConditions" element={<Suspense><TermsAndConditions /></Suspense>} />
-                    <Route path="/privacyPolicy" element={<Suspense><PrivacyPolicy /></Suspense>} />
-                    <Route path="/aboutUs" element={<Suspense><AboutUs /></Suspense>} />
-                    <Route path="/profile" element={<Suspense><Profile /></Suspense>} />
-                    <Route path="/edit-profile" element={<Suspense><EditProfile /></Suspense>} />
-                    <Route path="/payment" element={<Suspense><Payment /></Suspense>} />
-                    <Route path="/transactions" element={<Suspense><Transactions /></Suspense>} />
-                    <Route path="/paymentPage" element={<Suspense><PaymentPage /></Suspense>} />
-                    <Route path="/kundli" element={<Suspense><Kundli /></Suspense>} />
-                    <Route path="/parsad" element={<Suspense><ParsadPage /></Suspense>} />
-                    <Route path="/winners" element={<Suspense><WinnersList /></Suspense>} />
-                    <Route path="/blogs" element={<Suspense><Blogs /></Suspense>} />
-                    <Route path="/blogs/:id" element={<Suspense><BlogDetail /></Suspense>} />
-                    <Route path="/payment-complete" element={<Suspense><PaymentComplete /></Suspense>} />
-                    <Route path="/contact-us" element={<Suspense><ContactUs /></Suspense>} />
-                    <Route path="/kahaniya" element={<Suspense><Kahaniya /></Suspense>} />
-                    <Route path="/kahaniya/:categoryId" element={<Suspense><Kahaniya /></Suspense>} />
-                    <Route path="/kahaniya-details/:contentId" element={<Suspense><KahaniyaDetails /></Suspense>} />
+                    <Route path="/vrat-katha" element={<VratKatha />} />
+                    <Route path="/vrat-katha/:id" element={<VratKathaDetail />} />
+                    <Route path="/vrat-katha/:id/date/:date" element={<VratKathaDetail />} />
+                    <Route path="/vrat-katha/categoryDetails/:id" element={<VratKathaCategoryDetails />} />
+                    <Route path="/jaap-mala" element={<JaapMala />} />
+                    <Route path="/newjaapMaala" element={<NewJaapMala />} />
+                    <Route path="/newjaapMaala/:categoryId" element={<NewJaapMala />} />
+                    <Route path="/newJaapMaala-details/:id" element={<NewJaapMalaDetails />} />
+                    <Route path="/newjaapMaala-details/:id" element={<NewJaapMalaDetails />} />
+                    <Route path="/jaapmala/:id" element={<JaapMalaDetail />} />
+                    <Route path="/mantra" element={<Mantra />} />
+                    <Route path="/mantra/:id" element={<MantraDetail />} />
+                    <Route path="/aarti" element={<Aarti />} />
+                    <Route path="/aarti/:id" element={<AartiDetail />} />
+                    <Route path="/wallpaper" element={<Wallpaper />} />
+                    <Route path="/wallpaper/:id" element={<WallpaperDetail />} />
+                    <Route path="/rashifal" element={<Rashifal />} />
+                    <Route path="/hindi-calendar" element={<HindiCalendar />} />
+                    <Route path="/hindi-calendar/:id" element={<HindiCalendarDetail />} />
+                    <Route path="/puja-kare" element={<PujaKare />} />
+                    <Route path="/puja-kare/:id" element={<PujaKareDetail />} />
+                    <Route path="/chalisa" element={<Chalisa />} />
+                    <Route path="/chalisa/:id" element={<ChalisaDetail />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/verify-otp" element={<VerifyOtp />} />
+                    <Route path="/termsAndConditions" element={<TermsAndConditions />} />
+                    <Route path="/privacyPolicy" element={<PrivacyPolicy />} />
+                    <Route path="/aboutUs" element={<AboutUs />} />
+                    <Route path="/profile" element={<Profile />} />
+                    <Route path="/edit-profile" element={<EditProfile />} />
+                    <Route path="/payment" element={<Payment />} />
+                    <Route path="/transactions" element={<Transactions />} />
+                    <Route path="/paymentPage" element={<PaymentPage />} />
+                    <Route path="/kundli" element={<Kundli />} />
+                    <Route path="/parsad" element={<ParsadPage />} />
+                    <Route path="/winners" element={<WinnersList />} />
+                    <Route path="/blogs" element={<Blogs />} />
+                    <Route path="/blogs/:id" element={<BlogDetail />} />
+                    <Route path="/payment-complete" element={<PaymentComplete />} />
+                    <Route path="/contact-us" element={<ContactUs />} />
+                    <Route path="/kahaniya" element={<Kahaniya />} />
+                    <Route path="/kahaniya/:categoryId" element={<Kahaniya />} />
+                    <Route path="/kahaniya-details/:contentId" element={<KahaniyaDetails />} />
                   </Routes>
                   <GlobalAudioPlayer />
                 </PujaKareProvider>
