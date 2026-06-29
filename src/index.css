@@ -314,6 +314,38 @@ body::before {
   display: inline;
 }
 
+.new-jaap-title-scroll .new-jaap-hinglish-title {
+  display: inline-block;
+  margin: 0 4px 4px;
+  vertical-align: top;
+}
+
+.new-jaap-hinglish-title-hi,
+.new-jaap-hinglish-title-en {
+  display: block;
+  white-space: nowrap;
+}
+
+.new-jaap-hinglish-title-hi {
+  font-family: 'Noto Sans Devanagari', 'Mangal', sans-serif;
+  font-size: clamp(13px, 3.4vw, 18px);
+  line-height: 1.15;
+}
+
+.new-jaap-hinglish-title-en {
+  font-family: "PoppinsRegular";
+  font-size: clamp(10px, 2.7vw, 14px);
+  line-height: 1.05;
+}
+
+.new-jaap-hinglish-title-hi-page {
+  font-size: 18px;
+}
+
+.new-jaap-hinglish-title-en-page {
+  font-size: 13px;
+}
+
 .new-jaap-title-scroll span::after {
   content: " ";
 }
@@ -443,6 +475,19 @@ body::before {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.new-jaap-mala-title-hinglish {
+  white-space: normal;
+  text-overflow: clip;
+}
+
+.new-jaap-mala-title-hinglish .new-jaap-hinglish-title-hi {
+  font-size: clamp(10px, 2.8vw, 13px);
+}
+
+.new-jaap-mala-title-hinglish .new-jaap-hinglish-title-en {
+  font-size: clamp(8px, 2.2vw, 11px);
 }
 
 .new-jaap-modal-backdrop {
@@ -680,6 +725,12 @@ body::before {
   left: 0;
   right: 0;
 } 
+
+.overflow_bg.kahaniya-hinglish-title::before {
+  height: 54px;
+  max-height: 82px;
+  top: 63%;
+}
 
 .custom-circle {
   list-style-type: circle; /* ensures a hollow dot */

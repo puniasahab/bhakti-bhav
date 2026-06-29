@@ -6,5 +6,9 @@
   "en": {
     "aajKaRashifal": "Aaj Ka Rashifal",
     "panchang": "Panchang"
+  },
+  "hinglish": {
+    "aajKaRashifal": "<p>आज का राशिफल</br>(Aaj Ka Rashifal)</p>",
+    "panchang": "<p>पंचांग</br>(Panchang)</p>"
   }
 }

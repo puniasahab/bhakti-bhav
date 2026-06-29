@@ -19,6 +19,49 @@ const normalizeAssetUrl = (url) => {
 
 const getContentDetail = (response) => response?.data || response || null;
 
+const stripHtmlTags = (value) => String(value || "").replace(/<[^>]*>/g, "").trim();
+
+const getHinglishTitleParts = (title) => {
+  const normalizedTitle = String(title || "")
+    .replace(/<\/?p[^>]*>/gi, "")
+    .trim();
+  const [hindiText = "", englishText = ""] = normalizedTitle.split(/<\/?br\s*\/?>/i);
+  const cleanHindiText = stripHtmlTags(hindiText);
+  const cleanEnglishText = stripHtmlTags(englishText);
+
+  if (!cleanEnglishText) {
+    const titleWithoutTags = stripHtmlTags(normalizedTitle);
+    const parenthesizedEnglish = titleWithoutTags.match(/^(.*?)\s*(\([^()]*[A-Za-z][^()]*\))\s*$/);
+
+    if (parenthesizedEnglish) {
+      return {
+        hindiText: parenthesizedEnglish[1].trim(),
+        englishText: parenthesizedEnglish[2].trim()
+      };
+    }
+  }
+
+  return {
+    hindiText: cleanHindiText,
+    englishText: cleanEnglishText
+  };
+};
+
+const renderHinglishTitle = (title) => {
+  const { hindiText, englishText } = getHinglishTitleParts(title);
+
+  if (!englishText) {
+    return <span className="font-eng">{stripHtmlTags(title)}</span>;
+  }
+
+  return (
+    <>
+      <span className="block font-hindi text-[19px]">{hindiText}</span>
+      <span className="block font-eng text-[14px] leading-tight">{englishText}</span>
+    </>
+  );
+};
+
 export default function KahaniyaDetails() {
   const { contentId } = useParams();
   const location = useLocation();
@@ -67,6 +110,7 @@ export default function KahaniyaDetails() {
   const audioUrl = normalizeAssetUrl(detail?.audioUrl);
   const contentHtml = detail?.description || detail?.khaniya || "";
   const isCurrentAudioPlaying = audioUrl && currentTrack === audioUrl && isPlaying;
+  const pageTitleEn = language === "hinglish" ? renderHinglishTitle(title) : title;
 
   const labels = {
     share: {
@@ -159,7 +203,7 @@ const datePublished = formatDate(new Date());
       <div className="h-2"></div>
       <PageTitleCard
         titleHi={language === "hi" ? replaceSpecialChars(title) : ""}
-        titleEn={language === "hi" ? "" : title}
+        titleEn={language === "hi" ? "" : pageTitleEn}
         customEngFontSize="16px"
         customFontSize="19px"
       />
@@ -170,7 +214,7 @@ const datePublished = formatDate(new Date());
             <img
               crossOrigin="anonymous"
               src={imageUrl}
-              alt={title}
+              alt={stripHtmlTags(title)}
               className="max-w-[300px] max-h-[300px] mx-auto mt-4 rounded-xl shadow-lg object-cover"
               loading="lazy"
               decoding="async"

@@ -393,7 +393,7 @@ coreApi.interceptors.request.use(
 export const languageApis = {
   getLanguages: async () => {
     try {
-      const response = await coreApi.get("https://api.bhaktibhav.app/api/v1/lang")
+      const response = await coreApi.get("https://api.bhaktibhav.app/api/v1/lang/v1")
 // g");
       return response.data;
     } catch (error) {

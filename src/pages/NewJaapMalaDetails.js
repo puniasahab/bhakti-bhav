@@ -45,6 +45,62 @@ const getTitle = (detail, language) => {
   return detail?.title?.[language] || detail?.title?.hi || detail?.title?.en || "Jaap Mala";
 };
 
+const stripHtmlTags = (value) => String(value || "").replace(/<[^>]*>/g, "").trim();
+
+const getHinglishTitleParts = (title) => {
+  const normalizedTitle = String(title || "")
+    .replace(/<\/?p[^>]*>/gi, "")
+    .trim();
+  const [hindiText = "", englishText = ""] = normalizedTitle.split(/<\/?br\s*\/?>/i);
+  const cleanHindiText = stripHtmlTags(hindiText);
+  const cleanEnglishText = stripHtmlTags(englishText);
+
+  if (!cleanEnglishText) {
+    const titleWithoutTags = stripHtmlTags(normalizedTitle);
+    const parenthesizedEnglish = titleWithoutTags.match(/^(.*?)\s*(\([^()]*[A-Za-z][^()]*\))\s*$/);
+
+    if (parenthesizedEnglish) {
+      return {
+        hindiText: parenthesizedEnglish[1].trim(),
+        englishText: parenthesizedEnglish[2].trim()
+      };
+    }
+  }
+
+  return {
+    hindiText: cleanHindiText,
+    englishText: cleanEnglishText
+  };
+};
+
+const renderHinglishTitle = (title, variant = "default") => {
+  const { hindiText, englishText } = getHinglishTitleParts(title);
+
+  if (!englishText) {
+    return <span className="font-eng">{stripHtmlTags(title)}</span>;
+  }
+
+  const hindiClassName = variant === "page"
+    ? "new-jaap-hinglish-title-hi new-jaap-hinglish-title-hi-page"
+    : "new-jaap-hinglish-title-hi";
+  const englishClassName = variant === "page"
+    ? "new-jaap-hinglish-title-en new-jaap-hinglish-title-en-page"
+    : "new-jaap-hinglish-title-en";
+
+  return (
+    <span className={`new-jaap-hinglish-title new-jaap-hinglish-title-${variant}`}>
+      <span className={hindiClassName}>{hindiText}</span>
+      <span className={englishClassName}>{englishText}</span>
+    </span>
+  );
+};
+
+const renderTitle = (title, language, variant = "default") => {
+  if (language === "hi") return replaceSpecialChars(title);
+  if (language === "hinglish") return renderHinglishTitle(title, variant);
+  return title;
+};
+
 const JAAP_PER_MALA = 108;
 const CONFETTI_PIECES = Array.from({ length: 28 }, (_, index) => index);
 
@@ -104,6 +160,8 @@ export default function NewJaapMalaDetails() {
   }, [id, language]);
 
   const title = useMemo(() => getTitle(detail, language), [detail, language]);
+  const cleanTitle = useMemo(() => stripHtmlTags(title), [title]);
+  const pageTitle = useMemo(() => renderTitle(title, language, "page"), [title, language]);
   const imageUrl = normalizeAssetUrl(detail?.imageUrl);
   const displayImageUrl = imageUrl || "/img/shreeHanuman.png";
 
@@ -198,8 +256,8 @@ export default function NewJaapMalaDetails() {
     <>
     {/* <SchemaMarkup schema={newJaapMalaSchema(id)} /> */}
       <SEO
-        title={`${title} | भक्ति भाव`}
-        description={title}
+        title={`${cleanTitle} | भक्ति भाव`}
+        description={cleanTitle}
         canonical={`https://bhaktibhav.app/newJaapMaala-details/${id}`}
         schema={homeSchema}
       />
@@ -208,7 +266,7 @@ export default function NewJaapMalaDetails() {
         <div className="new-jaap-fixed-content">
           <PageTitleCard
             titleHi={language === "hi" ? replaceSpecialChars(title) : ""}
-            titleEn={language === "hi" ? "" : title}
+            titleEn={language === "hi" ? "" : pageTitle}
             customFontSize="18px"
             isFromJaapMala
           />
@@ -218,7 +276,7 @@ export default function NewJaapMalaDetails() {
               <img
                 crossOrigin="anonymous"
                 src={displayImageUrl}
-                alt={title}
+                alt={cleanTitle}
                 className="new-jaap-devta-image"
                 loading="lazy"
                 decoding="async"
@@ -230,7 +288,9 @@ export default function NewJaapMalaDetails() {
                 className={`new-jaap-title-scroll ${language === "hi" ? "font-devanagari" : "font-eng"}`}
               >
                 {Array.from({ length: jaapCount }, (_, index) => (
-                  <span key={`${title}-${index}`}>{title}</span>
+                  <span key={`${cleanTitle}-${index}`}>
+                    {renderTitle(title, language, "scroll")}
+                  </span>
                 ))}
               </div>
             )}
@@ -276,7 +336,9 @@ export default function NewJaapMalaDetails() {
                 <>
                   <small>Today's</small>
                   <b>{jaapCount} / {JAAP_PER_MALA}</b>
-                  <span className={`new-jaap-mala-title ${language === "hi" ? "font-devanagari" : "font-eng"}`}>{title}</span>
+                  <span className={`new-jaap-mala-title ${language === "hinglish" ? "new-jaap-mala-title-hinglish" : ""} ${language === "hi" ? "font-devanagari" : "font-eng"}`}>
+                    {renderTitle(title, language, "mala")}
+                  </span>
                 </>
               )}
             </span>

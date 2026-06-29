@@ -93,6 +93,43 @@ const getImageUrl = (imageUrl) => {
   return `${API_BASE_URL}${imageUrl.startsWith("/") ? imageUrl : `/${imageUrl}`}`;
 };
 
+const stripHtmlTags = (value) => String(value || "").replace(/<[^>]*>/g, "").trim();
+
+const getHinglishTitleParts = (title) => {
+  const normalizedTitle = String(title || "")
+    .replace(/<\/?p[^>]*>/gi, "")
+    .trim();
+  const [hindiText = "", englishText = ""] = normalizedTitle.split(/<\/?br\s*\/?>/i);
+
+  return {
+    hindiText: stripHtmlTags(hindiText),
+    englishText: stripHtmlTags(englishText)
+  };
+};
+
+const renderTitle = (title, language) => {
+  if (language === "hi") {
+    return replaceSpecialChars(title);
+  }
+
+  if (language !== "hinglish") {
+    return title;
+  }
+
+  const { hindiText, englishText } = getHinglishTitleParts(title);
+
+  if (!englishText) {
+    return <span className="font-eng">{stripHtmlTags(title)}</span>;
+  }
+
+  return (
+    <>
+      <span className="block font-hindi text-base md:text-lg">{hindiText}</span>
+      <span className="block font-eng text-xs md:text-sm leading-tight">{englishText}</span>
+    </>
+  );
+};
+
 export default function NewJaapMala() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -323,14 +360,14 @@ export default function NewJaapMala() {
                   <img
                     crossOrigin="anonymous"
                     src={getImageUrl(item?.imageUrl)}
-                    alt={title}
+                    alt={stripHtmlTags(title)}
                     className={`h-[150px] w-full object-cover sm:h-[170px] md:h-[170px] ${isRestricted ? "blur-sm" : ""}`}
                     loading="lazy"
                     decoding="async"
                   />
                   <div className="absolute left-2 right-2 bottom-5 z-10 rounded-xl bg-white/80 px-3 py-2 text-center shadow-sm backdrop-blur-[1px]">
                     <h2 className={`theme_text text-base font-semibold leading-tight ${language === "hi" ? "font-hindi" : "font-eng"}`}>
-                      {language === "hi" ? replaceSpecialChars(title) : title}
+                      {renderTitle(title, language)}
                     </h2>
                   </div>
                 </Link>

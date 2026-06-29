@@ -95,6 +95,58 @@ const isKahaniyaCategory = (category) => {
 
 const getCategoryIdFromCategory = (category) => category?.categoryId || category?._id || "";
 
+const stripHtmlTags = (value) => String(value || "").replace(/<[^>]*>/g, "").trim();
+
+const getHinglishTitleParts = (title) => {
+  const normalizedTitle = String(title || "")
+    .replace(/<\/?p[^>]*>/gi, "")
+    .trim();
+  const [hindiText = "", englishText = ""] = normalizedTitle.split(/<\/?br\s*\/?>/i);
+  const cleanHindiText = stripHtmlTags(hindiText);
+  const cleanEnglishText = stripHtmlTags(englishText);
+
+  if (!cleanEnglishText) {
+    const titleWithoutTags = stripHtmlTags(normalizedTitle);
+    const parenthesizedEnglish = titleWithoutTags.match(/^(.*?)\s*(\([^()]*[A-Za-z][^()]*\))\s*$/);
+
+    if (parenthesizedEnglish) {
+      return {
+        hindiText: parenthesizedEnglish[1].trim(),
+        englishText: parenthesizedEnglish[2].trim()
+      };
+    }
+  }
+
+  return {
+    hindiText: cleanHindiText,
+    englishText: cleanEnglishText
+  };
+};
+
+const renderTitle = (title, language) => {
+  if (language === "hi") {
+    return fixKrutiDevHtml(replaceSpecialChars(title));
+    // return replaceSpecialChars(title);
+  }
+
+  if (language !== "hinglish") {
+    return title;
+  }
+
+  const { hindiText, englishText } = getHinglishTitleParts(title);
+
+  if (!englishText) {
+    return <span className="font-eng">{stripHtmlTags(title)}</span>;
+  }
+
+  return (
+    <>
+      <span className="block font-hindi text-base md:text-lg">{fixKrutiDevHtml(replaceSpecialChars(hindiText))}</span>
+      <span className="block font-eng text-xs md:text-sm leading-tight">{englishText}</span>
+    </>
+  );
+};
+
 export default function Kahaniya() {
   const { categoryId: categoryIdParam, id } = useParams();
   const location = useLocation();
@@ -337,18 +389,18 @@ const datePublished = formatDate(new Date());
                   state={{ item, categoryId }}
                   className="relative block rounded-xl overflow-hidden shadow-lg"
                 >
-                  <div className="overflow_bg">
+                  <div className={`overflow_bg ${language === "hinglish" ? "kahaniya-hinglish-title" : ""}`}>
                     <img
                       crossOrigin="anonymous"
                       src={imgSrc}
-                      alt={title}
+                      alt={stripHtmlTags(title)}
                       className={`w-full rounded-md max-h-[150px] md:max-h-[150px] object-cover ${isRestricted ? "blur" : ""}`}
                       loading="lazy"
                       decoding="async"
                     />
                     <div className={`absolute inset-0 theme_text flex flex-col items-center justify-center text-center px-2 z-10 top-[60%] ${isRestricted ? "blur-sm" : ""}`}>
                       <h2 className={`text-sm font-[450] ${language === "hi" ? "font-hindi" : "font-eng"}`}>
-                        {language === 'hi' ? fixKrutiDevHtml(replaceSpecialChars(title)) : title}
+                        {renderTitle(title, language)}
                       </h2>
                     </div>
                   </div>

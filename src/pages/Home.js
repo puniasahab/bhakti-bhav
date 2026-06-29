@@ -459,6 +459,39 @@ function Home() {
 
     const categoriesToShow = homeCategories.length > 0 ? homeCategories : fallbackHomeCategories;
 
+    const stripHtmlTags = (value) => String(value || "").replace(/<[^>]*>/g, "").trim();
+
+    const getHinglishTitleParts = (title) => {
+        const normalizedTitle = String(title || "")
+            .replace(/<\/?p[^>]*>/gi, "")
+            .trim();
+        const [hindiText = "", englishText = ""] = normalizedTitle.split(/<\/?br\s*\/?>/i);
+
+        return {
+            hindiText: stripHtmlTags(hindiText),
+            englishText: stripHtmlTags(englishText)
+        };
+    };
+
+    const renderCategoryTitle = (title) => {
+        if (language !== "hinglish") {
+            return title;
+        }
+
+        const { hindiText, englishText } = getHinglishTitleParts(title);
+
+        if (!englishText) {
+            return <span className="font-eng">{stripHtmlTags(title)}</span>;
+        }
+
+        return (
+            <>
+                <span className="font-hindi block">{hindiText}</span>
+                <span className="font-eng block text-[11px] md:text-base leading-tight">{englishText}</span>
+            </>
+        );
+    };
+
     // Full-page shimmer skeleton shown while categories (and other home data) are loading
     const PageShimmer = () => (
         <div className="container mx-auto mt-8 flex flex-col px-4 md:px-0 animate-pulse">
@@ -599,14 +632,18 @@ function Home() {
                         className="theme_bg bg-white rounded-xl shadow md:p-6 p-3 text-center hover:bg-yellow-50 transition w-auto flex">
                         <div className="mx-auto flex md:flex-row flex-col items-center space-y-3 md:space-y-0">
                             <img crossOrigin='anonymous' src="./img/icon_1.png" alt="" width="36" height="36" className="md:mr-3" />
-                            <p className={`${language === "hi" ? "font-hindi" : "font-eng"} md:text-2xl text-sm font-normal leading-[14px]`}>{translation[language]?.aajKaRashifal} <br /></p>
+                            <p className={`${language === "hi" ? "font-hindi" : "font-eng"} md:text-2xl text-sm font-normal ${language === "hinglish" ? "leading-tight" : "leading-[14px]"}`}>
+                                {renderCategoryTitle(translation[language]?.aajKaRashifal)}
+                            </p>
                         </div>
                     </Link>
                     <button onClick={(e) => { setIsOpen(true) }}
                         className="theme_bg bg-white rounded-xl shadow md:p-6 p-3 text-center hover:bg-yellow-50 transition w-auto flex">
                         <div className="mx-auto flex md:flex-row flex-col items-center space-y-3 md:space-y-0">
                             <img crossOrigin='anonymous' src="./img/icon_5.png" alt="" width="36" height="36" className="md:mr-3" />
-                            <p className={`${language === "hi" ? "font-hindi" : "font-eng"} md:text-2xl text-sm font-normal leading-[14px]`}>{translation[language]?.panchang} <br /></p>
+                            <p className={`${language === "hi" ? "font-hindi" : "font-eng"} md:text-2xl text-sm font-normal ${language === "hinglish" ? "leading-tight" : "leading-[14px]"}`}>
+                                {renderCategoryTitle(translation[language]?.panchang)}
+                            </p>
                         </div>
                     </button>
                 </div>
@@ -627,13 +664,15 @@ function Home() {
                             <div className="mx-auto flex w-full flex-col items-center justify-center space-y-3 md:space-y-0">
                                 <img
                                     src={category.imageUrl}
-                                    alt={category.title || ""}
+                                    alt={stripHtmlTags(category.title)}
                                     width="36"
                                     crossOrigin='anonymous'
                                     height="36"
                                     className="w-9 h-9 object-cover rounded-md"
                                 />
-                                <p className={`${language === "hi" ? "font-hindi" : "font-eng"} md:text-2xl text-sm font-normal leading-[14px] text-center w-full mx-auto`}>{category.title}</p>
+                                <p className={`${language === "hi" ? "font-hindi" : "font-eng"} md:text-2xl text-sm font-normal ${language === "hinglish" ? "leading-tight" : "leading-[14px]"} text-center w-full mx-auto`}>
+                                    {renderCategoryTitle(category.title)}
+                                </p>
                             </div>
                         </Link>
                     ))
@@ -759,23 +798,23 @@ function Home() {
                                 <button
                                     onClick={() => {
                                         setShowLoginModal(false);
-                                        trackEvent(GA4Events.free_login_cta_clicked, { event_label: "free_login_clicked" });
-                                        navigate("/login");
+                                        trackEvent(GA4Events.free_login_cta_clicked, { event_label: "skip_button_clicked" });
+                                        // navigate("/login");
                                     }}
                                     className="flex-1 bg-white text-[#9A283D] font-eng font-semibold py-3 rounded-2xl shadow"
                                 >
-                                    Free Login
+                                    Skip
                                 </button>
                                 <button
                                     onClick={() => {
                                         setShowLoginModal(false);
-                                        trackEvent(GA4Events.free_login_cta_clicked, { event_label: "start_now_clicked" });
-                                        sessionStorage.setItem("loginSource", "home-v1");
+                                        trackEvent(GA4Events.free_login_cta_clicked, { event_label: "free_login_clicked" });
+                                        // sessionStorage.setItem("loginSource", "home-v1");
                                         navigate("/login");
                                     }}
                                     className="flex-1 bg-[#9A283D] text-white font-eng font-semibold py-3 rounded-2xl shadow"
                                 >
-                                    Start Now
+                                    Free Login
                                 </button>
                             </div>
                             <p className="text-center text-[#9A283D] font-eng text-sm font-medium">

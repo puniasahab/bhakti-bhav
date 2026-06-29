@@ -4,6 +4,7 @@ import { languageApis } from "../api";
 export const LanguageContext = createContext();
 
 const LANGUAGE_STORAGE_KEY = "bhakti_bhav_language";
+const DEFAULT_LANGUAGE_CODE = "hinglish";
 
 const normalizeLanguages = (response) => {
   const languages = Array.isArray(response)
@@ -20,7 +21,7 @@ const normalizeLanguages = (response) => {
 };
 
 export function LanguageProvider({ children }) {
-  const [language, setLanguageState] = useState(() => localStorage.getItem(LANGUAGE_STORAGE_KEY) || "hi");
+  const [language, setLanguageState] = useState(() => localStorage.getItem(LANGUAGE_STORAGE_KEY) || DEFAULT_LANGUAGE_CODE);
   const [languages, setLanguages] = useState([]);
   const [languageLoading, setLanguageLoading] = useState(false);
   const [languageError, setLanguageError] = useState("");
@@ -44,8 +45,8 @@ export function LanguageProvider({ children }) {
       const selectedLanguage = normalizedLanguages.find((item) => item.code === storedLanguage);
 
       if (!selectedLanguage && normalizedLanguages.length > 0) {
-        const hindiLanguage = normalizedLanguages.find((item) => item.code === "hi");
-        setLanguage(hindiLanguage?.code || normalizedLanguages[0].code);
+        const defaultLanguage = normalizedLanguages.find((item) => item.code === DEFAULT_LANGUAGE_CODE);
+        setLanguage(defaultLanguage?.code || normalizedLanguages[0].code);
       }
     } catch (error) {
       setLanguageError("Unable to load languages");
