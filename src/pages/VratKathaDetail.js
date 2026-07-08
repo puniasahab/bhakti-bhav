@@ -12,6 +12,7 @@ import useGA4Tracker from "../hooks/useGA4Tracker";
 import { GA4Events } from "../utils/ga4Events.enum";
 import { useLocation } from "react-router-dom";
 import { vratKathaApis } from "../api";
+import { fixKrutiDevHtml, replaceSpecialChars } from "../commonFunctions";
 
 function VratKathaDetail() {
     const { id, date } = useParams();
@@ -148,6 +149,121 @@ function VratKathaDetail() {
         }
     };
 
+    
+const stripHtmlTags = (value) => String(value || "").replace(/<[^>]*>/g, "").trim();
+
+const formatHindiName = (name) => String(name || "")
+  .replace(/\//g, "|").replace(/\|/g, "।")
+  .replace(/,/g, "]").replace(/\(/g, "¼").replace(/\)/g, "½")
+  .replace(/\:/g, "%").replace(/:/g, "ः")
+  .replace(/ँ/g, "ं")
+  .replace(/\u200D|\u200C/g, "  ")
+  .replace(/[.,;!?'"""'']/g, " ")
+  .replace(/[\[\]{}()]/g, "")
+  .replace(/[*/\\#%^+=_|<>~`@$₹]/g, " ")
+  .replace(/[^\u0900-\u097F\s।॥]/g, "")
+  .replace(/\u00A0/g, " ")
+  .replace(/\u200B|\u200C|\u200D/g, " ")
+  .replace(/\s+/g, " ")
+  .normalize("NFC");
+
+const getHinglishNameParts = (name) => {
+  const lines = stripHtmlTags(name)
+    .split(/\n+/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+  const hindiText = lines[0] || "";
+  const englishText = lines.slice(1).join(" ");
+
+  return {
+    hindiText,
+    englishText: englishText
+      ? englishText.startsWith("(") && englishText.endsWith(")")
+        ? englishText
+        : `(${englishText.replace(/^\(|\)$/g, "").trim()})`
+      : ""
+  };
+};
+
+const renderVratKathaName = (katha, language) => {
+  if (language === "hi") {
+    return formatHindiName(katha.name);
+  }
+
+  if (language !== "hinglish") {
+    return katha.name;
+  }
+
+  const { hindiText, englishText } = getHinglishNameParts(katha.name2 || katha.name);
+
+  if (!englishText) {
+    return <span className="font-eng">{hindiText}</span>;
+  }
+
+  return (
+    <>
+      <span className="block font-hindi text-lg md:text-xl leading-tight">{hindiText}</span>
+      <span className="block font-eng text-xs md:text-sm leading-tight">{englishText}</span>
+    </>
+  );
+};
+
+const getVratKathaAltText = (katha, language) => {
+  if (language === "hinglish") {
+    return stripHtmlTags(katha.name2 || katha.name);
+  }
+
+  return stripHtmlTags(katha.name);
+};
+
+const getPlainOrHtmlText = (value) => {
+  if (Array.isArray(value)) return value.join("\n");
+  if (value && typeof value === "object") return value.hinglish || value.en || value.hi || "";
+  return value || "";
+};
+
+const withLineBreaks = (value) => String(getPlainOrHtmlText(value) || "")
+  .replace(/\r\n/g, "\n")
+  .replace(/\n/g, "<br />");
+
+const hasHtmlTags = (value) => /<[^>]+>/.test(String(value || ""));
+
+const normalizeHinglishHtml = (value) => {
+  const html = withLineBreaks(value);
+
+  return fixKrutiDevHtml(
+    html.replace(/(<[^>]*>)|([^<]+)/g, (match, tag, text) => {
+      if (tag) return tag;
+      if (!text) return match;
+      return replaceSpecialChars(text);
+    })
+  );
+};
+
+const renderHinglishRichText = (value, className) => (
+  <div
+    className={className}
+    dangerouslySetInnerHTML={{ __html: normalizeHinglishHtml(value) }}
+  />
+);
+
+const renderVratKathaDetailTitle = (detail, language) => {
+  if (language === "hinglish") {
+    return renderVratKathaName(detail, language);
+  }
+
+  if (language === "hi") {
+    return formatHindiName(typeof detail.name === "string" ? detail.name : (detail.name?.hi || ""))
+      .replace(/[०-९]/g, digit => hindiToEnglishMap[digit]);
+  }
+
+  return typeof detail.name === "string" ? detail.name : (detail.name?.en || "");
+};
+
+
+    
+
     const hindiToEnglishMap = {
         '०': '0',
         '१': '1',
@@ -207,7 +323,7 @@ function VratKathaDetail() {
                         <span
                             key={index}
                             style={{
-                                fontFamily: "Roboto Mono, monospace",
+                                fontFamily: "Roboto Mono, mocode nospace",
                                 // fontWeight: "600",
                                 color: "black",
                             }}
@@ -323,12 +439,10 @@ function VratKathaDetail() {
             <Header pageName={{ hi: "ozr dFkk", en: "Vrat Katha" }} hindiFontSize="true" />
             <div className="h-2"></div>
             <PageTitleCard
-                titleHi={(() => {
-                    const n = typeof detail.name === "string" ? detail.name : (detail.name?.hi || "");
-                    return n.replace(/\//g, "|").replace(/\|/g, "।").replace(/,/g, "]").replace(/\(/g, "¼").replace(/\)/g, "½").replace(/\:/g, "%").replace(/:/g, "ः").replace(/ँ/g, "ं").replace(/\u200D|\u200C/g, "  ").replace(/[.,;!?'"""'']/g, " ").replace(/[\[\]{}()]/g, "").replace(/[*/\\#%^+=_|<>~`@$₹]/g, " ").replace(/[^\u0900-\u097F\s।॥]/g, "").replace(/\u00A0/g, " ").replace(/\u200B|\u200C|\u200D/g, " ").replace(/\s+/g, " ").replace(/[०-९]/g, digit => hindiToEnglishMap[digit]).normalize("NFC");
-                })()}
-                titleEn={typeof detail.name === "string" ? detail.name : (detail.name?.en || "")}
-                customEngFontSize={(() => { const n = typeof detail.name === "string" ? detail.name : (detail.name?.en || ""); return n.length > 30 ? "14px" : n.length > 20 ? "15px" : "16px"; })()}
+                titleHi={language === "hi" ? renderVratKathaDetailTitle(detail, language) : ""}
+                titleEn={language === "hi" ? "" : renderVratKathaDetailTitle(detail, language)}
+                
+                customEngFontSize={(() => { const n = language === "hinglish" ? stripHtmlTags(detail.name2 || detail.name || "") : (typeof detail.name === "string" ? detail.name : (detail.name?.en || "")); return n.length > 30 ? "14px" : n.length > 20 ? "15px" : "16px"; })()}
                 customFontSize={"19px"}
             />
 
@@ -337,7 +451,7 @@ function VratKathaDetail() {
                     <div className="flex justify-center mt-4">
                         <img
                             src={`${detail.imageUrl}`}
-                            alt={typeof detail.name === "string" ? detail.name : (detail.name?.en || "")}
+                            alt={getVratKathaAltText(detail, language)}
                             className="w-60 h-60 object-cover rounded-xl shadow-lg border-4 border-white bg-[#690016]"
                         />
                     </div>
@@ -382,6 +496,13 @@ function VratKathaDetail() {
                 {/* Mantra */}
                 <div className="text-center my-8 text-xl">
                     {(() => {
+                        if (language === "hinglish") {
+                            return renderHinglishRichText(
+                                detail.mantra2 || detail.mantra,
+                                `font-hindi text-[#9A283D] ${fontSize}`
+                            );
+                        }
+
                         const mantraText = typeof detail.mantra === "string" ? detail.mantra : (language === "hi" ? detail.mantra?.hi : detail.mantra?.en) || "";
                         const cleaned = mantraText.replace(/"/g, '').replace(/:/g, "ः").replace(/-/g, " ").replace(/\//g, " ").replace(/[(){}\[\]]/g, "").replace(/[.,;]/g, " ").replace(/[|]/g, "॥").replace(/[^\u0900-\u097F\s।॥ः]/g, "").replace(/[०-९]/g, digit => hindiToEnglishMap[digit]).normalize("NFC");
                         return (
@@ -412,6 +533,13 @@ function VratKathaDetail() {
                         {language === "hi" ? <span className="font-hindi text-2xl">iwtk fof/k </span> : <span className="font-eng"> Puja Vidhi </span>}
                     </h2>
                     {(() => {
+                        if (language === "hinglish") {
+                            return renderHinglishRichText(
+                                detail.pujaVidhi2 || detail.pujaVidhi,
+                                `font-hindi text-[rgba(0,0,0,0.7)] ${fontSize}`
+                            );
+                        }
+
                         const raw = typeof detail.pujaVidhi === "string" ? detail.pujaVidhi : (language === "hi" ? detail.pujaVidhi?.hi : detail.pujaVidhi?.en) || "";
                         return raw.split("\n").map((line, idx) => (
                             <p key={idx} className={`${language === "hi" ? "font-hindi" : "font-eng"} text-[rgba(0,0,0,0.7)] ${fontSize}`}>
@@ -428,6 +556,24 @@ function VratKathaDetail() {
                     </h2>
                     <ul className={`list-inside text-[rgba(0,0,0,0.7)] ${fontSize}`}>
                         {(() => {
+                            if (language === "hinglish") {
+                                const raw = getPlainOrHtmlText(detail.pujaSamagri2 || detail.pujaSamagri);
+
+                                if (hasHtmlTags(raw)) {
+                                    return (
+                                        <li className="list-none">
+                                            {renderHinglishRichText(raw, "font-hindi")}
+                                        </li>
+                                    );
+                                }
+
+                                return raw.split(/\n/).map((item, i) => (
+                                    <li key={i} className="font-hindi">
+                                        {replaceSpecialChars(item.trim())}
+                                    </li>
+                                ));
+                            }
+
                             const raw = typeof detail.pujaSamagri === "string"
                                 ? detail.pujaSamagri
                                 : Array.isArray(detail.pujaSamagri)
@@ -448,6 +594,13 @@ function VratKathaDetail() {
                         {language === "hi" ? <span className="font-hindi text-2xl"> dFkk </span> : <span className="font-eng">Katha</span>}
                     </h2>
                     {(() => {
+                        if (language === "hinglish") {
+                            return renderHinglishRichText(
+                                detail.pujaMahatva2 || detail.pujaMahatva,
+                                `font-hindi text-[rgba(0,0,0,0.7)] ${fontSize} break-words w-full`
+                            );
+                        }
+
                         const raw = typeof detail.pujaMahatva === "string" ? detail.pujaMahatva : (language === "hi" ? detail.pujaMahatva?.hi : detail.pujaMahatva?.en) || "";
                         if (language === "hi") {
                             const cleaned = raw.replace(/,/g, "]").replace(/\(/g, "¼").replace(/\)/g, "½").replace(/\:/g, "%").replace(/:/g, "ः").replace(/ँ/g, "ं").replace(/\u200D|\u200C/g, "  ").replace(/[.,;!?'"""'']/g, " ").replace(/[\[\]{}()]/g, "").replace(/[*/\\#%^+=_|<>~`@$₹]/g, " ").replace(/[^\u0900-\u097F\s।॥]/g, "").replace(/\u00A0/g, " ").replace(/\u200B|\u200C|\u200D/g, " ").replace(/\s+/g, " ").replace(/[०-९]/g, digit => hindiToEnglishMap[digit]).normalize("NFC");

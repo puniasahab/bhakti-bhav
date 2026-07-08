@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef} from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import bannerImg from "../assets/img/paymentPageBanner.jpeg";
-import { Check } from "lucide-react";
+import { Check, Tag } from "lucide-react";
 import { paymentApis, subscriptionApis, profileApis, wallpaperApis } from "../api";
 import { useNavigate } from "react-router-dom";
 import { usePayment } from "../contexts/PaymentContext";
@@ -222,26 +222,39 @@ export default function Payment() {
         </div> */}
 
         <div className="container mx-auto px-4 mt-6 space-y-4">
-          {plans && plans.length > 0  ? plans?.map((plan, index) => (
+          {plans && plans.length > 0  ? plans?.map((plan, index) => {
+            const isOfferActive = plan.isOfferActive === true;
+            const discountedPrice = plan.finalPrice ?? plan.offerPrice ?? plan.price;
+
+            return (
             <div
               key={plan._id || plan.id}
               onClick={() => setSelectedPlan(plan._id || plan.id)}
-              className={`cursor-pointer border-2 rounded-2xl px-4 py-5 bg-white transition-all duration-200
+              className={`relative cursor-pointer border-2 rounded-2xl bg-white transition-all duration-200
           ${selectedPlan === (plan._id || plan.id)
                   ? "border-[#9A283D] shadow-lg"
                   : "border-gray-200 hover:border-[#9A283D]"}`}
             >
+              {isOfferActive && (
+                <div className="absolute -top-3 right-3 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md z-10 font-eng">
+                  {plan.discountPercent || 0}% OFF
+                </div>
+              )}
+              <div className="px-4 py-5">
               <div className="flex items-center gap-2">
-                {/* Plan Logo Circle */}
-                <div className={`w-16 h-16 rounded-full flex items-center justify-center flex-shrink-0 text-center font-bold leading-tight
-                  ${index === 0
-                    ? "bg-gradient-to-br from-yellow-300 via-yellow-400 to-yellow-500 text-[#9A283D]"
-                    : "bg-gradient-to-br from-gray-200 via-gray-300 to-gray-400 text-[#9A283D]"}`}>
-                  <img src="./img/logo_splash.png" alt="Bhakti Bhav" className="w-10 h-10 object-contain" />
+                {/* Plan Logo Circle - shows plan.image from API (falls back to default logo) */}
+                <div className={`w-16 h-16 rounded-full flex items-center justify-center flex-shrink-0 text-center font-bold leading-tight overflow-hidden
+                    `}>
+                  <img
+                    src={plan.image || "./img/logo_splash.png"}
+                    alt="Bhakti Bhav"
+                    className="w-full h-full object-contain"
+                    onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = "./img/logo_splash.png"; }}
+                  />
                 </div>
 
                 {/* Plan Name & Duration */}
-                <div className="flex-1">
+                <div className={`flex-1 ${isOfferActive ? "pr-3 border-r border-dashed border-gray-300" : ""}`}>
                   <h3 className="font-eng text-[#9A283D] text-md font-bold leading-tight">
                     {plan.name || plan.title}
                   </h3>
@@ -251,9 +264,16 @@ export default function Payment() {
                 </div>
 
                 {/* Price */}
-                <span className="text-[#9A283D] mr-4 font-bold text-lg font-eng flex-shrink-0">
-                  ₹{plan.price}
-                </span>
+                <div className={`flex flex-col items-end mr-4 flex-shrink-0 ${isOfferActive ? "pl-3" : ""}`}>
+                  {isOfferActive && (
+                    <span className="text-gray-400 line-through text-md font-eng">
+                      ₹{plan.price}
+                    </span>
+                  )}
+                  <span className={`text-[#9A283D] font-bold font-eng ${isOfferActive ? "text-xl" : "text-lg"}`}>
+                    ₹{isOfferActive ? discountedPrice : plan.price}
+                  </span>
+                </div>
 
                 {/* Checkmark for selected */}
                 {selectedPlan === (plan._id || plan.id) && (
@@ -262,8 +282,23 @@ export default function Payment() {
                   </div>
                 )}
               </div>
+              </div>
+
+              {isOfferActive && (
+                <div
+                  className="px-4 py-3 rounded-b-2xl flex items-center gap-2"
+                  style={{ backgroundColor: "rgba(87, 0, 0, 0.05)" }}
+                >
+                  <Tag className="w-4 h-4 text-[#9A283D] font-semibold" />
+                  <span className="font-eng text-sm text-[#9A283D] font-semibold">
+                    You save ₹{plan.savings || (plan.price - discountedPrice)}
+                  </span>
+                </div>
+              )}
             </div>
-          )) : (
+            );
+          }) : (
+
             <div className="text-center py-12">
               {/* <div className="text-[#9A283D] text-6xl mb-4">�</div> */}
               <div className="font-eng text-lg font-semibold text-[#9A283D] mb-2">
@@ -330,14 +365,14 @@ export default function Payment() {
             What will you get?
           </p>
 
-          <div className="space-y-3">
+          <div className="flex gap-3 overflow-x-auto hide-scrollbar px-2 pb-1 snap-x snap-mandatory">
             {items.map((item, index) => (
               <div
                 key={index}
-                className="flex items-start gap-3 bg-white border border-[#E9B9C5] rounded-2xl px-4 py-4 shadow-sm"
+                className="flex-shrink-0 w-[45%] sm:w-[220px] snap-start flex flex-col items-start gap-2 bg-white border border-[#E9B9C5] rounded-2xl px-3 py-4 shadow-sm"
               >
-                <div className="w-6 h-6 rounded-full bg-white flex items-center justify-center flex-shrink-0 mt-1">
-                  <Check className="text-[#9A283D] w-4 h-4" strokeWidth={3} />
+                <div className="w-6 h-6 rounded-full bg-[#9A283D] flex items-center justify-center flex-shrink-0">
+                  <Check className="text-white w-4 h-4" strokeWidth={3} />
                 </div>
 
                 <div className="flex flex-col">

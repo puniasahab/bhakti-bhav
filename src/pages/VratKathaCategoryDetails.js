@@ -132,6 +132,77 @@ const handleTrackEvent = (id, katha) => {
   '५': '5', '६': '6', '७': '7', '८': '8', '९': '9'
 };
 
+
+
+const stripHtmlTags = (value) => String(value || "").replace(/<[^>]*>/g, "").trim();
+
+const formatHindiName = (name) => String(name || "")
+  .replace(/\//g, "|").replace(/\|/g, "।")
+  .replace(/,/g, "]").replace(/\(/g, "¼").replace(/\)/g, "½")
+  .replace(/\:/g, "%").replace(/:/g, "ः")
+  .replace(/ँ/g, "ं")
+  .replace(/\u200D|\u200C/g, "  ")
+  .replace(/[.,;!?'"""'']/g, " ")
+  .replace(/[\[\]{}()]/g, "")
+  .replace(/[*/\\#%^+=_|<>~`@$₹]/g, " ")
+  .replace(/[^\u0900-\u097F\s।॥]/g, "")
+  .replace(/\u00A0/g, " ")
+  .replace(/\u200B|\u200C|\u200D/g, " ")
+  .replace(/\s+/g, " ")
+  .normalize("NFC");
+
+const getHinglishNameParts = (name) => {
+  const lines = stripHtmlTags(name)
+    .split(/\n+/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+  const hindiText = lines[0] || "";
+  const englishText = lines.slice(1).join(" ");
+
+  return {
+    hindiText,
+    englishText: englishText
+      ? englishText.startsWith("(") && englishText.endsWith(")")
+        ? englishText
+        : `(${englishText.replace(/^\(|\)$/g, "").trim()})`
+      : ""
+  };
+};
+
+const renderVratKathaName = (katha, language) => {
+  if (language === "hi") {
+    return formatHindiName(katha.name);
+  }
+
+  if (language !== "hinglish") {
+    return katha.name;
+  }
+
+  const { hindiText, englishText } = getHinglishNameParts(katha.name2 || katha.name);
+
+  if (!englishText) {
+    return <span className="font-eng">{hindiText}</span>;
+  }
+
+  return (
+    <>
+      <span className="block font-hindi text-lg md:text-xl leading-tight">{formatHindiName(hindiText)}</span>
+      <span className="block font-eng text-xs md:text-sm leading-tight">{englishText}</span>
+    </>
+  );
+};
+
+const getVratKathaAltText = (katha, language) => {
+  if (language === "hinglish") {
+    return stripHtmlTags(katha.name2 || katha.name);
+  }
+
+  return stripHtmlTags(katha.name);
+};
+
+
+
 const formatKathaName = (name) => {
   return (typeof name === "string" ? name : (name?.hi || ""))
     // Step 1 - Normalize unicode
@@ -182,6 +253,7 @@ const renderMixedText = (text) => {
           <PageTitleCard
             titleHi={hiName}
             titleEn={enName}
+            isHinglishLanguageSelected={language === "hinglish"}
             customEngFontSize={"16px"}
             customFontSize={"19px"}
           />
@@ -209,7 +281,7 @@ const renderMixedText = (text) => {
                     className={`w-full rounded-md max-h-[150px] md:max-h-[150px] object-cover ${getSubscriptionStatusFromLS() ? "" : katha.accessType === "paid" ? "blur-sm" : ""}`}
                   />
                   <div className={`absolute inset-0 theme_text flex flex-col items-center justify-center text-center px-4 z-10 top-[60%] ${getSubscriptionStatusFromLS() ? "" : katha.accessType === "paid" ? "blur-sm" : ""}`}>
-                    {katha.name && (
+                    {language !== "hinglish" && katha.name && (
                       <h2 className={`text-${katha.name.length > 20 ? 'sm' : 'lg'} font-bold ${language === "hi" ? "font-hindi" : "font-eng text-sm"}`}>
                         {language === "hi"
                           ? id === "6a17ded44f7e9477ea58e92c" ? renderHindiText(typeof katha.name === "string" ? katha.name : (katha.name?.hi || ""))
@@ -217,6 +289,12 @@ const renderMixedText = (text) => {
                           : (typeof katha.name === "string" ? katha.name : (katha.name?.en || katha.name?.hi || ""))}
                       </h2>
                     )}
+
+                     {language === "hinglish" && (katha.name2 || katha.name) && (
+                                        <h2 className={`font-semibold pt-3 text-center font-eng text-sm ${getSubscriptionStatusFromLS() ? "" : katha.accessType === "paid" ? "blur-sm" : ""}`}>
+                                          {renderVratKathaName(katha, language)}
+                                        </h2>
+                                      )}
                   </div>
                 </div>
               </Link>

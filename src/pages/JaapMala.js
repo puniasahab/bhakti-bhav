@@ -68,6 +68,49 @@ function JaapMala() {
   const baseParams = useGA4BaseParams("Jaap Mala Screen");
   const { trackEvent } = useGA4Tracker(baseParams);
 
+
+  const stripHtmlTags = (value) => String(value || "").replace(/<[^>]*>/g, "").trim();
+
+const getNameFromNameKey = (aarti, isHindi) => {
+  if (typeof aarti.name === "string") {
+    return aarti.name;
+  }
+
+  // writing this to show the name in the selected language, if not available then show the other language
+  return isHindi
+    ? (aarti.name?.hi || aarti.name?.en || "")
+    : (aarti.name?.en || aarti.name?.hi || "");
+};
+
+const getHinglishNameParts = (name) => {
+  const lines = stripHtmlTags(name)
+    .split(/\n+/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+  return {
+    hindiText: lines[0] || "",
+    englishText: lines.slice(1).join(" ")
+  };
+};
+
+const renderHinglishName = (aarti) => {
+  console.log(aarti.title2, aarti, data, "This is the name that we are seeing.....");
+  const { hindiText, englishText } = getHinglishNameParts(aarti.title2 || "");
+
+  if (!englishText) {
+    return <span className="font-eng">{hindiText}</span>;
+  }
+
+  return (
+    <>
+      <span className="block font-hindi text-lg leading-tight">{HindiWithEnglishNumbers(hindiText)}</span>
+      <span className="block font-eng text-sm leading-tight">{englishText}</span>
+    </>
+  );
+};
+
+
   useEffect(() => {
     const fetchJaapMalaData = async () => {
       try {
@@ -216,7 +259,7 @@ function JaapMala() {
                 onClick={() => { handleTrackEvent(item._id, item.title, item.accessType); }}
                 className="relative block rounded-xl overflow-hidden shadow-lg  "
               >
-                <div className={`overflow_bg`}>
+                <div className={`overflow_bg ${language === "hinglish" ? "jaapmala-hinglish-title" : ""}`}>
 
                   <img
                     src={
@@ -229,10 +272,14 @@ function JaapMala() {
                     loading="lazy"
                     decoding="async"
                   />
-                  <div className={`absolute inset-0 theme_text flex flex-col items-center justify-center text-center px-4 z-10 top-[60%] ${isSubscribed ? "" : item.accessType === "paid" ? "blur-sm" : ""}`}>
+                  <div className={`absolute inset-0 theme_text flex flex-col items-center justify-center text-center px-4 z-10 ${
+    language === "hinglish" ? "top-[52%]" : "top-[60%]"
+  } ${isSubscribed ? "" : item.accessType === "paid" ? "blur-sm" : ""}`}>
                     {language === "hi"
                       ? HindiWithEnglishNumbers(item.title)
-                      : <h2 className="text-sm font-eng leading-snug">{item.title}</h2>
+                      : language === "hinglish"
+                        ? <h2 className="text-xs font-eng leading-snug">{renderHinglishName(item)}</h2>
+                        : <h2 className="text-sm font-eng leading-snug">{item.title}</h2>
                     }
                   </div>
                 </div>

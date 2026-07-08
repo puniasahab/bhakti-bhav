@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Loader from "../components/Loader";
@@ -10,7 +10,7 @@ import SEO from "../components/SEO";
 import { homeSchema } from "../seo/schemas";
 import { rashifalSchema } from "../schemas/pageSchemas";
 import SchemaMarkup from "../components/SchemaMarkup";
-
+import { LanguageContext } from "../contexts/LanguageContext";
 const RASHIFAL_CACHE_TTL = 5 * 60 * 1000;
 const RASHI_LIST_CACHE_KEY = "rashifal:rashi-list";
 const rashifalCache = new Map();
@@ -58,6 +58,8 @@ const getRashiList = (response) =>
   response?.status === "success" && Array.isArray(response.data) ? response.data : [];
 
 function Rashifal() {
+  
+    const { language } = useContext(LanguageContext);
   const cachedRashiList = getValidCachedRashifal(RASHI_LIST_CACHE_KEY);
   const [rashis, setRashis] = useState(() => getRashiList(cachedRashiList));
   const [modalOpen, setModalOpen] = useState(false);
@@ -201,6 +203,7 @@ const replacements = {
       <PageTitleCard
         titleHi={"vkt dk jkf'kQy"}
         titleEn={"Aaj Ka Rashifal"}
+        isHinglishLanguageSelected={language === "hinglish"}
         customEngFontSize={"14px"}
         customFontSize={"22px"}
       />

@@ -342,6 +342,7 @@ export default function Kahaniya() {
       <PageTitleCard
         titleHi="कहानियां"
         titleEn="Kahaniya"
+        isHinglishLanguageSelected={language === "hinglish"}
         customEngFontSize="16px"
         customFontSize="19px"
       />

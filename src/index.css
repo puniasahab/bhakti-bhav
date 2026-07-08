@@ -732,6 +732,27 @@ body::before {
   top: 63%;
 }
 
+.overflow_bg.aarti-hinglish-title::before {
+  height: 54px;
+  max-height: 82px;
+  top: 63%;
+}
+
+.overflow_bg.jaapmala-hinglish-title::before {
+  height: 54px;
+  max-height: 82px;
+  top: 63%;
+}
+
+.hide-scrollbar {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
 .custom-circle {
   list-style-type: circle; /* ensures a hollow dot */
   padding-left: 1.5rem;

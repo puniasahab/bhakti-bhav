@@ -12,6 +12,7 @@ import { LanguageContext } from "../contexts/LanguageContext";
 import { vratKathaSchema } from "../schemas/pageSchemas";
 import SchemaMarkup from "../components/SchemaMarkup";
 
+
 import useGA4BaseParams from "../hooks/useGA4BaseParams";
 import useGA4Tracker from "../hooks/useGA4Tracker";
 import { GA4Events } from "../utils/ga4Events.enum";
@@ -65,6 +66,73 @@ const getCachedVratKatha = async (cacheKey, fetcher) => {
 const getVratKathaItems = (json) => (Array.isArray(json?.data) ? json.data : []);
 
 const hasMoreVratKatha = (json, limit) => getVratKathaItems(json).length >= limit;
+
+const stripHtmlTags = (value) => String(value || "").replace(/<[^>]*>/g, "").trim();
+
+const formatHindiName = (name) => String(name || "")
+  .replace(/\//g, "|").replace(/\|/g, "।")
+  .replace(/,/g, "]").replace(/\(/g, "¼").replace(/\)/g, "½")
+  .replace(/\:/g, "%").replace(/:/g, "ः")
+  .replace(/ँ/g, "ं")
+  .replace(/\u200D|\u200C/g, "  ")
+  .replace(/[.,;!?'"""'']/g, " ")
+  .replace(/[\[\]{}()]/g, "")
+  .replace(/[*/\\#%^+=_|<>~`@$₹]/g, " ")
+  .replace(/[^\u0900-\u097F\s।॥]/g, "")
+  .replace(/\u00A0/g, " ")
+  .replace(/\u200B|\u200C|\u200D/g, " ")
+  .replace(/\s+/g, " ")
+  .normalize("NFC");
+
+const getHinglishNameParts = (name) => {
+  const lines = stripHtmlTags(name)
+    .split(/\n+/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+  const hindiText = lines[0] || "";
+  const englishText = lines.slice(1).join(" ");
+
+  return {
+    hindiText,
+    englishText: englishText
+      ? englishText.startsWith("(") && englishText.endsWith(")")
+        ? englishText
+        : `(${englishText.replace(/^\(|\)$/g, "").trim()})`
+      : ""
+  };
+};
+
+const renderVratKathaName = (katha, language) => {
+  if (language === "hi") {
+    return formatHindiName(katha.name);
+  }
+
+  if (language !== "hinglish") {
+    return katha.name;
+  }
+
+  const { hindiText, englishText } = getHinglishNameParts(katha.name2 || katha.name);
+
+  if (!englishText) {
+    return <span className="font-eng">{hindiText}</span>;
+  }
+
+  return (
+    <>
+      <span className="block font-hindi text-lg md:text-xl leading-tight">{hindiText}</span>
+      <span className="block font-eng text-xs md:text-sm leading-tight">{englishText}</span>
+    </>
+  );
+};
+
+const getVratKathaAltText = (katha, language) => {
+  if (language === "hinglish") {
+    return stripHtmlTags(katha.name2 || katha.name);
+  }
+
+  return stripHtmlTags(katha.name);
+};
 
 
 export default function VratKatha() {
@@ -542,6 +610,8 @@ export default function VratKatha() {
       <PageTitleCard
         titleHi={"ozr dFkk"}
         titleEn={"Vrat Katha"}
+        isHinglishLanguageSelected={language === "hinglish"}
+        
         customEngFontSize={"18px"}
         customFontSize={"23px"}
 
@@ -559,29 +629,14 @@ export default function VratKatha() {
                   <img
 
                     src={`${katha.imagethumb}`}
-                    alt={katha.name || ""}
+                    alt={getVratKathaAltText(katha, language)}
                     className={`w-auto rounded-md max-h-[100%] md:max-h-[100%] ${getSubscriptionStatusFromLS() ? "" : getPaidLogic(katha)}`}
                   />
                 </div>
                 <div className="p-2">
-                  {katha.name && (
-                    <h2 className={`md:text-xl text-lg font-semibold truncate pt-3 ${language === "hi" ? "font-hindi" : "font-eng text-sm"} ${getSubscriptionStatusFromLS() ? "" : getPaidLogic(katha)}`}>
-                      {language === "hi"
-                        ? katha.name
-                            .replace(/\//g, "|").replace(/\|/g, "।")
-                            .replace(/,/g, "]").replace(/\(/g, "¼").replace(/\)/g, "½")
-                            .replace(/\:/g, "%").replace(/:/g, "ः")
-                            .replace(/ँ/g, "ं")
-                            .replace(/\u200D|\u200C/g, "  ")
-                            .replace(/[.,;!?'"""'']/g, " ")
-                            .replace(/[\[\]{}()]/g, "")
-                            .replace(/[*/\\#%^+=_|<>~`@$₹]/g, " ")
-                            .replace(/[^\u0900-\u097F\s।॥]/g, "")
-                            .replace(/\u00A0/g, " ")
-                            .replace(/\u200B|\u200C|\u200D/g, " ")
-                            .replace(/\s+/g, " ")
-                            .normalize("NFC")
-                        : katha.name}
+                  {(language === "hinglish" ? katha.name2 || katha.name : katha.name) && (
+                    <h2 className={`font-semibold pt-3 ${language === "hinglish" ? "text-center" : "truncate md:text-xl text-lg"} ${language === "hi" ? "font-hindi" : "font-eng text-sm"} ${getSubscriptionStatusFromLS() ? "" : getPaidLogic(katha)}`}>
+                      {renderVratKathaName(katha, language)}
                     </h2>
                   )}
                 </div>

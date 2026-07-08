@@ -49,6 +49,49 @@ const getCachedAartis = async (cacheKey, fetcher) => {
   return request;
 };
 
+
+
+const stripHtmlTags = (value) => String(value || "").replace(/<[^>]*>/g, "").trim();
+
+const getNameFromNameKey = (aarti, isHindi) => {
+  if (typeof aarti.name === "string") {
+    return aarti.name;
+  }
+
+  // writing this to show the name in the selected language, if not available then show the other language
+  return isHindi
+    ? (aarti.name?.hi || aarti.name?.en || "")
+    : (aarti.name?.en || aarti.name?.hi || "");
+};
+
+const getHinglishNameParts = (name) => {
+  const lines = stripHtmlTags(name)
+    .split(/\n+/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+  return {
+    hindiText: lines[0] || "",
+    englishText: lines.slice(1).join(" ")
+  };
+};
+
+const renderHinglishName = (aarti) => {
+  const { hindiText, englishText } = getHinglishNameParts(aarti.name2 || "");
+
+  if (!englishText) {
+    return <span className="font-eng">{hindiText}</span>;
+  }
+
+  return (
+    <>
+      <span className="block font-hindi text-lg leading-tight">{hindiText}</span>
+      <span className="block font-eng text-xs leading-tight">{englishText}</span>
+    </>
+  );
+};
+
+
 export default function Aarti() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -174,6 +217,7 @@ export default function Aarti() {
       <PageTitleCard
         titleHi={"vkjrh"}
         titleEn={"Aarti"}
+        isHinglishLanguageSelected={language === 'hinglish'}
         customEngFontSize={"18px"}
         customFontSize={"23px"}
       />
@@ -193,24 +237,30 @@ export default function Aarti() {
                   to={handleNavigate(item._id, item.accessType)}
                   className="relative block rounded-xl overflow-hidden shadow-lg"
                 >
-                  <div className={`overflow_bg`}>
+                  <div className={`overflow_bg ${language === "hinglish" ? "aarti-hinglish-title" : ""}`}>
                     <img
                       src={imgSrc}
                       alt={typeof item.name === "string" ? item.name : (language === "hi" ? (item.name?.hi || item.name?.en || "Aarti") : (item.name?.en || item.name?.hi || "Aarti"))}
+                      // alt={language === "hinglish" ? stripHtmlTags(aarti.name2 || "") : stripHtmlTags(getNameFromNameKey(aarti, language === "hi"))}
+                    
                       className={`w-full rounded-md max-h-[150px] md:max-h-[150px] object-cover ${isSubscribed ? "" : item.accessType === "paid" ? "blur" : ""}`}
                       loading="lazy"
                       decoding="async"
                     />
-                    <div className={`absolute inset-0 theme_text flex flex-col items-center justify-center text-center px-4 z-10 top-[60%] ${isSubscribed ? "" : item.accessType === "paid" ? "blur-sm" : ""}`}>
+                    <div className={`absolute inset-0 theme_text flex flex-col items-center justify-center text-center px-4 z-10 ${language==='hinglish' ? 'top-[52%]' : 'top-[60%]'} ${isSubscribed ? "" : item.accessType === "paid" ? "blur-sm" : ""}`}>
                       {(() => {
                         const isHindi = language === "hi";
-                        const displayName = typeof item.name === "string"
-                          ? item.name
-                          : (isHindi ? (item.name?.hi || item.name?.en || "") : (item.name?.en || item.name?.hi || ""));
+                        // const displayName = typeof item.name === "string"
+                        //   ? item.name
+                        //   : (isHindi ? (item.name?.hi || item.name?.en || "") : (item.name?.en || item.name?.hi || ""));
+                         const displayName = getNameFromNameKey(item, isHindi);
                         return (
-                          <h2 className={`text-lg font-bold ${isHindi ? "font-hindi" : "font-eng text-sm"}`}>
-                            {displayName}
-                          </h2>
+                          // <h2 className={`text-lg font-bold ${isHindi ? "font-hindi" : "font-eng text-sm"}`}>
+                          //   {displayName}
+                          // </h2>
+                          <h2 className={`font-semibold pt-2 ${language === "hinglish" ? "text-center" : "truncate md:text-lg text-lg"} ${isHindi ? "font-hindi" : "font-eng text-sm"} ${isSubscribed ? "" : item.accessType === "paid" ? "blur-sm" : ""}`}>
+                        {language === "hinglish" ? renderHinglishName(item) : displayName}
+                      </h2>
                         );
                       })()}
                     </div>

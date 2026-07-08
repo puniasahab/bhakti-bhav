@@ -66,6 +66,63 @@ export default function Mantra() {
   const isSubscribed = useMemo(() => getSubscriptionStatusFromLS(), []);
   const hasToken = useMemo(() => getTokenFromLS(), []);
 
+
+  
+const stripHtmlTags = (value) => String(value || "").replace(/<[^>]*>/g, "").trim();
+
+const getNameFromNameKey = (mantra, isHindi) => {
+  if (typeof mantra.name === "string") {
+    return mantra.name;
+  }
+
+  return isHindi
+    ? (mantra.name?.hi || mantra.name?.en || "")
+    : (mantra.name?.en || mantra.name?.hi || "");
+};
+
+const getHinglishNameParts = (name) => {
+  const lines = stripHtmlTags(name)
+    .split(/\n+/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+  return {
+    hindiText: lines[0] || "",
+    englishText: lines.slice(1).join(" ")
+  };
+};
+
+const renderHinglishName = (mantra) => {
+  const { hindiText, englishText } = getHinglishNameParts(mantra.name2 || "");
+
+  if (!englishText) {
+    return <span className="font-eng">{hindiText}</span>;
+  }
+
+  return (
+    <>
+      <span className="block font-hindi text-lg leading-tight">{hindiText}</span>
+      <span className="block font-eng text-xs leading-tight">{englishText}</span>
+    </>
+  );
+};
+
+const renderMantraName = (mantra, language) => {
+  if (language === "hinglish") {
+    return renderHinglishName(mantra);
+  }
+
+  return getNameFromNameKey(mantra, language === "hi");
+};
+
+const getMantraAltText = (mantra, language) => {
+  if (language === "hinglish") {
+    return stripHtmlTags(mantra.name2 || getNameFromNameKey(mantra, false));
+  }
+
+  return stripHtmlTags(getNameFromNameKey(mantra, language === "hi"));
+};
+
   useEffect(() => {
     async function fetchItems() {
       try {
@@ -169,6 +226,7 @@ export default function Mantra() {
       <PageTitleCard
         titleHi={"ea="}
         titleEn={"Mantra"}
+        isHinglishLanguageSelected={language === "hinglish"}
         customEngFontSize={"18px"}
         customFontSize={"23px"}
 
@@ -187,15 +245,15 @@ export default function Mantra() {
                 <div className={`w-full h-36 flex items-center justify-center ${isSubscribed ? "" : item.accessType === "paid" ? "blur" : ""}`}>
                   <img
                     src={item.imagethumb || "/img/default-mantra.png"}
-                    alt={item.name || ""}
+                    alt={getMantraAltText(item, language)}
                     className="w-auto rounded-md max-h-[100%] md:max-h-[100%]"
                     loading="lazy"
                     decoding="async"
                   />
                 </div>
                 <div className="p-2">
-                  <h2 className={`font-semibold mt-1 text-center leading-snug ${language === "hi" ? "font-hindi text-lg" : "font-eng text-sm"} ${isSubscribed ? "" : item.accessType === "paid" ? "blur" : ""}`}>
-                    {item.name}
+                  <h2 className={`font-semibold mt-1 text-center leading-snug ${language === "hinglish" ? "" : language === "hi" ? "font-hindi text-lg" : "font-eng text-sm"} ${isSubscribed ? "" : item.accessType === "paid" ? "blur" : ""}`}>
+                    {renderMantraName(item, language)}
                   </h2>
                 </div>
               </Link>

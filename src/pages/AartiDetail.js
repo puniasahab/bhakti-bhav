@@ -117,6 +117,7 @@ function AartiDetail() {
       <PageTitleCard
         titleHi={detail.name.hi}
         titleEn={detail.name.en} 
+        isHinglisghLanguageSeelcted={language === "hinglish"}
         customEngFontSize={"16px"}
         customFontSize={"19px"}
         

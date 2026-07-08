@@ -12,6 +12,8 @@ const api = axios.create({
   },
 });
 
+const someNewUrlForV4 = 'https://api.bhaktibhav.app/api/v1/frontend-v4/';
+
 const pendingGetRequests = new Map();
 
 const normalizeRequestPart = (value) => {
@@ -74,6 +76,18 @@ api.interceptors.request.use(
   }
 );
 
+
+export const homeMainApis = {
+  getHomeData: async (lang) => {
+    try {
+      const response = await api.get(`${endPoints.homeData}?lang=${lang}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching home data:", error);
+      throw error;
+    }
+  }
+}
 
 export const wallpaperApis = {
   downloadWallpaper: async (id) => {
@@ -452,7 +466,7 @@ export const vratKathaApis = {
       return cached.data;
     }
     try {
-      const response = await api.get(`${endPoints.vratKathaList}-${version}?page=${currentPage}&limit=${limit}&lang=${lang}`);
+      const response = await api.get(`${someNewUrlForV4}${endPoints.vratKathaList}-${version}?page=${currentPage}&limit=${limit}&lang=${lang}`);
       vratKathaCache.set(cacheKey, { data: response.data, timestamp: Date.now() });
       return response.data;
     }
@@ -465,7 +479,7 @@ export const vratKathaApis = {
   fetchSingleVratKathaData: async (version, id, lang, date) => {
     try {
       const dateParam = date ? `&date=${date}` : "";
-      const response = await api.get(`${endPoints.vratKathaById}-${version}/${id}?lang=${lang}${dateParam}`);
+      const response = await api.get(`${someNewUrlForV4}${endPoints.vratKathaById}-${version}/${id}?lang=${lang}${dateParam}`);
       return response.data;
     }
     catch (error) {
@@ -476,7 +490,7 @@ export const vratKathaApis = {
 
   fetchVratKathaCategoryData: async (version, categoryId, lang) => {
     try {
-      const response = await api.get(`${endPoints.vratKathaCategoryList}-${version}/${categoryId}?lang=${lang}`);
+      const response = await api.get(`${someNewUrlForV4}${endPoints.vratKathaCategoryList}-${version}/${categoryId}?lang=${lang}`);
       return response.data;
     }
     catch (error) {
@@ -573,8 +587,6 @@ export const hindiCalendarApis = {
       throw error;
     }
   },
-
-
 };
 
 
@@ -582,7 +594,7 @@ export const hindiCalendarApis = {
 export const chalisaApis = {
   getChalisas: async (version, currentPage, limit, lang) => {
     try {
-      const response = await api.get(`${endPoints.chalisa}?version-${version}&page=${currentPage}&limit=${limit}&lang=${lang}`);
+      const response = await api.get(`${someNewUrlForV4}${endPoints.chalisa}-${version}?page=${currentPage}&limit=${limit}&lang=${lang}`);
       return response.data;
     }
     catch (error) {
@@ -593,7 +605,7 @@ export const chalisaApis = {
 
   getChalisaById: async (version, id, lang) => {
     try {
-      const response = await api.get(`${endPoints.getSingleChalisa}-version=${version}/id?lang=${lang}`);
+      const response = await api.get(`${someNewUrlForV4}${endPoints.getSingleChalisa}-version=${version}/id?lang=${lang}`);
       return response.data;
     }
     catch (error) {
@@ -607,7 +619,7 @@ export const chalisaApis = {
 export const aartiApis = {
   getAartis: async (version, currentPage, limit, lang) => {
     try {
-      const response = await api.get(`${endPoints.aarti}-${version}?page=${currentPage}&limit=${limit}&lang=${lang}`);
+      const response = await api.get(`${someNewUrlForV4}${endPoints.aarti}-${version}?page=${currentPage}&limit=${limit}&lang=${lang}`);
       return response.data;
     }
     catch(error){
@@ -618,7 +630,7 @@ export const aartiApis = {
 
   getAartiById: async (version, id, lang) => {
     try {
-      const response = await api.get(`${endPoints.aarti}-${version}/${id}?lang=${lang}`);
+      const response = await api.get(`${someNewUrlForV4}${endPoints.aarti}-${version}/${id}?lang=${lang}`);
       return response.data;
     }
     catch(error){
@@ -632,7 +644,7 @@ export const aartiApis = {
 export const mantraApis = {
   getMantras: async (version, currentPage, limit, lang) => {
     try {
-      const response = await api.get(`${endPoints.mantras}-${version}?page=${currentPage}&limit=${limit}&lang=${lang}`);
+      const response = await api.get(`${someNewUrlForV4}${endPoints.mantras}-${version}?page=${currentPage}&limit=${limit}&lang=${lang}`);
       return response.data;
     }
     catch(error){
@@ -643,7 +655,7 @@ export const mantraApis = {
 
   getMantraById: async (version, id, lang) => {
     try {
-      const response = await api.get(`${endPoints.getSingleMantra}-${version}/${id}?lang=${lang}`);
+      const response = await api.get(`${someNewUrlForV4}${endPoints.getSingleMantra}-${version}/${id}?lang=${lang}`);
       return response.data;
     }
     catch(error){
@@ -733,7 +745,7 @@ export const newJaapMalaApis = {
 export const naamJaapApis = {
   getNaamJaapData: async (vsersion, currentPage, limit, lang) => {
     try {
-      const response = await api.get(`${endPoints.naamJaap}-${vsersion}?page=${currentPage}&limit=${limit}&lang=${lang}`);
+      const response = await api.get(`${someNewUrlForV4}${endPoints.naamJaap}-${vsersion}?page=${currentPage}&limit=${limit}&lang=${lang}`);
       return response.data;
     }
     catch(error) {
@@ -744,7 +756,7 @@ export const naamJaapApis = {
 
   getNaamJaapById: async(version, id, lang) => {
     try {
-      const response = await api.get(`${endPoints.getSingleNaamJaap}-${version}/${id}?lang=${lang}`);
+      const response = await api.get(`${someNewUrlForV4}${endPoints.getSingleNaamJaap}-${version}/${id}?lang=${lang}`);
       return response.data;
     }
     catch(error) {

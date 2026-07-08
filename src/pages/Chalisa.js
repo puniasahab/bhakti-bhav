@@ -48,6 +48,45 @@ const getCachedChalisas = async (cacheKey, fetcher) => {
   return request;
 };
 
+const stripHtmlTags = (value) => String(value || "").replace(/<[^>]*>/g, "").trim();
+
+const getNameFromNameKey = (chalisa, isHindi) => {
+  if (typeof chalisa.name === "string") {
+    return chalisa.name;
+  }
+
+  return isHindi
+    ? (chalisa.name?.hi || chalisa.name?.en || "")
+    : (chalisa.name?.en || chalisa.name?.hi || "");
+};
+
+const getHinglishNameParts = (name) => {
+  const lines = stripHtmlTags(name)
+    .split(/\n+/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+  return {
+    hindiText: lines[0] || "",
+    englishText: lines.slice(1).join(" ")
+  };
+};
+
+const renderHinglishName = (chalisa) => {
+  const { hindiText, englishText } = getHinglishNameParts(chalisa.name2 || "");
+
+  if (!englishText) {
+    return <span className="font-eng">{hindiText}</span>;
+  }
+
+  return (
+    <>
+      <span className="block font-hindi text-lg leading-tight">{hindiText}</span>
+      <span className="block font-eng text-xs leading-tight">{englishText}</span>
+    </>
+  );
+};
+
 export default function Chalisa() {
   const [chalisa, setChalisa] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -196,7 +235,7 @@ export default function Chalisa() {
                       ? chalisa.imagethumb
                       : `https://api.bhaktibhav.app${chalisa.imagethumb}`
                     }
-                    alt={typeof chalisa.name === "string" ? chalisa.name : (chalisa.name?.hi || chalisa.name?.en || "")}
+                    alt={language === "hinglish" ? stripHtmlTags(chalisa.name2 || "") : stripHtmlTags(getNameFromNameKey(chalisa, language === "hi"))}
                     className={`w-auto rounded-md max-h-[100%] md:max-h-[100%] ${isSubscribed ? "" : chalisa.accessType === "paid" ? "blur-sm" : ""}`}
                     loading="lazy"
                     decoding="async"
@@ -206,12 +245,10 @@ export default function Chalisa() {
                 <div className="px-3 py-4">
                   {(() => {
                     const isHindi = language === "hi";
-                    const displayName = typeof chalisa.name === "string"
-                      ? chalisa.name
-                      : (isHindi ? (chalisa.name?.hi || chalisa.name?.en || "") : (chalisa.name?.en || chalisa.name?.hi || ""));
+                    const displayName = getNameFromNameKey(chalisa, isHindi);
                     return (
-                      <h2 className={`md:text-lg text-lg font-semibold truncate pt-2 ${isHindi ? "font-hindi" : "font-eng text-sm"} ${isSubscribed ? "" : chalisa.accessType === "paid" ? "blur-sm" : ""}`}>
-                        {displayName}
+                      <h2 className={`font-semibold pt-2 ${language === "hinglish" ? "text-center" : "truncate md:text-lg text-lg"} ${isHindi ? "font-hindi" : "font-eng text-sm"} ${isSubscribed ? "" : chalisa.accessType === "paid" ? "blur-sm" : ""}`}>
+                        {language === "hinglish" ? renderHinglishName(chalisa) : displayName}
                       </h2>
                     );
                   })()}
