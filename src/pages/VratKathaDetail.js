@@ -74,7 +74,8 @@ function VratKathaDetail() {
             pause();
         } else {
             // Store katha name for the global player
-            localStorage.setItem('currentTrackName', `${typeof detail.name === "string" ? detail.name : (detail.name?.hi || detail.name?.en)} कथा`);
+            console.log("getting name data logged in", detail.name2, detail.name, typeof detail.name);
+            localStorage.setItem('currentTrackName', `${(language === 'hinglish' || language === 'en') ? detail.name2.split("\n")[0] : detail.name} कथा`);
             play(url);
         }
     };
@@ -229,15 +230,33 @@ const withLineBreaks = (value) => String(getPlainOrHtmlText(value) || "")
 
 const hasHtmlTags = (value) => /<[^>]+>/.test(String(value || ""));
 
+// const normalizeHinglishHtml = (value) => {
+//   const html = withLineBreaks(value);
+
+//   return fixKrutiDevHtml(
+//     html.replace(/(<[^>]*>)|([^<]+)/g, (match, tag, text) => {
+//       if (tag) return tag;
+//       if (!text) return match;
+//       return replaceSpecialChars(text);
+//     })
+//   );
+// };
+
 const normalizeHinglishHtml = (value) => {
   const html = withLineBreaks(value);
 
-  return fixKrutiDevHtml(
+  const normalized = fixKrutiDevHtml(
     html.replace(/(<[^>]*>)|([^<]+)/g, (match, tag, text) => {
       if (tag) return tag;
       if (!text) return match;
       return replaceSpecialChars(text);
     })
+  );
+
+  // Wrap all numbers in an English-font span
+  return normalized.replace(
+    /([०-९0-9]+)/g,
+    '<span style="font-family: Roboto Mono, monospace;">$1</span>'
   );
 };
 

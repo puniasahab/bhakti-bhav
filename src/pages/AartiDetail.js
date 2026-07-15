@@ -114,6 +114,7 @@ function AartiDetail() {
     <>
       <Header pageName={{ hi: "vkjrh", en: "Aarti" }} hindiFontSize="true" />
       <div className="h-2"></div>
+
       <PageTitleCard
         titleHi={detail.name.hi}
         titleEn={detail.name.en} 

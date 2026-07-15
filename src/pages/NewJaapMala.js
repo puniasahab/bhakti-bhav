@@ -328,6 +328,7 @@ export default function NewJaapMala() {
         titleHi="जाप माला"
         titleEn="Jaap Mala"
         customFontSize="18px"
+        isHinglishLanguageSelected={language === "hinglish"}
         isFromJaapMala
       />
       {content}

@@ -10,6 +10,20 @@ import useGA4Tracker from "../hooks/useGA4Tracker";
 import { GA4Events } from "../utils/ga4Events.enum";
 import { mantraApis } from "../api";
 
+const stripHtmlTags = (value) => String(value || "").replace(/<[^>]*>/g, "").trim();
+
+const getHinglishNameParts = (name2) => {
+  const lines = stripHtmlTags(name2)
+    .split(/\n+/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+  return {
+    hindiText: lines[0] || "",
+    englishText: lines.slice(1).join(" ")
+  };
+};
+
 export default function MantraDetail() {
   const { id } = useParams();
   const [detail, setDetail] = useState(null);
@@ -76,7 +90,7 @@ export default function MantraDetail() {
     }
     
     play(url);
-    localStorage.setItem('currentTrackName', `${detail.name} मंत्र`);
+    localStorage.setItem('currentTrackName', `${language === 'hinglish' ? detail.name2.split('\n')[0] : detail.name} मंत्र`);
   };
 
   const toggleLoop = (mantraId, audioUrl) => {
@@ -98,8 +112,8 @@ export default function MantraDetail() {
     } else {
       play(audioUrl);
       setCurrentLoopMantra(mantraId);
-      localStorage.setItem('currentTrackName', `${detail.name} मंत्र`);
-      
+      localStorage.setItem('currentTrackName', `${language === 'hinglish' ? detail.name2.split('\n')[0] : detail.name} मंत्र`);
+
       setTimeout(() => {
         if (audioRef.current) {
           audioRef.current.loop = true;
@@ -127,9 +141,10 @@ export default function MantraDetail() {
       <Header pageName={{ hi: "ea=", en: "Mantra" }} fontSizeOption="true" />
       <div className="h-2"></div>
       <PageTitleCard
-        titleHi={language === "hi" ? detail.name : ""}
-        titleEn={language === "hi" ? "" : detail.name}
-        customEngFontSize={"16px"}
+        titleHi={language === "hinglish" ? getHinglishNameParts(detail.name2 || "").hindiText : (language === "hi" ? detail.name : "")}
+        titleEn={language === "hinglish" ? getHinglishNameParts(detail.name2 || "").englishText : (language === "hi" ? "" : detail.name)}
+        isHinglishLanguageSelected={language === "hinglish"}
+        customEngFontSize={language==='hinglish' ? '15px' : "16px"}
         customFontSize={"19px"}
       /> 
 
@@ -149,8 +164,8 @@ export default function MantraDetail() {
         <div className="space-y-4">
           {detail.mantras
             ?.sort((a, b) => {
-              const lengthA = a.text?.length || 0;
-              const lengthB = b.text?.length || 0;
+              const lengthA = language === 'hinglish' ? a.text2.length || 0 : a.text?.length || 0;
+              const lengthB = language === 'hinglish' ? b.text2.length || 0 : b.text?.length || 0;
               return lengthA - lengthB;
             })
             ?.map((item, index) => {
@@ -165,7 +180,7 @@ export default function MantraDetail() {
                   <p
                     className={`theme_text text-[21px] font-semibold font-hindi ${fontSize}`}
                   >
-                    {(item.text || "")
+                    {((language === 'hinglish' || language === 'en') ? item.text2 || "" : item.text || "")
                       .replace(/:/g, "ः")
                       .replace(/ँ/g, "ं")
                       .replace(/,/g, "]")

@@ -218,7 +218,8 @@ export default function Aarti() {
         titleHi={"vkjrh"}
         titleEn={"Aarti"}
         isHinglishLanguageSelected={language === 'hinglish'}
-        customEngFontSize={"18px"}
+        // customEngFontSize={"18px"}
+        customEngFontSize={language === "hinglish" ? "16px" : "18px"}
         customFontSize={"23px"}
       />
 

@@ -335,7 +335,7 @@ export default function NewJaapMalaDetails() {
               ) : (
                 <>
                   <small>Today's</small>
-                  <b>{jaapCount} / {JAAP_PER_MALA}</b>
+                  <b style={{fontSize: '20px'}}>{jaapCount} / {JAAP_PER_MALA}</b>
                   <span className={`new-jaap-mala-title ${language === "hinglish" ? "new-jaap-mala-title-hinglish" : ""} ${language === "hi" ? "font-devanagari" : "font-eng"}`}>
                     {renderTitle(title, language, "mala")}
                   </span>

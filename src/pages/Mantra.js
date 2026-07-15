@@ -227,7 +227,8 @@ const getMantraAltText = (mantra, language) => {
         titleHi={"ea="}
         titleEn={"Mantra"}
         isHinglishLanguageSelected={language === "hinglish"}
-        customEngFontSize={"18px"}
+        // customEngFontSize={"18px"}
+        customEngFontSize={language === "hinglish" ? "14px" : "18px"}
         customFontSize={"23px"}
 
       />

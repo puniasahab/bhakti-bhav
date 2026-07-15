@@ -243,9 +243,11 @@ const renderHinglishName = (aarti) => {
     <SEO title = "Best Jaap Mala Counter App – Digital Chanting Beads & Jap | भक्ति भाव" description="Track your mantra chanting with a digital mala jap app. Supports 5 mukhi, 9 mukhi Rudraksha, Tulsi mala and more. Simple, accurate and भक्तिमय experience." canonical="https://bhaktibhav.app/jaap-mala" schema={homeSchema} />
       <Header pageName={{ hi: "tkkp ekyk", en: "Jaap mala" }} />
       <PageTitleCard
-        titleHi={"tki ekyk"}
-        titleEn={"Jaap mala"}
-        customEngFontSize={"18px"}
+        titleHi={"uke tki"}
+        titleEn={"Naam Jaap"}
+        isHinglishLanguageSelected={language==='hinglish'}
+        // customEngFontSize={"18px"}
+        customEngFontSize={language === "hinglish" ? "16px" : "18px"}
         customFontSize={"23px"}
       />
 

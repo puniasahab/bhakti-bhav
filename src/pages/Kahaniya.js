@@ -343,7 +343,8 @@ export default function Kahaniya() {
         titleHi="कहानियां"
         titleEn="Kahaniya"
         isHinglishLanguageSelected={language === "hinglish"}
-        customEngFontSize="16px"
+        // customEngFontSize="16px"
+        customEngFontSize={language === "hinglish" ? "14px" : "16px"}
         customFontSize="19px"
       />
 

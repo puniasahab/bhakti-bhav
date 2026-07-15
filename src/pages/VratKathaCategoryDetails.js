@@ -249,12 +249,15 @@ const renderMixedText = (text) => {
         const nameStr = typeof rawName === "string" ? rawName : (rawName?.hi || "");
         const hiName = nameStr.replace(/\//g, "|").replace(/\|/g, "।").replace(/,/g, "]").replace(/\(/g, "¼").replace(/\)/g, "½").replace(/\:/g, "%").replace(/:/g, "ः").replace(/ँ/g, "ं").replace(/\u200D|\u200C/g, "  ").replace(/[.,;!?'"""'']/g, " ").replace(/[\[\]{}()]/g, "").replace(/[*/\\#%^+=_|<>~`@$₹]/g, " ").replace(/[^\u0900-\u097F\s।॥]/g, "").replace(/\u00A0/g, " ").replace(/\u200B|\u200C|\u200D/g, " ").replace(/\s+/g, " ").normalize("NFC") || "dFkk";
         const enName = typeof rawName === "string" ? rawName : (rawName?.en || "Katha");
+        const hinglishLanguageNames = kathaCategoryData?.category?.name2.split("\n");
+        const hiHin = hinglishLanguageNames[0];
+        const enHin = hinglishLanguageNames[1];
         return (
           <PageTitleCard
-            titleHi={hiName}
-            titleEn={enName}
+            titleHi={language === 'hinglish' ? hiHin : hiName}
+            titleEn={language === 'hinglish' ? enHin : enName}
             isHinglishLanguageSelected={language === "hinglish"}
-            customEngFontSize={"16px"}
+            customEngFontSize={language === 'hinglish' ? '15px' : '16px'}
             customFontSize={"19px"}
           />
         );
@@ -274,15 +277,15 @@ const renderMixedText = (text) => {
                 onClick={() => { handleTrackEvent(katha._id, katha); }}
                 className="relative block rounded-xl overflow-hidden shadow-lg"
               >
-                <div className="overflow_bg">
+                <div className={`overflow_bg ${language === "hinglish" ? "aarti-hinglish-title" : ""}`}>
                   <img
                     src={katha.imagethumb || katha.imageUrl}
                     alt={typeof katha.name === "string" ? katha.name : (katha.name?.hi || katha.name?.en || "")}
                     className={`w-full rounded-md max-h-[150px] md:max-h-[150px] object-cover ${getSubscriptionStatusFromLS() ? "" : katha.accessType === "paid" ? "blur-sm" : ""}`}
                   />
-                  <div className={`absolute inset-0 theme_text flex flex-col items-center justify-center text-center px-4 z-10 top-[60%] ${getSubscriptionStatusFromLS() ? "" : katha.accessType === "paid" ? "blur-sm" : ""}`}>
+                  <div className={`absolute inset-0 theme_text flex flex-col items-center justify-center text-center px-4 z-10 ${language === 'hinglish' ? 'top-[52%]' : 'top-[60%]'} ${getSubscriptionStatusFromLS() ? "" : katha.accessType === "paid" ? "blur-sm" : ""}`}>
                     {language !== "hinglish" && katha.name && (
-                      <h2 className={`text-${katha.name.length > 20 ? 'sm' : 'lg'} font-bold ${language === "hi" ? "font-hindi" : "font-eng text-sm"}`}>
+                      <h2 className={`text-${katha.name.length > 20 ? 'sm' : 'md'} font-bold ${language === "hi" ? "font-hindi" : "font-eng text-sm"}`}>
                         {language === "hi"
                           ? id === "6a17ded44f7e9477ea58e92c" ? renderHindiText(typeof katha.name === "string" ? katha.name : (katha.name?.hi || ""))
                               : (typeof katha.name === "string" ? katha.name : (katha.name?.hi || "")).replace(/\//g, "|").replace(/\|/g, "।").replace(/,/g, "]").replace(/\(/g, "¼").replace(/\)/g, "½").replace(/\:/g, "%").replace(/:/g, "ः").replace(/ँ/g, "ं").replace(/\u200D|\u200C/g, "  ").replace(/[.,;!?'"""'']/g, " ").replace(/[\[\]{}()]/g, "").replace(/[*/\\#%^+=_|<>~`@$₹]/g, " ").replace(/[^\u0900-\u097F\s।॥]/g, "").replace(/\u00A0/g, " ").replace(/\u200B|\u200C|\u200D/g, " ").replace(/\s+/g, " ").replace(/[०-९]/g, digit => hindiToEnglishMap[digit]).normalize("NFC")

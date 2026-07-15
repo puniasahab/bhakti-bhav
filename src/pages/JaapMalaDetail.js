@@ -83,11 +83,12 @@ function JaapMalaDetail() {
     };
   return (
     <>
-      <Header pageName={{ hi: "tki ekyk", en: "Jaap mala" }} />
+      <Header pageName={{ hi: "tuke tki", en: "Naam Jaap" }} />
       <div className="h-2"></div>
       <PageTitleCardJaapMala
         titleHi={detail.title.hi}
         titleEn={detail.title.en}
+        isHinglishLanguageSelected={language === "hinglish"}
         customEngFontSize={"13px"}
         customFontSize={"15px"}
         isFromJaapMala={true}
@@ -120,19 +121,22 @@ function JaapMalaDetail() {
                 <div className="flex flex-col items-center justify-center px-4">
                   <div
                     className="relative w-[95%] max-w-md px-6 py-[150px] text-center jaapmala_bg" >
-                    <p className="text-[20px] font-bold text-red-900 mb-2">
+                    {(language === 'hinglish' || language === 'hi') && <p className="text-[20px] font-bold text-red-900 mb-2">
                       {item.name.hi}
-                    </p>
+                    </p>}
+                    {(language === 'hinglish' || language === 'en') && <p className="text-[20px] font-bold text-red-900 mb-2 font-eng">
+                      {item.name.en}
+                    </p>}
                   </div>
 
                   <div className="mt-6 text-center max-w-md">
-                    <p className="text-2xl font-semibold theme_text mb-4">अर्थ%</p>
-                    <p className="text-lg md:text-lg text-gray-700">
+                    <p className={`text-2xl font-semibold theme_text mb-4 ${language === 'en' ? "font-eng" : "font-hindi"}`}>{language === 'hinglish' || language === 'hi' ? "अर्थ" : "Meaning"}</p>
+                    {(language === 'hinglish' || language === 'hi') && <p className="text-lg md:text-lg text-gray-700">
                       {HighlightNumbers(item.meaning.hi)}
-                    </p>
-                    <p className="text-lg text-gray-500 font-eng">
+                    </p>}
+                    {(language === 'hinglish' || language === 'en') && <p className="text-lg text-gray-500 font-eng">
                       {item.meaning.en}
-                    </p>
+                    </p>}
                   </div>
                 </div>
               </SwiperSlide>

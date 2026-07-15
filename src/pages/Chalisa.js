@@ -215,8 +215,9 @@ export default function Chalisa() {
       <PageTitleCard
         titleHi={"चालीसा"}
         titleEn={"Chalisa"}
+        isHinglishLanguageSelected={language === "hinglish"}
         customFontSize={"21px"}
-        customEngFontSize={"18px"}
+        customEngFontSize={language === "hinglish" ? "16px" : "18px"}
 
       />
 

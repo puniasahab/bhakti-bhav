@@ -151,7 +151,7 @@ export default function ChalisaDetail() {
         titleHi={chalisa.name.hi}
         titleEn={chalisa.name.en}
         isHinglishLanguageSelected={language === "hinglish"}
-        customEngFontSize={'16px'}
+        customEngFontSize={language === 'hinglish' ? '15px' : '16px'}
         customFontSize={'19px'}
       />
 
@@ -202,8 +202,8 @@ export default function ChalisaDetail() {
         </div>
 
 
-        <div className={`theme_text text-center leading-loose ${fontSize} ${language === "hi" ? "font-hindi" : "font-eng"}`}>
-          {language === "hi"
+        <div className={`theme_text text-center leading-loose ${fontSize} ${(language === "hi" || language === 'hinglish') ? "font-hindi" : "font-eng"}`}>
+          {(language === "hi" || language === 'hinglish')
             ?
             <div dangerouslySetInnerHTML={{ __html: chalisa.text.hi.replace(/,/g, "]").replace(/\(/g, "¼").replace(/\)/g, "½").replace(/\:/g, "%") }} />
             // chalisa.text.hi.split("\n").map((line, idx) => (
