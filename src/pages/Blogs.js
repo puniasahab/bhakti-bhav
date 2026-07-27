@@ -16,6 +16,7 @@ export default function Blogs() {
       try {
         setLoading(true);
         const data = await blogApis.getBlogs();
+        // console.log("LOOP UUID", data?.data[0].blog_uuid)
         console.log("Consoling line data:", data);
         setBlogs(data?.data || []);
       } catch (err) {
@@ -60,8 +61,8 @@ export default function Blogs() {
 
             return (
               <div
-                key={blog.id}
-                onClick={() => { navigate(`/blogs/${blog.id}`); window.scrollTo(0, 0); }}
+                key={blog.blog_uuid}
+                onClick={() => { navigate(`/blogs/${blog.blog_uuid}`); window.scrollTo(0, 0); }}
                 className="flex gap-3 bg-[rgba(255,250,244,0.92)] rounded-2xl shadow-md overflow-hidden cursor-pointer active:scale-[0.98] transition-transform"
                 style={{ border: "1.5px solid #E9B9C5" }}
               >
