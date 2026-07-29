@@ -62,8 +62,8 @@ const PageTitleCardJaapMala = ({
           style={customFontSize ? { fontSize: customFontSize } : {}}
         >
           {language === "hi" ? HindiWithEnglishNumbers(titleHi) : titleEn}
-        </div>clnpm start
-        x
+        </div>
+        
         
         <div 
           className={`font-eng ${!customEngFontSize ? engTextSize : ''}`}
