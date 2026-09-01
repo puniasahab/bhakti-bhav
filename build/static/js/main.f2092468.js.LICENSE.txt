@@ -17,7 +17,7 @@
   PERFORMANCE OF THIS SOFTWARE.
   ***************************************************************************** */
 
-/*! @license DOMPurify 3.2.7 | (c) Cure53 and other contributors | Released under the Apache license 2.0 and Mozilla Public License 2.0 | github.com/cure53/DOMPurify/blob/3.2.7/LICENSE */
+/*! @license DOMPurify 3.4.10 | (c) Cure53 and other contributors | Released under the Apache license 2.0 and Mozilla Public License 2.0 | github.com/cure53/DOMPurify/blob/3.4.10/LICENSE */
 
 /**
    * @license
@@ -339,7 +339,7 @@
  */
 
 /**
- * react-router v7.9.2
+ * react-router v7.18.0
  *
  * Copyright (c) Remix Software Inc.
  *
@@ -387,7 +387,7 @@
 /** @license
  *
  * jsPDF - PDF Document creation from JavaScript
- * Version 3.0.3 Built on 2025-09-18T08:03:54.261Z
+ * Version 3.0.4 Built on 2025-11-19T12:48:37.232Z
  *                      CommitID 00000000
  *
  * Copyright (c) 2010-2025 James Hall <james@parall.ax>, https://github.com/MrRio/jsPDF

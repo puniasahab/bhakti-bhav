@@ -16,9 +16,8 @@ import { getMobileNoFromLS } from "../commonFunctions";
 export default function PaymentDrop() {
   const { paymentResponse, selectedPlanData, userProfile } = usePayment();
   const navigate = useNavigate();
-  const containerRef = useRef(null);
+  const cashfreeRef = useRef(null);
   const [error, setError] = useState(null);
-  const [orderId, setOrderId] = useState("");
   const [loading, setLoading] = useState(false);
   const [paymentProcessing, setPaymentProcessing] = useState(false);
 
@@ -27,20 +26,48 @@ export default function PaymentDrop() {
   const { trackEvent } = useGA4Tracker(baseParams);
 
 
-  
-  console.log("Payment", paymentResponse.data.cashfree.payment_session_id);
-  let cashfree;
-  let initializeSDK = async () => {
-    cashfree = await load({
-      mode: 'production', // Use 'sandbox' for testing and 'production' for live transactions
-    })
-  }
-  initializeSDK();
+  const parseStoredJson = (key) => {
+    try {
+      return JSON.parse(localStorage.getItem(key) || "null");
+    } catch (err) {
+      console.error(`Unable to parse ${key} from localStorage`, err);
+      return null;
+    }
+  };
+
+  const storedPaymentResponse = paymentResponse || parseStoredJson("cashfreeSubscriptionResponse");
+  const storedPlanData = selectedPlanData || parseStoredJson("cashfreeSelectedPlanData");
+  const storedUserProfile = userProfile || parseStoredJson("cashfreeBillingProfile");
+  const cashfreeData = storedPaymentResponse?.data?.cashfree || {};
+  const subscriptionSessionId = storedPaymentResponse?.data?.subscriptionSessionId || cashfreeData?.subscription_session_id;
+  const paymentSessionId = cashfreeData?.payment_session_id;
+  const currentOrderId = cashfreeData?.order_id || storedPaymentResponse?.data?.subscriptionId;
+  const currentAmount = storedPaymentResponse?.data?.amount || cashfreeData?.order_amount || storedPlanData?.price;
+  const currentStatus = storedPaymentResponse?.data?.status || cashfreeData?.subscription_status;
+
+  useEffect(() => {
+    let isMounted = true;
+    const initializeSDK = async () => {
+      cashfreeRef.current = await load({
+        mode: 'production', // Use 'sandbox' for testing and 'production' for live transactions
+      });
+    };
+
+    initializeSDK().catch((sdkError) => {
+      console.error("Cashfree SDK initialization error:", sdkError);
+      if (isMounted) {
+        setError("Unable to initialize payment. Please try again.");
+      }
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const getSessionId = async () => {
-    if (paymentResponse.data) {
-      setOrderId(paymentResponse.data.cashfree.order_id);
-      return paymentResponse.data.cashfree.payment_session_id;
+    if (storedPaymentResponse?.data) {
+      return subscriptionSessionId || paymentSessionId;
     }
   }
 
@@ -50,25 +77,60 @@ export default function PaymentDrop() {
     try {
       setLoading(true);
       setError(null);
-      trackCustomEvent(PIXEL_STANDARD_EVENTS.PAYMENT_INITIATED, { message: "User initiated payment", mobileNumber: getMobileNoFromLS });
+      trackCustomEvent(PIXEL_STANDARD_EVENTS.PAYMENT_INITIATED, { message: "User initiated payment", mobileNumber: getMobileNoFromLS() });
       trackEvent(GA4Events.subscription_start_cta_clicked, { event_label: "subscription_start_cta_clicked_from_payment_drop_screen" });
       
-      const sessionId = getSessionId();
+      const sessionId = await getSessionId();
       console.log("SessionId", sessionId);
-      
-      let checkoutOptions = {
-        paymentSessionId: paymentResponse.data.cashfree.payment_session_id,
-        redirectTarget: "_modal", // this is open popup on out website
+      if (!sessionId || !cashfreeRef.current) {
+        setError("Payment session is not available. Please try again.");
+        setLoading(false);
+        return;
       }
+      
+      const checkoutOptions = subscriptionSessionId
+        ? {
+          subsSessionId: subscriptionSessionId,
+          redirectTarget: "_modal",
+        }
+        : {
+          paymentSessionId,
+          redirectTarget: "_modal", // this is open popup on out website
+        };
 
-      cashfree.checkout(checkoutOptions).then((res) => {
+      const checkout = subscriptionSessionId
+        ? cashfreeRef.current.subscriptionsCheckout(checkoutOptions)
+        : cashfreeRef.current.checkout(checkoutOptions);
+
+      checkout.then((res) => {
         console.log("Cashfree checkout result:", res);
+        if (res?.error) {
+          trackCustomEvent(PIXEL_STANDARD_EVENTS.PAYMENT_FAILED, { message: res.error?.message || "Cashfree subscription authorization cancelled", orderId: currentOrderId, mobileNumber: getMobileNoFromLS() });
+          localStorage.setItem("cashfreeSubscriptionStatus", "AUTHORIZATION_CANCELLED");
+          setError(res.error?.message || "Mandate authorization was not completed. Please try again.");
+          setLoading(false);
+          setPaymentProcessing(false);
+          return;
+        }
+
         setPaymentProcessing(true);
+
+        if (subscriptionSessionId) {
+          localStorage.setItem("cashfreeSubscriptionStatus", "AUTHORIZED");
+          navigate('/payment-complete', {
+            state: {
+              paymentSuccess: true,
+              orderId: currentOrderId,
+              subscriptionId: storedPaymentResponse?.data?.subscriptionId,
+            }
+          });
+          return;
+        }
         
         const verifyPayment = async () => {
           try {
             const resp = await paymentApis.verifyPayments({
-              order_id: paymentResponse.data.cashfree.order_id,
+              order_id: currentOrderId,
               source: "web",
             });
             console.log("Payment verification response:", resp);
@@ -81,18 +143,18 @@ export default function PaymentDrop() {
               navigate('/payment-complete', { 
                 state: { 
                   paymentSuccess: true, 
-                  orderId: paymentResponse.data.cashfree.order_id,
+                  orderId: currentOrderId,
                 } 
               });
             } else {
               // Payment verification failed
-              trackCustomEvent(PIXEL_STANDARD_EVENTS.PAYMENT_FAILED, { message: "Payment verification failed", orderId: paymentResponse.data.cashfree.order_id, mobileNumber: getMobileNoFromLS() });
+              trackCustomEvent(PIXEL_STANDARD_EVENTS.PAYMENT_FAILED, { message: "Payment verification failed", orderId: currentOrderId, mobileNumber: getMobileNoFromLS() });
               setError("Payment verification failed. Please contact support.");
               setPaymentProcessing(false);
             }
           } catch (verifyError) {
             console.error("Payment verification error:", verifyError);
-            trackCustomEvent(PIXEL_STANDARD_EVENTS.PAYMENT_FAILED, { message: verifyError?.message || "Payment verification API error", orderId: paymentResponse.data.cashfree.order_id, mobileNumber: getMobileNoFromLS() });
+            trackCustomEvent(PIXEL_STANDARD_EVENTS.PAYMENT_FAILED, { message: verifyError?.message || "Payment verification API error", orderId: currentOrderId, mobileNumber: getMobileNoFromLS() });
             setError("Unable to verify payment. Please contact support if amount was deducted.");
             setPaymentProcessing(false);
           }
@@ -101,7 +163,8 @@ export default function PaymentDrop() {
         verifyPayment();
       }).catch((checkoutError) => {
         console.error("Checkout error:", checkoutError);
-        trackCustomEvent(PIXEL_STANDARD_EVENTS.PAYMENT_FAILED, { message: checkoutError?.message || "Cashfree checkout failed or dismissed", orderId: paymentResponse.data.cashfree.order_id, mobileNumber: getMobileNoFromLS() });
+        localStorage.setItem("cashfreeSubscriptionStatus", "AUTHORIZATION_CANCELLED");
+        trackCustomEvent(PIXEL_STANDARD_EVENTS.PAYMENT_FAILED, { message: checkoutError?.message || "Cashfree checkout failed or dismissed", orderId: currentOrderId, mobileNumber: getMobileNoFromLS() });
         setError("Payment process failed. Please try again.");
         setLoading(false);
         setPaymentProcessing(false);
@@ -149,13 +212,13 @@ export default function PaymentDrop() {
           <div className="p-6">
             <div className="text-center mb-6">
               <h3 className="text-2xl font-bold text-[#9A283D] mb-2 font-eng">
-                {selectedPlanData?.name || "Premium Plan"}
+                {storedPlanData?.name || storedPaymentResponse?.data?.cashfree?.plan_details?.plan_name || "Premium Plan"}
               </h3>
               <div className="text-3xl font-bold text-gray-800 mb-1 font-eng">
-                ₹{selectedPlanData?.price || paymentResponse?.data?.cashfree?.order_amount}
+                ₹{currentAmount}
               </div>
               <p className="text-gray-500 text-sm font-eng">
-                {selectedPlanData?.duration || "Monthly Subscription"}
+                {storedPlanData?.duration || `${storedPaymentResponse?.data?.intervals || ""} ${storedPaymentResponse?.data?.intervalType || "Monthly Subscription"}`.trim()}
               </p>
             </div>
 
@@ -186,13 +249,13 @@ export default function PaymentDrop() {
             <div className="mb-6 p-4 bg-gray-50 rounded-lg">
               <h4 className="font-semibold text-gray-700 mb-2 font-eng">Billing Information:</h4>
               <p className="text-gray-600 font-eng">
-                <span className="font-medium">Name:</span> {userProfile?.name || "User"}
+                <span className="font-medium">Name:</span> {storedUserProfile?.name || cashfreeData?.customer_details?.customer_name || "User"}
               </p>
               <p className="text-gray-600 font-eng">
-                <span className="font-medium">Email:</span> {userProfile?.email || paymentResponse?.data?.cashfree?.customer_details?.customer_email}
+                <span className="font-medium">Email:</span> {storedUserProfile?.email || cashfreeData?.customer_details?.customer_email}
               </p>
               <p className="text-gray-600 font-eng">
-                <span className="font-medium">Phone:</span> {userProfile?.phone || paymentResponse?.data?.cashfree?.customer_details?.customer_phone}
+                <span className="font-medium">Phone:</span> {storedUserProfile?.phone || storedUserProfile?.mobileNumber || cashfreeData?.customer_details?.customer_phone}
               </p>
             </div>
 
@@ -200,11 +263,16 @@ export default function PaymentDrop() {
             <div className="mb-6 p-4 bg-yellow-50 rounded-lg border border-yellow-200">
               <h4 className="font-semibold text-gray-700 mb-2 font-eng">Order Details:</h4>
               <p className="text-gray-600 text-sm font-eng">
-                <span className="font-medium">Order ID:</span> {paymentResponse?.data?.cashfree?.order_id}
+                <span className="font-medium">{subscriptionSessionId ? "Subscription ID" : "Order ID"}:</span> {currentOrderId}
               </p>
               <p className="text-gray-600 text-sm font-eng">
-                <span className="font-medium">Amount:</span> ₹{paymentResponse?.data?.cashfree?.order_amount}
+                <span className="font-medium">Amount:</span> ₹{currentAmount}
               </p>
+              {currentStatus && (
+                <p className="text-gray-600 text-sm font-eng">
+                  <span className="font-medium">Status:</span> {currentStatus}
+                </p>
+              )}
             </div>
 
             {/* Error Display */}

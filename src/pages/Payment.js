@@ -16,6 +16,7 @@ import { getMobileNoFromLS } from "../commonFunctions";
 
 
 export default function Payment() {
+  const DEFAULT_SUBSCRIPTION_PLAN_ID = "69cf557fd51b9fa7a048826c";
   
   const [plans, setPlans] = useState([]);
    const [profile, setProfile] = useState({
@@ -160,6 +161,18 @@ export default function Payment() {
     },
   ];
 
+  const saveSubscriptionPaymentInLS = (response, planData, profileData) => {
+    const subscriptionData = response?.data || {};
+    localStorage.setItem("cashfreeSubscriptionResponse", JSON.stringify(response));
+    localStorage.setItem("cashfreeSubscriptionId", subscriptionData.subscriptionId || "");
+    localStorage.setItem("cashfreeSubscriptionSessionId", subscriptionData.subscriptionSessionId || "");
+    localStorage.setItem("cashfreeCfSubscriptionId", subscriptionData.cfSubscriptionId || "");
+    localStorage.setItem("cashfreeSubscriptionStatus", subscriptionData.status || "");
+    localStorage.setItem("cashfreeSubscriptionAmount", String(subscriptionData.amount || planData?.price || ""));
+    localStorage.setItem("cashfreeSelectedPlanData", JSON.stringify(planData || {}));
+    localStorage.setItem("cashfreeBillingProfile", JSON.stringify(profileData || {}));
+  };
+
   const makePayment = async (selectedPlan) => {
     if(!selectedPlan) {
       alert("No valid plan is selected for payment.");
@@ -168,6 +181,12 @@ export default function Payment() {
     }
     else {
       const planDetails = plans.filter((plan) => plan?._id === selectedPlan);
+      const planData = planDetails[0];
+      if (!planData) {
+        alert("No valid plan is selected for payment.");
+        trackCustomEvent(PIXEL_STANDARD_EVENTS.PAYMENT_FAILED, { message: "Selected plan details not found", mobileNumber: getMobileNoFromLS(), planId: selectedPlan });
+        return;
+      }
     console.log("selectedPlan", planDetails);
     console.log("profile", profile);
     if(profile.email === '' || profile.email == null || profile.email === undefined) {
@@ -178,26 +197,40 @@ export default function Payment() {
         }
       }, 500);
     }
-    console.log({ planId: planDetails[0]._id, amount: planDetails[0].price, name: profile.name, email: profile.email, phone: profile.mobileNumber }
+    const billingProfile = {
+      name: profile.name || "Smruti Ranjan Mallick",
+      email: profile.email || "dummytest@gmail.com",
+      phone: profile.mobileNumber || getMobileNoFromLS() || "9540089701",
+    };
+
+    const subscriptionPayload = {
+      planId: DEFAULT_SUBSCRIPTION_PLAN_ID,
+      name: billingProfile.name,
+      phone: billingProfile.phone,
+      email: billingProfile.email,
+      source: "web",
+      couponCode: "",
+    };
+
+    console.log({ ...subscriptionPayload, amount: planData.price }
     );
 
     try {
-      const res = await paymentApis.makePayment(
-        { planId: planDetails[0]._id, amount: planDetails[0].price, name: profile.name, email: profile.email, phone: profile.mobileNumber, source: "web" }
-      );
+      const res = await paymentApis.createSubscription(subscriptionPayload);
 
       if(res.success) {
         // Store payment data in context before navigation
-        setPaymentData(res, planDetails[0], profile);
+        saveSubscriptionPaymentInLS(res, planData, billingProfile);
+        setPaymentData(res, planData, billingProfile);
         navigate("/paymentPage");
       } else {
         // API responded but payment initiation failed
-        trackCustomEvent(PIXEL_STANDARD_EVENTS.PAYMENT_FAILED, { message: res?.message || "Payment initiation failed", mobileNumber: getMobileNoFromLS(), planId: planDetails[0]._id });
+        trackCustomEvent(PIXEL_STANDARD_EVENTS.PAYMENT_FAILED, { message: res?.message || "Payment initiation failed", mobileNumber: getMobileNoFromLS(), planId: planData._id });
       }
       console.log(res, "Payment Response");
     } catch (paymentError) {
       console.error("Error making payment:", paymentError);
-      trackCustomEvent(PIXEL_STANDARD_EVENTS.PAYMENT_FAILED, { message: paymentError?.message || "Network error during payment initiation", mobileNumber: getMobileNoFromLS(), planId: planDetails[0]?._id });
+      trackCustomEvent(PIXEL_STANDARD_EVENTS.PAYMENT_FAILED, { message: paymentError?.message || "Network error during payment initiation", mobileNumber: getMobileNoFromLS(), planId: planData?._id });
     }
     }
   }
@@ -210,7 +243,7 @@ export default function Payment() {
       <div className="container mx-auto px-4 py-6 theme_text">
         <div className="rounded-xl shadow flex flex-col items-center">
           <img
-            src={bannersData && bannersData[0]?.imageUrl || "../assets/img/paymentPageBanner.jpeg"}
+            src={(bannersData && bannersData[0]?.imageUrl) || "../assets/img/paymentPageBanner.jpeg"}
             alt={"payment_bg"}
             className="w-auto rounded-md max-h-[100%] md:max-h-[100%]"
           />

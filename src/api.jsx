@@ -205,6 +205,16 @@ export const paymentApis = {
     }
   },
 
+  createSubscription: async (data) => {
+    try {
+      const response = await api.post(endPoints.createSubscription, data);
+      return response.data;
+    } catch (error) {
+      console.error("Error creating subscription:", error);
+      throw error;
+    }
+  },
+
   verifyPayments: async (data) => {
     try {
       const response = await api.post(endPoints.verifyPayment, data);

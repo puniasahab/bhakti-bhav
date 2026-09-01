@@ -142,7 +142,7 @@ function VerifyOtp() {
                 setTokenInLS(data.token);
                 setIsLoggedIn();
                 // Redirect based on which home flow triggered the login
-                if (loginSource === "home-v1") {
+                if (loginSource === "home-v1" || loginSource === "app-events1-payment") {
                     sessionStorage.removeItem("loginSource");
                     navigate("/payment");
                 } else {

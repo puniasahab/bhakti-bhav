@@ -1,8 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { loginApis } from "../api";
+import { getIsLoggedIn, getUserIdFromLS, setMobileNoInLS, setUserIdInLS } from "../commonFunctions";
+import mandalaImg from "../assets/img/mandala.png";
 
 const AppEvents1 = () => {
   const [selectedPlan, setSelectedPlan] = useState(2);
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+  const [showEventLogin, setShowEventLogin] = useState(false);
+  const [mobile, setMobile] = useState("");
+  const [loginLoading, setLoginLoading] = useState(false);
+  const navigate = useNavigate();
+
   useEffect(() => {
     let viewportMeta = document.querySelector('meta[name="viewport"]');
     let originalContent = '';
@@ -19,6 +28,68 @@ const AppEvents1 = () => {
       }
     };
   }, []);
+
+  useEffect(() => {
+    if (!getIsLoggedIn()) {
+      setShowLoginPrompt(true);
+    }
+  }, []);
+
+  const getOrCreateDeviceId = () => {
+    let deviceId = localStorage.getItem('deviceId');
+    if (deviceId) return deviceId;
+
+    if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+      deviceId = crypto.randomUUID();
+    } else {
+      deviceId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+        const r = (Math.random() * 16) | 0;
+        const v = c === 'x' ? r : (r & 0x3) | 0x8;
+        return v.toString(16);
+      });
+    }
+
+    localStorage.setItem('deviceId', deviceId);
+    return deviceId;
+  };
+
+  const openEventLogin = () => {
+    if (getIsLoggedIn()) {
+      navigate("/payment");
+      return;
+    }
+
+    setShowLoginPrompt(false);
+    setShowEventLogin(true);
+  };
+
+  const handleEventLoginSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!mobile || mobile.length !== 10) {
+      alert("Please enter a valid 10-digit phone number");
+      return;
+    }
+
+    setLoginLoading(true);
+    try {
+      const response = await loginApis.generateOtp(mobile, getOrCreateDeviceId(), getUserIdFromLS());
+      setUserIdInLS(response?.userId);
+
+      if (response.success) {
+        setMobileNoInLS(mobile);
+        sessionStorage.setItem("loginSource", "app-events1-payment");
+        navigate("/verify-otp", { state: { mobile, loginSource: "app-events1-payment" } });
+      } else {
+        alert(response?.message || "Failed to send OTP");
+      }
+    } catch (error) {
+      console.error("Event login API error:", error);
+      alert("Something went wrong!");
+    } finally {
+      setLoginLoading(false);
+    }
+  };
 
   return (
     <div className="bg-[#fff8f0] min-h-screen font-sans text-gray-800 min-w-[1024px]">
@@ -309,6 +380,107 @@ const AppEvents1 = () => {
           <Link to="/contact-us" className="hover:text-[#9A283D] transition-colors whitespace-nowrap">संपर्क करें</Link>
         </div>
       </footer>
+
+      {showLoginPrompt && (
+        <div className="fixed inset-0 z-[100] flex items-end justify-center bg-black/45">
+          <div className="relative w-full max-w-[420px] overflow-hidden rounded-t-[42px] bg-[#F9D99A] px-7 pb-10 pt-4 text-center shadow-2xl">
+            <button
+              type="button"
+              aria-label="Close login popup"
+              onClick={() => setShowLoginPrompt(false)}
+              className="absolute right-5 top-5 z-10 flex h-14 w-14 items-center justify-center rounded-full bg-white/90 text-5xl leading-none text-[#9A283D] shadow-md"
+            >
+              ×
+            </button>
+
+            <img
+              src="/img/bell-img.png"
+              alt=""
+              className="mx-auto -mt-8 h-36 w-28 object-contain"
+            />
+            <div className="absolute left-1/2 top-[155px] h-52 w-40 -translate-x-1/2 rounded-t-full bg-white/30 shadow-[0_0_42px_rgba(255,255,255,0.75)]" />
+            <div className="relative z-10 mt-12">
+              <h2 className="font-eng text-[42px] font-extrabold leading-tight text-[#760914]">
+                Unlock Bhakti Bhav Plus
+              </h2>
+              <p className="mt-4 font-hindi text-[40px] leading-tight text-[#760914]">
+                रोज की भक्ति बिना रुकावट
+              </p>
+              <button
+                type="button"
+                onClick={openEventLogin}
+                className="mt-16 w-full rounded-2xl bg-[#A72440] px-6 py-5 font-eng text-3xl font-medium text-white shadow-xl transition hover:bg-[#86182f]"
+              >
+                Free Login
+              </button>
+              <p className="mt-16 font-eng text-xl font-medium text-[#A72440]">
+                Trusted by Lakhs of Devotees
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showEventLogin && (
+        <div className="fixed inset-0 z-[110] flex justify-center bg-white">
+          <div className="relative min-h-screen w-full max-w-[430px] overflow-hidden bg-white px-8 pt-8 text-center">
+            <img
+              src="/img/bell-img.png"
+              alt=""
+              className="absolute -left-7 -top-5 h-72 w-44 object-contain"
+            />
+            <img
+              src={mandalaImg}
+              alt=""
+              className="absolute right-0 top-12 h-72 w-72 opacity-20"
+            />
+            <button
+              type="button"
+              aria-label="Close login"
+              onClick={() => {
+                setShowEventLogin(false);
+                setShowLoginPrompt(true);
+              }}
+              className="absolute right-5 top-6 z-20 flex h-11 w-11 items-center justify-center rounded-full bg-[#fff4dd] text-4xl leading-none text-[#9A283D] shadow"
+            >
+              ×
+            </button>
+
+            <div className="relative z-10 mt-72 flex flex-col items-center">
+              <img src="./img/logo_splash.png" alt="Bhakti Bhav" className="h-[184px] w-[192px]" />
+              <div className="-mt-1 rounded-full border-[6px] border-white bg-[#FFE4B3] px-9 py-4 font-eng text-base font-extrabold tracking-wide text-[#9A283D] shadow-xl">
+                BHAKTI BHAV FAMILY
+              </div>
+            </div>
+
+            <form onSubmit={handleEventLoginSubmit} className="relative z-10 mt-12 rounded-t-[34px] bg-white px-4 pb-8">
+              <h2 className="font-eng text-5xl font-extrabold text-[#A72440]">Sign In</h2>
+              <p className="mt-2 font-eng text-3xl font-bold text-[#A72440]">Enter your Phone Number</p>
+
+              <div className="mt-12 flex h-20 items-center rounded-2xl bg-[#F3F3F3] px-6">
+                <span className="text-3xl" aria-hidden="true">🇮🇳</span>
+                <span className="ml-3 text-2xl text-black">⌄</span>
+                <span className="ml-6 border-r border-gray-300 pr-5 font-eng text-4xl font-extrabold text-black">+91</span>
+                <input
+                  type="tel"
+                  value={mobile}
+                  onChange={(e) => setMobile(e.target.value.replace(/\D/g, "").slice(0, 10))}
+                  placeholder="Enter Phone Nu..."
+                  className="min-w-0 flex-1 bg-transparent px-6 font-eng text-3xl font-medium text-[#9A283D] placeholder:text-[#C98B9A] focus:outline-none"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={loginLoading}
+                className="mt-10 w-full rounded-2xl bg-[#A72440] py-5 font-eng text-4xl font-extrabold text-white shadow-xl transition hover:bg-[#86182f] disabled:opacity-60"
+              >
+                {loginLoading ? "Sending..." : "Send OTP"}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
       
     </div>
   );
