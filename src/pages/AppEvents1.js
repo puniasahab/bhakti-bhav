@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { loginApis, paymentApis, profileApis } from "../api";
 import { getIsLoggedIn, getMobileNoFromLS, getUserIdFromLS, setIsLoggedIn, setMobileNoInLS, setSubscriptionStatusInLS, setTokenInLS, setUserIdInLS } from "../commonFunctions";
@@ -8,6 +8,7 @@ import mandalaImg from "../assets/img/mandala.png";
 const SUBSCRIPTION_SUCCESS_STATUSES = ["ACTIVE"];
 const SUBSCRIPTION_FAILURE_STATUSES = ["FAILED", "CANCELLED", "AUTHORIZATION_CANCELLED", "EXPIRED"];
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+const DESKTOP_VIEWPORT_CONTENT = "width=1180, initial-scale=1";
 
 const AppEvents1 = () => {
   const [selectedPlan, setSelectedPlan] = useState(2);
@@ -25,6 +26,32 @@ const AppEvents1 = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { deviceType, redirectToStore, storeUrls } = useAppStoreRedirect();
+
+  useLayoutEffect(() => {
+    const viewportMeta = document.querySelector('meta[name="viewport"]');
+    const originalViewportContent = viewportMeta?.getAttribute("content") || "";
+    const originalBodyMinWidth = document.body.style.minWidth;
+    const originalBodyOverflowX = document.body.style.overflowX;
+    const originalHtmlOverflowX = document.documentElement.style.overflowX;
+
+    if (viewportMeta) {
+      viewportMeta.setAttribute("content", DESKTOP_VIEWPORT_CONTENT);
+    }
+
+    document.body.style.minWidth = "1180px";
+    document.body.style.overflowX = "auto";
+    document.documentElement.style.overflowX = "auto";
+
+    return () => {
+      if (viewportMeta) {
+        viewportMeta.setAttribute("content", originalViewportContent || "width=device-width, initial-scale=1");
+      }
+
+      document.body.style.minWidth = originalBodyMinWidth;
+      document.body.style.overflowX = originalBodyOverflowX;
+      document.documentElement.style.overflowX = originalHtmlOverflowX;
+    };
+  }, []);
 
   useEffect(() => {
     const subscriptionId = searchParams.get("subscription_id");
@@ -300,35 +327,35 @@ const AppEvents1 = () => {
   const isSubscriptionFailed = SUBSCRIPTION_FAILURE_STATUSES.includes(normalizedPaymentStatus);
 
   return (
-    <div className="bg-[#fff8f0] min-h-screen w-full overflow-x-hidden font-sans text-gray-800">
+    <div className="min-h-screen min-w-[1180px] bg-[#fff8f0] font-sans text-gray-800">
       
       {/* 1. Navbar */}
-      <nav className="sticky top-0 z-50 flex flex-col gap-4 bg-white px-4 py-4 shadow-sm md:flex-row md:items-center md:justify-between md:px-12">
+      <nav className="sticky top-0 z-50 flex items-center justify-between gap-4 bg-white px-12 py-4 shadow-sm">
         <div className="flex items-center gap-3">
           <div className="flex flex-col">
-            <span className="text-[#9A283D] font-bold text-3xl leading-tight md:text-4xl">भक्ति भाव</span>
+            <span className="text-[#9A283D] font-bold text-4xl leading-tight">भक्ति भाव</span>
             <span className="text-base text-gray-500 leading-none mt-1">हर दिन भक्ति, हर कदम शांति</span>
           </div>
         </div>
         
-        <div className="flex flex-wrap items-center gap-4 text-base font-bold text-gray-600 md:gap-8 md:text-xl">
+        <div className="flex items-center gap-8 text-xl font-bold text-gray-600">
           <a href="#" className="text-[#9A283D] border-b-2 border-[#9A283D] pb-1">होम</a>
           <a href="#plans" className="hover:text-[#9A283D] transition-colors">प्लान</a>
           <a href="#download" className="hover:text-[#9A283D] transition-colors">डाउनलोड</a>
           <a href="#" className="hover:text-[#9A283D] transition-colors">सहायता</a>
         </div>
 
-        <a href="#download" className="flex items-center justify-center gap-2 whitespace-nowrap rounded-lg bg-[#590f1d] px-5 py-3 text-base font-bold text-white shadow-md transition-colors hover:bg-[#360810] md:px-8 md:text-xl">
+        <a href="#download" className="flex items-center justify-center gap-2 whitespace-nowrap rounded-lg bg-[#590f1d] px-8 py-3 text-xl font-bold text-white shadow-md transition-colors hover:bg-[#360810]">
           ऐप डाउनलोड करें
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
         </a>
       </nav>
 
       {/* 2. Hero Section (Two Columns, Tight Spacing) */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-white via-[#fff8f0] to-[#f9ede1] px-4 pb-10 pt-10 md:px-12 md:pt-16">
+      <section className="relative overflow-hidden bg-gradient-to-br from-white via-[#fff8f0] to-[#f9ede1] px-12 pb-10 pt-16">
         <div className="absolute top-0 right-0 w-1/2 h-full opacity-30 bg-cover bg-center pointer-events-none" style={{ backgroundImage: 'url(https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Kashi_Vishwanath_Temple_Varanasi.jpg/800px-Kashi_Vishwanath_Temple_Varanasi.jpg)' }}></div>
         
-        <div className="relative z-10 mx-auto flex max-w-[1100px] flex-col items-center justify-center gap-8 md:flex-row md:gap-10">
+        <div className="relative z-10 mx-auto flex max-w-[1100px] flex-row items-center justify-center gap-10">
           
           {/* Left Column (Text & Buttons) */}
           <div className="flex-1 max-w-xl">
@@ -336,23 +363,23 @@ const AppEvents1 = () => {
               <span className="text-yellow-500 text-2xl leading-none">❖</span> आपकी आध्यात्मिक यात्रा का साथी
             </div>
             
-            <h1 className="mb-8 text-4xl font-extrabold leading-[1.15] text-gray-900 md:mb-10 md:text-6xl">
+            <h1 className="mb-10 text-6xl font-extrabold leading-[1.15] text-gray-900">
               हर व्रत, पूजा और त्योहार की <br/>
               <span className="text-[#9A283D]">पूरी जानकारी</span> <br/>
               एक ही जगह
             </h1>
             
-            <div className="mb-10 flex flex-col gap-4 sm:flex-row md:mb-12">
-              <a href="#plans" className="flex items-center justify-center gap-2 whitespace-nowrap rounded-lg bg-[#7a1f30] px-6 py-4 text-xl font-bold text-white shadow-lg transition-colors hover:bg-[#590f1d] md:px-8 md:text-2xl">
+            <div className="mb-12 flex flex-row gap-4">
+              <a href="#plans" className="flex items-center justify-center gap-2 whitespace-nowrap rounded-lg bg-[#7a1f30] px-8 py-4 text-2xl font-bold text-white shadow-lg transition-colors hover:bg-[#590f1d]">
                 अपनी यात्रा शुरू करें <span className="text-3xl leading-none">→</span>
               </a>
-              <button className="flex items-center justify-center gap-2 whitespace-nowrap rounded-lg border-2 border-[#7a1f30] bg-white px-6 py-4 text-xl font-bold text-[#7a1f30] transition-colors hover:bg-gray-50 md:px-8 md:text-2xl">
+              <button className="flex items-center justify-center gap-2 whitespace-nowrap rounded-lg border-2 border-[#7a1f30] bg-white px-8 py-4 text-2xl font-bold text-[#7a1f30] transition-colors hover:bg-gray-50">
                 <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                 वीडियो देखें
               </button>
             </div>
 
-            <div className="flex max-w-full flex-wrap items-center gap-4 rounded-xl border border-gray-200 bg-white/80 p-4 text-center shadow-sm backdrop-blur-sm md:max-w-max md:gap-6">
+            <div className="flex max-w-max items-center gap-6 rounded-xl border border-gray-200 bg-white/80 p-4 text-center shadow-sm backdrop-blur-sm">
               <div className="flex flex-col items-center">
                 <span className="text-[#9A283D] font-bold text-3xl flex items-center gap-2"><span className="text-3xl">👥</span> 50K+</span>
                 <span className="text-base text-gray-500 font-bold whitespace-nowrap">भक्तों का विश्वास</span>
@@ -380,8 +407,8 @@ const AppEvents1 = () => {
       </section>
 
       {/* 3. Features (5 Columns, Large Text) */}
-      <section className="relative border-y border-gray-200 bg-white px-4 py-8 shadow-sm md:px-12">
-        <div className="mx-auto grid max-w-[1100px] grid-cols-2 gap-4 md:flex md:flex-row md:justify-between md:gap-6">
+      <section className="relative border-y border-gray-200 bg-white px-12 py-8 shadow-sm">
+        <div className="mx-auto flex max-w-[1100px] flex-row justify-between gap-6">
           {[
             { icon: "📅", name: "पंचांग" },
             { icon: "🏺", name: "व्रत और त्योहार" },
@@ -390,27 +417,27 @@ const AppEvents1 = () => {
             { icon: "📖", name: "कथा" },
           ].map((feature, i) => (
             <div key={i} className="flex-1 flex flex-col items-center justify-center p-6 border border-gray-100 rounded-2xl shadow-sm bg-white hover:shadow-md transition-shadow">
-              <span className="mb-4 text-5xl md:text-7xl">{feature.icon}</span>
-              <span className="text-center text-lg font-extrabold text-gray-800 md:text-2xl">{feature.name}</span>
+              <span className="mb-4 text-7xl">{feature.icon}</span>
+              <span className="text-center text-2xl font-extrabold text-gray-800">{feature.name}</span>
             </div>
           ))}
         </div>
       </section>
 
       {/* 4. Pricing Plans (Side by Side) */}
-      <section id="plans" className="bg-[#fff8f0] px-4 py-14 md:px-12 md:py-20">
+      <section id="plans" className="bg-[#fff8f0] px-12 py-20">
         <div className="max-w-[1100px] mx-auto">
-          <h2 className="relative mb-12 flex items-center justify-center text-center text-3xl font-extrabold text-[#9A283D] md:mb-16 md:text-5xl">
+          <h2 className="relative mb-16 flex items-center justify-center text-center text-5xl font-extrabold text-[#9A283D]">
             <span className="bg-[#fff8f0] px-8 z-10">अपने लिए सही प्लान चुनें</span>
             <div className="absolute left-0 right-0 h-[2px] bg-red-200 z-0"></div>
           </h2>
           
-          <div className="flex flex-col items-center justify-center gap-8 md:flex-row md:gap-12">
+          <div className="flex flex-row items-center justify-center gap-12">
             
             {/* Plan 1 */}
             <div 
               onClick={() => setSelectedPlan(1)}
-              className={`relative w-full max-w-[420px] cursor-pointer rounded-[2rem] bg-white p-6 pt-14 shadow-sm transition-all md:flex-1 md:p-10 md:pt-16 ${selectedPlan === 1 ? 'border-[4px] border-[#7a1f30] md:-translate-y-4 shadow-xl' : 'border-2 border-gray-200'}`}
+              className={`relative w-full max-w-[420px] flex-1 cursor-pointer rounded-[2rem] bg-white p-10 pt-16 shadow-sm transition-all ${selectedPlan === 1 ? 'border-[4px] border-[#7a1f30] -translate-y-4 shadow-xl' : 'border-2 border-gray-200'}`}
             >
               <div className="absolute top-6 right-6 bg-orange-100 text-orange-800 text-xl font-bold px-4 py-2 rounded">16% बचत</div>
               
@@ -429,7 +456,7 @@ const AppEvents1 = () => {
             {/* Plan 2 (Popular) */}
             <div 
               onClick={() => setSelectedPlan(2)}
-              className={`relative w-full max-w-[420px] cursor-pointer rounded-[2rem] bg-white p-6 pt-14 transition-all md:flex-1 md:p-10 md:pt-16 ${selectedPlan === 2 ? 'border-[4px] border-[#7a1f30] md:-translate-y-4 shadow-xl' : 'border-2 border-gray-200 shadow-sm'}`}
+              className={`relative w-full max-w-[420px] flex-1 cursor-pointer rounded-[2rem] bg-white p-10 pt-16 transition-all ${selectedPlan === 2 ? 'border-[4px] border-[#7a1f30] -translate-y-4 shadow-xl' : 'border-2 border-gray-200 shadow-sm'}`}
             >
               <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-gradient-to-r from-orange-400 to-yellow-500 text-white text-xl font-bold px-8 py-3 rounded-full shadow-md uppercase tracking-wide whitespace-nowrap">सबसे लोकप्रिय</div>
               <div className="absolute top-6 right-6 bg-orange-100 text-orange-800 text-xl font-bold px-4 py-2 rounded">28% बचत</div>
@@ -449,7 +476,7 @@ const AppEvents1 = () => {
           </div>
 
           {/* Guarantees */}
-          <div className="mx-auto mt-12 flex max-w-5xl flex-col justify-center gap-4 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm md:mt-16 md:flex-row md:gap-8 md:p-8">
+          <div className="mx-auto mt-16 flex max-w-5xl flex-row justify-center gap-8 rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
             <div className="flex items-center gap-3 text-xl font-bold text-gray-700 whitespace-nowrap"><span className="text-orange-500 text-3xl">🛡️</span> 7 दिन की मनी बैक</div>
             <div className="w-[1px] bg-gray-200"></div>
             <div className="flex items-center gap-3 text-xl font-bold text-gray-700 whitespace-nowrap"><span className="text-orange-500 text-3xl">🔒</span> 100% सुरक्षित भुगतान</div>
@@ -462,50 +489,50 @@ const AppEvents1 = () => {
       </section>
 
       {/* 5. How it Works (Horizontal Steps) */}
-      <section className="border-t border-gray-100 bg-white px-4 py-14 md:px-12 md:py-20">
+      <section className="border-t border-gray-100 bg-white px-12 py-20">
         <div className="max-w-[1100px] mx-auto">
-          <h2 className="relative mb-12 flex items-center justify-center text-center text-3xl font-extrabold text-[#9A283D] md:mb-20 md:text-5xl">
+          <h2 className="relative mb-20 flex items-center justify-center text-center text-5xl font-extrabold text-[#9A283D]">
             <span className="bg-white px-8 z-10">कैसे काम करता है?</span>
             <div className="absolute left-0 right-0 h-[2px] bg-red-200 z-0"></div>
           </h2>
           
-          <div className="relative mx-auto grid max-w-5xl grid-cols-2 gap-8 md:flex md:flex-row md:items-start md:justify-between">
+          <div className="relative mx-auto flex max-w-5xl flex-row items-start justify-between gap-8">
             {/* Dashed line connecting steps */}
-            <div className="absolute left-20 right-20 top-12 z-0 hidden h-1 border-t-4 border-dashed border-gray-300 md:block"></div>
+            <div className="absolute left-20 right-20 top-12 z-0 h-1 border-t-4 border-dashed border-gray-300"></div>
 
-            <div className="relative z-10 flex flex-col items-center text-center md:w-48">
-              <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full border-[4px] border-[#9A283D] bg-white text-3xl shadow-md md:mb-6 md:h-24 md:w-24 md:text-4xl">💳</div>
-              <h4 className="text-2xl font-extrabold text-[#9A283D] md:text-3xl">चुनें</h4>
-              <p className="mt-2 text-base font-bold text-gray-500 md:text-xl">प्लान चुनें</p>
+            <div className="relative z-10 flex w-48 flex-col items-center text-center">
+              <div className="mb-6 flex h-24 w-24 items-center justify-center rounded-full border-[4px] border-[#9A283D] bg-white text-4xl shadow-md">💳</div>
+              <h4 className="text-3xl font-extrabold text-[#9A283D]">चुनें</h4>
+              <p className="mt-2 text-xl font-bold text-gray-500">प्लान चुनें</p>
             </div>
             
-            <div className="relative z-10 flex flex-col items-center text-center md:w-48">
-              <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full border-[4px] border-[#9A283D] bg-white text-3xl shadow-md md:mb-6 md:h-24 md:w-24 md:text-4xl">🛡️</div>
-              <h4 className="text-2xl font-extrabold text-[#9A283D] md:text-3xl">भुगतान करें</h4>
-              <p className="mt-2 text-base font-bold text-gray-500 md:text-xl">सुरक्षित भुगतान करें</p>
+            <div className="relative z-10 flex w-48 flex-col items-center text-center">
+              <div className="mb-6 flex h-24 w-24 items-center justify-center rounded-full border-[4px] border-[#9A283D] bg-white text-4xl shadow-md">🛡️</div>
+              <h4 className="text-3xl font-extrabold text-[#9A283D]">भुगतान करें</h4>
+              <p className="mt-2 text-xl font-bold text-gray-500">सुरक्षित भुगतान करें</p>
             </div>
             
-            <div className="relative z-10 flex flex-col items-center text-center md:w-48">
-              <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full border-[4px] border-[#9A283D] bg-white text-3xl shadow-md md:mb-6 md:h-24 md:w-24 md:text-4xl">⬇️</div>
-              <h4 className="text-2xl font-extrabold text-[#9A283D] md:text-3xl">डाउनलोड करें</h4>
-              <p className="mt-2 text-base font-bold text-gray-500 md:text-xl">ऐप डाउनलोड करें</p>
+            <div className="relative z-10 flex w-48 flex-col items-center text-center">
+              <div className="mb-6 flex h-24 w-24 items-center justify-center rounded-full border-[4px] border-[#9A283D] bg-white text-4xl shadow-md">⬇️</div>
+              <h4 className="text-3xl font-extrabold text-[#9A283D]">डाउनलोड करें</h4>
+              <p className="mt-2 text-xl font-bold text-gray-500">ऐप डाउनलोड करें</p>
             </div>
             
-            <div className="relative z-10 flex flex-col items-center text-center md:w-48">
-              <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full border-[4px] border-[#9A283D] bg-white text-3xl shadow-md md:mb-6 md:h-24 md:w-24 md:text-4xl">👤</div>
-              <h4 className="text-2xl font-extrabold text-[#9A283D] md:text-3xl">लॉगिन करें</h4>
-              <p className="mt-2 text-base font-bold text-gray-500 md:text-xl">और शुरू करें भक्ति</p>
+            <div className="relative z-10 flex w-48 flex-col items-center text-center">
+              <div className="mb-6 flex h-24 w-24 items-center justify-center rounded-full border-[4px] border-[#9A283D] bg-white text-4xl shadow-md">👤</div>
+              <h4 className="text-3xl font-extrabold text-[#9A283D]">लॉगिन करें</h4>
+              <p className="mt-2 text-xl font-bold text-gray-500">और शुरू करें भक्ति</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* 6. Testimonials (3 Cards Horizontal) */}
-      <section className="bg-[#fff8f0] px-4 py-14 md:px-12 md:py-20">
+      <section className="bg-[#fff8f0] px-12 py-20">
         <div className="max-w-[1100px] mx-auto">
-          <h2 className="mb-10 text-center text-3xl font-extrabold text-[#9A283D] md:mb-16 md:text-5xl">भक्तों के अनुभव</h2>
+          <h2 className="mb-16 text-center text-5xl font-extrabold text-[#9A283D]">भक्तों के अनुभव</h2>
           
-          <div className="flex flex-col justify-center gap-6 md:flex-row md:gap-8">
+          <div className="flex flex-row justify-center gap-8">
             
             {/* Card 1 */}
             <div className="flex-1 bg-white p-10 rounded-[2rem] shadow-sm border border-gray-100">
@@ -551,12 +578,12 @@ const AppEvents1 = () => {
       </section>
 
       {/* 7. Footer / Final CTA */}
-      <section id="download" className="relative overflow-hidden bg-[#590f1d] px-4 py-14 text-white md:px-12 md:py-20">
-        <div className="relative z-10 mx-auto flex max-w-[1100px] flex-col items-center justify-between gap-10 md:flex-row">
+      <section id="download" className="relative overflow-hidden bg-[#590f1d] px-12 py-20 text-white">
+        <div className="relative z-10 mx-auto flex max-w-[1100px] flex-row items-center justify-between gap-10">
           
           <div className="flex items-center gap-8">
             <div className="text-[100px] drop-shadow-[0_0_20px_rgba(252,211,77,0.8)] leading-none">🪔</div>
-            <h2 className="text-3xl font-extrabold leading-tight md:text-5xl">आज ही जुड़ें और अपनी <br/>आध्यात्मिक यात्रा को बनाएं <br/>और भी खास</h2>
+            <h2 className="text-5xl font-extrabold leading-tight">आज ही जुड़ें और अपनी <br/>आध्यात्मिक यात्रा को बनाएं <br/>और भी खास</h2>
           </div>
           
           <div className="flex flex-col items-center">
@@ -569,7 +596,7 @@ const AppEvents1 = () => {
                 <img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg" alt="Download on the App Store" className="h-16" />
               </a>
             </div>
-            <button onClick={handleDownloadApp} className="mt-8 flex items-center gap-3 whitespace-nowrap rounded-full bg-gradient-to-r from-yellow-400 to-yellow-600 px-8 py-4 text-2xl font-bold text-gray-900 shadow-lg shadow-yellow-500/30 transition-transform hover:scale-105 md:px-12 md:py-5 md:text-3xl">
+            <button onClick={handleDownloadApp} className="mt-8 flex items-center gap-3 whitespace-nowrap rounded-full bg-gradient-to-r from-yellow-400 to-yellow-600 px-12 py-5 text-3xl font-bold text-gray-900 shadow-lg shadow-yellow-500/30 transition-transform hover:scale-105">
               ऐप डाउनलोड करें <span className="text-4xl leading-none">→</span>
             </button>
           </div>
@@ -578,9 +605,9 @@ const AppEvents1 = () => {
       </section>
 
       {/* Bottom Legal */}
-      <footer className="flex flex-col items-center justify-between gap-4 border-t border-gray-200 bg-white px-4 py-8 text-center text-base text-gray-500 md:flex-row md:px-12 md:text-xl">
+      <footer className="flex flex-row items-center justify-between gap-4 border-t border-gray-200 bg-white px-12 py-8 text-center text-xl text-gray-500">
         <span className="font-bold">© 2026 भक्ति भाव. सर्वाधिकार सुरक्षित.</span>
-        <div className="flex flex-wrap justify-center gap-4 font-bold md:gap-8">
+        <div className="flex justify-center gap-8 font-bold">
           <Link to="/privacyPolicy" className="hover:text-[#9A283D] transition-colors whitespace-nowrap">गोपनीयता नीति</Link>
           <span className="text-gray-300">|</span>
           <Link to="/termsAndConditions" className="hover:text-[#9A283D] transition-colors whitespace-nowrap">नियम और शर्तें</Link>

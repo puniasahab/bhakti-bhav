@@ -13,7 +13,6 @@ import { trackCustomEvent } from "../utils/metaPixel";
 import { PIXEL_STANDARD_EVENTS } from "../utils/pixelEvents";
 
 const POLL_INTERVAL_MS = 3000;
-const MAX_POLL_ATTEMPTS = 40;
 const SUCCESS_STATUSES = ["ACTIVE"];
 const WAITING_STATUSES = ["INITIALIZED", "PENDING", "BANK_APPROVAL_PENDING", "VERIFYING"];
 const FAILURE_STATUSES = ["FAILED", "CANCELLED", "AUTHORIZATION_CANCELLED", "EXPIRED"];
@@ -31,11 +30,21 @@ const getStatusFromResponse = (response) => {
   ).toUpperCase();
 };
 
+const getSubscriptionIdFromSearch = (searchParams) => {
+  return (
+    searchParams.get("subscription_id") ||
+    searchParams.get("subscripition_id") ||
+    searchParams.get("subscriptionId") ||
+    localStorage.getItem("cashfreeSubscriptionId") ||
+    ""
+  );
+};
+
 export default function PaymentPay() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { deviceType, redirectToStore, storeUrls } = useAppStoreRedirect();
-  const subscriptionId = searchParams.get("subscription_id") || localStorage.getItem("cashfreeSubscriptionId") || "";
+  const subscriptionId = getSubscriptionIdFromSearch(searchParams);
   const pollingStopped = useRef(false);
   const [status, setStatus] = useState("VERIFYING");
   const [attempts, setAttempts] = useState(0);
@@ -65,7 +74,9 @@ export default function PaymentPay() {
     pollingStopped.current = false;
 
     const pollStatus = async () => {
-      for (let attempt = 1; attempt <= MAX_POLL_ATTEMPTS; attempt += 1) {
+      let attempt = 1;
+
+      while (!pollingStopped.current) {
         if (pollingStopped.current) return;
         setAttempts(attempt);
 
@@ -74,6 +85,11 @@ export default function PaymentPay() {
           const nextStatus = getStatusFromResponse(response) || "PENDING";
           localStorage.setItem("cashfreeSubscriptionStatus", nextStatus);
           setStatus(nextStatus);
+          setMessage(
+            WAITING_STATUSES.includes(nextStatus)
+              ? "Payment is received. Waiting for mandate confirmation..."
+              : "Confirming your auto-pay mandate..."
+          );
 
           if (SUCCESS_STATUSES.includes(nextStatus)) {
             setMessage("Subscription confirmed. Refreshing your profile...");
@@ -102,6 +118,13 @@ export default function PaymentPay() {
           }
         } catch (error) {
           console.error("PaymentPay subscription polling failed:", error);
+          const errorStatus = error?.response?.status;
+          setStatus("VERIFYING");
+          setMessage(
+            errorStatus === 405
+              ? "Payment confirmation is being prepared. Please wait..."
+              : "We are checking your payment status. Please wait..."
+          );
         }
 
         try {
@@ -122,16 +145,8 @@ export default function PaymentPay() {
           console.error("PaymentPay profile refresh failed:", profileError);
         }
 
-        if (attempt < MAX_POLL_ATTEMPTS) {
-          await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL_MS));
-        }
-      }
-
-      if (!pollingStopped.current) {
-        setChecking(false);
-        setStatus("PENDING");
-        localStorage.setItem("cashfreeSubscriptionStatus", "PENDING");
-        setMessage("Payment is still pending. We will confirm it shortly.");
+        attempt += 1;
+        await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL_MS));
       }
     };
 
@@ -195,7 +210,7 @@ export default function PaymentPay() {
         {isWaiting && (
           <p className="mt-5 flex items-center justify-center gap-2 text-sm text-gray-500">
             <Clock className="h-4 w-4" />
-            Checking every 3 seconds ({attempts}/{MAX_POLL_ATTEMPTS})
+            Checking every 3 seconds ({attempts})
           </p>
         )}
 
