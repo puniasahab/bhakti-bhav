@@ -50,6 +50,7 @@ import Profile from "./pages/Profile";
 import Payment from "./pages/Payment";
 import Transactions from "./pages/transactions";
 import PaymentPage from "./pages/PaymentPage";
+import PaymentPay from "./pages/PaymentPay";
 import Kundli from "./pages/kundli";
 import ParsadPage from "./pages/ParsadPage";
 import WinnersList from "./pages/WinnersList";
@@ -179,6 +180,7 @@ function App() {
                     <Route path="/payment" element={<Payment />} />
                     <Route path="/transactions" element={<Transactions />} />
                     <Route path="/paymentPage" element={<PaymentPage />} />
+                    <Route path="/PaymentPay" element={<PaymentPay />} />
                     <Route path="/kundli" element={<Kundli />} />
                     <Route path="/parsad" element={<ParsadPage />} />
                     <Route path="/winners" element={<WinnersList />} />

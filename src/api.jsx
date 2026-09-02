@@ -215,6 +215,16 @@ export const paymentApis = {
     }
   },
 
+  getSubscriptionStatus: async (subscriptionId) => {
+    try {
+      const response = await api.get(`${endPoints.getSubscriptionStatus}/${subscriptionId}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching subscription status:", error);
+      throw error;
+    }
+  },
+
   verifyPayments: async (data) => {
     try {
       const response = await api.post(endPoints.verifyPayment, data);

@@ -204,12 +204,14 @@ export default function Payment() {
     };
 
     const subscriptionPayload = {
-      planId: DEFAULT_SUBSCRIPTION_PLAN_ID,
+      planId: planData?._id || selectedPlan || DEFAULT_SUBSCRIPTION_PLAN_ID,
       name: billingProfile.name,
       phone: billingProfile.phone,
       email: billingProfile.email,
       source: "web",
       couponCode: "",
+      returnUrl: `${window.location.origin}/PaymentPay?subscription_id={subscription_id}`,
+      return_url: `${window.location.origin}/PaymentPay?subscription_id={subscription_id}`,
     };
 
     console.log({ ...subscriptionPayload, amount: planData.price }

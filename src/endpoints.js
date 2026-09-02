@@ -10,6 +10,7 @@ export const endPoints = {
     getSubscriptionPlansById: "subscriptions",
     makePayment: 'cashfree/create-order',
     createSubscription: 'cashfree/subscription/create',
+    getSubscriptionStatus: 'cashfree/subscription',
     verifyPayment: 'cashfree/verify-payment',
     getTransactions: 'Usertranctions',
     downloadWallpaper: 'download',

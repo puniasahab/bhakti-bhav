@@ -44,6 +44,7 @@ export default function PaymentDrop() {
   const currentOrderId = cashfreeData?.order_id || storedPaymentResponse?.data?.subscriptionId;
   const currentAmount = storedPaymentResponse?.data?.amount || cashfreeData?.order_amount || storedPlanData?.price;
   const currentStatus = storedPaymentResponse?.data?.status || cashfreeData?.subscription_status;
+  const currentSubscriptionId = storedPaymentResponse?.data?.subscriptionId || currentOrderId;
 
   useEffect(() => {
     let isMounted = true;
@@ -70,8 +71,6 @@ export default function PaymentDrop() {
       return subscriptionSessionId || paymentSessionId;
     }
   }
-
-
 
   const handleClick = async () => {
     try {
@@ -116,14 +115,9 @@ export default function PaymentDrop() {
         setPaymentProcessing(true);
 
         if (subscriptionSessionId) {
-          localStorage.setItem("cashfreeSubscriptionStatus", "AUTHORIZED");
-          navigate('/payment-complete', {
-            state: {
-              paymentSuccess: true,
-              orderId: currentOrderId,
-              subscriptionId: storedPaymentResponse?.data?.subscriptionId,
-            }
-          });
+          const subscriptionId = currentSubscriptionId || localStorage.getItem("cashfreeSubscriptionId");
+          localStorage.setItem("cashfreeSubscriptionStatus", "PENDING");
+          navigate(`/PaymentPay?subscription_id=${encodeURIComponent(subscriptionId || "")}`, { replace: true });
           return;
         }
         
@@ -311,7 +305,7 @@ export default function PaymentDrop() {
             {paymentProcessing && !error && (
               <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
                 <p className="text-green-600 text-sm font-eng text-center">
-                  ✅ Payment successful! Redirecting to transactions...
+                  Redirecting to payment verification...
                 </p>
               </div>
             )}
