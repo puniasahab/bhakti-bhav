@@ -1,0 +1,131 @@
+.flower-game-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  background: var(--bg-deep-blue);
+  position: relative;
+  overflow: hidden;
+  user-select: none;
+}
+
+/* ── Play Field ── */
+.flower-field {
+  flex: 1;
+  position: relative;
+  width: 100%;
+}
+
+.lane-divider {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.active-lane-glow {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  background: rgba(255, 215, 0, 0.04);
+  border-left: 1px solid rgba(255, 215, 0, 0.15);
+  border-right: 1px solid rgba(255, 215, 0, 0.15);
+  transition: left 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  pointer-events: none;
+}
+
+/* ── Falling Items ── */
+.falling-item {
+  position: absolute;
+  font-size: 2.8rem;
+  transform: translateX(-50%);
+  z-index: 5;
+  pointer-events: none;
+  filter: drop-shadow(0 4px 12px rgba(255, 200, 100, 0.5));
+  will-change: top;
+}
+
+.falling-item.thorn {
+  filter: drop-shadow(0 4px 12px rgba(255, 60, 60, 0.5));
+}
+
+/* ── Basket ── */
+.basket {
+  position: absolute;
+  transform: translateX(-50%);
+  z-index: 10;
+  pointer-events: none;
+  will-change: left;
+}
+
+.basket-icon {
+  font-size: 4.5rem;
+  display: block;
+  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.7));
+}
+
+/* ── Score Popups ── */
+.score-popup {
+  position: absolute;
+  transform: translateX(-50%);
+  font-size: 1.4rem;
+  font-weight: 900;
+  z-index: 20;
+  pointer-events: none;
+  animation: floatUp 0.8s ease-out forwards;
+}
+
+.score-popup.positive { color: #7CFC00; text-shadow: 0 0 10px rgba(124, 252, 0, 0.8); }
+.score-popup.negative { color: #FF4500; text-shadow: 0 0 10px rgba(255, 69, 0, 0.8); }
+
+@keyframes floatUp {
+  0%   { opacity: 1; transform: translateX(-50%) translateY(0); }
+  100% { opacity: 0; transform: translateX(-50%) translateY(-50px); }
+}
+
+/* ── Arrow Controls ── */
+.basket-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 0.75rem 1rem;
+  background: rgba(0, 0, 0, 0.3);
+  border-top: 1px solid rgba(255, 215, 0, 0.1);
+  flex-shrink: 0;
+}
+
+.arrow-btn {
+  width: 72px;
+  height: 56px;
+  font-size: 1.5rem;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: manipulation;
+  cursor: pointer;
+}
+
+.lane-dots {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.25);
+  transition: all 0.15s ease;
+}
+
+.dot.active {
+  background: var(--accent-gold);
+  box-shadow: 0 0 8px var(--accent-gold);
+  transform: scale(1.3);
+}

@@ -1,0 +1,173 @@
+:root {
+  /* Color Palette */
+  --bg-deep-blue: #07162E;
+  --bg-royal-blue: #123C8E;
+  --accent-gold: #F5C542;
+  --glow-light-gold: #FFD76A;
+  --text-white: #FFFFFF;
+  --text-muted: rgba(255, 255, 255, 0.7);
+  --success-green: #2ecc71;
+  --glass-bg: rgba(255, 255, 255, 0.05);
+  --glass-border: rgba(255, 255, 255, 0.1);
+
+  /* Typography */
+  --font-heading: 'Cinzel', serif;
+  --font-body: 'Poppins', sans-serif;
+  --font-small: 'Inter', sans-serif;
+
+  /* Shadows & Glows */
+  --glow-gold: 0 0 20px rgba(245, 197, 66, 0.4);
+  --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--bg-deep-blue);
+  color: var(--text-white);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  font-weight: 600;
+}
+
+small, .small-text {
+  font-family: var(--font-small);
+}
+
+/* Glassmorphism Utility */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  border-radius: 24px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(255, 215, 0, 0.15);
+}
+
+/* 3D Premium Buttons */
+.btn-3d {
+  position: relative;
+  background: linear-gradient(180deg, #FFD700 0%, #CD7F32 100%);
+  color: #1a1a1a;
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 1.2rem;
+  border: none;
+  border-radius: 50px;
+  padding: 1rem 2.5rem;
+  cursor: pointer;
+  box-shadow: 0 6px 0 #995c00, 0 15px 20px rgba(0,0,0,0.4);
+  transition: all 0.1s;
+  overflow: hidden;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.btn-3d:active {
+  transform: translateY(6px);
+  box-shadow: 0 0 0 #995c00, 0 5px 10px rgba(0,0,0,0.4);
+}
+
+.btn-3d::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0) 100%);
+  transform: skewX(-25deg);
+  animation: shine 4s infinite;
+}
+
+@keyframes shine {
+  0% { left: -100%; }
+  20% { left: 200%; }
+  100% { left: 200%; }
+}
+
+/* Base App Layout */
+#root {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Typography Utilities */
+.text-gold {
+  color: var(--accent-gold);
+}
+
+.text-gradient-gold {
+  background: linear-gradient(135deg, var(--accent-gold) 0%, var(--glow-light-gold) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Animations */
+@keyframes pulseGlow {
+  0% { box-shadow: 0 0 10px rgba(245, 197, 66, 0.2); }
+  50% { box-shadow: 0 0 25px rgba(245, 197, 66, 0.6); }
+  100% { box-shadow: 0 0 10px rgba(245, 197, 66, 0.2); }
+}
+
+@keyframes floatAnimation {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -1000px 0; }
+  100% { background-position: 1000px 0; }
+}
+
+/* Custom Scrollbar for hiding if needed */
+::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
+}
+
+/* ==========================================================================
+   Mobile Responsiveness (Global)
+   ========================================================================== */
+@media (max-width: 768px) {
+  :root {
+    font-size: 14px; /* Scale down base font size */
+  }
+  
+  .glass-panel {
+    border-radius: 16px; /* Smaller radius on mobile */
+  }
+  
+  .btn-3d {
+    padding: 0.8rem 2rem;
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    font-size: 13px; /* Even smaller for very small devices */
+  }
+
+  .btn-3d {
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+    width: 100%; /* Full width buttons on small phones */
+  }
+}

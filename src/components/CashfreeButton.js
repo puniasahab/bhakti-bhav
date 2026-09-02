@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { load } from "@cashfreepayments/cashfree-js";
 import axios from "axios";
 
-const CashfreeButton: React = () => {
+const CashfreeButton = () => {
   const [loading, setLoading] = useState(false);
 
   const handlePayment = async () => {

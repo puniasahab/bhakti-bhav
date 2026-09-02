@@ -1,0 +1,109 @@
+.game-selection-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100vh;
+  height: 100dvh;
+  padding: 2rem 1.5rem;
+  background: var(--bg-deep-blue);
+  position: relative;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.selection-header {
+  text-align: center;
+  margin-top: 1rem;
+  margin-bottom: 2rem;
+}
+
+.selection-header h2 {
+  color: var(--accent-gold);
+  font-family: var(--font-heading);
+  font-size: 2.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.selection-header p {
+  color: var(--text-white);
+  font-size: 1rem;
+  opacity: 0.9;
+}
+
+.game-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  width: 100%;
+  max-width: 600px;
+  padding-bottom: 1rem;
+}
+
+.game-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 215, 0, 0.2);
+  border-radius: 16px;
+  padding: 1rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.game-card:hover {
+  border-color: rgba(255, 215, 0, 0.6);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.5), inset 0 0 15px rgba(255, 215, 0, 0.1);
+}
+
+.game-emoji {
+  font-size: 3rem;
+  line-height: 1;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
+  margin-bottom: 0;
+}
+
+.game-info {
+  flex: 1;
+}
+
+.game-info h3 {
+  color: var(--accent-gold);
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  margin-bottom: 0.2rem;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+
+.game-info p {
+  color: var(--text-white);
+  font-size: 0.75rem;
+  line-height: 1.2;
+  opacity: 0.9;
+  margin-bottom: 0.2rem;
+}
+
+.play-now-btn {
+  background: linear-gradient(180deg, #FFD700 0%, #CD7F32 100%);
+  color: #1a1a1a;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-weight: 800;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 3px 0 #995c00;
+  margin-top: 0.2rem;
+  transition: all 0.2s;
+}
+
+.game-card:active .play-now-btn {
+  transform: translateY(3px);
+  box-shadow: 0 0 0 #995c00;
+}

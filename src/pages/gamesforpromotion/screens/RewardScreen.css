@@ -1,0 +1,94 @@
+.reward-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  height: 100dvh;
+  padding: 2rem;
+  z-index: 20;
+  position: relative;
+  text-align: center;
+}
+
+.scroll-container {
+  position: relative;
+  width: 100%;
+  max-width: 320px;
+  background: linear-gradient(180deg, #F9D976 0%, #E2B02B 100%);
+  border-radius: 8px;
+  padding: 3rem 2rem;
+  box-shadow: 0 20px 50px rgba(245, 197, 66, 0.4), inset 0 0 20px rgba(255,255,255,0.5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #5C4304; /* Dark gold text */
+}
+
+/* Scroll wooden ends */
+.scroll-container::before,
+.scroll-container::after {
+  content: '';
+  position: absolute;
+  left: -10px;
+  width: calc(100% + 20px);
+  height: 20px;
+  background: linear-gradient(90deg, #5C4304, #8A6508, #5C4304);
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+}
+
+.scroll-container::before {
+  top: -10px;
+}
+
+.scroll-container::after {
+  bottom: -10px;
+}
+
+.reward-title {
+  font-size: 1.2rem;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 1.5rem;
+  letter-spacing: 2px;
+}
+
+.reward-value {
+  font-size: 4rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+  line-height: 1;
+  text-shadow: 0 2px 4px rgba(255,255,255,0.5);
+}
+
+.reward-subtitle {
+  font-size: 1rem;
+  font-weight: 600;
+  opacity: 0.8;
+}
+
+.claim-button {
+  margin-top: 3rem;
+  background: var(--bg-royal-blue);
+  color: var(--text-white);
+  padding: 1rem 2rem;
+  border-radius: 30px;
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 1.1rem;
+  border: 1px solid var(--glow-light-gold);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  cursor: pointer;
+}
+
+.floating-petal {
+  position: absolute;
+  width: 20px;
+  height: 15px;
+  background: #FFB7C5;
+  border-radius: 50% 0 50% 0;
+  opacity: 0.8;
+  filter: blur(1px);
+}

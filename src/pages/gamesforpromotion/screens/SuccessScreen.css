@@ -1,0 +1,209 @@
+.success-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100vh;
+  height: 100dvh;
+  padding: 2rem;
+  z-index: 20;
+  position: relative;
+  text-align: center;
+  overflow-y: auto;
+}
+
+.success-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  animation: floatAnimation 3s ease-in-out infinite;
+}
+
+.success-message {
+  font-size: 1.5rem;
+  font-family: var(--font-heading);
+  margin-bottom: 0.5rem;
+}
+
+.success-submessage {
+  color: var(--text-muted);
+  margin-bottom: 2rem;
+}
+
+.coupon-card {
+  width: 100%;
+  max-width: 320px;
+  background: linear-gradient(135deg, #1A1A1A 0%, #000 100%);
+  border-radius: 20px;
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 1px 1px rgba(245, 197, 66, 0.3);
+  margin-bottom: 2rem;
+}
+
+/* Glass overlay for the Apple Wallet look */
+.coupon-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 40%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, transparent 100%);
+  z-index: 1;
+}
+
+/* Moving shine effect */
+.coupon-card::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent 40%, rgba(245, 197, 66, 0.15) 50%, transparent 60%);
+  transform: rotate(30deg);
+  animation: shine 4s linear infinite;
+  z-index: 2;
+  pointer-events: none;
+}
+
+@keyframes shine {
+  0% {
+    transform: translateX(-100%) rotate(30deg);
+  }
+
+  100% {
+    transform: translateX(100%) rotate(30deg);
+  }
+}
+
+.coupon-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  position: relative;
+  z-index: 3;
+}
+
+.coupon-logo {
+  font-family: var(--font-heading);
+  color: var(--accent-gold);
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+.coupon-discount {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #FFF;
+}
+
+.coupon-code-container {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px dashed rgba(245, 197, 66, 0.5);
+  border-radius: 10px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+  z-index: 3;
+}
+
+.coupon-code {
+  font-family: monospace;
+  font-size: 1.8rem;
+  letter-spacing: 4px;
+  color: var(--glow-light-gold);
+  font-weight: bold;
+}
+
+.coupon-footer {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  position: relative;
+  z-index: 3;
+}
+
+.timer {
+  color: #ff4757;
+  font-weight: bold;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+  max-width: 320px;
+  margin-bottom: 2rem;
+}
+
+.btn-secondary {
+  flex: 1;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  color: var(--text-white);
+  padding: 0.8rem;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-primary {
+  flex: 1;
+  background: linear-gradient(135deg, var(--accent-gold), var(--glow-light-gold));
+  border: none;
+  color: var(--bg-deep-blue);
+  padding: 0.8rem;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.info-card {
+  width: 100%;
+  max-width: 320px;
+  background: var(--glass-bg);
+  border-radius: 10px;
+  padding: 1rem;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+/* ==========================================================================
+   Mobile Responsiveness (SuccessScreen)
+   ========================================================================== */
+@media (max-width: 480px) {
+  .success-message {
+    font-size: 1.3rem;
+  }
+  
+  .success-submessage {
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .coupon-card {
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .coupon-code {
+    font-size: 1.4rem;
+    letter-spacing: 2px;
+  }
+  
+  .coupon-discount {
+    font-size: 1.2rem;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+  
+  .btn-secondary, .btn-primary {
+    width: 100%;
+  }
+}

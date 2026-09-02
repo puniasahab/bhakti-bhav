@@ -1,0 +1,102 @@
+.background-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
+  overflow: hidden;
+  transition: background-color 2s ease;
+}
+
+.theme-mystic {
+  --aura-1: rgba(147, 51, 234, 0.4);
+  --aura-2: rgba(217, 70, 239, 0.3);
+  --aura-3: rgba(255, 215, 0, 0.15);
+  background-color: #0f0c29;
+}
+
+.theme-fire {
+  --aura-1: rgba(255, 69, 0, 0.45);
+  --aura-2: rgba(255, 140, 0, 0.35);
+  --aura-3: rgba(255, 215, 0, 0.2);
+  background-color: #2a0800;
+}
+
+.theme-serene {
+  --aura-1: rgba(0, 191, 255, 0.4);
+  --aura-2: rgba(32, 178, 170, 0.3);
+  --aura-3: rgba(255, 215, 0, 0.15);
+  background-color: #001a2c;
+}
+
+.theme-gold {
+  --aura-1: rgba(255, 215, 0, 0.4);
+  --aura-2: rgba(218, 165, 32, 0.3);
+  --aura-3: rgba(255, 250, 205, 0.2);
+  background-color: #1a1500;
+}
+
+.aura-layer {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  animation: pulse 12s infinite alternate ease-in-out;
+  transition: background-color 2s ease;
+}
+
+.layer-1 {
+  width: 60vw;
+  height: 60vw;
+  top: -10%;
+  left: -10%;
+  background-color: var(--aura-1);
+}
+
+.layer-2 {
+  width: 70vw;
+  height: 70vw;
+  bottom: -20%;
+  right: -10%;
+  background-color: var(--aura-2);
+  animation-delay: -4s;
+}
+
+.layer-3 {
+  width: 50vw;
+  height: 50vw;
+  top: 30%;
+  left: 20%;
+  background-color: var(--aura-3);
+  animation-delay: -8s;
+}
+
+.particles-container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.particle {
+  position: absolute;
+  bottom: -20px;
+  background: rgba(255, 215, 0, 0.8);
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 1);
+  animation-name: floatUp;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1) translate(0, 0); opacity: 0.6; }
+  100% { transform: scale(1.2) translate(5%, 5%); opacity: 1; }
+}
+
+@keyframes floatUp {
+  0% { transform: translateY(0) translateX(0) scale(1); opacity: 0; }
+  10% { opacity: 0.8; }
+  90% { opacity: 0.8; }
+  100% { transform: translateY(-110vh) translateX(30px) scale(0.5); opacity: 0; }
+}
