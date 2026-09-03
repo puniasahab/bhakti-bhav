@@ -181,6 +181,7 @@ function App() {
                     <Route path="/transactions" element={<Transactions />} />
                     <Route path="/paymentPage" element={<PaymentPage />} />
                     <Route path="/PaymentPay" element={<PaymentPay />} />
+                    <Route path="/payment-pay" element={<PaymentPay />} />
                     <Route path="/kundli" element={<Kundli />} />
                     <Route path="/parsad" element={<ParsadPage />} />
                     <Route path="/winners" element={<WinnersList />} />

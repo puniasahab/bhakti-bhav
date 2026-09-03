@@ -13,6 +13,7 @@ import useGA4BaseParams from "../hooks/useGA4BaseParams";
 import { trackCustomEvent } from "../utils/metaPixel";
 import { PIXEL_STANDARD_EVENTS } from "../utils/pixelEvents";
 import { getMobileNoFromLS } from "../commonFunctions";
+import { buildCashfreeReturnUrl } from "../utils/paymentReturnUrl";
 
 
 export default function Payment() {
@@ -203,16 +204,21 @@ export default function Payment() {
       phone: profile.mobileNumber || getMobileNoFromLS() || "9540089701",
     };
 
-    const subscriptionPayload = {
-      planId: planData?._id || selectedPlan || DEFAULT_SUBSCRIPTION_PLAN_ID,
-      name: billingProfile.name,
-      phone: billingProfile.phone,
-      email: billingProfile.email,
-      source: "web",
-      couponCode: "",
-      returnUrl: `${window.location.origin}/PaymentPay?subscription_id={subscription_id}`,
-      return_url: `${window.location.origin}/PaymentPay?subscription_id={subscription_id}`,
-    };
+      // Build return URL: routes via backend in production to avoid 405 on Nginx
+      const frontendReturnUrl = `${window.location.origin}/PaymentPay?subscription_id={subscription_id}`;
+      const cashfreeReturnUrl = buildCashfreeReturnUrl(frontendReturnUrl);
+
+      const subscriptionPayload = {
+        planId: planData?._id || selectedPlan || DEFAULT_SUBSCRIPTION_PLAN_ID,
+        name: billingProfile.name,
+        phone: billingProfile.phone,
+        email: billingProfile.email,
+        source: "web",
+        couponCode: "",
+        returnUrl: cashfreeReturnUrl,
+        return_url: cashfreeReturnUrl,
+        frontendReturnUrl, // backend uses this to redirect user after handling POST
+      };
 
     console.log({ ...subscriptionPayload, amount: planData.price }
     );

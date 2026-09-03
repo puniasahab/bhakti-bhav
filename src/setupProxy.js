@@ -13,4 +13,14 @@ module.exports = function (app) {
       },
     })
   );
+
+  // Intercept POST requests from payment gateways (like Cashfree) to frontend routes
+  // and redirect them as GET requests to avoid 405 Method Not Allowed.
+  app.post("*", (req, res, next) => {
+    // Ignore API routes if they need POST
+    if (!req.path.startsWith("/drupal-api")) {
+      return res.redirect(302, req.originalUrl);
+    }
+    next();
+  });
 };

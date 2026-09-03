@@ -33,11 +33,27 @@ const getStatusFromResponse = (response) => {
 const getSubscriptionIdFromSearch = (searchParams) => {
   return (
     searchParams.get("subscription_id") ||
+    searchParams.get("cf_subscription_id") ||
     searchParams.get("subscripition_id") ||
     searchParams.get("subscriptionId") ||
+    searchParams.get("subscription_id[]") ||
     localStorage.getItem("cashfreeSubscriptionId") ||
     ""
   );
+};
+
+const getInitialStatusFromSearch = (searchParams) => {
+  const raw = (
+    searchParams.get("status") ||
+    searchParams.get("cf_status") ||
+    searchParams.get("payment_status") ||
+    searchParams.get("subscription_status") ||
+    ""
+  ).toUpperCase();
+  // Map Cashfree's raw statuses to our internal ones
+  if (SUCCESS_STATUSES.includes(raw)) return raw;
+  if (FAILURE_STATUSES.includes(raw)) return raw;
+  return "VERIFYING";
 };
 
 export default function PaymentPay() {
@@ -45,11 +61,12 @@ export default function PaymentPay() {
   const navigate = useNavigate();
   const { deviceType, redirectToStore, storeUrls } = useAppStoreRedirect();
   const subscriptionId = getSubscriptionIdFromSearch(searchParams);
+  const initialStatus = getInitialStatusFromSearch(searchParams);
   const pollingStopped = useRef(false);
-  const [status, setStatus] = useState("VERIFYING");
+  const [status, setStatus] = useState(initialStatus);
   const [attempts, setAttempts] = useState(0);
   const [message, setMessage] = useState("Confirming your auto-pay mandate...");
-  const [checking, setChecking] = useState(true);
+  const [checking, setChecking] = useState(initialStatus === "VERIFYING");
 
   const refreshProfile = async () => {
     const profile = await profileApis.getProfile();
