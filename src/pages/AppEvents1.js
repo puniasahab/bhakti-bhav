@@ -677,9 +677,9 @@ const AppEvents1 = () => {
 
             <div className="relative z-10 mx-auto flex flex-col items-center">
               <img src="./img/logo_splash.png" alt="Bhakti Bhav" className="h-[280px] w-[300px] drop-shadow-2xl sm:h-[320px] sm:w-[340px]" />
-              <div className="-mt-2 rounded-full border-[8px] border-white bg-[#FFE4B3] px-14 py-6 font-eng text-[2rem] font-extrabold tracking-widest text-[#9A283D] shadow-2xl sm:text-[2.5rem]">
+              {/* <div className="-mt-2 rounded-full border-[8px] border-white bg-[#FFE4B3] px-14 py-6 font-eng text-[2rem] font-extrabold tracking-widest text-[#9A283D] shadow-2xl sm:text-[2.5rem]">
                 BHAKTI BHAV FAMILY
-              </div>
+              </div> */}
             </div>
 
             <form onSubmit={handleEventLoginSubmit} className="relative z-10 mx-auto mt-20 w-full max-w-[850px] rounded-[3.5rem] bg-white/95 p-16 shadow-2xl backdrop-blur-sm sm:p-20">
