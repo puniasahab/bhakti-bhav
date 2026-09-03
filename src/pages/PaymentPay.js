@@ -8,7 +8,6 @@ import {
   setUserIdInLS,
   setUserName,
 } from "../commonFunctions";
-import { useAppStoreRedirect } from "../hooks/useAppStoreRedirect";
 import { trackCustomEvent } from "../utils/metaPixel";
 import { PIXEL_STANDARD_EVENTS } from "../utils/pixelEvents";
 
@@ -59,7 +58,6 @@ const getInitialStatusFromSearch = (searchParams) => {
 export default function PaymentPay() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { deviceType, redirectToStore, storeUrls } = useAppStoreRedirect();
   const subscriptionId = getSubscriptionIdFromSearch(searchParams);
   const initialStatus = getInitialStatusFromSearch(searchParams);
   const pollingStopped = useRef(false);
@@ -175,11 +173,7 @@ export default function PaymentPay() {
   }, [subscriptionId]);
 
   const handleDownloadApp = () => {
-    if (deviceType === "ios" || deviceType === "android") {
-      redirectToStore();
-      return;
-    }
-    window.location.href = storeUrls.android;
+    window.location.href = "https://bhakti-bhav-referral.onelink.me/VOv8/vc1rvamj";
   };
 
   const isSuccess = SUCCESS_STATUSES.includes(status);
