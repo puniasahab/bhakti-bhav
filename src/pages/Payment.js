@@ -13,8 +13,15 @@ import useGA4BaseParams from "../hooks/useGA4BaseParams";
 import { trackCustomEvent } from "../utils/metaPixel";
 import { PIXEL_STANDARD_EVENTS } from "../utils/pixelEvents";
 import { getMobileNoFromLS } from "../commonFunctions";
-import { buildCashfreeReturnUrl } from "../utils/paymentReturnUrl";
 
+const CASHFREE_RETURN_BACKEND_URL =
+  process.env.REACT_APP_CASHFREE_SUBSCRIPTION_RETURN_URL ||
+  "https://api.bhaktibhav.app/api/v1/frontend/cashfree/subscription/return";
+
+const buildCashfreeReturnUrl = (frontendReturnUrl) => {
+  const encoded = encodeURIComponent(frontendReturnUrl);
+  return `${CASHFREE_RETURN_BACKEND_URL}?redirect_url=${encoded}`;
+};
 
 export default function Payment() {
   const DEFAULT_SUBSCRIPTION_PLAN_ID = "69cf557fd51b9fa7a048826c";
