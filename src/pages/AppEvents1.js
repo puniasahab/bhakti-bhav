@@ -369,7 +369,7 @@ const AppEvents1 = () => {
         
         {/* Beautiful Logo in Top Right */}
         <div className="fixed top-8 right-8 z-50 flex flex-col items-end cursor-default bg-white/95 backdrop-blur-md px-8 py-4 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-white">
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#9A283D] to-[#e64a66] font-black text-5xl leading-none drop-shadow-sm">भक्ति भाव</span>
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#9A283D] to-[#e64a66] font-black text-5xl pt-2 pb-1 drop-shadow-sm">भक्ति भाव</span>
           <span className="text-lg font-bold text-gray-500 mt-2">हर दिन भक्ति, हर कदम शांति</span>
         </div>
 
@@ -677,7 +677,7 @@ const AppEvents1 = () => {
 
             <div className="relative z-10 mx-auto flex flex-col items-center">
               <img src="./img/logo_splash.png" alt="Bhakti Bhav" className="h-[280px] w-[300px] drop-shadow-2xl sm:h-[320px] sm:w-[340px]" />
-              <div className="-mt-8 rounded-full border-[8px] border-white bg-[#FFE4B3] px-14 py-6 font-eng text-[2rem] font-extrabold tracking-widest text-[#9A283D] shadow-2xl sm:text-[2.5rem]">
+              <div className="-mt-2 rounded-full border-[8px] border-white bg-[#FFE4B3] px-14 py-6 font-eng text-[2rem] font-extrabold tracking-widest text-[#9A283D] shadow-2xl sm:text-[2.5rem]">
                 BHAKTI BHAV FAMILY
               </div>
             </div>
