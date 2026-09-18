@@ -346,7 +346,7 @@ function GameEvents() {
   const { redirectToStore, storeUrls, deviceType } = useAppStoreRedirect();
 
   // AppsFlyer OneLink (auto-routes iOS -> App Store, Android -> Play Store)
-  const ONELINK_URL = "https://bhakti-bhav-referral.onelink.me/VOv8/vc1rvamj";
+  const ONELINK_URL = "https://bhakti-bhav-referral.onelink.me/VOv8?af_xp=custom&pid=redirectional_event&c=Bhakti-bhav-redirectional&af_click_lookback=30d";
 
   const handleDownloadApp = () => {
     if (ONELINK_URL) {
