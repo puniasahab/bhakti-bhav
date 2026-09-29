@@ -63,6 +63,7 @@ import KahaniyaDetails from "./pages/KahaniyaDetails";
 import AppEvents from "./pages/AppEvents";
 import AppEvents1 from "./pages/AppEvents1";
 import AppEvents2 from "./pages/AppEvents2";
+import GameEvents from "./pages/GameEvents";
 
 
 // Wrapper that marks the login flow source when /home-v1 is accessed
@@ -196,6 +197,8 @@ function App() {
                     <Route path="/app-events" element={<AppEvents />} />
                     <Route path="/app-events1" element={<AppEvents1 />} />
                     <Route path="/app-events2" element={<AppEvents2 />} />
+                    <Route path="/game_events" element={<GameEvents />} />
+                    <Route path="/game-events" element={<GameEvents />} />
                   </Routes>
                   <GlobalAudioPlayer />
                 </PujaKareProvider>
