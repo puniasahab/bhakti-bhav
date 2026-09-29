@@ -76,7 +76,7 @@ async function verifyAppEvents2Otp(mobileNumber, otp) {
 }
 
 async function createAppEvents2WebLoginToken(userJwtToken) {
-  const response = await fetch("https://stagingapi.bhaktibhav.app/frontend/api/v2/users/web-login-token", {
+  const response = await fetch("https://stagingapi.bhaktibhav.app/api/v2/frontend/web-login-token", {
     method: "POST",
     headers: {
       Authorization: `Bearer ${userJwtToken}`,
