@@ -86,7 +86,63 @@ export const homeMainApis = {
       console.error("Error fetching home data:", error);
       throw error;
     }
-  }
+  },
+
+  getHomeScreenData: async(lang, platform) => {
+      try {
+        const url = `https://api.bhaktibhav.app/api/v2/frontend/${endPoints.newHomeApi}`
+        const response = await api.get(url, {
+          params: { lang, platform }
+        });
+        return response.data;
+      }
+      catch(error ) {
+        console.log("Getting error while fetching home screen data: ", error);
+        throw error;
+      }
+  },
+
+
+  fetchHomeScreenData: async(lang) => {
+    try {
+      const url = `https://api.bhaktibhav.app/api/v1/frontend/${endPoints.homedata}`
+      const response = await api.get(url, {
+        params: {lang}
+      });
+      return response.data;
+    }
+    catch(error) {
+      console.log("Getting error while fetching consolidated data for home screen: ", error);
+    }
+  },
+}
+
+export const teachingApis = {
+  getTeachingCategories: async (page = 1, limit = 10, lang = "hinglish") => {
+    try {
+      const response = await api.get(`${someNewUrlForV4}${endPoints.teachingCategoriesV3}`, {
+        params: { page, limit, lang }
+      });
+      return response.data;
+    }
+    catch (error) {
+      console.error("Error fetching teaching categories:", error);
+      throw error;
+    }
+  },
+
+  getTeachingCategoryItems: async (categoryId, page = 1, limit = 10, lang = "hinglish") => {
+    try {
+      const response = await api.get(`${someNewUrlForV4}${endPoints.teachingCategoryV3}/${categoryId}`, {
+        params: { page, limit, lang }
+      });
+      return response.data;
+    }
+    catch (error) {
+      console.error("Error fetching teaching category items:", error);
+      throw error;
+    }
+  },
 }
 
 export const wallpaperApis = {

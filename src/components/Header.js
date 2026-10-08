@@ -5,7 +5,7 @@ import rupeesIcon from "../assets/img/rupees_icon.png";
 import userIcon from "../assets/img/hd_user_icon.png";
 import logo from "../assets/img/logo.png";
 import backBtn from "../assets/img/back_icon.svg";
-import { Check, ChevronLeft, Download, Eye, Globe2, Heart, LogOut, MoreVertical, Pencil, ReceiptText } from "lucide-react";
+import { Bell, Check, ChevronLeft, CircleUserRound, Download, Eye, Globe2, Heart, LogOut, Menu, MoreVertical, Pencil, ReceiptText, Search } from "lucide-react";
 import { LanguageContext } from "../contexts/LanguageContext";
 import { getTokenFromLS, removeMobileNoFromLS, removeSubscriptionStatusFromLS, removeTokenFromLS, formatNumber, removeUserName, removeUserIdFromLS, getMobileNoFromLS } from "../commonFunctions";
 import useGA4Tracker from "../hooks/useGA4Tracker";
@@ -29,7 +29,8 @@ function Header({
     profileText,
     hideEditIcon = false,
     showEnglishText = false,
-    showVerticalLogout = false
+    showVerticalLogout = false,
+    onHomeMenuClick
 }) {
     const { pathname } = useLocation();
     const navigate = useNavigate();
@@ -55,6 +56,7 @@ function Header({
     const homeRoutes = ["/", "/home", "/Rashifal", "/payment", "/hindi-calendar", "/vrat-katha", "/chalisa", "/aarti", '/jaap-mala', "/mantra", "/wallpaper", "/termsAndConditions", "/aboutUs", "/privacyPolicy", "/parsad", "/winners"];
 
     const isHomeRoute = homeRoutes.includes(pathname);
+    const isHomePage = pathname === "/" || pathname === "/home" || pathname === "/home-v1";
 
     // Close dropdown when clicking outside
     useEffect(() => {
@@ -120,6 +122,21 @@ function Header({
             fetchLanguages();
         }
     };
+
+    useEffect(() => {
+        const handleOpenLanguageModal = () => {
+            setPendingLanguage(language);
+            setShowLanguageModal(true);
+            if (!languages.length && !languageLoading) {
+                fetchLanguages();
+            }
+        };
+
+        window.addEventListener("bhakti-bhav:open-language-modal", handleOpenLanguageModal);
+        return () => {
+            window.removeEventListener("bhakti-bhav:open-language-modal", handleOpenLanguageModal);
+        };
+    }, [language, languages.length, languageLoading, fetchLanguages]);
 
     const handleLanguageSelect = (code) => {
         setPendingLanguage(code);
@@ -192,9 +209,12 @@ function Header({
 
     return (
         <>
-            <header className="fixed top-0 left-0 right-0 z-50 px-4 pt-3 bg-white shadow-sm" style={{height: '80px'}}>
-                <div className="container mx-auto hd_bg rounded-xl">
-                    <div className="flex justify-between items-center px-4 py-6">
+            <header
+                className={`fixed top-0 left-0 right-0 z-50 bg-white ${isHomePage ? "px-4 pt-5 shadow-none" : "px-4 pt-3 shadow-sm"}`}
+                style={{ height: isHomePage ? "96px" : "80px" }}
+            >
+                <div className={`${isHomePage ? "container mx-auto max-w-md md:max-w-5xl" : "container mx-auto hd_bg rounded-xl"}`}>
+                    <div className={`${isHomePage ? "flex h-14 items-center justify-between gap-3" : "flex justify-between items-center px-4 py-6"}`}>
 
                     {showProfileHeader && (
                         <>
@@ -315,7 +335,7 @@ function Header({
                         </div>
                     )}
 
-                    {isHomeRoute && (
+                    {isHomeRoute && !isHomePage && (
                         <>
                             <h1 className="text-lg font-bold">
                                 <a href="/">
@@ -338,11 +358,56 @@ function Header({
                         </>
                     )}
 
+                    {isHomePage && (
+                        <>
+                            <div className="flex min-w-0 items-center gap-3">
+                                <button
+                                    type="button"
+                                    onClick={onHomeMenuClick}
+                                    className="flex h-10 w-10 shrink-0 items-center justify-center text-[#9A283D]"
+                                    aria-label="Open menu"
+                                >
+                                    <Menu size={34} strokeWidth={2.4} />
+                                </button>
+                                <a href="/" className="min-w-0">
+                                    <h1 className="font-devanagari truncate text-2xl font-bold leading-none text-[#9A283D]">
+                                        भक्ति भाव
+                                    </h1>
+                                </a>
+                            </div>
+
+                            <div className="flex shrink-0 items-center gap-3 text-[#9A283D]">
+                                <button
+                                    type="button"
+                                    className="flex h-10 w-10 items-center justify-center"
+                                    aria-label="Search"
+                                >
+                                    <Search size={34} strokeWidth={2.2} />
+                                </button>
+                                <button
+                                    type="button"
+                                    className="flex h-10 w-10 items-center justify-center"
+                                    aria-label="Notifications"
+                                >
+                                    <Bell size={32} strokeWidth={2.2} />
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={handleProfileNavigation}
+                                    className="flex h-10 w-10 items-center justify-center"
+                                    aria-label="Profile"
+                                >
+                                    <CircleUserRound size={36} strokeWidth={2.2} />
+                                </button>
+                            </div>
+                        </>
+                    )}
+
                 </div>
             </div>
         </header>
         {/* Spacer div to prevent content overlap */}
-        <div className="h-20 w-full"></div>
+        <div className={`${isHomePage ? "h-24" : "h-20"} w-full`}></div>
         {showLanguageModal && (
             <div className="fixed inset-0 z-[60] flex justify-end bg-black bg-opacity-40" onClick={closeLanguageModal}>
                 <div

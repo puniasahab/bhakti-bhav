@@ -38,4 +38,7 @@ export const endPoints = {
     vratKathaCategoryList: 'katha-category',
     vratKathaById: 'katha',
     homeData: 'homedata',
+    newHomeApi: 'home-screen',
+    teachingCategoriesV3: 'teaching-categories-v3',
+    teachingCategoryV3: 'teaching-category-v3'
 }

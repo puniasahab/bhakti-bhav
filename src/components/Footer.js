@@ -1,13 +1,92 @@
 import React from "react";
-import { Facebook, Instagram } from 'lucide-react';
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Facebook, Home, Instagram, Languages, Quote, SunMedium } from 'lucide-react';
 import whatsapp_icon from "../assets/img/whatssapp_icon.png";
 import useGA4BaseParams from "../hooks/useGA4BaseParams";
 import useGA4Tracker from "../hooks/useGA4Tracker";
 import { GA4Events } from "../utils/ga4Events.enum";
-    
-function Footer() {
+
+function Footer({ variant = "default" }) {
+    const location = useLocation();
+    const navigate = useNavigate();
     const baseParams = useGA4BaseParams("Home Screen");
     const { trackEvent } = useGA4Tracker(baseParams);
+    const isHomeActive = location.pathname === "/" || location.pathname === "/home" || location.pathname === "/home-v1";
+
+    const openLanguageModal = () => {
+        window.dispatchEvent(new Event("bhakti-bhav:open-language-modal"));
+    };
+
+    const handleSuvicharClick = () => {
+        navigate("/");
+        window.setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 0);
+    };
+
+    if (variant === "homeNav") {
+        const navItems = [
+            {
+                key: "home",
+                label: "Home",
+                Icon: Home,
+                active: isHomeActive,
+                element: Link,
+                to: "/"
+            },
+            {
+                key: "language",
+                label: "Language",
+                Icon: Languages,
+                active: false,
+                onClick: openLanguageModal
+            },
+            {
+                key: "rashifal",
+                label: "Rashifal",
+                Icon: SunMedium,
+                active: location.pathname.toLowerCase() === "/rashifal",
+                element: Link,
+                to: "/rashifal"
+            },
+            {
+                key: "suvichar",
+                label: "Suvichar",
+                Icon: Quote,
+                active: false,
+                onClick: handleSuvicharClick
+            }
+        ];
+
+        return (
+            <footer className="fixed bottom-0 left-0 right-0 z-40 border-t border-[#EEE7E2] bg-white/95 shadow-[0_-10px_28px_rgba(31,22,20,0.08)] backdrop-blur">
+                <nav className="container mx-auto grid max-w-md grid-cols-4 px-4 pb-[max(14px,env(safe-area-inset-bottom))] pt-3 md:max-w-5xl" aria-label="Home navigation">
+                    {navItems.map(({ key, label, Icon, active, element: Element, to, onClick }) => {
+                        const className = `font-eng flex min-w-0 flex-col items-center justify-center gap-1 text-xs leading-none transition ${active ? "text-[#9A283D]" : "text-[#9D9D9D]"}`;
+                        const iconClassName = active ? "text-[#9A283D]" : "text-[#9D9D9D]";
+                        const content = (
+                            <>
+                                <Icon size={28} strokeWidth={active ? 2.8 : 2.4} className={iconClassName} />
+                                <span className={`${active ? "font-bold" : "font-medium"} truncate`}>{label}</span>
+                            </>
+                        );
+
+                        if (Element) {
+                            return (
+                                <Element key={key} to={to} className={className}>
+                                    {content}
+                                </Element>
+                            );
+                        }
+
+                        return (
+                            <button key={key} type="button" onClick={onClick} className={className}>
+                                {content}
+                            </button>
+                        );
+                    })}
+                </nav>
+            </footer>
+        );
+    }
 
     return (
         <footer className="mt-6 py-4">

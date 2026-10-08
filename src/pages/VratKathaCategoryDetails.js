@@ -277,7 +277,8 @@ const renderMixedText = (text) => {
                 onClick={() => { handleTrackEvent(katha._id, katha); }}
                 className="relative block rounded-xl overflow-hidden shadow-lg"
               >
-                <div className={`overflow_bg ${language === "hinglish" ? "aarti-hinglish-title" : ""}`}>
+                {/* removing overflow_bg className from below div so that container don't show white blur background. */}
+                <div className={`${language === "hinglish" ? "aarti-hinglish-title" : ""}`}>
                   <img
                     src={katha.imagethumb || katha.imageUrl}
                     alt={typeof katha.name === "string" ? katha.name : (katha.name?.hi || katha.name?.en || "")}
@@ -293,11 +294,11 @@ const renderMixedText = (text) => {
                       </h2>
                     )}
 
-                     {language === "hinglish" && (katha.name2 || katha.name) && (
+                     {/* {language === "hinglish" && (katha.name2 || katha.name) && (
                                         <h2 className={`font-semibold pt-3 text-center font-eng text-sm ${getSubscriptionStatusFromLS() ? "" : katha.accessType === "paid" ? "blur-sm" : ""}`}>
                                           {renderVratKathaName(katha, language)}
                                         </h2>
-                                      )}
+                                      )} */}
                   </div>
                 </div>
               </Link>

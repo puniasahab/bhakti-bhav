@@ -261,7 +261,8 @@ const renderHinglishName = (aarti) => {
                 onClick={() => { handleTrackEvent(item._id, item.title, item.accessType); }}
                 className="relative block rounded-xl overflow-hidden shadow-lg  "
               >
-                <div className={`overflow_bg ${language === "hinglish" ? "jaapmala-hinglish-title" : ""}`}>
+                {/* removing overflow_bg class from below div */}
+                <div className={`${language === "hinglish" ? "jaapmala-hinglish-title" : ""}`}>
 
                   <img
                     src={
@@ -274,7 +275,7 @@ const renderHinglishName = (aarti) => {
                     loading="lazy"
                     decoding="async"
                   />
-                  <div className={`absolute inset-0 theme_text flex flex-col items-center justify-center text-center px-4 z-10 ${
+                  {/* <div className={`absolute inset-0 theme_text flex flex-col items-center justify-center text-center px-4 z-10 ${
     language === "hinglish" ? "top-[52%]" : "top-[60%]"
   } ${isSubscribed ? "" : item.accessType === "paid" ? "blur-sm" : ""}`}>
                     {language === "hi"
@@ -283,7 +284,7 @@ const renderHinglishName = (aarti) => {
                         ? <h2 className="text-xs font-eng leading-snug">{renderHinglishName(item)}</h2>
                         : <h2 className="text-sm font-eng leading-snug">{item.title}</h2>
                     }
-                  </div>
+                  </div> */}
                 </div>
               </Link>
             </li>

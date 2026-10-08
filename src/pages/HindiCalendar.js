@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from "react";
-import Header from "../components/Header";
-import Footer from "../components/Footer";
 import { Link } from "react-router-dom";
 import Loader from "../components/Loader";
-import PageTitleCard from "../components/PageTitleCard";
 import { getTokenFromLS, getSubscriptionStatusFromLS } from "../commonFunctions";
 import { useNavigate } from "react-router-dom";
 import { GA4Events } from "../utils/ga4Events.enum";
@@ -13,6 +10,7 @@ import SEO from "../components/SEO";
 import { homeSchema } from "../seo/schemas";
 import { hindiCalendarSchema } from "../schemas/pageSchemas";
 import SchemaMarkup from "../components/SchemaMarkup";
+import { ChevronDown, ChevronLeft, ChevronRight, CircleUserRound, IndianRupee, Search } from "lucide-react";
 
 const HINDI_CALENDAR_CACHE_KEY = "hindi-calendar:panchang-calendar";
 const HINDI_CALENDAR_CACHE_TTL = 5 * 60 * 1000;
@@ -66,6 +64,44 @@ const getCalendarMonths = (json) => {
   return [];
 };
 
+const sanitizeHindiName = (value) => String(value || "")
+  .replace(/\//g, "")
+  .replace(/[⁄∕／]/g, "/")
+  .replace(/\(/g, "【")
+  .replace(/\)/g, "】")
+  .trim();
+
+const getFestivalBadge = (festival) => {
+  const name = sanitizeHindiName(festival?.name?.hi);
+
+  if (name.includes("एकादशी")) return "एकादशी";
+  if (name.includes("अमावस्या")) return "अमावस्या";
+  if (name.includes("पूर्णिमा")) return "पूर्णिमा";
+  if (name.includes("चतुर्थी")) return "चतुर्थी";
+  if (name.includes("शिवरात्रि") || name.includes("व्रत")) return "व्रत";
+
+  return festival?.accessType === "free" ? "त्योहार" : "व्रत";
+};
+
+const getFestivalSummary = (festival) => {
+  const name = sanitizeHindiName(festival?.name?.hi);
+
+  if (name.includes("अमावस्या")) return "स्नान, दान और पूजा विधि";
+  if (name.includes("शिवरात्रि")) return "व्रत विधि, पूजा विधि और महत्व";
+
+  return "व्रत विधि, कथा, मंत्र और महत्व";
+};
+
+const parseFestivalDate = (date) => {
+  const [year, month, day] = String(date || "").split("-").map(Number);
+
+  if (year && month && day) {
+    return new Date(year, month - 1, day);
+  }
+
+  return new Date(date);
+};
+
 export default function HindiCalendar() {
   const cachedCalendar = getValidCachedCalendar();
   const [months, setMonths] = useState(() => getCalendarMonths(cachedCalendar));
@@ -105,6 +141,7 @@ export default function HindiCalendar() {
   const currentMonth = months?.find(
     (m) => m.monthNumber === currentMonthNumber && m.year === currentYear
   );
+  const activeMonth = currentMonth || months?.[0];
 
 
   const handleNavigate = (id, accessType, date) => {
@@ -144,96 +181,134 @@ export default function HindiCalendar() {
 
   return (
     <>
-    <SchemaMarkup schema={hindiCalendarSchema} />
-    <SEO title="Best Hindu Calendar App | हिंदी पंचांग कैलेंडर डाउनलोड | भक्ति भाव"  description="Hindi Calendar 2026 और Hindu Panchang ऐप डाउनलोड करें। सभी व्रत, त्योहार, शुभ मुहूर्त और चंद्र कैलेंडर की जानकारी एक जगह | भक्ति भाव" canonical="https://bhaktibhav.app/hindi-calendar" schema={homeSchema}/>
-    <div className="bg-[url('../img/home_bg.png')] bg-cover bg-top bg-no-repeat min-h-screen w-full text-white font-kruti">
-      <Header />
-    <div className="h-1"></div>
-      <PageTitleCard
-        titleHi={"fgUnh dySaMj"}
-        titleEn={"Hindi Calender"}
-        customEngFontSize={"18px"}
-        customFontSize={"23px"}
+      <SchemaMarkup schema={hindiCalendarSchema} />
+      <SEO title="Best Hindu Calendar App | हिंदी पंचांग कैलेंडर डाउनलोड | भक्ति भाव" description="Hindi Calendar 2026 और Hindu Panchang ऐप डाउनलोड करें। सभी व्रत, त्योहार, शुभ मुहूर्त और चंद्र कैलेंडर की जानकारी एक जगह | भक्ति भाव" canonical="https://bhaktibhav.app/hindi-calendar" schema={homeSchema}/>
+      <div className="min-h-screen w-full bg-[url('../img/home_bg.png')] bg-cover bg-top bg-no-repeat font-devanagari text-[#9A283D]">
+        <main className="container mx-auto flex max-w-md flex-col px-4 pb-10 pt-8 md:max-w-5xl">
+          <header className="relative mb-11 rounded-[22px] bg-gradient-to-r from-[#F2A13A] to-[#FFF56A] px-4 py-3.5 shadow-[0_10px_24px_rgba(154,40,61,0.08)] sm:px-5">
+            <div className="flex items-center justify-between gap-3 sm:gap-4">
+              <div className="flex min-w-0 items-center gap-3 sm:gap-4">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (window.history.state && window.history.state.idx > 0) {
+                      navigate(-1);
+                    } else {
+                      navigate("/");
+                    }
+                  }}
+                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#FFE8B5]/95 text-[#9A283D]"
+                  aria-label="Back"
+                >
+                  <ChevronLeft size={27} strokeWidth={2.6} />
+                </button>
+                <h1 className="truncate text-[22px] font-bold leading-none">भक्ति भाव</h1>
+              </div>
 
-      />
+              <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+                <button type="button" className="flex h-10 w-10 items-center justify-center rounded-full bg-[#FFF4B6]/90 text-[#9A283D]" aria-label="Search">
+                  <Search size={24} strokeWidth={2.4} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    trackEvent(GA4Events.rupees_icon_clicked, { event_label: "rupees_icon_clicked_from_hindi_calendar" });
+                    navigate(getTokenFromLS() ? "/payment" : "/login");
+                  }}
+                  className="flex h-10 w-10 items-center justify-center rounded-full bg-[#FFF4B6]/90 text-[#9A283D]"
+                  aria-label="Payment"
+                >
+                  <IndianRupee size={24} strokeWidth={2.7} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => navigate(getTokenFromLS() ? "/profile" : "/login")}
+                  className="flex h-10 w-10 items-center justify-center rounded-full bg-[#FFF4B6]/90 text-[#9A283D]"
+                  aria-label="Profile"
+                >
+                  <CircleUserRound size={26} strokeWidth={2.4} />
+                </button>
+              </div>
+            </div>
 
-      <div className="px-4 mt-6">
-        <div className="container mx-auto">
-          <ul className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-            {months.map((m, idx) => {
-              const monthData = m.month;
-              console.log("Month data:", m, "Type:", typeof monthData);
-              return (
-                <li key={m._id}>
-                  <Link
-                    onClick= {() => {trackEvent(GA4Events.calendar_month_clicked, { event_label: "calendar_month_clicked_from_hindi_calendar", month: monthData.hi })}}
-                    to={`/hindi-calendar/${m._id || idx}`}
-                    className={`theme_bg bg-white rounded-full shadow md:p-4 p-3 text-center hover:bg-yellow-50 transition flex flex-col`}
-                  >
-                    {monthData.hi} <span className="font-eng">({monthData.en})</span>
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
+            <div className="absolute left-1/2 top-full flex h-[48px] w-[150px] -translate-x-1/2 -translate-y-[1px] items-center justify-center rounded-b-[20px] border-[3px] border-t-0 border-[#E65C21] bg-white text-center text-[18px] font-semibold leading-none shadow-[0_8px_18px_rgba(154,40,61,0.08)]">
+              हिन्दी कैलेंडर
+            </div>
+          </header>
 
-          {currentMonth && (
-            <section className="mt-6 px-4">
-              <h3 className="theme_text font-semibold mb-3 current_mont text-3xl">
-                {currentMonth.month.hi}{" "}
-                <span className="font-eng text-sm">({currentMonth.year})</span>
-              </h3>
+          <section>
+            <ul className="grid grid-cols-3 gap-x-4 gap-y-4">
+              {months.map((m, idx) => {
+                const monthData = m.month;
+                const isActive = activeMonth?._id === m._id;
 
-              <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-                {currentMonth.festivals.map((festival) => {
-                  const dateObj = new Date(festival.date);
+                return (
+                  <li key={m._id || idx}>
+                    <Link
+                      onClick={() => { trackEvent(GA4Events.calendar_month_clicked, { event_label: "calendar_month_clicked_from_hindi_calendar", month: monthData.hi }); }}
+                      to={`/hindi-calendar/${m._id || idx}`}
+                      className={`flex h-[50px] items-center justify-center rounded-full border-2 text-[17px] font-semibold leading-none shadow-[0_7px_16px_rgba(154,40,61,0.04)] transition ${
+                        isActive
+                          ? "border-[#A72440] bg-[#A72440] text-white"
+                          : "border-[#9A283D] bg-white text-[#9A283D] hover:bg-[#FFF7ED]"
+                      }`}
+                    >
+                      {monthData.hi}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+
+          {activeMonth && (
+            <section className="mt-7">
+              <h2 className="mb-4 flex items-center gap-2 text-[24px] font-bold leading-none text-[#9A283D]">
+                {activeMonth.month.hi} {activeMonth.year}
+                <ChevronDown size={23} strokeWidth={2.8} />
+              </h2>
+
+              <ul className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                {activeMonth.festivals.map((festival) => {
+                  const dateObj = parseFestivalDate(festival.date);
                   const day = dateObj.getDate().toString().padStart(2, "0");
-
                   const weekdayHi = dateObj.toLocaleDateString("hi-IN", { weekday: "long" });
-                  const weekdayEn = dateObj.toLocaleDateString("en-US", { weekday: "long" });
+                  const festivalName = sanitizeHindiName(festival.name?.hi);
+                  const badge = getFestivalBadge(festival);
+                  const summary = getFestivalSummary(festival);
 
                   return (
-                    <li
-                      key={festival._id}
-                      onClick={
-                        () => navigate(handleNavigate(festival.kathaId, festival.accessType, festival.date))}
-                      className={`bg-[#9A283D] text-white rounded-lg flex items-center px-4 py-3 shadow-md  ${getSubscriptionStatusFromLS() ? "" : festival.accessType === "paid" ? "blur-sm" : ""}`}
-                    >
-                      <div className="flex items-center text-sm font-medium w-1/2">
-                        <div className="text-lg font-bold font-eng mr-2">{day}</div>
-                        <div>
-                          <p className="font-hindi text-lg">{weekdayHi}</p>
-                          <p className="font-eng text-sm">({weekdayEn})</p>
-                        </div>
-                      </div>
-
-                      <div className="w-px h-10 bg-white/50 mx-3"></div>
-
-                      <div className="flex flex-col w-[70%]">
-                        <span className="text-lg font-hindi">{festival.name.hi.replace(/\//g, "").replace(/[⁄∕／]/g, "/").replace(/\(/g, "【")
-  .replace(/\)/g, "】")}</span>
-                        <span className="text-sm font-eng">
-                          {festival.name.en}
+                    <li key={festival._id}>
+                      <button
+                        type="button"
+                        onClick={() => navigate(handleNavigate(festival.kathaId, festival.accessType, festival.date))}
+                        className="flex min-h-[90px] w-full items-center rounded-2xl border border-[#F0E4DC] bg-white px-4 py-3.5 text-left text-[#9A283D] shadow-[0_8px_22px_rgba(154,40,61,0.05)] transition hover:border-[#9A283D]/50 hover:bg-[#FFFDF8]"
+                      >
+                        <span className="flex w-[76px] shrink-0 flex-col items-center justify-center">
+                          <span className="font-eng text-[29px] font-bold leading-none">{day}</span>
+                          <span className="mt-1.5 text-[14px] font-medium leading-none">{weekdayHi}</span>
                         </span>
-                      </div>
 
-                      <div className="ml-3">
-                        <span className="text-3xl font-eng">›</span>
-                      </div>
+                        <span className="mx-3 h-12 w-px shrink-0 bg-[#E9DED8]" />
+
+                        <span className="min-w-0 flex-1">
+                          <span className="flex min-w-0 items-center gap-3">
+                            <span className="truncate text-[18px] font-semibold leading-tight">{festivalName}</span>
+                            <span className="shrink-0 rounded-md bg-[#FFF0D1] px-2.5 py-1 text-xs font-semibold leading-none text-[#8C652E]">{badge}</span>
+                          </span>
+                          <span className="mt-2 block truncate text-[14px] font-normal leading-tight text-[#7B6A62]">{summary}</span>
+                        </span>
+
+                        <ChevronRight size={26} strokeWidth={2.6} className="ml-2 shrink-0 text-[#9A283D]" />
+                      </button>
                     </li>
                   );
                 })}
               </ul>
-
-
-
             </section>
           )}
-        </div>
+        </main>
       </div>
-
-
-    </div>
     </>
   );
 }

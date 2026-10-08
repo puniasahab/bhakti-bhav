@@ -391,7 +391,8 @@ const datePublished = formatDate(new Date());
                   state={{ item, categoryId }}
                   className="relative block rounded-xl overflow-hidden shadow-lg"
                 >
-                  <div className={`overflow_bg ${language === "hinglish" ? "kahaniya-hinglish-title" : ""}`}>
+                  {/* Remove overflow_bg className from below div (FOR Future reference) overflow_bg*/}
+                  <div className={`${language === "hinglish" ? "kahaniya-hinglish-title" : ""}`}>
                     <img
                       crossOrigin="anonymous"
                       src={imgSrc}
@@ -400,11 +401,11 @@ const datePublished = formatDate(new Date());
                       loading="lazy"
                       decoding="async"
                     />
-                    <div className={`absolute inset-0 theme_text flex flex-col items-center justify-center text-center px-2 z-10 top-[60%] ${isRestricted ? "blur-sm" : ""}`}>
-                      <h2 className={`text-sm font-[450] ${language === "hi" ? "font-hindi" : "font-eng"}`}>
-                        {renderTitle(title, language)}
-                      </h2>
-                    </div>
+                    {/* <div className={`absolute inset-0 theme_text flex flex-col items-center justify-center text-center px-2 z-10 top-[60%] ${isRestricted ? "blur-sm" : ""}`}> */}
+                      {/* <h2 className={`text-sm font-[450] ${language === "hi" ? "font-hindi" : "font-eng"}`}> */}
+                        {/* {renderTitle(title, language)} */}
+                      {/* </h2> */}
+                    {/* </div> */}
                   </div>
                 </Link>
               </li>

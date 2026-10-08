@@ -238,7 +238,8 @@ export default function Aarti() {
                   to={handleNavigate(item._id, item.accessType)}
                   className="relative block rounded-xl overflow-hidden shadow-lg"
                 >
-                  <div className={`overflow_bg ${language === "hinglish" ? "aarti-hinglish-title" : ""}`}>
+                  {/* remove overflow_bg class from below div to hide the blur container where we are showing names */}
+                  <div className={` ${language === "hinglish" ? "aarti-hinglish-title" : ""}`}>
                     <img
                       src={imgSrc}
                       alt={typeof item.name === "string" ? item.name : (language === "hi" ? (item.name?.hi || item.name?.en || "Aarti") : (item.name?.en || item.name?.hi || "Aarti"))}
@@ -248,7 +249,7 @@ export default function Aarti() {
                       loading="lazy"
                       decoding="async"
                     />
-                    <div className={`absolute inset-0 theme_text flex flex-col items-center justify-center text-center px-4 z-10 ${language==='hinglish' ? 'top-[52%]' : 'top-[60%]'} ${isSubscribed ? "" : item.accessType === "paid" ? "blur-sm" : ""}`}>
+                    {/* <div className={`absolute inset-0 theme_text flex flex-col items-center justify-center text-center px-4 z-10 ${language==='hinglish' ? 'top-[52%]' : 'top-[60%]'} ${isSubscribed ? "" : item.accessType === "paid" ? "blur-sm" : ""}`}>
                       {(() => {
                         const isHindi = language === "hi";
                         // const displayName = typeof item.name === "string"
@@ -264,7 +265,7 @@ export default function Aarti() {
                       </h2>
                         );
                       })()}
-                    </div>
+                    </div> */}
                   </div>
                 </Link>
               </li>

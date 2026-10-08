@@ -1,86 +1,134 @@
 import React, { useState, useEffect, useRef, useContext } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import { Link } from "react-router-dom";
-import TodayThoughts from "../components/TodayThoughts";
+import { Link, useNavigate } from "react-router-dom";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination, Autoplay } from "swiper/modules";
-import { useNavigate } from "react-router-dom";
+import { ArrowRight, BookOpen, CalendarDays, ChevronUp, Gift, Globe2, IndianRupee, Instagram, Sparkles, WalletCards } from "lucide-react";
 import { homeSchema } from "../seo/schemas";
 import { useAppStoreRedirect } from "../hooks/useAppStoreRedirect";
 
 import "swiper/css";
 import "swiper/css/pagination";
-import { homeCategoryApis, profileApis, wallpaperApis, wallpaperDeepLinkingApi } from "../api";
+import { homeCategoryApis, homeMainApis, profileApis, wallpaperApis } from "../api";
 import { getMobileNoFromLS, setUserIdInLS, setUserName, removeSubscriptionStatusFromLS, setSubscriptionStatusInLS, getTokenFromLS, getSubscriptionStatusFromLS, getIsLoggedIn } from "../commonFunctions";
 import homeCache from "../utils/homeCache";
-// import { trackEventCommonFunction } from "../utils/eventCommonFunctions";
 import useGA4BaseParams from "../hooks/useGA4BaseParams";
 import useGA4Tracker from "../hooks/useGA4Tracker";
 import { GA4Events } from "../utils/ga4Events.enum";
 import SEO from "../components/SEO";
 import { LanguageContext } from "../contexts/LanguageContext";
-import translation from "../utils/translation.json";
+import malaGif from "../assets/img/mala.gif";
+
+const ASSET_BASE_URL = "https://api.bhaktibhav.app";
+
+const normalizeImageUrl = (url) => {
+    if (!url) return "";
+    if (/^https?:\/\//i.test(url)) return url;
+    if (url.startsWith("/")) return `${ASSET_BASE_URL}${url}`;
+    return url;
+};
+
+const stripHtmlTags = (value) => String(value || "").replace(/<[^>]*>/g, "").trim();
+
+const getSocialReelsFromResponse = (response) => {
+    const possiblePayloads = [
+        response,
+        response?.data,
+        response?.data?.data
+    ];
+
+    for (const payload of possiblePayloads) {
+        if (Array.isArray(payload?.socialReels)) {
+            return payload.socialReels
+                .filter((reel) => reel?.thumbnailUrl || reel?.videoUrl || reel?.redirectUrl)
+                .sort((a, b) => (a.position || 0) - (b.position || 0));
+        }
+    }
+
+    return [];
+};
+
+const getHomeBannersFromBannersResponse = (response) => {
+    const banners = Array.isArray(response?.data)
+        ? response.data
+        : Array.isArray(response)
+            ? response
+            : [];
+
+    return banners.filter((banner) => banner?.pageName === "home" && (banner.imageUrl || banner.imagethumb));
+};
+
+const getHomeDeepLinksFromResponse = (response) => {
+    const payload = response?.data || response || {};
+    const deepLinks = payload.deeplink || payload.deepLink || payload.deepLinks || [];
+
+    if (!Array.isArray(deepLinks)) return [];
+
+    return deepLinks
+        .filter((item) => item?.image || item?.imagethumb || item?.imageUrl)
+        .sort((a, b) => (a.position || 0) - (b.position || 0));
+};
 
 function Home() {
-
-
     const navigate = useNavigate();
     const { language } = useContext(LanguageContext);
     const baseParams = useGA4BaseParams("Home Screen");
     const { trackEvent } = useGA4Tracker(baseParams);
+    const { deviceType, redirectToStore } = useAppStoreRedirect();
 
-    const { deviceType, redirectToStore, storeUrls } = useAppStoreRedirect();
-    // Initialize state from cache if available (instant render on back-navigation)
     const [isOpen, setIsOpen] = useState(false);
+    const [isHomeMenuOpen, setIsHomeMenuOpen] = useState(false);
     const [showLoginModal, setShowLoginModal] = useState(false);
     const [panchangData, setPanchangData] = useState(() => {
-        // Rebuild from cached raw data if available
         const cachedRaw = homeCache.get("panchangRawData");
-        if (cachedRaw) {
-            // language not yet available in lazy init, default to "hi"
-            return [
-                {
-                    side: "left",
-                    items: [
-                        <span><strong>तिथि</strong> % {cachedRaw.tithi.hi || "-"}</span>,
-                        <span><strong>नक्षत्र</strong> % {cachedRaw.nakshatra.hi || "-"}</span>,
-                        <span><strong>करण</strong> % {cachedRaw.karana.hi || "-"}</span>,
-                    ],
-                },
-                {
-                    side: "right",
-                    items: [
-                        <span><strong>पक्ष</strong> % {cachedRaw.paksha.hi || "-"}</span>,
-                        <span><strong>योग</strong> % {cachedRaw.yoga.hi || "-"}</span>,
-                        <span><strong>वार</strong> % {cachedRaw.vaar.hi || "-"}</span>,
-                    ],
-                },
-            ];
-        }
-        return [];
+        if (!cachedRaw) return [];
+        return [
+            {
+                side: "left",
+                items: [
+                    <span><strong>तिथि</strong> % {cachedRaw.tithi?.hi || "-"}</span>,
+                    <span><strong>नक्षत्र</strong> % {cachedRaw.nakshatra?.hi || "-"}</span>,
+                    <span><strong>करण</strong> % {cachedRaw.karana?.hi || "-"}</span>,
+                ],
+            },
+            {
+                side: "right",
+                items: [
+                    <span><strong>पक्ष</strong> % {cachedRaw.paksha?.hi || "-"}</span>,
+                    <span><strong>योग</strong> % {cachedRaw.yoga?.hi || "-"}</span>,
+                    <span><strong>वार</strong> % {cachedRaw.vaar?.hi || "-"}</span>,
+                ],
+            },
+        ];
     });
+    const [homeScreenData, setHomeScreenData] = useState(() => homeCache.get(`homeScreenData:${language}`) || null);
+    const [socialReelsData, setSocialReelsData] = useState(() => homeCache.get(`homeSocialReels:${language}`) || []);
     const [bannersData, setBannersData] = useState(() => homeCache.get("bannersData") || []);
-    const [wallpaperImage, setWallpaperImage] = useState(() => homeCache.get("wallpaperImage") || "");
+    const [homeDeepLinks, setHomeDeepLinks] = useState(() => homeCache.get(`homeDeepLinks:${language}`) || []);
     const [homeCategories, setHomeCategories] = useState(() => homeCache.get("homeCategories") || []);
-    const [categoriesLoading, setCategoriesLoading] = useState(() => !homeCache.has("homeCategories"));
-    const [wallpaperDeepLinks, setWallpaperDeepLinks] = useState(() => homeCache.get("wallpaperDeepLinks") || []);
-    const hasFetchedBanners = useRef(false);
+    const [categoriesLoading, setCategoriesLoading] = useState(() => !homeCache.get(`homeScreenData:${language}`) && !homeCache.has("homeCategories"));
     const hasTrackedScreenView = useRef(false);
 
     const fallbackHomeCategories = [
-        { _id: "hindi-calendar", imageUrl: "./img/icon_2.png", url: "hindi-calendar", title: "fgUnh dySaMj" },
-        { _id: "vrat-katha", imageUrl: "./img/icon_3.png", url: "vrat-katha", title: "ozr dFkk" },
-        { _id: "jaap-mala", imageUrl: "./img/icon_4.png", url: "jaap-mala", title: "tki ekyk" },
-        { _id: "mantra", imageUrl: "./img/icon_5.png", url: "mantra", title: "ea=" },
-        { _id: "chalisa", imageUrl: "./img/icon_1.png", url: "chalisa", title: "pkyhlk" },
-        { _id: "aarti", imageUrl: "./img/icon_6.png", url: "aarti", title: "vkjrh" }
+        { _id: "hindi-calendar", imageUrl: "./img/icon_2.png", url: "hindi-calendar", title: "हिन्दी कैलेंडर" },
+        { _id: "vrat-katha", imageUrl: "./img/icon_3.png", url: "vrat-katha", title: "व्रत कथा" },
+        { _id: "jaap-mala", imageUrl: "./img/icon_4.png", url: "jaap-mala", title: "नाम जाप" },
+        { _id: "mantra", imageUrl: "./img/icon_5.png", url: "mantra", title: "मंत्र" },
+        { _id: "chalisa", imageUrl: "./img/icon_1.png", url: "chalisa", title: "चालीसा" },
+        { _id: "aarti", imageUrl: "./img/icon_6.png", url: "aarti", title: "आरती" }
     ];
 
     const categoryRouteMap = {
         arti: "aarti",
         "jaap-mala": "newjaapMaala",
         "japp-mala": "newjaapMaala",
+        "puja-karein": "puja-kare",
+        "aaj-ka-rashifal": "rashifal",
+        "guru-ji": "guru-ji",
+        guruji: "guru-ji",
+        teaching: "guru-ji",
+        "teaching-content": "guru-ji",
         108: "jaap-mala"
     };
 
@@ -116,13 +164,48 @@ function Home() {
         wallpaper: {
             eventName: GA4Events.wallpaper_widget_clicked,
             event_label: "wallpaper_card_clicked_on_home_screen"
+        },
+        "puja-kare": {
+            eventName: GA4Events.pooja_karein_widget_clicked,
+            event_label: "pooja_kare_card_clicked_on_home_screen"
+        },
+        rashifal: {
+            eventName: GA4Events.rashifal_tab_clicked,
+            event_label: "rashifal_card_clicked_on_home_screen"
         }
+    };
+
+    const redirectPageRouteMap = {
+        "panchang-calendar": "/hindi-calendar",
+        "hindi-calendar": "/hindi-calendar",
+        hindi_calendar: "/hindi-calendar",
+        vrat: "/vrat-katha",
+        "vrat-katha": "/vrat-katha",
+        katha: "/vrat-katha",
+        wallpaper: "/wallpaper",
+        chalisa: "/chalisa",
+        arti: "/aarti",
+        aarti: "/aarti",
+        jaapmala: "/jaap-mala",
+        "jaap-mala": "/newjaapMaala",
+        mantra: "/mantra",
+        "puja-karein": "/puja-kare",
+        "aaj-ka-rashifal": "/rashifal",
+        "guru-ji": "/guru-ji",
+        guruji: "/guru-ji",
+        teaching: "/guru-ji",
+        "teaching-content": "/guru-ji",
+        kahaniya: "/kahaniya-details"
     };
 
     const getCategoryRoute = (category) => {
         const url = String(category?.url || "").replace(/^\/+/, "");
         const route = categoryRouteMap[url] || url;
         const categoryId = category?.categoryId || category?._id;
+
+        if (!route || route === "aaj-ka-suvichar") {
+            return "/";
+        }
 
         if (route === "kahaniya" && categoryId) {
             return `/kahaniya/${categoryId}`;
@@ -142,96 +225,37 @@ function Home() {
         return [];
     };
 
-    const getWallpaperDeepLinksFromResponse = (response) => {
-        if (Array.isArray(response)) return response;
-        if (Array.isArray(response?.data)) return response.data;
-        return [];
-    };
+    const getHomeScreenPayload = (response) => response?.data || response || null;
 
-
-    const redirection = {
-        "katha": "/vrat-katha",
-        "kahaniya": "/kahaniya-details",
-        "wallpaper": "/wallpaper",
-        "chalisa": "/chalisa",
-        "arti": "/aarti",
-        "jaapmala": "/jaapmala",
-        "mantra": "/mantra"
-
-    }
-
-    const getWallpaperDeepLinkRoute = (item) => {
-        // if (item?.categoryRedirect === "katha" && item?.categoryId) {
-        //     return `/vrat-katha/categoryDetails/${item.categoryId}`;
-        // }
-
-        // else if(item?.categoryRedirect === 'kahaniya' && item?.categoryId) {
-        //     return 
-        // }
-
-        // else if(item?.categoryRedirect === '') {
-
-        // }
-
-
-
-        // if (item?.categoryRedirect === "wallpaper" && item?._id) {
-        //     return `/wallpaper/${item._id}`;
-        // }
-
-        let route = "";
-        // Never call setShowLoginModal here — this function runs during render (as `to` prop).
-        // Login modal is handled in the onClick handler (handleWallpaperDeepLinkClicked).
-        if (getIsLoggedIn()) {
-            if (getSubscriptionStatusFromLS()) {
-                if (item?.categoryRedirect && item?.categoryId) {
-                    route = `${redirection[item.categoryRedirect]}/${item.categoryId}`;
-                }
-                else if (item?.categoryRedirect) {
-                    route = `${redirection[item.categoryRedirect]}`;
-                }
-            }
-        }
-        return route || "/payment";
-    };
-
-    // Helper to format raw panchang data into React elements
     const formatPanchangData = (rawData) => [
         {
             side: "left",
             items: [
-                <span><strong>तिथि</strong> % {rawData.tithi.hi || "-"}</span>,
-                <span><strong>नक्षत्र</strong> % {rawData.nakshatra.hi || "-"}</span>,
-                <span><strong>करण</strong> % {rawData.karana.hi || "-"}</span>,
+                <span><strong>तिथि</strong> % {rawData.tithi?.hi || "-"}</span>,
+                <span><strong>नक्षत्र</strong> % {rawData.nakshatra?.hi || "-"}</span>,
+                <span><strong>करण</strong> % {rawData.karana?.hi || "-"}</span>,
             ],
         },
         {
             side: "right",
             items: [
-                <span><strong>पक्ष</strong> % {rawData.paksha.hi || "-"}</span>,
-                <span><strong>योग</strong> % {rawData.yoga.hi || "-"}</span>,
-                <span><strong>वार</strong> % {rawData.vaar.hi || "-"}</span>,
+                <span><strong>पक्ष</strong> % {rawData.paksha?.hi || "-"}</span>,
+                <span><strong>योग</strong> % {rawData.yoga?.hi || "-"}</span>,
+                <span><strong>वार</strong> % {rawData.vaar?.hi || "-"}</span>,
             ],
         },
     ];
 
-
     useEffect(() => {
         if (!isOpen) return;
 
-        // If cached panchang raw data exists, rebuild formatted data from it
         const cachedPanchangRaw = homeCache.get("panchangRawData");
         if (cachedPanchangRaw) {
-            const formatted = formatPanchangData(cachedPanchangRaw);
-            setPanchangData(formatted);
+            setPanchangData(formatPanchangData(cachedPanchangRaw));
             return;
         }
 
-
-
         const fetchPanchang = async () => {
-
-
             trackEvent(GA4Events.panchang_card_clicked, {
                 event_label: "panchang_card_clicked_on_home_screen"
             });
@@ -240,9 +264,7 @@ function Home() {
                 const data = await res.json();
 
                 if (data?.success && data.data) {
-                    const formatted = formatPanchangData(data.data);
-                    setPanchangData(formatted);
-                    // Cache the raw API data for 30 minutes
+                    setPanchangData(formatPanchangData(data.data));
                     homeCache.set("panchangRawData", data.data);
                 } else {
                     setPanchangData([]);
@@ -254,76 +276,45 @@ function Home() {
         };
 
         fetchPanchang();
-
-
-    }, [isOpen]);
+    }, [isOpen, trackEvent]);
 
     useEffect(() => {
-        // const isLoggedIn = !!getTokenFromLS();
-        // const isSubscribed = getSubscriptionStatusFromLS();
-
-        // const params = {
-        //     user_id: isLoggedIn ? (getUserIdFromLS() || "logged_in") : "anonymous",
-        //     device_id: getDeviceId(),
-        //     platform: getBrowserName(),
-        //     session_id: getSessionId(),
-        //     user_type: isLoggedIn ? (isSubscribed ? "paid" : "free") : "free",
-        //     subscription_plan: isLoggedIn ? getSubscriptionPlanFromLS() : "none",
-        //     language: "en",
-        //     country: "India",
-        //     screen_name: "home_screen",
-        //     env: "prod",
-        //     phone_number: isLoggedIn ? (getMobileNoFromLS() || "none") : "none",
-        //     source: "web",
-        // };
-
-        // // Delay slightly so Firebase Analytics async init completes before sending
-        // const timer = setTimeout(() => {
-        //     trackEventCommonFunction("screen_view", params);
-        // }, 500);
-
-        // return () => clearTimeout(timer);
-
-        // const baseParams = useGA4BaseParams("panchang_card_clicked_on_home_screen");
-        // const { trackEvent } = useGA4Tracker(baseParams);
-        // trackEvent("panchang_card_clicked");
         if (!hasTrackedScreenView.current) {
             trackEvent(GA4Events.screen_view);
             hasTrackedScreenView.current = true;
         }
-    }, []);
+    }, [trackEvent]);
 
     const phoneNumber = getMobileNoFromLS();
 
     useEffect(() => {
         let isMounted = true;
+        const cacheKey = `homeScreenData:${language}`;
+        const deepLinksCacheKey = `homeDeepLinks:${language}`;
+        const cachedHomeScreenData = homeCache.get(cacheKey);
+        const cachedDeepLinks = homeCache.get(deepLinksCacheKey);
 
-        // On language change, clear language-sensitive cache and reset categories state
-        homeCache.delete("homeCategories");
-        setHomeCategories([]);
-        setCategoriesLoading(true);
+        setCategoriesLoading(!cachedHomeScreenData && !homeCache.has("homeCategories"));
 
-        // Check cache first for instant render, but continue fetching other home APIs.
-        const cachedBanners = homeCache.get("bannersData");
-        const cachedWallpaper = homeCache.get("wallpaperImage");
-        const shouldUseCachedBanners = cachedBanners && cachedBanners.length > 0;
-
-        if (shouldUseCachedBanners) {
-            setBannersData(cachedBanners);
-            setWallpaperImage(cachedWallpaper || "");
-            hasFetchedBanners.current = true;
+        if (cachedHomeScreenData) {
+            setHomeScreenData(cachedHomeScreenData);
+            setSocialReelsData(getSocialReelsFromResponse(cachedHomeScreenData));
+            setHomeCategories(cachedHomeScreenData.categories || []);
         }
 
-        const shouldFetchBanners = !shouldUseCachedBanners && !hasFetchedBanners.current;
+        if (cachedDeepLinks) {
+            setHomeDeepLinks(cachedDeepLinks);
+        }
 
         const homeApiPromises = [
             profileApis.getProfile(),
-            shouldFetchBanners ? wallpaperApis.getBanners() : Promise.resolve(null),
+            homeMainApis.getHomeScreenData(language, "android"),
+            homeMainApis.getHomeData(language),
             homeCategoryApis.fetchHomeCategories(language),
-            wallpaperDeepLinkingApi.getWallpaperDeepLinkingData(language)
+            wallpaperApis.getBanners()
         ];
 
-        Promise.allSettled(homeApiPromises).then(([profileResult, bannersResult, homeCategoriesResult, wallpaperDeepLinksResult]) => {
+        Promise.allSettled(homeApiPromises).then(([profileResult, homeScreenResult, legacyHomeResult, homeCategoriesResult, bannersResult]) => {
             if (!isMounted) return;
 
             if (profileResult.status === "fulfilled") {
@@ -332,109 +323,161 @@ function Home() {
                     setSubscriptionStatusInLS(resp.hasActivePlan);
                     setUserIdInLS(resp._id);
                     setUserName(resp.name === "New User" ? "" : resp.name || "");
-                    console.log("Profile data:", resp);
                 }
             } else {
-                // removeTokenFromLS();
                 removeSubscriptionStatusFromLS();
                 console.error("Error fetching profile data:", profileResult.reason);
             }
 
-            if (bannersResult.status === "fulfilled" && bannersResult.value) {
-                const banners = bannersResult.value;
-                console.log("Banners:", banners);
+            if (homeScreenResult.status === "fulfilled") {
+                const payload = getHomeScreenPayload(homeScreenResult.value);
+                if (payload) {
+                    const socialReels = getSocialReelsFromResponse(homeScreenResult.value);
 
-                const homeBanners = banners?.data?.filter(b => b.pageName === "home") || [];
-                const wpImage = banners?.data?.find(b => b.pageName === "homewallapaper" && b.imageUrl)?.imageUrl || "";
+                    setHomeScreenData(payload);
+                    homeCache.set(cacheKey, payload);
+                    setSocialReelsData(socialReels);
+                    homeCache.set(`homeSocialReels:${language}`, socialReels);
 
-                setBannersData(homeBanners);
-                setWallpaperImage(wpImage);
-
-                // Cache for 30 minutes
-                homeCache.set("bannersData", homeBanners);
-                homeCache.set("wallpaperImage", wpImage);
-                hasFetchedBanners.current = true;
-            } else if (bannersResult.status === "rejected") {
-                console.error("Error fetching banners:", bannersResult.reason);
+                    if (payload.categories?.length) {
+                        setHomeCategories(payload.categories);
+                        homeCache.set("homeCategories", payload.categories);
+                    }
+                }
+            } else {
+                console.error("Error fetching home screen data:", homeScreenResult.reason);
             }
 
-            if (homeCategoriesResult.status === "fulfilled") {
-                const categories = getHomeCategoriesFromResponse(homeCategoriesResult.value);
-                console.log("Home categories:", homeCategoriesResult.value);
+            if (legacyHomeResult.status === "fulfilled" && legacyHomeResult.value) {
+                const deepLinks = getHomeDeepLinksFromResponse(legacyHomeResult.value);
+                setHomeDeepLinks(deepLinks);
+                homeCache.set(deepLinksCacheKey, deepLinks);
+            } else if (legacyHomeResult.status === "rejected") {
+                console.error("Error fetching legacy home data:", legacyHomeResult.reason);
+            }
 
+            if (!homeScreenResult.value && homeCategoriesResult.status === "fulfilled") {
+                const categories = getHomeCategoriesFromResponse(homeCategoriesResult.value);
                 if (categories.length > 0) {
                     setHomeCategories(categories);
                     homeCache.set("homeCategories", categories);
                 }
-                setCategoriesLoading(false);
-            } else {
+            } else if (homeCategoriesResult.status === "rejected") {
                 console.error("Error fetching home categories:", homeCategoriesResult.reason);
-                setCategoriesLoading(false);
             }
 
-            if (wallpaperDeepLinksResult.status === "fulfilled") {
-                const deepLinks = getWallpaperDeepLinksFromResponse(wallpaperDeepLinksResult.value);
-                console.log("Wallpaper deep linking data:", wallpaperDeepLinksResult.value);
-
-                if (deepLinks.length > 0) {
-                    setWallpaperDeepLinks(deepLinks);
-                    homeCache.set("wallpaperDeepLinks", deepLinks);
-                }
-            } else {
-                console.error("Error fetching wallpaper deep linking data:", wallpaperDeepLinksResult.reason);
+            if (bannersResult.status === "fulfilled" && bannersResult.value) {
+                const homeBanners = getHomeBannersFromBannersResponse(bannersResult.value);
+                setBannersData(homeBanners);
+                homeCache.set("bannersData", homeBanners);
+            } else if (bannersResult.status === "rejected") {
+                console.error("Error fetching banners:", bannersResult.reason);
             }
+
+            setCategoriesLoading(false);
         });
 
         return () => {
             isMounted = false;
         };
-    }, [phoneNumber, language])
+    }, [phoneNumber, language]);
 
-    const requireLogin = (e) => {
+    const getRedirectRoute = (item) => {
+        if (!item) return "/";
+
+        if (item.redirectUrl) {
+            try {
+                const url = new URL(item.redirectUrl);
+                return url.origin === window.location.origin ? url.pathname : item.redirectUrl;
+            } catch (error) {
+                return item.redirectUrl.startsWith("/") ? item.redirectUrl : `/${item.redirectUrl}`;
+            }
+        }
+
+        const page = item.redirectPage || item.categoryRedirect || item.source;
+        const baseRoute = redirectPageRouteMap[page] || "/";
+        const id = item.redirectId || item.categoryId || item.kathaId || item.vratId || item._id;
+
+        if ((page === "katha" || page === "kahaniya") && id) {
+            return `${baseRoute}/${id}`;
+        }
+
+        return baseRoute;
+    };
+
+    const handleAccessControlledClick = (item, e, eventName, eventPayload = {}) => {
+        const route = getRedirectRoute(item);
+        const isExternal = /^https?:\/\//i.test(route);
+
+        if (item?.accessType === "paid") {
+            if (!getTokenFromLS()) {
+                e?.preventDefault();
+                setShowLoginModal(true);
+                return;
+            }
+
+            if (!getSubscriptionStatusFromLS()) {
+                e?.preventDefault();
+                navigate("/payment");
+                return;
+            }
+        }
+
+        if (eventName) {
+            trackEvent(eventName, eventPayload);
+        }
+
+        if (isExternal) {
+            e?.preventDefault();
+            window.open(route, "_blank", "noopener,noreferrer");
+        }
+    };
+
+    const handleBannerClicked = (banner, e) => {
+        if (!banner?.Urls) {
+            return;
+        }
+
+        let route = "";
+        try {
+            route = new URL(banner.Urls).pathname;
+        } catch (error) {
+            route = banner.Urls.startsWith("/") ? banner.Urls : `/${banner.Urls}`;
+        }
+
         if (!getTokenFromLS()) {
             e?.preventDefault();
             setShowLoginModal(true);
-            return true;
+            return;
         }
-        return false;
-    };
-    const handleWallpaperClicked = (e) => {
-        if (requireLogin(e)) return;
-        trackEvent(GA4Events.wallpaper_widget_clicked, {
-            event_label: "wallpaper_card_clicked_on_home_screen"
+
+        if (!getSubscriptionStatusFromLS()) {
+            e?.preventDefault();
+            trackEvent(GA4Events.main_banner_clicked, {
+                event_label: "main_banner_clicked_from_home_screen"
+            });
+            navigate("/payment");
+            return;
+        }
+
+        e?.preventDefault();
+        trackEvent(GA4Events.main_banner_clicked, {
+            event_label: "main_banner_clicked_from_home_screen"
         });
+        navigate(route);
     };
 
     const handleBannerRedirectionClick = (banner, e) => {
-        e.stopPropagation(); // prevent outer div onClick from firing
-        console.log("button clicked");
-        if (deviceType === 'ios' || deviceType === 'android') {
+        e.stopPropagation();
+        if (deviceType === "ios" || deviceType === "android") {
             redirectToStore();
-        } else {
-            console.log('Desktop user — show both store buttons');
+        } else if (banner?.Urls) {
+            handleBannerClicked(banner, e);
         }
     };
 
-    const handleWallpaperDeepLinkClicked = (item, e) => {
-        // Always require login for deep link items, regardless of isWithoutLoginFree.
-        // setShowLoginModal is safe here (onClick handler, not during render).
-        if (requireLogin(e)) return;
-
-        trackEvent(GA4Events.wallpaper_widget_clicked, {
-            event_label: "wallpaper_deep_linking_card_clicked_on_home_screen",
-            id: item?._id,
-            categoryId: item?.categoryId,
-            categoryRedirect: item?.categoryRedirect
-        });
-    };
-
     const handleHomeCategoryClicked = (category, e) => {
-        // If isWithoutLoginFree is explicitly false, always show login modal (even if logged in)
-        // If isWithoutLoginFree is true or key is absent, require only a valid token
         const isLoggedIn = getIsLoggedIn();
-        // needsLogin is true only when:
-        // - user is NOT logged in, AND
-        // - category explicitly requires login (isWithoutLoginFree === false) OR has no token
         const needsLogin = !isLoggedIn && (
             category?.isWithoutLoginFree === false || !getTokenFromLS()
         );
@@ -457,81 +500,227 @@ function Home() {
         }
     };
 
-    const categoriesToShow = homeCategories.length > 0 ? homeCategories : fallbackHomeCategories;
-
-    const stripHtmlTags = (value) => String(value || "").replace(/<[^>]*>/g, "").trim();
-
-    const getHinglishTitleParts = (title) => {
-        const normalizedTitle = String(title || "")
-            .replace(/<\/?p[^>]*>/gi, "")
-            .trim();
-        const [hindiText = "", englishText = ""] = normalizedTitle.split(/<\/?br\s*\/?>/i);
-
-        return {
-            hindiText: stripHtmlTags(hindiText),
-            englishText: stripHtmlTags(englishText)
-        };
-    };
-
     const renderCategoryTitle = (title) => {
         if (language !== "hinglish") {
-            return title;
+            return stripHtmlTags(title);
         }
 
-        const { hindiText, englishText } = getHinglishTitleParts(title);
+        const normalizedTitle = String(title || "").replace(/<\/?p[^>]*>/gi, "").trim();
+        const [hindiText = "", englishText = ""] = normalizedTitle.split(/<\/?br\s*\/?>/i);
+        const cleanHindi = stripHtmlTags(hindiText);
+        const cleanEnglish = stripHtmlTags(englishText);
 
-        if (!englishText) {
+        if (!cleanEnglish) {
             return <span className="font-eng">{stripHtmlTags(title)}</span>;
         }
 
         return (
             <>
-                <span className="font-hindi block">{hindiText}</span>
-                <span className="font-eng block text-[11px] md:text-base leading-tight">{englishText}</span>
+                <span className="font-devanagari block">{cleanHindi}</span>
+                {/* <span className="font-eng block text-[11px] leading-tight">{cleanEnglish}</span> */}
             </>
         );
     };
 
-    // Full-page shimmer skeleton shown while categories (and other home data) are loading
+    const categoriesToShow = homeScreenData?.categories?.length ? homeScreenData.categories : (homeCategories.length > 0 ? homeCategories : fallbackHomeCategories);
+    const homeMenuActions = [
+        {
+            key: "upgrade",
+            label: "अभी अपग्रेड करें",
+            Icon: IndianRupee,
+            onClick: () => {
+                if (getTokenFromLS()) {
+                    navigate("/payment");
+                } else {
+                    navigate("/login");
+                }
+            }
+        },
+        {
+            key: "language",
+            label: "भाषा",
+            Icon: Globe2,
+            onClick: () => window.dispatchEvent(new Event("bhakti-bhav:open-language-modal"))
+        },
+        {
+            key: "wallet",
+            label: "मेरा वॉलेट",
+            Icon: WalletCards,
+            onClick: () => {
+                if (getTokenFromLS()) {
+                    navigate("/transactions");
+                } else {
+                    navigate("/login");
+                }
+            }
+        },
+        {
+            key: "refer",
+            label: "रेफर",
+            Icon: Gift,
+            onClick: () => window.open("https://bhakti-bhav-referral.onelink.me/VOv8/vc1rvamj", "_blank", "noopener,noreferrer")
+        }
+    ];
+    const quickLinks = homeScreenData?.quickLinks?.length ? homeScreenData.quickLinks : [
+        { key: "hindi_calendar", title: "हिंदी कैलेंडर", redirectPage: "panchang-calendar", imageUrl: "./img/icon_2.png" },
+        { key: "vrat_katha", title: "व्रत कथा", redirectPage: "vrat", imageUrl: "./img/icon_3.png" }
+    ];
+    const guidance = homeScreenData?.todaysGuidance;
+    const todaysVrat = guidance?.todaysVrat;
+    const jaapStreak = homeScreenData?.jaapStreak;
+    const upcomingFestival = homeScreenData?.upcomingFestivals?.[0];
+    const premium = homeScreenData?.premium;
+    const socialReels = socialReelsData.length ? socialReelsData : getSocialReelsFromResponse(homeScreenData);
+    const topBanners = bannersData;
+
+    console.log("This is top banner data: ", topBanners);
+
     const PageShimmer = () => (
-        <div className="container mx-auto mt-8 flex flex-col px-4 md:px-0 animate-pulse">
-            {/* Banner shimmer */}
-            <div className="bg-gray-200 rounded-xl h-[20vh] md:h-[60vh] w-full mb-4" />
-
-            {/* Rashifal + Panchang row shimmer */}
-            <div className="grid grid-cols-2 gap-3 mb-3">
-                {[0, 1].map(i => (
-                    <div key={i} className="bg-white rounded-xl shadow p-3 md:p-6 flex justify-center">
-                        <div className="flex flex-col items-center space-y-3 w-full">
-                            <div className="w-9 h-9 bg-gray-200 rounded-md" />
-                            <div className="h-3 w-3/4 bg-gray-200 rounded" />
-                        </div>
-                    </div>
-                ))}
+        <div className="container mx-auto flex max-w-md flex-col gap-4 px-4 pt-4 md:max-w-5xl animate-pulse">
+            <div className="h-6 w-36 rounded bg-gray-200" />
+            <div className="h-44 rounded-2xl bg-gray-200" />
+            <div className="grid grid-cols-2 gap-3">
+                <div className="h-12 rounded-xl bg-gray-200" />
+                <div className="h-12 rounded-xl bg-gray-200" />
             </div>
-
-            {/* Category cards shimmer — 6 cards */}
-            <div className="grid grid-cols-3 md:gap-4 gap-2 mb-6">
-                {Array.from({ length: 6 }).map((_, i) => (
-                    <div key={i} className="bg-white rounded-xl shadow p-3 md:p-6 flex justify-center">
-                        <div className="flex flex-col items-center space-y-3 w-full">
-                            <div className="w-9 h-9 bg-gray-200 rounded-md" />
-                            <div className="h-3 w-3/4 bg-gray-200 rounded" />
-                        </div>
-                    </div>
+            <div className="h-20 rounded-2xl bg-gray-200" />
+            <div className="grid grid-cols-4 gap-4">
+                {Array.from({ length: 12 }).map((_, index) => (
+                    <div key={index} className="h-20 rounded-xl bg-gray-200" />
                 ))}
-            </div>
-
-            {/* Wallpaper banner shimmer */}
-            <div className="bg-gray-200 rounded-xl h-32 w-full mb-6" />
-
-            {/* Today's Thought + Puja row shimmer */}
-            <div className="flex gap-4 flex-row">
-                <div className="basis-[60%] md:basis-[70%] bg-gray-200 rounded-xl h-40" />
-                <div className="basis-[40%] md:basis-[30%] bg-gray-200 rounded-xl h-40" />
             </div>
         </div>
     );
+
+    const renderGuidanceCard = () => {
+        const cardData = todaysVrat || guidance?.cta || {};
+        const panchang = guidance?.panchang || {};
+        const guidanceTitle = guidance?.title || "आज का मार्गदर्शन";
+        const guidanceDate = cardData.date || panchang.date || guidance?.thought?.date;
+        const panchangDescription = panchang.nakshatra && panchang.paksha
+            ? `आज ${panchang.nakshatra} नक्षत्र और ${panchang.paksha} पक्ष है।`
+            : "";
+        const guidanceDescription = cardData.description || panchangDescription || guidance?.thought?.thought;
+        const route = getRedirectRoute({
+            redirectPage: cardData.redirectPage || guidance?.cta?.redirectPage,
+            redirectId: cardData.redirectId || guidance?.cta?.redirectId,
+            redirectUrl: cardData.redirectUrl || guidance?.cta?.redirectUrl,
+            accessType: cardData.accessType || guidance?.cta?.accessType
+        });
+        const imageUrl = normalizeImageUrl(cardData.additionalImageUrl || cardData.imageUrl || "/img/banner-1.jpg");
+
+        return (
+            <Link
+                to={route}
+                onClick={(e) => handleAccessControlledClick(cardData, e, GA4Events.main_banner_clicked, {
+                    event_label: "main_guidance_card_clicked_from_home_screen"
+                })}
+                className="relative block h-[196px] overflow-hidden rounded-[28px] bg-[#FFF1DD] shadow-[0_10px_28px_rgba(154,40,61,0.08)] md:h-[320px]"
+            >
+                <img
+                    src={imageUrl}
+                    crossOrigin="anonymous"
+                    alt={stripHtmlTags(cardData.title || guidanceTitle)}
+                    className="absolute inset-0 h-full w-full object-cover object-center"
+                />
+                <div className="absolute inset-0 bg-gradient-to-r from-[#FFF2DF] via-[#FFF2DF]/95 via-[58%] to-transparent" />
+                <div className="relative z-10 flex h-full max-w-[66%] flex-col justify-center px-5 py-5 text-[#9A283D] md:px-8">
+                    <span className="font-devanagari inline-flex w-fit rounded-xl bg-[#FFE1AC] px-4 py-2 text-sm font-bold leading-none md:text-base">{guidanceTitle}</span>
+                    <h2 className="font-devanagari mt-4 text-[31px] font-bold leading-none md:text-5xl">{cardData.title || "आज का व्रत"}</h2>
+                    {guidanceDate && <p className="font-eng mt-4 text-base text-[#5E5E5E] md:text-lg">{guidanceDate}</p>}
+                    {guidanceDescription && (
+                        <p className="font-devanagari mt-3 text-base leading-tight text-[#4E4E4E] md:text-lg">
+                            {guidanceDescription}
+                        </p>
+                    )}
+                    <span className="font-devanagari mt-5 inline-flex w-fit items-center gap-1 rounded-xl bg-[#9A283D] px-6 py-3 text-base font-semibold leading-none text-white shadow-[0_8px_16px_rgba(154,40,61,0.22)] md:text-lg">
+                        {cardData.ctaLabel || guidance?.cta?.label || "आज का व्रत"}
+                        <ArrowRight size={16} />
+                    </span>
+                </div>
+            </Link>
+        );
+    };
+
+    const renderTopBanner = (banner) => {
+        const imageUrl = normalizeImageUrl(banner.imageUrl || banner.imagethumb);
+
+        return (
+            <Link
+                to={banner?.Urls || "#"}
+                onClick={(e) => handleBannerClicked(banner, e)}
+                className="relative block h-[172px] overflow-hidden rounded-2xl bg-[#FFF4E2] shadow-[0_10px_28px_rgba(154,40,61,0.12)] md:h-[320px]"
+            >
+                {imageUrl && (
+                    <img
+                        src={imageUrl}
+                        crossOrigin="anonymous"
+                        alt={stripHtmlTags(banner.name || "Bhakti Bhav")}
+                        className="h-full w-full object-cover"
+                    />
+                )}
+                {banner?.Urls && (
+                    <button
+                        type="button"
+                        onClick={(e) => handleBannerRedirectionClick(banner, e)}
+                        className="font-eng absolute bottom-4 right-4 rounded-full bg-[#9A283D] px-4 py-2 text-xs font-semibold text-white shadow-md transition hover:bg-[#7a1f30] md:text-sm"
+                    >
+                        Click Here
+                    </button>
+                )}
+            </Link>
+        );
+    };
+
+    const renderHomeDeepLinkCard = (item) => {
+        const imageUrl = normalizeImageUrl(item.imagethumb || item.image || item.imageUrl);
+        const accessItem = {
+            ...item,
+            accessType: item.accessType || (item.isPaid && item.isWithoutLoginFree === false ? "paid" : "free")
+        };
+
+        return (
+            <Link
+                key={item._id || imageUrl}
+                to={getRedirectRoute(item)}
+                onClick={(e) => handleAccessControlledClick(accessItem, e, GA4Events.wallpaper_widget_clicked, {
+                    event_label: "home_deeplink_card_clicked_above_quick_access",
+                    id: item?._id,
+                    categoryId: item?.categoryId,
+                    categoryRedirect: item?.categoryRedirect
+                })}
+                className="relative block h-[92px] overflow-hidden rounded-2xl bg-[#FFF1D8] shadow-[0_10px_22px_rgba(154,40,61,0.08)] md:h-[150px]"
+            >
+                <img
+                    src={imageUrl}
+                    crossOrigin="anonymous"
+                    alt={stripHtmlTags(item.title || item.name || "Bhakti Bhav")}
+                    className="h-full w-full object-cover"
+                />
+            </Link>
+        );
+    };
+
+    const closeHomeMenu = () => setIsHomeMenuOpen(false);
+
+    const handleHomeMenuActionClick = (action) => {
+        closeHomeMenu();
+        action.onClick();
+    };
+
+    const handleHomeMenuCategoryClick = (category, e) => {
+        handleHomeCategoryClicked(category, e);
+        if (!e.defaultPrevented) {
+            closeHomeMenu();
+        }
+    };
+
+    const renderHomeMenuTitle = (title) => {
+        const normalizedTitle = String(title || "").replace(/<\/?p[^>]*>/gi, "").trim();
+        const [primaryTitle = ""] = normalizedTitle.split(/<\/?br\s*\/?>/i);
+
+        return stripHtmlTags(primaryTitle || title);
+    };
 
     return (
         <>
@@ -541,237 +730,282 @@ function Home() {
                 canonical="https://bhaktibhav.app/"
                 schema={homeSchema}
             />
-            <Header />
+            <Header onHomeMenuClick={() => setIsHomeMenuOpen(true)} />
 
-            {/* Show full-page shimmer while loading, swap to real content once ready */}
             {categoriesLoading ? <PageShimmer /> : null}
 
-            <div className={`container mx-auto mt-8 flex flex-col px-4 md:px-0 ${categoriesLoading ? "hidden" : ""}`}>
-                <section className="bg-[#FFFAF4] rounded-xl text-sm space-y-1 shadow-md">
-                    <div className="relative w-full h-[20vh] md:h-[60vh] overflow-hidden">
-                        <Swiper
-                            modules={[Pagination, Autoplay]}
-                            pagination={{ clickable: true }}
-                            autoplay={{ delay: 3000, disableOnInteraction: false }}
-                            loop={true}
-                            className="w-full h-full rounded-xl"
-                        >
-                            {
-                                bannersData?.slice(-1)?.map((banner, index) => (
-
-                                    <SwiperSlide key={index}>
-                                        <div
-                                            onClick={() => {
-                                                const relativePath = new URL(banner.Urls).pathname;
-                                                console.log("relativePath", relativePath);
-                                                if (!getTokenFromLS()) {
-                                                    setShowLoginModal(true);  // Show login modal
-                                                    return;
-                                                }
-
-                                                // Step 2: Check if user has active subscription
-                                                if (!getSubscriptionStatusFromLS()) {
-                                                    trackEvent(GA4Events.main_banner_clicked, {
-                                                        event_label: "main_banner_clicked_from_home_screen"
-                                                    });
-                                                    navigate("/payment");  // Redirect to payment
-                                                    return;
-                                                }
-
-                                                // Step 3: User is logged in + subscribed, navigate normally
-                                                trackEvent(GA4Events.main_banner_clicked, {
-                                                    event_label: "main_banner_clicked_from_home_screen"
-                                                });
-                                                navigate(relativePath);
-
-                                            }}
-                                            className="relative h-[20vh] md:h-[60vh] bg-cover bg-center flex items-center justify-center"
-                                            style={{ backgroundImage: `url(${banner.imageUrl})` }}
-                                        >
-                                            <button
-                                                onClick={(e) => handleBannerRedirectionClick(banner, e)}
-                                                className="absolute bg-[#9A283D] text-white font-eng font-bold rounded-full shadow-md hover:bg-[#7a1f30] transition"
-                                                style={{
-                                                    bottom: '5%',
-                                                    right: '3%',
-                                                    fontSize: 'clamp(12px, 2.8vw, 18px)',
-                                                    padding: 'clamp(5px, 0.8vw, 10px) clamp(12px, 2.2vw, 20px)',
-                                                }}
-                                            >
-                                                Click here
-                                            </button>
-                                        </div>
-                                    </SwiperSlide>
-                                )
-                                )
-                            }
-                            {/* <SwiperSlide>
-                                <div
-                                    className="h-[20vh] md:h-[60vh] bg-[url('/img/banner-3.jpeg')] bg-cover bg-center flex items-center justify-center"
-                                ></div>
-                            </SwiperSlide>
-
-                            <SwiperSlide>
-                                <div
-                                    className="h-[20vh] md:h-[60vh] bg-[url('/img/banner-5.jpeg')] bg-cover bg-center flex items-center justify-center"
-                                ></div>
-                            </SwiperSlide> */}
-                        </Swiper>
-                    </div>
+            <main className={`container mx-auto flex max-w-md flex-col px-4 pb-28 pt-3 md:max-w-5xl ${categoriesLoading ? "hidden" : ""}`}>
+                <section className="mb-4">
+                    <p className="font-devanagari inline-flex rounded-md bg-[#FFE8B4] px-3 py-1 text-base font-semibold text-[#9A283D]">
+                        {homeScreenData?.greeting || "नमस्ते भक्त!"}
+                    </p>
+                    <p className="font-devanagari mt-2 text-sm text-[#7B6A62]">ईश्वर आपके दिन को मंगलमय करें 🙏</p>
                 </section>
 
-                <div className="mt-4 grid grid-cols-2 gap-3">
+                <section className="mb-4">
+                    <Swiper
+                        modules={[Pagination, Autoplay]}
+                        pagination={{ clickable: true }}
+                        autoplay={{ delay: 3500, disableOnInteraction: false }}
+                        loop={(guidance ? 1 : 0) + topBanners.length > 1}
+                        className="home-main-swiper w-full rounded-2xl"
+                    >
+                        {guidance && <SwiperSlide>{renderGuidanceCard()}</SwiperSlide>}
+                        {/* this code is commented because it is showing banner carousel */}
+                        {/* {topBanners.map((banner) => (
+                            <SwiperSlide key={banner._id || banner.imageUrl}>{renderTopBanner(banner)}</SwiperSlide>
+                        ))} */}
+                    </Swiper>
+                </section>
 
-                    <Link to="/Rashifal"
-                        onClick={() => {
+                <section className="mb-4 grid grid-cols-2 gap-2">
+                    {quickLinks.slice(0, 2).map((item) => {
+                        const isCalendar = item.key === "hindi_calendar" || item.redirectPage === "panchang-calendar";
+                        const Icon = isCalendar ? CalendarDays : BookOpen;
 
-                            trackEvent(GA4Events.rashifal_tab_clicked, {
-                                event_label: "rashifal_card_clicked_on_home_screen"
-                            })
-                        }}
-                        className="theme_bg bg-white rounded-xl shadow md:p-6 p-3 text-center hover:bg-yellow-50 transition w-auto flex">
-                        <div className="mx-auto flex md:flex-row flex-col items-center space-y-3 md:space-y-0">
-                            <img crossOrigin='anonymous' src="./img/icon_1.png" alt="" width="36" height="36" className="md:mr-3" />
-                            <p className={`${language === "hi" ? "font-hindi" : "font-eng"} md:text-2xl text-sm font-normal ${language === "hinglish" ? "leading-tight" : "leading-[14px]"}`}>
-                                {renderCategoryTitle(translation[language]?.aajKaRashifal)}
-                            </p>
+                        return (
+                            <Link
+                                key={item.key || item.title}
+                                to={getRedirectRoute(item)}
+                                onClick={(e) => handleAccessControlledClick(item, e, isCalendar ? GA4Events.hindi_calendar_widget_clicked : GA4Events.vrat_katha_widget_clicked, {
+                                    event_label: `${item.key || item.redirectPage}_shortcut_clicked_on_home_screen`
+                                })}
+                                className="font-devanagari flex min-h-[52px] items-center justify-center gap-2 rounded-xl border border-[#9A283D] bg-white px-3 text-base font-semibold text-[#9A283D] shadow-sm transition hover:bg-[#FFF7ED]"
+                            >
+                                {normalizeImageUrl(item.imageUrl) ? (
+                                    <img
+                                        src={normalizeImageUrl(item.imageUrl)}
+                                        crossOrigin="anonymous"
+                                        alt={stripHtmlTags(item.title)}
+                                        className="h-7 w-7 rounded-full object-cover"
+                                    />
+                                ) : (
+                                    <Icon size={22} />
+                                )}
+                                <span className="truncate">{stripHtmlTags(item.title)}</span>
+                            </Link>
+                        );
+                    })}
+                </section>
+
+                <section className="mb-4">
+                    <Link
+                        to={jaapStreak?.categoryId ? `/newjaapMaala/${jaapStreak.categoryId}` : "/newjaapMaala"}
+                        onClick={() => trackEvent(GA4Events.jaap_mala_widget_clicked, {
+                            event_label: "jaap_streak_card_clicked_on_home_screen",
+                            categoryId: jaapStreak?.categoryId
+                        })}
+                        className="flex min-h-[108px] items-center justify-between overflow-hidden rounded-[22px] border border-[#F5E5D7] bg-white px-4 py-4 shadow-[0_8px_24px_rgba(154,40,61,0.08)]"
+                    >
+                        <div className="flex min-w-0 flex-1 items-center gap-3">
+                            <div className="flex h-20 w-20 shrink-0 items-center justify-center">
+                                <img src={malaGif} alt="" className="h-20 w-20 object-contain" />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                                <h2 className="font-devanagari whitespace-nowrap text-[18px] font-bold leading-tight text-[#9A283D]">{jaapStreak?.ctaLabel || "अपना जाप जारी रखें"}</h2>
+                            </div>
                         </div>
+                        <span className="font-eng ml-3 inline-flex shrink-0 items-center gap-1 rounded-full bg-[#9A283D] px-3 py-2 text-xs font-semibold text-white">
+                            Click Here <ArrowRight size={14} />
+                        </span>
                     </Link>
-                    <button onClick={(e) => { setIsOpen(true) }}
-                        className="theme_bg bg-white rounded-xl shadow md:p-6 p-3 text-center hover:bg-yellow-50 transition w-auto flex">
-                        <div className="mx-auto flex md:flex-row flex-col items-center space-y-3 md:space-y-0">
-                            <img crossOrigin='anonymous' src="./img/icon_5.png" alt="" width="36" height="36" className="md:mr-3" />
-                            <p className={`${language === "hi" ? "font-hindi" : "font-eng"} md:text-2xl text-sm font-normal ${language === "hinglish" ? "leading-tight" : "leading-[14px]"}`}>
-                                {renderCategoryTitle(translation[language]?.panchang)}
-                            </p>
-                        </div>
-                    </button>
-                </div>
+                </section>
 
-
-                <div className="grid grid-cols-3 md:gap-4 gap-2 mt-3 text-center font-medium">
-                    {categoriesToShow.map((category) => (
+                {upcomingFestival && !homeDeepLinks.length && (
+                    <section className="mb-5">
                         <Link
-                            key={category._id || category.url || category.title}
-                            to={getCategoryRoute(category)}
-                            state={{
-                                categoryId: category?.categoryId || category?._id,
-                                categoryTitle: category?.title
-                            }}
-                            onClick={(e) => handleHomeCategoryClicked(category, e)}
-                            className="theme_bg bg-white rounded-xl shadow md:p-6 p-3 text-center hover:bg-yellow-50 transition w-auto flex justify-center"
+                            to={upcomingFestival.kathaId ? `/vrat-katha/${upcomingFestival.kathaId}` : "/hindi-calendar"}
+                            onClick={(e) => handleAccessControlledClick({
+                                redirectPage: "katha",
+                                redirectId: upcomingFestival.kathaId,
+                                accessType: upcomingFestival.accessType
+                            }, e, GA4Events.vrat_katha_widget_clicked, {
+                                event_label: "upcoming_festival_banner_clicked_on_home_screen",
+                                festival: upcomingFestival.name
+                            })}
+                            className="relative block h-[92px] overflow-hidden rounded-2xl bg-[#FFF1D8] shadow-[0_10px_22px_rgba(154,40,61,0.08)] md:h-[150px]"
                         >
-                            <div className="mx-auto flex w-full flex-col items-center justify-center space-y-3 md:space-y-0">
-                                <img
-                                    src={category.imageUrl}
-                                    alt={stripHtmlTags(category.title)}
-                                    width="36"
-                                    crossOrigin='anonymous'
-                                    height="36"
-                                    className="w-9 h-9 object-cover rounded-md"
-                                />
-                                <p className={`${language === "hi" ? "font-hindi" : "font-eng"} md:text-2xl text-sm font-normal ${language === "hinglish" ? "leading-tight" : "leading-[14px]"} text-center w-full mx-auto`}>
-                                    {renderCategoryTitle(category.title)}
-                                </p>
+                            <img
+                                src={normalizeImageUrl(upcomingFestival.imageUrl) || "/img/banner-2.jpg"}
+                                crossOrigin="anonymous"
+                                alt={stripHtmlTags(upcomingFestival.name)}
+                                className="absolute inset-0 h-full w-full object-cover"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#fff4dc]/80 to-[#fff4dc]" />
+                            <div className="font-devanagari relative z-10 ml-auto flex h-full w-[58%] flex-col justify-center pr-5 text-right text-[#9A283D] md:pr-8">
+                                <h2 className="text-3xl font-bold leading-tight md:text-5xl">{upcomingFestival.nameHi || upcomingFestival.name}</h2>
+                                <p className="text-sm text-[#7A554E] md:text-lg">{upcomingFestival.daysLeftLabel || upcomingFestival.date}</p>
                             </div>
                         </Link>
-                    ))
-                    }
-                </div>
+                    </section>
+                )}
 
-                <div className="mt-6">
-                    {/* Previous wallpaper module code kept for reference as requested.
-                    <Link to="/wallpaper" onClick={handleWallpaperClicked} className="relative theme_bg hd_bg rounded-xl flex items-center justify-center rounded-xl font-semibold overflow-hidden 
-          hover:bg-yellow-50 transition">
-
-                        <span className="absolute left-[30px] top-[50%] -translate-y-1/2 
-	                  bg-[url('/img/icon_7.png')] bg-no-repeat bg-cover w-[70px] h-[70px]"></span>
-                        <span className="absolute right-[30px] top-[45%] -translate-y-1/2 
-	                  bg-[url('/img/icon_8.png')] bg-no-repeat bg-cover  w-[46px] h-[46px]"></span>
-
-                        <span className="relative z-10 flex items-center">
-                            <span className="text-3xl font-normal leading-[20px]">okWyisij <br /><span className="font-eng text-xs">(Wallpaper)</span></span>
-                        </span>
-                        <img crossOrigin = 'anonymous' src={wallpaperImage} alt="Wallpaper" width="100%" height="100%" className="max-w-full h-auto" />
-                    </Link>
-                    */}
-
-                    {wallpaperDeepLinks.length > 0 ? (
+                {homeDeepLinks.length > 0 && (
+                    <section className="mb-5">
                         <Swiper
                             modules={[Pagination, Autoplay]}
                             pagination={{ clickable: true }}
-                            autoplay={{ delay: 2500, disableOnInteraction: false }}
-                            loop={wallpaperDeepLinks.length > 1}
-                            className="w-full rounded-xl"
+                            autoplay={{ delay: 3500, disableOnInteraction: false }}
+                            loop={homeDeepLinks.length > 1}
+                            className="home-deeplink-swiper w-full rounded-2xl"
                         >
-                            {wallpaperDeepLinks.map((item) => (
-                                <SwiperSlide key={item._id}>
-                                    <Link
-                                        to={getWallpaperDeepLinkRoute(item)}
-                                        onClick={(e) => handleWallpaperDeepLinkClicked(item, e)}
-                                        className="relative theme_bg hd_bg rounded-xl flex items-center justify-center font-semibold overflow-hidden hover:bg-yellow-50 transition block"
-                                    >
-                                        <img
-                                            crossOrigin="anonymous"
-                                            src={item.image || item.imagethumb}
-                                            alt="Wallpaper"
-                                            width="100%"
-                                            height="100%"
-                                            className="max-w-full h-auto"
-                                        />
-                                    </Link>
+                            {homeDeepLinks.map((item) => (
+                                <SwiperSlide key={item._id || item.imagethumb || item.image || item.imageUrl}>
+                                    {renderHomeDeepLinkCard(item)}
                                 </SwiperSlide>
                             ))}
                         </Swiper>
-                    ) : (
-                        <Link to="/wallpaper" onClick={handleWallpaperClicked} className="relative theme_bg hd_bg rounded-xl flex items-center justify-center font-semibold overflow-hidden hover:bg-yellow-50 transition">
-                            <img crossOrigin="anonymous" src={wallpaperImage} alt="Wallpaper" width="100%" height="100%" className="max-w-full h-auto" />
-                        </Link>
-                    )}
-                </div>
+                    </section>
+                )}
 
-                <div className="mt-6 flex gap-4 flex-row">
-                    <TodayThoughts />
-                    <div className="md:basis-[40%] basis-[40%] flex flex-col justify-between items-center md:p-4 theme_text">
-                        <span className="font-semibold md:text-3xl text-2xl">iwtk djs!</span>
-                        <div className="my-4"><img crossOrigin='anonymous' src="./img/puja_bgs.png" alt="" width="150" height="120" className="max-w-full h-auto" /></div>
-                        <Link to="/puja-kare" onClick={() => {
-                            trackEvent(GA4Events.pooja_karein_widget_clicked, {
-                                event_label: "pooja_kare_card_clicked_on_home_screen"
-                            });
-                        }} className="relative bg-[#6d001f] bg-[url('/img/btn_icon_1.png'), 
-          url('/img/btn_icon_1.png')] text-white text-center px-4 py-2 rounded-full font-eng md:text-lg text-sm md:w-[70%] w-full
-                      hover:scale-105 transition-all duration-300 ease-in-out">
-                            <span className="absolute left-2 top-1/2 -translate-y-1/2 
-                      bg-[url('/img/btn_icon_1.png')] bg-no-repeat bg-contain w-[14px] h-[14px]"></span>
-                            <span className="absolute right-2 top-1/2 -translate-y-1/2 
-                      bg-[url('/img/btn_icon_2.png')] bg-no-repeat bg-contain  w-[14px] h-[14px]"></span>
-                            Click here
-                        </Link>
+                <section className="mb-5">
+                    <div className="mb-3 flex items-center justify-between">
+                        <h2 className="font-eng text-xl font-bold text-[#9A283D]">Quick Access</h2>
+                        <span className="font-eng inline-flex items-center gap-1 text-xs text-[#8F7B73]">See less <ChevronUp size={14} /></span>
                     </div>
-                </div>
-            </div>
+                    <div className="grid grid-cols-4 gap-x-4 gap-y-5 text-center md:grid-cols-6">
+                        {categoriesToShow.map((category) => (
+                            <Link
+                                key={category._id || category.url || category.title}
+                                to={getCategoryRoute(category)}
+                                state={{
+                                    categoryId: category?.categoryId || category?._id,
+                                    categoryTitle: category?.title
+                                }}
+                                onClick={(e) => handleHomeCategoryClicked(category, e)}
+                                className="group flex min-w-0 flex-col items-center"
+                            >
+                                <span className="flex h-[70px] w-[70px] items-center justify-center rounded-xl border border-[#F0E4DC] bg-white shadow-[0_6px_16px_rgba(154,40,61,0.06)] transition group-hover:border-[#9A283D] group-hover:bg-[#FFF8F0] md:h-20 md:w-20">
+                                    <img
+                                        src={normalizeImageUrl(category.imageUrl)}
+                                        alt={stripHtmlTags(category.title)}
+                                        crossOrigin="anonymous"
+                                        className="h-10 w-10 object-contain"
+                                    />
+                                </span>
+                                <p className="font-devanagari mt-2 w-full truncate text-xs leading-tight text-[#2F2724] md:text-base">
+                                    {renderCategoryTitle(category.title)}
+                                </p>
+                            </Link>
+                        ))}
+                    </div>
+                </section>
+
+                {premium && (
+                    <section className="mb-7">
+                        <Link
+                            to="/payment"
+                            onClick={() => trackEvent(GA4Events.rupees_icon_clicked, {
+                                event_label: "premium_card_clicked_on_home_screen"
+                            })}
+                            className="flex items-center justify-between rounded-2xl bg-[#F9E4EA] px-6 py-5 shadow-[0_10px_26px_rgba(154,40,61,0.08)]"
+                        >
+                            <div className="flex items-center gap-4">
+                                <span className="flex h-14 w-14 items-center justify-center rounded-full bg-[#FBEFF2] text-3xl font-bold text-[#9A283D]">₹</span>
+                                <div>
+                                    <h2 className="font-devanagari text-xl font-bold text-[#9A283D]">{premium.title || "भक्ति भाव प्रीमियम"}</h2>
+                                    <p className="font-devanagari mt-1 text-xs text-[#8A7770]">एक दिव्य अनुभव प्राप्त करें</p>
+                                </div>
+                            </div>
+                            <span className="font-eng inline-flex items-center gap-1 rounded-full bg-[#9A283D] px-4 py-2 text-xs font-bold text-white">
+                                JOIN <ArrowRight size={14} />
+                            </span>
+                        </Link>
+                    </section>
+                )}
+
+                {socialReels.length > 0 && (
+                    <section className="mb-5">
+                        <div className="mb-4 flex items-center gap-3">
+                            <span className="h-px flex-1 bg-[#9A283D]" />
+                            <h2 className="font-eng text-sm font-bold tracking-[0.32em] text-[#9A283D]">SOCIALS</h2>
+                            <span className="h-px flex-1 bg-[#9A283D]" />
+                        </div>
+                        <div className="-mx-4 flex gap-4 overflow-x-auto px-4 pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:gap-6">
+                            {socialReels.map((reel) => {
+                                const thumbnailUrl = normalizeImageUrl(reel.thumbnailUrl);
+                                const videoUrl = normalizeImageUrl(reel.videoUrl);
+
+                                return (
+                                    <a
+                                        key={reel._id || reel.redirectUrl || reel.videoUrl}
+                                        href={reel.redirectUrl || homeScreenData?.socialLinks?.instagramUrl || "https://www.instagram.com/bhaktibhavapp"}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        onClick={() => trackEvent(GA4Events.instagram_icon_clicked, {
+                                            platform: "instagram",
+                                            event_label: "social_reel_clicked_on_home_screen",
+                                            id: reel._id
+                                        })}
+                                        className="relative aspect-[9/16] shrink-0 basis-[43%] max-w-[188px] overflow-hidden rounded-[28px] bg-[#2F2724] shadow-[0_14px_32px_rgba(0,0,0,0.2)] md:basis-[32%] md:max-w-[380px]"
+                                    >
+                                        {videoUrl ? (
+                                            <video
+                                                src={videoUrl}
+                                                poster={thumbnailUrl}
+                                                autoPlay
+                                                loop
+                                                muted
+                                                playsInline
+                                                preload="auto"
+                                                className="h-full w-full bg-[#1B1514] object-contain"
+                                            />
+                                        ) : (
+                                            <img
+                                                src={thumbnailUrl}
+                                                crossOrigin="anonymous"
+                                                alt={stripHtmlTags(reel.title)}
+                                                className="h-full w-full bg-[#1B1514] object-contain"
+                                            />
+                                        )}
+                                        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/80 to-transparent" />
+                                        <span className="font-eng absolute left-3 top-4 inline-flex items-center gap-2 rounded-full bg-black/60 px-3 py-2 text-[11px] font-bold text-white md:left-5 md:top-5 md:text-lg">
+                                            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#9A283D] md:h-7 md:w-7">
+                                                <Instagram size={13} className="md:h-4 md:w-4" />
+                                            </span>
+                                            Insta Reel
+                                        </span>
+                                        <div className="absolute inset-x-0 bottom-0 p-3 text-white md:p-6">
+                                            <p className="font-devanagari line-clamp-2 text-base font-bold leading-tight drop-shadow md:text-3xl">{reel.title || reel.label || "भक्ति भाव"}</p>
+                                            <span className="font-eng mt-3 flex items-center justify-between text-xs font-bold md:mt-6 md:text-2xl">
+                                                View on Instagram
+                                                <ArrowRight size={18} className="md:h-8 md:w-8" />
+                                            </span>
+                                        </div>
+                                    </a>
+                                );
+                            })}
+                        </div>
+                    </section>
+                )}
+
+                {!socialReels.length && (
+                    <section className="mb-5 rounded-2xl border border-[#F0E4DC] bg-white px-5 py-4 text-[#9A283D]">
+                        <div className="flex items-center gap-2">
+                            <Sparkles size={18} />
+                            <p className="font-devanagari text-base font-semibold">नए सोशल वीडियो जल्द उपलब्ध होंगे</p>
+                        </div>
+                    </section>
+                )}
+            </main>
 
             {isOpen && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-xl shadow-lg w-11/12 md:w-2/4 lg:w-1/3 relative">
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+                    <div className="relative w-11/12 rounded-xl bg-white shadow-lg md:w-2/4 lg:w-1/3">
                         <button
                             onClick={() => setIsOpen(false)}
-                            className="absolute top-1 right-3 theme_text hover:text-black"
+                            className="absolute right-3 top-1 theme_text hover:text-black"
                         >
-                            ✕
+                            x
                         </button>
 
-                        <div className="p-6 max-h-[80vh] overflow-y-auto" style={{ paddingRight: '16px', paddingLeft: '6px' }}>
-                            <div className="grid grid-cols-2 gap-4 px-5 py-3 border border-[#9A283D] bg-[rgba(255,250,244,0.6)] font-hindi theme_text rounded-xl">
+                        <div className="max-h-[80vh] overflow-y-auto p-6" style={{ paddingRight: "16px", paddingLeft: "6px" }}>
+                            <div className="grid grid-cols-2 gap-4 rounded-xl border border-[#9A283D] bg-[rgba(255,250,244,0.6)] px-5 py-3 font-hindi theme_text">
                                 {panchangData.map((col, index) => (
-                                    <div key={index} className="text-xl text-left">
-                                        {col.items.map((text, i) => {
-                                            console.log({ text });
-                                            return (
-                                                <p key={i} className="mb-2 leading-relaxed">{text}</p>
-                                            )
-                                        })}
+                                    <div key={index} className="text-left text-xl">
+                                        {col.items.map((text, itemIndex) => (
+                                            <p key={itemIndex} className="mb-2 leading-relaxed">{text}</p>
+                                        ))}
                                     </div>
                                 ))}
                             </div>
@@ -780,28 +1014,24 @@ function Home() {
                 </div>
             )}
 
-            {/* Login Gate Modal */}
             {showLoginModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-5">
-                    <div className="relative w-full max-w-sm rounded-3xl overflow-hidden shadow-2xl" style={{ background: "linear-gradient(to bottom, #D4A843 0%, #F5E6C8 40%)" }}>
-                        {/* Top image — fills full width, contains bell + title + Hindi text */}
+                    <div className="relative w-full max-w-sm overflow-hidden rounded-3xl shadow-2xl" style={{ background: "linear-gradient(to bottom, #D4A843 0%, #F5E6C8 40%)" }}>
                         <img
                             src="/img/popup.png"
-                            crossOrigin='anonymous'
+                            crossOrigin="anonymous"
                             alt="Unlock Bhakti Bhav Plus"
-                            className="w-full h-auto block rounded-t-3xl"
-                            style={{ width: "100%", display: "block", marginTop: "-12px", }}
+                            className="block h-auto w-full rounded-t-3xl"
+                            style={{ width: "100%", display: "block", marginTop: "-12px" }}
                         />
-                        {/* Buttons + trust text on cream background */}
-                        <div className="px-5 pt-4 pb-5 bg-[#F5E6C8]">
-                            <div className="flex gap-3 mb-3">
+                        <div className="bg-[#F5E6C8] px-5 pb-5 pt-4">
+                            <div className="mb-3 flex gap-3">
                                 <button
                                     onClick={() => {
                                         setShowLoginModal(false);
                                         trackEvent(GA4Events.free_login_cta_clicked, { event_label: "skip_button_clicked" });
-                                        // navigate("/login");
                                     }}
-                                    className="flex-1 bg-white text-[#9A283D] font-eng font-semibold py-3 rounded-2xl shadow"
+                                    className="font-eng flex-1 rounded-2xl bg-white py-3 font-semibold text-[#9A283D] shadow"
                                 >
                                     Skip
                                 </button>
@@ -809,15 +1039,14 @@ function Home() {
                                     onClick={() => {
                                         setShowLoginModal(false);
                                         trackEvent(GA4Events.free_login_cta_clicked, { event_label: "free_login_clicked" });
-                                        // sessionStorage.setItem("loginSource", "home-v1");
                                         navigate("/login");
                                     }}
-                                    className="flex-1 bg-[#9A283D] text-white font-eng font-semibold py-3 rounded-2xl shadow"
+                                    className="font-eng flex-1 rounded-2xl bg-[#9A283D] py-3 font-semibold text-white shadow"
                                 >
                                     Free Login
                                 </button>
                             </div>
-                            <p className="text-center text-[#9A283D] font-eng text-sm font-medium">
+                            <p className="font-eng text-center text-sm font-medium text-[#9A283D]">
                                 Trusted by Lakhs of Devotees
                             </p>
                         </div>
@@ -825,9 +1054,75 @@ function Home() {
                 </div>
             )}
 
-            <Footer />
-        </>
+            {isHomeMenuOpen && (
+                <div className="fixed inset-0 z-[55] flex bg-black/55" onClick={closeHomeMenu}>
+                    <aside
+                        className="h-full w-[84%] max-w-[430px] overflow-y-auto rounded-r-2xl bg-white shadow-2xl"
+                        onClick={(event) => event.stopPropagation()}
+                        aria-label="Home menu"
+                    >
+                        <div className="px-9 pb-8 pt-24">
+                            <h2 className="font-devanagari mb-16 text-center text-[34px] font-bold leading-none text-[#9A283D]">
+                                भक्ति भाव
+                            </h2>
 
+                            <div className="space-y-11">
+                                {homeMenuActions.map(({ key, label, Icon, onClick }) => (
+                                    <button
+                                        key={key}
+                                        type="button"
+                                        onClick={() => handleHomeMenuActionClick({ onClick })}
+                                        className="font-devanagari flex w-full items-center gap-7 text-left text-[20px] font-normal leading-none text-[#3F3F3F]"
+                                    >
+                                        <span className="flex h-10 w-10 shrink-0 items-center justify-center text-[#9A283D]">
+                                            {key === "upgrade" ? (
+                                                <span className="font-eng text-[32px] font-medium leading-none">₹</span>
+                                            ) : (
+                                                <Icon size={28} strokeWidth={1.8} />
+                                            )}
+                                        </span>
+                                        <span>{label}</span>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="border-t border-[#282828] px-9 py-8">
+                            <div className="space-y-8">
+                                {categoriesToShow.map((category) => (
+                                    <Link
+                                        key={category._id || category.url || category.title}
+                                        to={getCategoryRoute(category)}
+                                        state={{
+                                            categoryId: category?.categoryId || category?._id,
+                                            categoryTitle: category?.title
+                                        }}
+                                        onClick={(e) => handleHomeMenuCategoryClick(category, e)}
+                                        className="font-devanagari flex min-h-[38px] items-center gap-7 text-[20px] font-normal leading-tight text-[#3F3F3F]"
+                                    >
+                                        <span className="flex h-10 w-10 shrink-0 items-center justify-center">
+                                            {normalizeImageUrl(category.imageUrl) ? (
+                                                <img
+                                                    src={normalizeImageUrl(category.imageUrl)}
+                                                    crossOrigin="anonymous"
+                                                    alt={stripHtmlTags(category.title)}
+                                                    className="h-7 w-7 object-contain"
+                                                />
+                                            ) : (
+                                                <BookOpen size={26} className="text-[#9A283D]" />
+                                            )}
+                                        </span>
+                                        <span className="min-w-0">{renderHomeMenuTitle(category.title)}</span>
+                                    </Link>
+                                ))}
+                            </div>
+                        </div>
+                    </aside>
+                </div>
+            )}
+
+            <Footer variant="homeNav" />
+        </>
     );
 }
 
