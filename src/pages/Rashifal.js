@@ -13,6 +13,8 @@ import SchemaMarkup from "../components/SchemaMarkup";
 import { LanguageContext } from "../contexts/LanguageContext";
 const RASHIFAL_CACHE_TTL = 5 * 60 * 1000;
 const RASHI_LIST_CACHE_KEY = "rashifal:rashi-list";
+const RASHI_LIST_API_URL = "https://api.bhaktibhav.app/api/v1/frontend-v4/all-rashis-v3";
+const getRashifalDetailApiUrl = (rashiId) => `https://api.bhaktibhav.app/api/v1/frontend-v4/today-v3/${rashiId}`;
 const rashifalCache = new Map();
 const pendingRashifalRequests = new Map();
 
@@ -54,8 +56,72 @@ const getCachedRashifal = async (cacheKey, fetcher) => {
   return request;
 };
 
+const splitRashiName = (item) => {
+  if (item?.name && typeof item.name === "object") {
+    return {
+      hi: item.name.hi || "",
+      en: item.name.en || "",
+    };
+  }
+
+  const nameParts = String(item?.name2 || item?.name || "")
+    .split(/\n|<br\s*\/?>/i)
+    .map((part) => part.trim())
+    .filter(Boolean);
+
+  return {
+    hi: nameParts[0] || "",
+    en: nameParts[1] || "",
+  };
+};
+
+const normalizeRashiItem = (item) => {
+  const normalizedName = splitRashiName(item);
+  const id = item?._id || item?.id;
+
+  return {
+    ...item,
+    _id: id,
+    id,
+    key: item?.key || id,
+    name: normalizedName,
+    position: Number(item?.position) || 0,
+  };
+};
+
 const getRashiList = (response) =>
-  response?.status === "success" && Array.isArray(response.data) ? response.data : [];
+  response?.status === "success" && Array.isArray(response.data)
+    ? response.data
+        .map(normalizeRashiItem)
+        .filter((item) => item._id && item.key)
+        .sort((a, b) => a.position - b.position)
+    : [];
+
+const getStringList = (value) => Array.isArray(value)
+  ? value.filter((item) => typeof item === "string" && item.trim())
+  : [];
+
+const getRashifalDetailPayload = (data) => {
+  if (Array.isArray(data)) return data[0] || {};
+  if (Array.isArray(data?.data)) return data.data[0] || {};
+  return data?.data || data || {};
+};
+
+const getRashifalContent = (data) => {
+  const payload = getRashifalDetailPayload(data);
+  const legacyHindiPoints = Array.isArray(payload?.points) ? payload.points : payload?.points?.hi;
+  const hi = getStringList(payload?.points2?.[0]).length
+    ? getStringList(payload.points2[0])
+    : getStringList(legacyHindiPoints);
+  const en = getStringList(payload?.points2?.[1]).length
+    ? getStringList(payload.points2[1])
+    : getStringList(payload?.points?.en);
+
+  return {
+    hi: hi.length ? hi : ["आज का राशिफ़ल उपलब्ध नहीं है।"],
+    en: en.length ? en : ["Rashifal not available."],
+  };
+};
 
 function Rashifal() {
   
@@ -90,7 +156,7 @@ function Rashifal() {
     }
 
     getCachedRashifal(RASHI_LIST_CACHE_KEY, () =>
-      fetch("https://api.bhaktibhav.app/frontend/all-rashis").then((res) => res.json())
+      fetch(RASHI_LIST_API_URL).then((res) => res.json())
     )
       .then((resJson) => {
         const nextRashis = getRashiList(resJson);
@@ -126,23 +192,13 @@ function Rashifal() {
     try {
       const data = await getCachedRashifal(
         `rashifal:today:${rashi._id}`,
-        () => fetch(`https://api.bhaktibhav.app/frontend/today/${rashi._id}`).then((res) => res.json())
+        () => fetch(getRashifalDetailApiUrl(rashi._id)).then((res) => res.json())
       );
       console.log("API response:", data);
 
-      const todayData = Array.isArray(data) ? data[0] : null;
-      let content = todayData?.points?.[0];
-
-      if (!content || typeof content !== "object") {
-        content = {
-          hi: ["आज का राशिफ़ल उपलब्ध नहीं है।"],
-          en: ["Rashifal not available."],
-        };
-      }
-
       setSelectedRashi({
         ...rashi,
-        content,
+        content: getRashifalContent(data),
         image: rashiImages[rashi.key] || "/img/default.png",
       });
 
@@ -185,20 +241,11 @@ function normalizeEnglishText(text) {
     .trim();
 }
 
-const replacements = {
-    ",": "၊",     // comma alternative — or you can keep "," if you prefer
-    ";": "]",     // semicolon alternative (or just "।" if you want sentence end)
-    ":": "꠱",     // colon alternative
-    "?": "?",     // optional: can replace with "?"
-    "!": "!",     // optional: can replace with "!"
-    ".": "।",   // Hindi "पूर्णविराम" (Danda) 
-    "-": "–",     
-  };
   return (
     <>
       <SchemaMarkup schema={rashifalSchema} />
       <SEO title = "Daily Horoscope Hindi, Today Rashifal, Weekly & Monthly Rashifal | भक्ति भाव" description="Get today rashifal in Hindi, daily horoscope updates, and weekly & monthly zodiac predictions for all signs – Bhakti Bhav." canonical="https://bhaktibhav.app/rashifal" schema = {homeSchema}/>
-      <Header pageName={{ hi: "jkf'kQy", en: "Rashifal" }} />
+      <Header showBrandBackHeader pageName={{ hi: "jkf'kQy", en: "Rashifal" }} />
 
       <PageTitleCard
         titleHi={"vkt dk jkf'kQy"}
@@ -208,26 +255,37 @@ const replacements = {
         customFontSize={"22px"}
       />
 
-        <div className="container mx-auto mt-4 px-4">
-          <ul className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 md:py-6 py-3 text-center">
+        <div className="container mx-auto max-w-md px-4 pb-28 pt-4 md:max-w-5xl">
+          <ul className="grid grid-cols-3 gap-x-4 gap-y-6 text-center max-[374px]:gap-x-3 max-[374px]:gap-y-5 md:grid-cols-4 md:gap-5">
             {rashis.map((item) => (
               <li key={item._id}>
                 <button
                   onClick={() => openModal(item)}
-                  className="block bg-[#9A283D] shadow-lg rounded-2xl overflow-hidden hover:shadow-2xl hover:rounded-[10px] hover:scale-105 transition-all duration-300 ease-in-out w-full"
+                  className="group flex min-h-[156px] w-full flex-col items-center justify-start overflow-hidden rounded-[18px] border border-[#EEDFBF] bg-[#FFFCF7] px-2.5 py-4 shadow-[0_5px_16px_rgba(154,40,61,0.06)] transition-all duration-300 ease-in-out hover:-translate-y-0.5 hover:shadow-[0_10px_24px_rgba(154,40,61,0.12)] max-[374px]:min-h-[148px] max-[374px]:px-2 max-[374px]:py-3 md:min-h-[180px]"
                 >
-                  <div className="w-full h-24 flex items-center justify-center mt-2">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-full border border-[#F0DFC0] bg-[#FFF2D9] max-[374px]:h-14 max-[374px]:w-14 md:h-20 md:w-20">
                     <img
-                      src={item.imageUrl}
-                      alt={item.name.en}
-                      className="w-auto rounded-md max-h-[100%]"
+                      src={item.imageUrl || rashiImages[item.key] || "/img/default.png"}
+                      crossOrigin="anonymous"
+                      alt={item.name.en || item.name.hi || "Rashi"}
+                      className="h-11 w-11 object-contain max-[374px]:h-10 max-[374px]:w-10 md:h-14 md:w-14"
+                      style={{
+                        filter: "brightness(0) saturate(100%) invert(20%) sepia(32%) saturate(1981%) hue-rotate(312deg) brightness(89%) contrast(89%)",
+                      }}
                     />
                   </div>
-                  <div className="p-4">
-                    <h2 className="text-lg font-semibold text-white font-eng">
-                      {item.name.en}
+                  <div className="mt-3 flex w-full flex-1 flex-col items-center">
+                    <h2 className="font-devanagari text-[22px] font-bold leading-tight text-[#9A283D] max-[374px]:text-[20px] md:text-2xl">
+                      {item.name.hi}
                     </h2>
-                    <p className="text-2xl rashi">{item.name.hi}</p>
+                    <div className="my-2 flex w-full items-center justify-center gap-1.5 text-[#B99758]">
+                      <span className="h-px w-8 bg-[#D8C293]" />
+                      <span className="text-[11px] leading-none">✦</span>
+                      <span className="h-px w-8 bg-[#D8C293]" />
+                    </div>
+                    <p className="font-eng text-[15px] font-semibold leading-tight text-[#9A283D] max-[374px]:text-sm md:text-base">
+                      {item.name.en}
+                    </p>
                   </div>
                 </button>
               </li>
@@ -238,50 +296,63 @@ const replacements = {
         {/* Modal */}
         {modalOpen && selectedRashi && (
           <div
-            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/55 px-0 py-0"
             onClick={closeModal}
           >
             <div
-              className="bg-white rounded-xl shadow-lg max-w-lg w-full relative p-6"
+              className="relative max-h-[82vh] w-[78vw] min-w-[300px] max-w-[565px] overflow-y-auto rounded-[28px] bg-white px-6 py-7 shadow-[0_18px_45px_rgba(0,0,0,0.2)] max-[374px]:w-[86vw] max-[374px]:min-w-0 max-[374px]:px-5 max-[374px]:py-6"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="mb-4 text-center flex flex-col items-center">
-                <div className="bg-[#9A283D] rounded-lg flex items-center justify-center  mb-4">
-                  <img
-                    src={selectedRashi.imageUrl}
-                    alt={selectedRashi.name?.en}
-                    className="h-32 w-auto rounded-md mx-auto"
-                  />
-
-                </div>
-                <h2 className="text-2xl theme_text mb-1 font-eng">
-                  {selectedRashi.name?.hi} <span className="ml-2 text-lg">({selectedRashi.name?.en})</span>
+              <div className="text-center flex flex-col items-center">
+                <img
+                  src={selectedRashi.imageUrl || selectedRashi.image}
+                  crossOrigin="anonymous"
+                  alt={selectedRashi.name?.en || selectedRashi.name?.hi || "Rashi"}
+                  className="h-[74px] w-[74px] object-contain max-[374px]:h-16 max-[374px]:w-16"
+                  style={{
+                    filter: "brightness(0) saturate(100%) invert(20%) sepia(32%) saturate(1981%) hue-rotate(312deg) brightness(89%) contrast(89%)",
+                  }}
+                />
+                <h2 className="font-devanagari mt-3 text-[18px] font-bold leading-tight text-[#9A283D] max-[374px]:text-[22px]">
+                  {selectedRashi.name?.hi}
                 </h2>
-
+                <div className="my-2.5 flex w-40 items-center justify-center gap-2 text-[#B99758]">
+                  <span className="h-px flex-1 bg-[#D8C293]" />
+                  <span className="text-sm leading-none">✦</span>
+                  <span className="h-px flex-1 bg-[#D8C293]" />
+                </div>
+                <p className="font-eng text-[16px] font-semibold leading-tight text-[#9A283D] max-[374px]:text-xl">
+                  {selectedRashi.name?.en}
+                </p>
               </div>
 
-              <div className="text-start theme_text my-5">
+              <div className="mt-6 text-start text-[#9A283D] max-[374px]:mt-5">
                 {selectedRashi.content?.hi?.length > 0 && (
-                  <ul className="space-y-2">
+                  <ul className="space-y-3">
                     {selectedRashi.content.hi.map((line, idx) => (
-                      <li key={idx} className="text-lg leading-relaxed flex items-start">
-                        <span className="text-[#9A283D] mr-3 mt-1 flex-shrink-0 font-bold text-lg min-w-[16px]">●</span>
-                        <span className="flex-1 text-md">
-                          {normalizeHindiText(line).replace(/\.\.\./g, "---").replace(/,/g, "]").replace(/:/g, "ः").replace(/[,:;.!?-]/g, match => replacements[match] || match)        // Replace colon with visarga
-                    .replace(/ँ/g, "ं")          // Normalize chandrabindu if misencoded
-                    .replace(/\u200D|\u200C/g, " ") // Remove zero-width joiners
-                    .normalize("NFC")}
+                      <li key={idx} className="font-devanagari flex items-start text-[16px] leading-[1.22] max-[374px]:text-[17px]">
+                        <span className="mr-4 mt-2.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[#9A283D]" />
+                        <span className="flex-1">
+                          {normalizeHindiText(line).replace(/\.\.\./g, "---").replace(/ँ/g, "ं").replace(/\u200D|\u200C/g, " ").normalize("NFC")}
                         </span>
                       </li>
                     ))}
                   </ul>
                 )}
 
+                {selectedRashi.content?.hi?.length > 0 && selectedRashi.content?.en?.length > 0 && (
+                  <div className="my-5 flex w-full items-center justify-center gap-2 text-[#B99758]">
+                    <span className="h-px w-24 bg-[#D8C293]" />
+                    <span className="text-sm leading-none">✦</span>
+                    <span className="h-px w-24 bg-[#D8C293]" />
+                  </div>
+                )}
+
                 {selectedRashi.content?.en?.length > 0 && (
-                  <ul className="space-y-2 mt-4">
+                  <ul className="space-y-3">
                     {selectedRashi.content.en.map((line, idx) => (
-                      <li key={idx} className="text-lg leading-relaxed font-eng flex items-start">
-                        <span className="text-[#9A283D] mr-3 mt-1 flex-shrink-0 font-bold text-lg min-w-[16px]">●</span>
+                      <li key={idx} className="font-eng flex items-start text-[15px] leading-[1.22] max-[374px]:text-[17px]">
+                        <span className="mr-4 mt-2.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[#9A283D]" />
                         <span className="flex-1">
                           {normalizeEnglishText(line).replace(/\.\.\./g, "---").replace(/,/g, ",")}
                         </span>
@@ -291,10 +362,10 @@ const replacements = {
                 )}
               </div>
 
-              <div className="mx-auto text-center mt-6">
+              <div className="mx-auto mt-6 text-center max-[374px]:mt-5">
                 <button
                   onClick={closeModal}
-                  className="text-white text-md font-eng bg-[#9A283D] rounded-full px-6 py-2"
+                  className="rounded-full bg-[#9A283D] px-9 py-3.5 font-eng text-lg font-semibold text-white shadow-[0_8px_16px_rgba(154,40,61,0.22)] max-[374px]:px-8 max-[374px]:py-3 max-[374px]:text-base"
                 >
                   Close
                 </button>

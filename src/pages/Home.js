@@ -19,6 +19,8 @@ import { GA4Events } from "../utils/ga4Events.enum";
 import SEO from "../components/SEO";
 import { LanguageContext } from "../contexts/LanguageContext";
 import malaGif from "../assets/img/mala.gif";
+import hindiCalendarHomeImage from '../assets/img/hindi_calendar_home.png';
+import vratKathaHomeImage from "../assets/img/vrat_katha_home.png";
 
 const ASSET_BASE_URL = "https://api.bhaktibhav.app";
 
@@ -615,25 +617,25 @@ function Home() {
                 onClick={(e) => handleAccessControlledClick(cardData, e, GA4Events.main_banner_clicked, {
                     event_label: "main_guidance_card_clicked_from_home_screen"
                 })}
-                className="relative block h-[196px] overflow-hidden rounded-[28px] bg-[#FFF1DD] shadow-[0_10px_28px_rgba(154,40,61,0.08)] md:h-[320px]"
+                className="relative block min-h-[228px] overflow-hidden rounded-[22px] bg-[#FFF1DD] shadow-[0_10px_28px_rgba(154,40,61,0.08)] sm:min-h-[220px] md:h-[320px] md:min-h-0 md:rounded-[28px]"
             >
                 <img
                     src={imageUrl}
                     crossOrigin="anonymous"
                     alt={stripHtmlTags(cardData.title || guidanceTitle)}
-                    className="absolute inset-0 h-full w-full object-cover object-center"
+                    className="absolute inset-0 h-full w-full object-cover object-[62%_center] sm:object-center"
                 />
-                <div className="absolute inset-0 bg-gradient-to-r from-[#FFF2DF] via-[#FFF2DF]/95 via-[58%] to-transparent" />
-                <div className="relative z-10 flex h-full max-w-[66%] flex-col justify-center px-5 py-5 text-[#9A283D] md:px-8">
-                    <span className="font-devanagari inline-flex w-fit rounded-xl bg-[#FFE1AC] px-4 py-2 text-sm font-bold leading-none md:text-base">{guidanceTitle}</span>
-                    <h2 className="font-devanagari mt-4 text-[31px] font-bold leading-none md:text-5xl">{cardData.title || "आज का व्रत"}</h2>
-                    {guidanceDate && <p className="font-eng mt-4 text-base text-[#5E5E5E] md:text-lg">{guidanceDate}</p>}
+                <div className="absolute inset-0 bg-gradient-to-r from-[#FFF2DF] via-[#FFF2DF]/95 via-[64%] to-transparent md:via-[58%]" />
+                <div className="relative z-10 flex min-h-[228px] max-w-[68%] flex-col justify-center px-4 py-4 text-[#9A283D] sm:min-h-[220px] sm:max-w-[66%] md:h-full md:min-h-0 md:px-8 md:py-5">
+                    <span className="font-devanagari inline-flex w-fit rounded-xl bg-[#FFE1AC] px-3 py-1.5 text-[13px] font-bold leading-none md:px-4 md:py-2 md:text-base">{guidanceTitle}</span>
+                    <h2 className="font-devanagari mt-3 text-[27px] font-bold leading-none md:mt-4 md:text-5xl">{cardData.title || "आज का व्रत"}</h2>
+                    {guidanceDate && <p className="font-eng mt-3 text-sm text-[#5E5E5E] md:mt-4 md:text-lg">{guidanceDate}</p>}
                     {guidanceDescription && (
-                        <p className="font-devanagari mt-3 text-base leading-tight text-[#4E4E4E] md:text-lg">
+                        <p className="font-devanagari mt-2.5 text-[15px] leading-snug text-[#4E4E4E] md:mt-3 md:text-lg md:leading-tight">
                             {guidanceDescription}
                         </p>
                     )}
-                    <span className="font-devanagari mt-5 inline-flex w-fit items-center gap-1 rounded-xl bg-[#9A283D] px-6 py-3 text-base font-semibold leading-none text-white shadow-[0_8px_16px_rgba(154,40,61,0.22)] md:text-lg">
+                    <span className="font-devanagari mt-4 inline-flex w-fit items-center gap-1 rounded-xl bg-[#9A283D] px-5 py-2.5 text-[15px] font-semibold leading-none text-white shadow-[0_8px_16px_rgba(154,40,61,0.22)] md:mt-5 md:px-6 md:py-3 md:text-lg">
                         {cardData.ctaLabel || guidance?.cta?.label || "आज का व्रत"}
                         <ArrowRight size={16} />
                     </span>
@@ -722,6 +724,7 @@ function Home() {
         return stripHtmlTags(primaryTitle || title);
     };
 
+    const homeImages = [hindiCalendarHomeImage, vratKathaHomeImage];
     return (
         <>
             <SEO
@@ -734,7 +737,7 @@ function Home() {
 
             {categoriesLoading ? <PageShimmer /> : null}
 
-            <main className={`container mx-auto flex max-w-md flex-col px-4 pb-28 pt-3 md:max-w-5xl ${categoriesLoading ? "hidden" : ""}`}>
+            <main className={`container mx-auto flex max-w-md flex-col px-4 pb-28 pt-2 md:max-w-5xl ${categoriesLoading ? "hidden" : ""}`}>
                 <section className="mb-4">
                     <p className="font-devanagari inline-flex rounded-md bg-[#FFE8B4] px-3 py-1 text-base font-semibold text-[#9A283D]">
                         {homeScreenData?.greeting || "नमस्ते भक्त!"}
@@ -759,7 +762,7 @@ function Home() {
                 </section>
 
                 <section className="mb-4 grid grid-cols-2 gap-2">
-                    {quickLinks.slice(0, 2).map((item) => {
+                    {quickLinks.slice(0, 2).map((item, index) => {
                         const isCalendar = item.key === "hindi_calendar" || item.redirectPage === "panchang-calendar";
                         const Icon = isCalendar ? CalendarDays : BookOpen;
 
@@ -773,8 +776,12 @@ function Home() {
                                 className="font-devanagari flex min-h-[52px] items-center justify-center gap-2 rounded-xl border border-[#9A283D] bg-white px-3 text-base font-semibold text-[#9A283D] shadow-sm transition hover:bg-[#FFF7ED]"
                             >
                                 {normalizeImageUrl(item.imageUrl) ? (
+                                    // here removed normalizeImageUrl(item?.imageUrl) from bottom image src because 
+                                    // have to show static image inside this place. 
                                     <img
-                                        src={normalizeImageUrl(item.imageUrl)}
+                                    
+                                        // src={normalizeImageUrl(item?.imageUrl)}
+                                        src={homeImages[index]}
                                         crossOrigin="anonymous"
                                         alt={stripHtmlTags(item.title)}
                                         className="h-7 w-7 rounded-full object-cover"

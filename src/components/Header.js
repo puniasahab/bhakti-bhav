@@ -5,7 +5,7 @@ import rupeesIcon from "../assets/img/rupees_icon.png";
 import userIcon from "../assets/img/hd_user_icon.png";
 import logo from "../assets/img/logo.png";
 import backBtn from "../assets/img/back_icon.svg";
-import { Bell, Check, ChevronLeft, CircleUserRound, Download, Eye, Globe2, Heart, LogOut, Menu, MoreVertical, Pencil, ReceiptText, Search } from "lucide-react";
+import { Bell, Check, ChevronLeft, CircleUserRound, Download, Eye, Globe2, Heart, IndianRupee, LogOut, Menu, MoreVertical, Pencil, ReceiptText, Search } from "lucide-react";
 import { LanguageContext } from "../contexts/LanguageContext";
 import { getTokenFromLS, removeMobileNoFromLS, removeSubscriptionStatusFromLS, removeTokenFromLS, formatNumber, removeUserName, removeUserIdFromLS, getMobileNoFromLS } from "../commonFunctions";
 import useGA4Tracker from "../hooks/useGA4Tracker";
@@ -30,6 +30,7 @@ function Header({
     hideEditIcon = false,
     showEnglishText = false,
     showVerticalLogout = false,
+    showBrandBackHeader = false,
     onHomeMenuClick
 }) {
     const { pathname } = useLocation();
@@ -210,13 +211,65 @@ function Header({
     return (
         <>
             <header
-                className={`fixed top-0 left-0 right-0 z-50 bg-white ${isHomePage ? "px-4 pt-5 shadow-none" : "px-4 pt-3 shadow-sm"}`}
-                style={{ height: isHomePage ? "96px" : "80px" }}
+                className={`fixed top-0 left-0 right-0 z-50 ${isHomePage ? "bg-transparent px-4 pt-4 shadow-none" : "bg-white px-4 pt-3 shadow-sm"}`}
+                style={{ height: isHomePage ? "88px" : showBrandBackHeader ? "92px" : "80px" }}
             >
-                <div className={`${isHomePage ? "container mx-auto max-w-md md:max-w-5xl" : "container mx-auto hd_bg rounded-xl"}`}>
-                    <div className={`${isHomePage ? "flex h-14 items-center justify-between gap-3" : "flex justify-between items-center px-4 py-6"}`}>
+                <div className={`${isHomePage || showBrandBackHeader ? "container mx-auto max-w-md md:max-w-5xl" : "container mx-auto hd_bg rounded-xl"}`}>
+                    <div className={`${isHomePage ? "flex h-12 items-center justify-between gap-3" : showBrandBackHeader ? "hd_bg flex h-16 items-center justify-between rounded-2xl px-4 shadow-[0_8px_22px_rgba(154,40,61,0.12)]" : "flex justify-between items-center px-4 py-6"}`}>
 
-                    {showProfileHeader && (
+                    {showBrandBackHeader && (
+                        <>
+                            <div className="flex min-w-0 items-center gap-3">
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        if (window.history.state && window.history.state.idx > 0) {
+                                            navigate(-1);
+                                        } else {
+                                            navigate("/");
+                                        }
+                                    }}
+                                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#FFE2B7] text-[#9A283D]"
+                                    aria-label="Go back"
+                                >
+                                    <ChevronLeft size={28} strokeWidth={2.6} />
+                                </button>
+                                <a href="/" className="min-w-0">
+                                    <h1 className="font-devanagari truncate py-0.5 text-[23px] font-bold leading-tight text-[#9A283D] sm:text-2xl">
+                                        भक्ति भाव
+                                    </h1>
+                                </a>
+                            </div>
+
+                            <div className="flex shrink-0 items-center gap-2 text-[#9A283D] max-[374px]:gap-1.5">
+                                <button
+                                    type="button"
+                                    className="flex h-11 w-11 items-center justify-center rounded-full bg-[#FFF6D4]"
+                                    aria-label="Search"
+                                >
+                                    <Search size={27} strokeWidth={2.3} />
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => { trackEvent(GA4Events.rupees_icon_clicked, {event_label: "rupees_icon_clicked_from_home_screen"}); handlePaymentNavigation(); }}
+                                    className="flex h-11 w-11 items-center justify-center rounded-full bg-[#FFF6D4]"
+                                    aria-label="Payment"
+                                >
+                                    <IndianRupee size={25} strokeWidth={2.5} />
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={handleProfileNavigation}
+                                    className="flex h-11 w-11 items-center justify-center rounded-full bg-[#FFF6D4]"
+                                    aria-label="Profile"
+                                >
+                                    <CircleUserRound size={29} strokeWidth={2.3} />
+                                </button>
+                            </div>
+                        </>
+                    )}
+
+                    {showProfileHeader && !showBrandBackHeader && (
                         <>
                             {/* Back Button and Profile Text */}
                             <div className="flex items-center gap-3">
@@ -261,7 +314,7 @@ function Header({
                         </>
                     )}
 
-                    {!isHomeRoute && !showProfileHeader && (
+                    {!isHomeRoute && !showProfileHeader && !showBrandBackHeader && (
                         <div className="flex items-center" style={{ gap: window.innerWidth < 368 ? "2px" : "8px" }}>
                             <button onClick={() => {
 
@@ -330,12 +383,12 @@ function Header({
                         </div>
                     )}
 
-                    {!isHomeRoute && !showProfileHeader && !showHindiFontControls && !showFontSizeControls && (
+                    {!isHomeRoute && !showProfileHeader && !showBrandBackHeader && !showHindiFontControls && !showFontSizeControls && (
                         <div className="ml-auto">
                         </div>
                     )}
 
-                    {isHomeRoute && !isHomePage && (
+                    {isHomeRoute && !isHomePage && !showBrandBackHeader && (
                         <>
                             <h1 className="text-lg font-bold">
                                 <a href="/">
@@ -360,44 +413,44 @@ function Header({
 
                     {isHomePage && (
                         <>
-                            <div className="flex min-w-0 items-center gap-3">
+                            <div className="flex min-w-0 items-center gap-2.5">
                                 <button
                                     type="button"
                                     onClick={onHomeMenuClick}
-                                    className="flex h-10 w-10 shrink-0 items-center justify-center text-[#9A283D]"
+                                    className="flex h-9 w-9 shrink-0 items-center justify-center text-[#9A283D]"
                                     aria-label="Open menu"
                                 >
-                                    <Menu size={34} strokeWidth={2.4} />
+                                    <Menu size={30} strokeWidth={2.4} />
                                 </button>
                                 <a href="/" className="min-w-0">
-                                    <h1 className="font-devanagari truncate text-2xl font-bold leading-none text-[#9A283D]">
+                                    <h1 className="font-devanagari truncate py-0.5 text-[23px] font-bold leading-tight text-[#9A283D] sm:text-2xl">
                                         भक्ति भाव
                                     </h1>
                                 </a>
                             </div>
 
-                            <div className="flex shrink-0 items-center gap-3 text-[#9A283D]">
+                            <div className="flex shrink-0 items-center gap-2 text-[#9A283D] max-[374px]:gap-1">
                                 <button
                                     type="button"
-                                    className="flex h-10 w-10 items-center justify-center"
+                                    className="flex h-9 w-9 items-center justify-center"
                                     aria-label="Search"
                                 >
-                                    <Search size={34} strokeWidth={2.2} />
+                                    <Search size={29} strokeWidth={2.2} />
                                 </button>
                                 <button
                                     type="button"
-                                    className="flex h-10 w-10 items-center justify-center"
+                                    className="flex h-9 w-9 items-center justify-center"
                                     aria-label="Notifications"
                                 >
-                                    <Bell size={32} strokeWidth={2.2} />
+                                    <Bell size={28} strokeWidth={2.2} />
                                 </button>
                                 <button
                                     type="button"
                                     onClick={handleProfileNavigation}
-                                    className="flex h-10 w-10 items-center justify-center"
+                                    className="flex h-9 w-9 items-center justify-center"
                                     aria-label="Profile"
                                 >
-                                    <CircleUserRound size={36} strokeWidth={2.2} />
+                                    <CircleUserRound size={32} strokeWidth={2.2} />
                                 </button>
                             </div>
                         </>
@@ -407,7 +460,7 @@ function Header({
             </div>
         </header>
         {/* Spacer div to prevent content overlap */}
-        <div className={`${isHomePage ? "h-24" : "h-20"} w-full`}></div>
+        <div className={`${isHomePage ? "h-[88px]" : showBrandBackHeader ? "h-[92px]" : "h-20"} w-full`}></div>
         {showLanguageModal && (
             <div className="fixed inset-0 z-[60] flex justify-end bg-black bg-opacity-40" onClick={closeLanguageModal}>
                 <div
