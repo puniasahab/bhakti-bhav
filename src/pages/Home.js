@@ -4,7 +4,7 @@ import Footer from "../components/Footer";
 import { Link, useNavigate } from "react-router-dom";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination, Autoplay } from "swiper/modules";
-import { ArrowRight, BookOpen, CalendarDays, ChevronUp, Gift, Globe2, IndianRupee, Instagram, Sparkles, WalletCards } from "lucide-react";
+import { ArrowRight, BookOpen, CalendarDays, ChevronDown, ChevronUp, Gift, Globe2, IndianRupee, Instagram, Sparkles, WalletCards } from "lucide-react";
 import { homeSchema } from "../seo/schemas";
 import { useAppStoreRedirect } from "../hooks/useAppStoreRedirect";
 
@@ -81,6 +81,7 @@ function Home() {
 
     const [isOpen, setIsOpen] = useState(false);
     const [isHomeMenuOpen, setIsHomeMenuOpen] = useState(false);
+    const [isQuickAccessExpanded, setIsQuickAccessExpanded] = useState(true);
     const [showLoginModal, setShowLoginModal] = useState(false);
     const [panchangData, setPanchangData] = useState(() => {
         const cachedRaw = homeCache.get("panchangRawData");
@@ -502,7 +503,9 @@ function Home() {
         }
     };
 
-    const renderCategoryTitle = (title) => {
+    const renderCategoryTitle = (title, category) => {
+        if (getCategoryRoute(category) === "/guru-ji") return "गुरु जी";
+
         if (language !== "hinglish") {
             return stripHtmlTags(title);
         }
@@ -525,6 +528,7 @@ function Home() {
     };
 
     const categoriesToShow = homeScreenData?.categories?.length ? homeScreenData.categories : (homeCategories.length > 0 ? homeCategories : fallbackHomeCategories);
+    const visibleQuickAccessCategories = isQuickAccessExpanded ? categoriesToShow : categoriesToShow.slice(0, 4);
     const homeMenuActions = [
         {
             key: "upgrade",
@@ -865,13 +869,24 @@ function Home() {
                     </section>
                 )}
 
-                <section className="mb-5">
+                <section className="mb-5" aria-label="Quick Access">
                     <div className="mb-3 flex items-center justify-between">
                         <h2 className="font-eng text-xl font-bold text-[#9A283D]">Quick Access</h2>
-                        <span className="font-eng inline-flex items-center gap-1 text-xs text-[#8F7B73]">See less <ChevronUp size={14} /></span>
+                        {categoriesToShow.length > 4 && (
+                            <button
+                                type="button"
+                                className="font-eng inline-flex min-h-8 items-center gap-1 text-xs text-[#8F7B73]"
+                                aria-expanded={isQuickAccessExpanded}
+                                aria-controls="home-quick-access-cards"
+                                onClick={() => setIsQuickAccessExpanded((expanded) => !expanded)}
+                            >
+                                {isQuickAccessExpanded ? "See less" : "See more"}
+                                {isQuickAccessExpanded ? <ChevronUp size={14} aria-hidden="true" /> : <ChevronDown size={14} aria-hidden="true" />}
+                            </button>
+                        )}
                     </div>
-                    <div className="grid grid-cols-4 gap-x-4 gap-y-5 text-center md:grid-cols-6">
-                        {categoriesToShow.map((category) => (
+                    <div id="home-quick-access-cards" className="grid grid-cols-4 gap-x-4 gap-y-5 text-center md:grid-cols-6">
+                        {visibleQuickAccessCategories.map((category) => (
                             <Link
                                 key={category._id || category.url || category.title}
                                 to={getCategoryRoute(category)}
@@ -885,13 +900,13 @@ function Home() {
                                 <span className="flex h-[70px] w-[70px] items-center justify-center rounded-xl border border-[#F0E4DC] bg-white shadow-[0_6px_16px_rgba(154,40,61,0.06)] transition group-hover:border-[#9A283D] group-hover:bg-[#FFF8F0] md:h-20 md:w-20">
                                     <img
                                         src={normalizeImageUrl(category.imageUrl)}
-                                        alt={stripHtmlTags(category.title)}
+                                        alt={getCategoryRoute(category) === "/guru-ji" ? "गुरु जी" : stripHtmlTags(category.title)}
                                         crossOrigin="anonymous"
                                         className="h-10 w-10 object-contain"
                                     />
                                 </span>
-                                <p className="font-devanagari mt-2 w-full truncate text-xs leading-tight text-[#2F2724] md:text-base">
-                                    {renderCategoryTitle(category.title)}
+                                <p className="font-devanagari mt-2 w-full truncate text-sm leading-tight text-[#2F2724] md:text-base">
+                                    {renderCategoryTitle(category.title, category)}
                                 </p>
                             </Link>
                         ))}

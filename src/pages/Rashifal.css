@@ -1,0 +1,141 @@
+.rashifal-page {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  overflow-y: auto;
+  background: rgba(255, 255, 255, 0.35);
+  color: #9a283d;
+  letter-spacing: 0;
+}
+
+.rashifal-heading {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.rashifal-heading header {
+  padding-top: max(12px, env(safe-area-inset-top));
+}
+
+.rashifal-heading header > div {
+  max-width: 448px;
+}
+
+.rashifal-heading .hd_bg {
+  height: 60px;
+  padding: 0 12px;
+  box-shadow: none;
+}
+
+.rashifal-heading .hd_bg button {
+  width: 36px;
+  height: 36px;
+}
+
+.rashifal-heading .hd_bg button svg { width: 24px; height: 24px; }
+.rashifal-heading .hd_bg h1 { font-size: 22px; }
+.rashifal-heading .hd_bg > div:first-child { gap: 10px; }
+.rashifal-heading .hd_bg > div:last-child { gap: 8px; }
+
+.rashifal-title > div { margin: 0; }
+.rashifal-title > div > p {
+  min-height: 32px;
+  padding: 5px 18px;
+  border-radius: 0 0 16px 16px;
+  box-shadow: none;
+  font-weight: 600;
+  line-height: 20px;
+}
+
+.rashifal-list {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 16px 18px max(20px, env(safe-area-inset-bottom));
+}
+
+.rashifal-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  /* Reserve room for the attached heading, row gaps, and bottom safe area. */
+  grid-auto-rows: clamp(96px, calc((100svh - 180px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) / 4), 146px);
+  gap: 12px 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  text-align: center;
+}
+
+.rashifal-grid > li { min-width: 0; min-height: 0; }
+.rashifal-card {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 5px;
+  border: 1px solid #e9dfc6;
+  border-radius: 18px;
+  background: #fffdf6;
+  color: #9a283d;
+  box-shadow: 0 3px 9px rgba(154, 40, 61, 0.04);
+  cursor: pointer;
+}
+.rashifal-card:hover { border-color: #b99758; }
+.rashifal-card:focus-visible { outline: 2px solid #9a283d; outline-offset: 2px; }
+.rashifal-card-icon {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  border: 1px solid #eee0c6;
+  border-radius: 50%;
+  background: #fff3d9;
+}
+.rashifal-card-image { width: 72%; height: 72%; object-fit: contain; }
+.rashifal-card-label { width: 100%; margin-top: 6px; }
+.rashifal-card-hindi { margin: 0; font-size: 16px; font-weight: 700; line-height: 1.4; }
+.rashifal-card-english { margin: 0; font-size: 12px; font-weight: 400; line-height: 16px; overflow-wrap: anywhere; }
+.rashifal-card-divider { display: flex; align-items: center; justify-content: center; gap: 5px; width: 76%; margin: 4px auto; color: #b99758; font-size: 10px; line-height: 10px; }
+.rashifal-card-divider > span:first-child, .rashifal-card-divider > span:last-child { height: 1px; flex: 1; background: #d5c6a5; }
+
+@media (max-width: 359px) {
+  .rashifal-heading header { padding-left: 12px; padding-right: 12px; }
+  .rashifal-heading .hd_bg { padding: 0 8px; }
+  .rashifal-heading .hd_bg h1 { font-size: 20px; }
+  .rashifal-heading .hd_bg > div:first-child { gap: 6px; }
+  .rashifal-heading .hd_bg > div:last-child { gap: 4px; }
+  .rashifal-heading .hd_bg button { width: 32px; height: 32px; }
+  .rashifal-list { padding-left: 12px; padding-right: 12px; }
+  .rashifal-grid { column-gap: 8px; }
+  .rashifal-card-english { font-size: 11px; }
+}
+
+@media (max-height: 740px) {
+  .rashifal-card { padding-top: 6px; padding-bottom: 6px; }
+  .rashifal-card-icon { width: 48px; height: 48px; }
+  .rashifal-card-label { margin-top: 4px; }
+  .rashifal-card-hindi { font-size: 15px; line-height: 20px; }
+  .rashifal-card-divider { margin: 3px auto; line-height: 8px; }
+}
+
+@media (max-height: 620px) {
+  .rashifal-card { padding-top: 4px; padding-bottom: 4px; }
+  .rashifal-card-icon { width: 36px; height: 36px; }
+  .rashifal-card-label { margin-top: 3px; }
+  .rashifal-card-hindi { font-size: 14px; line-height: 18px; }
+  .rashifal-card-english { line-height: 14px; }
+  .rashifal-card-divider { margin: 2px auto; line-height: 7px; font-size: 8px; }
+}
+
+@media (min-width: 640px) and (min-height: 900px) {
+  .rashifal-heading header > div { max-width: 688px; }
+  .rashifal-list { max-width: 720px; }
+  .rashifal-grid { grid-auto-rows: clamp(146px, calc((100svh - 180px) / 4), 220px); }
+  .rashifal-card-icon { width: 80px; height: 80px; }
+  .rashifal-card-hindi { font-size: 20px; }
+  .rashifal-card-english { font-size: 15px; line-height: 20px; }
+}

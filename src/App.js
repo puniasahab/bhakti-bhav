@@ -19,6 +19,7 @@ import Splash from "./pages/Splash";
 // Import Home directly (not lazy) — it's the main screen,
 // should never show a loader when navigating back from other screens
 import Home from "./pages/Home";
+import SearchPage from "./pages/Search";
 
 import VratKatha from "./pages/VratKatha";
 import VratKathaDetail from "./pages/VratKathaDetail";
@@ -151,6 +152,7 @@ function App() {
                     {/* Home is directly imported — no Suspense, no loader, instant render */}
                     <Route path="/" element={<HomeWrapper />} />
                     <Route path="/home-v1" element={<HomeV1Wrapper />} />
+                    <Route path="/search" element={<SearchPage />} />
                     <Route path="/vrat-katha" element={<VratKatha />} />
                     <Route path="/vrat-katha/:id" element={<VratKathaDetail />} />
                     <Route path="/vrat-katha/detail/:id" element={<VratKathaDetail />} />

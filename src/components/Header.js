@@ -33,9 +33,12 @@ function Header({
     showBrandBackHeader = false,
     onHomeMenuClick,
     onBackClick,
-    backRoute
+    backRoute,
+    inlineHeader = false,
+    hidePaymentAction = false,
 }) {
-    const { pathname } = useLocation();
+    const location = useLocation();
+    const { pathname } = location;
     const navigate = useNavigate();
     const {
         language,
@@ -106,9 +109,9 @@ function Header({
     }
 
     const handleLogout = () => {
-        trackCustomEvent(PIXEL_STANDARD_EVENTS.LOGOUT, {message: "Logout button Clicked", mobileNumber: getMobileNoFromLS()})
+        trackCustomEvent(PIXEL_STANDARD_EVENTS.LOGOUT, { message: "Logout button Clicked", mobileNumber: getMobileNoFromLS() })
         trackEvent(GA4Events.logout_clicked, { event_label: "logout_clicked_from_header_on_edit_profile_screen" });
-        removeTokenFromLS();    
+        removeTokenFromLS();
         removeUserName();
         removeUserIdFromLS();
         removeSubscriptionStatusFromLS();
@@ -225,338 +228,338 @@ function Header({
     return (
         <>
             <header
-                className={`fixed top-0 left-0 right-0 z-50 ${isHomePage ? "bg-transparent px-4 pt-4 shadow-none" : "bg-white px-4 pt-3 shadow-sm"}`}
-                style={{ height: isHomePage ? "88px" : showBrandBackHeader ? "92px" : "80px" }}
+                className={inlineHeader ? "relative z-20 px-4 pt-3" : `fixed top-0 left-0 right-0 z-50 ${isHomePage ? "home-header-surface px-4 pt-4 shadow-none" : "bg-white px-4 pt-3 shadow-sm"}`}
+                style={{ height: inlineHeader ? "auto" : isHomePage ? "88px" : showBrandBackHeader ? "92px" : "80px" }}
             >
                 <div className={`${isHomePage || showBrandBackHeader ? "container mx-auto max-w-md md:max-w-5xl" : "container mx-auto hd_bg rounded-xl"}`}>
                     <div className={`${isHomePage ? "flex h-12 items-center justify-between gap-3" : showBrandBackHeader ? "hd_bg flex h-16 items-center justify-between rounded-2xl px-4 shadow-[0_8px_22px_rgba(154,40,61,0.12)]" : "flex justify-between items-center px-4 py-6"}`}>
 
-                    {showBrandBackHeader && (
-                        <>
-                            <div className="flex min-w-0 items-center gap-3">
-                                <button
-                                    type="button"
-                                    onClick={handleBackClick}
-                                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#FFE2B7] text-[#9A283D]"
-                                    aria-label="Go back"
-                                >
-                                    <ChevronLeft size={28} strokeWidth={2.6} />
-                                </button>
-                                <a href="/" className="min-w-0">
-                                    <h1 className="font-devanagari truncate py-0.5 text-[23px] font-bold leading-tight text-[#9A283D] sm:text-2xl">
-                                        भक्ति भाव
-                                    </h1>
-                                </a>
-                            </div>
-
-                            <div className="flex shrink-0 items-center gap-2 text-[#9A283D] max-[374px]:gap-1.5">
-                                <button
-                                    type="button"
-                                    className="flex h-11 w-11 items-center justify-center rounded-full bg-[#FFF6D4]"
-                                    aria-label="Search"
-                                >
-                                    <Search size={27} strokeWidth={2.3} />
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => { trackEvent(GA4Events.rupees_icon_clicked, {event_label: "rupees_icon_clicked_from_home_screen"}); handlePaymentNavigation(); }}
-                                    className="flex h-11 w-11 items-center justify-center rounded-full bg-[#FFF6D4]"
-                                    aria-label="Payment"
-                                >
-                                    <IndianRupee size={25} strokeWidth={2.5} />
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={handleProfileNavigation}
-                                    className="flex h-11 w-11 items-center justify-center rounded-full bg-[#FFF6D4]"
-                                    aria-label="Profile"
-                                >
-                                    <CircleUserRound size={29} strokeWidth={2.3} />
-                                </button>
-                            </div>
-                        </>
-                    )}
-
-                    {showProfileHeader && !showBrandBackHeader && (
-                        <>
-                            {/* Back Button and Profile Text */}
-                            <div className="flex items-center gap-3">
-                                <button onClick={handleBackClick} aria-label="Go back">
-                                    <img src={backBtn} alt="Back" width="24" height="24" />
-                                </button>
-                                <span className={`${showEnglishText ? "font-eng" : "font-hindi"} text-xl theme_text`}>{profileText}</span>
-                            </div>
-
-                            {/* Three Dots Menu */}
-                            <div className="flex items-center gap-3">
-
-                                {!hideEditIcon && (
-                                    <button className="bg-white rounded-full p-2 shadow-md border border-gray-200 hover:bg-gray-50 transition-colors" onClick={() => { navigate("/edit-profile"); }}>
-                                        <Pencil size={20} className="text-[#9A283D]" style={{ background: "transparent !important" }} />
-                                    </button>
-                                )}
-
-                                {showVerticalLogout && <div className="relative" ref={dropdownRef}>
+                        {showBrandBackHeader && (
+                            <>
+                                <div className="flex min-w-0 items-center gap-3">
                                     <button
-                                        className="bg-white rounded-full p-2 shadow-md border border-gray-200 hover:bg-gray-50 transition-colors"
-                                        onClick={() => setShowDropdown(!showDropdown)}
+                                        type="button"
+                                        onClick={handleBackClick}
+                                        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#FFE2B7] text-[#9A283D]"
+                                        aria-label="Go back"
                                     >
-                                        <MoreVertical size={20} className="text-[#9A283D]" />
+                                        <ChevronLeft size={28} strokeWidth={2.6} />
                                     </button>
+                                    <a href="/" className="min-w-0">
+                                        <h1 className="font-devanagari truncate py-0.5 text-[23px] font-bold leading-tight text-[#9A283D] sm:text-2xl">
+                                            भक्ति भाव
+                                        </h1>
+                                    </a>
+                                </div>
 
-                                    {showDropdown && (
-                                        <div className="absolute right-0 top-12 bg-white rounded-lg shadow-lg border border-gray-200 py-2 min-w-[120px] z-50">
-                                            <button
-                                                onClick={handleLogout}
-                                                className="w-full px-4 py-2 text-left hover:bg-gray-50 transition-colors flex items-center gap-2 text-[#9A283D] font-eng"
-                                            >
-                                                <LogOut size={16} />
-                                                Logout
-                                            </button>
-                                        </div>
+                                <div className="flex shrink-0 items-center gap-2 text-[#9A283D] max-[374px]:gap-1.5">
+                                    <button
+                                        type="button"
+                                        className="flex h-11 w-11 items-center justify-center rounded-full bg-[#FFF6D4]"
+                                        aria-label="Search"
+                                        onClick={() => navigate("/search", { state: { from: location.pathname + location.search } })}
+                                    >
+                                        <Search size={27} strokeWidth={2.3} />
+                                    </button>
+                                    {!hidePaymentAction && <button
+                                        type="button"
+                                        onClick={() => { trackEvent(GA4Events.rupees_icon_clicked, { event_label: "rupees_icon_clicked_from_home_screen" }); handlePaymentNavigation(); }}
+                                        className="flex h-11 w-11 items-center justify-center rounded-full bg-[#FFF6D4]"
+                                        aria-label="Payment"
+                                    >
+                                        <IndianRupee size={25} strokeWidth={2.5} />
+                                    </button>}
+                                    <button
+                                        type="button"
+                                        onClick={handleProfileNavigation}
+                                        className="flex h-11 w-11 items-center justify-center rounded-full bg-[#FFF6D4]"
+                                        aria-label="Profile"
+                                    >
+                                        <CircleUserRound size={29} strokeWidth={2.3} />
+                                    </button>
+                                </div>
+                            </>
+                        )}
+
+                        {showProfileHeader && !showBrandBackHeader && (
+                            <>
+                                {/* Back Button and Profile Text */}
+                                <div className="flex items-center gap-3">
+                                    <button onClick={handleBackClick} aria-label="Go back">
+                                        <img src={backBtn} alt="Back" width="24" height="24" />
+                                    </button>
+                                    <span className={`${showEnglishText ? "font-eng" : "font-hindi"} text-xl theme_text`}>{profileText}</span>
+                                </div>
+
+                                {/* Three Dots Menu */}
+                                <div className="flex items-center gap-3">
+
+                                    {!hideEditIcon && (
+                                        <button className="bg-white rounded-full p-2 shadow-md border border-gray-200 hover:bg-gray-50 transition-colors" onClick={() => { navigate("/edit-profile"); }}>
+                                            <Pencil size={20} className="text-[#9A283D]" style={{ background: "transparent !important" }} />
+                                        </button>
                                     )}
-                                </div>}
+
+                                    {showVerticalLogout && <div className="relative" ref={dropdownRef}>
+                                        <button
+                                            className="bg-white rounded-full p-2 shadow-md border border-gray-200 hover:bg-gray-50 transition-colors"
+                                            onClick={() => setShowDropdown(!showDropdown)}
+                                        >
+                                            <MoreVertical size={20} className="text-[#9A283D]" />
+                                        </button>
+
+                                        {showDropdown && (
+                                            <div className="absolute right-0 top-12 bg-white rounded-lg shadow-lg border border-gray-200 py-2 min-w-[120px] z-50">
+                                                <button
+                                                    onClick={handleLogout}
+                                                    className="w-full px-4 py-2 text-left hover:bg-gray-50 transition-colors flex items-center gap-2 text-[#9A283D] font-eng"
+                                                >
+                                                    <LogOut size={16} />
+                                                    Logout
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>}
+                                </div>
+                            </>
+                        )}
+
+                        {!isHomeRoute && !showProfileHeader && !showBrandBackHeader && (
+                            <div className="flex items-center" style={{ gap: window.innerWidth < 368 ? "2px" : "8px" }}>
+                                <button onClick={handleBackClick} aria-label="Go back">
+                                    <img src={backBtn} alt="Back" width={window.innerWidth < 375 ? "22" : "24"} height={window.innerWidth < 375 ? "22" : "24"} />
+                                </button>
+
+                                {pageTitle && (
+                                    <div className="flex flex-row theme_text items-center">
+                                        <span className={pageTitle.className}>{pageTitle.text}</span>
+                                    </div>
+                                )}
                             </div>
-                        </>
-                    )}
+                        )}
 
-                    {!isHomeRoute && !showProfileHeader && !showBrandBackHeader && (
-                        <div className="flex items-center" style={{ gap: window.innerWidth < 368 ? "2px" : "8px" }}>
-                            <button onClick={handleBackClick} aria-label="Go back">
-                                <img src={backBtn} alt="Back" width={window.innerWidth < 375 ? "22" : "24"} height={window.innerWidth < 375 ? "22" : "24"} />
+
+                        {showWallpaperHeader && (
+                            <div className="flex items-center gap-1 text-sm font-eng theme_text ml-auto">
+                                <div className="flex items-center gap-0.5 text-sm">
+                                    <Download size={16} /> {formatNumber(downloads)}
+                                </div>
+                                <div className="flex items-center gap-0.5 text-sm">
+                                    <Eye size={16} /> {formatNumber(views)}
+                                </div>
+                                <div className="flex items-center gap-0.5 text-sm">
+                                    <Heart size={16} /> {formatNumber(likes)}
+                                </div>
+                            </div>
+                        )}
+
+                        {showHindiFontControls && (
+                            <div className="flex space-x-2 theme_text text-lg font-eng ml-auto max-[374px]:space-x-1 max-[374px]:text-sm">
+                                <button
+                                    onClick={() => setFontSize("text-base")}
+                                    className="px-2 border-[#9A283D] border rounded-lg max-[374px]:px-1 max-[374px]:py-1 max-[374px]:text-xs"
+                                >
+                                    A
+                                </button>
+                                <button
+                                    onClick={() => setFontSize("text-xl")}
+                                    className="px-2 border-[#9A283D] border rounded-lg max-[374px]:px-1 max-[374px]:py-1 max-[374px]:text-xs"
+                                >
+                                    A+
+                                </button>
+                            </div>
+                        )}
+                        {showFontSizeControls && (
+                            <div className="flex space-x-2 theme_text text-lg font-eng ml-auto">
+                                <button
+                                    onClick={() => setFontSize("text-base")}
+                                    className="px-2 border-[#9A283D] border rounded-lg"
+                                >
+                                    A
+                                </button>
+                                <button
+                                    onClick={() => setFontSize("text-xl")}
+                                    className="px-2 border-[#9A283D] border rounded-lg"
+                                >
+                                    A+
+                                </button>
+                            </div>
+                        )}
+
+                        {!isHomeRoute && !showProfileHeader && !showBrandBackHeader && !showHindiFontControls && !showFontSizeControls && (
+                            <div className="ml-auto">
+                            </div>
+                        )}
+
+                        {isHomeRoute && !isHomePage && !showBrandBackHeader && !showProfileHeader && (
+                            <>
+                                <h1 className="text-lg font-bold">
+                                    <a href="/">
+                                        <img src={logo} alt="Logo" width="108" height="27" />
+                                    </a>
+                                </h1>
+
+                                <div className="flex items-center md:space-x-6 space-x-4 text-xl ms-auto">
+                                    {renderLanguageButton("shadow-none border-0 p-0")}
+                                    <button onClick={() => { trackEvent(GA4Events.rupees_icon_clicked, { event_label: "rupees_icon_clicked_from_home_screen" }); handlePaymentNavigation(); }}>
+                                        <img src={rupeesIcon} alt="₹" width="22" height="22" />
+                                    </button>
+                                    <button onClick={() => { trackEvent(GA4Events.transaction_option_clicked, { event_label: "transaction_icon_clicked_from_home_screen" }); handleTransactionNavigation(); }}>
+                                        <ReceiptText size={22} className="text-[#9A283D]" />
+                                    </button>
+                                    <button onClick={handleProfileNavigation}>
+                                        <img src={userIcon} alt="User" width="22" height="20" />
+                                    </button>
+                                </div>
+                            </>
+                        )}
+
+                        {isHomePage && (
+                            <>
+                                <div className="flex min-w-0 items-center gap-2.5">
+                                    <button
+                                        type="button"
+                                        onClick={onHomeMenuClick}
+                                        className="flex h-9 w-9 shrink-0 items-center justify-center text-[#9A283D]"
+                                        aria-label="Open menu"
+                                    >
+                                        <Menu size={30} strokeWidth={2.4} />
+                                    </button>
+                                    <a href="/" className="min-w-0">
+                                        <h1 className="font-devanagari truncate py-0.5 text-[23px] font-bold leading-tight text-[#9A283D] sm:text-2xl">
+                                            भक्ति भाव
+                                        </h1>
+                                    </a>
+                                </div>
+
+                                <div className="flex shrink-0 items-center gap-2 text-[#9A283D] max-[374px]:gap-1">
+                                    <button
+                                        type="button"
+                                        className="flex h-9 w-9 items-center justify-center"
+                                        aria-label="Search"
+                                        onClick={() => navigate("/search", { state: { from: location.pathname + location.search } })}
+                                    >
+                                        <Search size={29} strokeWidth={2.2} />
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className="flex h-9 w-9 items-center justify-center"
+                                        aria-label="Notifications"
+                                    >
+                                        <Bell size={28} strokeWidth={2.2} />
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={handleProfileNavigation}
+                                        className="flex h-9 w-9 items-center justify-center"
+                                        aria-label="Profile"
+                                    >
+                                        <CircleUserRound size={32} strokeWidth={2.2} />
+                                    </button>
+                                </div>
+                            </>
+                        )}
+
+                    </div>
+                </div>
+            </header>
+            {/* Spacer div to prevent content overlap */}
+            {!inlineHeader && <div className={`${isHomePage ? "h-[88px]" : showBrandBackHeader ? "h-[92px]" : "h-20"} w-full`}></div>}
+            {showLanguageModal && (
+                <div className="fixed inset-0 z-[60] flex justify-end bg-black bg-opacity-40" onClick={closeLanguageModal}>
+                    <div
+                        className="h-full w-full max-w-md bg-white shadow-2xl flex flex-col"
+                        onClick={(event) => event.stopPropagation()}
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="language-modal-title"
+                    >
+                        <div className="relative flex items-center justify-center px-6 pt-8 pb-7">
+                            <button
+                                type="button"
+                                onClick={closeLanguageModal}
+                                className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full p-2 hover:bg-gray-100 transition-colors"
+                                aria-label="Close language modal"
+                            >
+                                <ChevronLeft size={32} strokeWidth={2.8} className="text-black" />
                             </button>
+                            <h2 id="language-modal-title" className="font-eng text-2xl font-bold tracking-normal text-black">
+                                Select Language
+                            </h2>
+                        </div>
 
-                            {pageTitle && (
-                                <div className="flex flex-row theme_text items-center">
-                                    <span className={pageTitle.className}>{pageTitle.text}</span>
+                        <div className="flex-1 overflow-y-auto px-5 pb-6">
+                            {languageLoading && (
+                                <p className="font-eng text-base text-gray-500">Loading languages...</p>
+                            )}
+
+                            {!languageLoading && languageError && (
+                                <div className="font-eng text-sm text-red-600">
+                                    <p>{languageError}</p>
+                                    <button
+                                        type="button"
+                                        onClick={fetchLanguages}
+                                        className="mt-3 rounded-xl border border-[#AA273F] px-4 py-2 text-[#AA273F]"
+                                    >
+                                        Try again
+                                    </button>
+                                </div>
+                            )}
+
+                            {!languageLoading && !languageError && (
+                                <div className="space-y-5">
+                                    {languages.map((item) => {
+                                        const isSelected = item.code === pendingLanguage;
+                                        const languageImageUrl = getLanguageImageUrl(item.imageUrl);
+
+                                        return (
+                                            <button
+                                                key={item._id || item.code}
+                                                type="button"
+                                                onClick={() => handleLanguageSelect(item.code)}
+                                                className={`w-full flex items-center gap-4 rounded-2xl border px-4 py-4 text-left transition-colors ${isSelected
+                                                    ? "border-[#AA273F] bg-[#EBD5DA] shadow-[0_8px_24px_rgba(170,39,63,0.22)]"
+                                                    : "border-[#E9C9B8] bg-white hover:border-[#AA273F]/70"
+                                                    }`}
+                                            >
+                                                <div className="w-12 h-12 rounded-2xl bg-gray-100 flex items-center justify-center overflow-hidden shrink-0">
+                                                    {languageImageUrl ? (
+                                                        <img src={languageImageUrl} crossOrigin="anonoymous" alt={item.name} className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        <span className="w-8 h-8 rounded-full bg-[#FF9F2E] text-white flex items-center justify-center font-eng text-lg font-bold">
+                                                            !
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <p className={`font-eng text-2xl font-bold truncate ${isSelected ? "text-[#AA273F]" : "text-[#222222]"}`}>
+                                                        {item.name}
+                                                    </p>
+                                                </div>
+                                                <span className={`w-9 h-9 rounded-full border-2 flex items-center justify-center shrink-0 ${isSelected ? "border-[#AA273F] bg-[#AA273F]" : "border-[#B9B9B9] bg-white"
+                                                    }`}>
+                                                    {isSelected && <Check size={24} strokeWidth={2.8} className="text-white" />}
+                                                </span>
+                                            </button>
+                                        );
+                                    })}
                                 </div>
                             )}
                         </div>
-                    )}
 
-
-                    {showWallpaperHeader && (
-                        <div className="flex items-center gap-1 text-sm font-eng theme_text ml-auto">
-                            <div className="flex items-center gap-0.5 text-sm">
-                                <Download size={16} /> {formatNumber(downloads)}
-                            </div>
-                            <div className="flex items-center gap-0.5 text-sm">
-                                <Eye size={16} /> {formatNumber(views)}
-                            </div>
-                            <div className="flex items-center gap-0.5 text-sm">
-                                <Heart size={16} /> {formatNumber(likes)}
-                            </div>
-                        </div>
-                    )}
-
-                    {showHindiFontControls && (
-                        <div className="flex space-x-2 theme_text text-lg font-eng ml-auto max-[374px]:space-x-1 max-[374px]:text-sm">
+                        <div className="px-5 pb-6 pt-3 bg-white">
                             <button
-                                onClick={() => setFontSize("text-base")}
-                                className="px-2 border-[#9A283D] border rounded-lg max-[374px]:px-1 max-[374px]:py-1 max-[374px]:text-xs"
+                                type="button"
+                                onClick={handleLanguageContinue}
+                                disabled={languageLoading || Boolean(languageError) || !languages.length}
+                                className="w-full rounded-2xl bg-[#AA273F] py-5 font-eng text-2xl font-bold text-white shadow-[0_8px_18px_rgba(0,0,0,0.18)] disabled:opacity-60"
                             >
-                                A
-                            </button>
-                            <button
-                                onClick={() => setFontSize("text-xl")}
-                                className="px-2 border-[#9A283D] border rounded-lg max-[374px]:px-1 max-[374px]:py-1 max-[374px]:text-xs"
-                            >
-                                A+
+                                Continue
                             </button>
                         </div>
-                    )}
-                    {showFontSizeControls && (
-                        <div className="flex space-x-2 theme_text text-lg font-eng ml-auto">
-                            <button
-                                onClick={() => setFontSize("text-base")}
-                                className="px-2 border-[#9A283D] border rounded-lg"
-                            >
-                                A
-                            </button>
-                            <button
-                                onClick={() => setFontSize("text-xl")}
-                                className="px-2 border-[#9A283D] border rounded-lg"
-                            >
-                                A+
-                            </button>
-                        </div>
-                    )}
-
-                    {!isHomeRoute && !showProfileHeader && !showBrandBackHeader && !showHindiFontControls && !showFontSizeControls && (
-                        <div className="ml-auto">
-                        </div>
-                    )}
-
-                    {isHomeRoute && !isHomePage && !showBrandBackHeader && !showProfileHeader && (
-                        <>
-                            <h1 className="text-lg font-bold">
-                                <a href="/">
-                                    <img src={logo} alt="Logo" width="108" height="27" />
-                                </a>
-                            </h1>
-
-                            <div className="flex items-center md:space-x-6 space-x-4 text-xl ms-auto">
-                                {renderLanguageButton("shadow-none border-0 p-0")}
-                                <button onClick={() => { trackEvent(GA4Events.rupees_icon_clicked, {event_label: "rupees_icon_clicked_from_home_screen"}); handlePaymentNavigation(); }}>
-                                    <img src={rupeesIcon} alt="₹" width="22" height="22" />
-                                </button>
-                                <button onClick={() => { trackEvent(GA4Events.transaction_option_clicked, {event_label: "transaction_icon_clicked_from_home_screen"}); handleTransactionNavigation(); }}>
-                                    <ReceiptText size={22} className="text-[#9A283D]" />
-                                </button>
-                                <button onClick={handleProfileNavigation}>
-                                    <img src={userIcon} alt="User" width="22" height="20" />
-                                </button>
-                            </div>
-                        </>
-                    )}
-
-                    {isHomePage && (
-                        <>
-                            <div className="flex min-w-0 items-center gap-2.5">
-                                <button
-                                    type="button"
-                                    onClick={onHomeMenuClick}
-                                    className="flex h-9 w-9 shrink-0 items-center justify-center text-[#9A283D]"
-                                    aria-label="Open menu"
-                                >
-                                    <Menu size={30} strokeWidth={2.4} />
-                                </button>
-                                <a href="/" className="min-w-0">
-                                    <h1 className="font-devanagari truncate py-0.5 text-[23px] font-bold leading-tight text-[#9A283D] sm:text-2xl">
-                                        भक्ति भाव
-                                    </h1>
-                                </a>
-                            </div>
-
-                            <div className="flex shrink-0 items-center gap-2 text-[#9A283D] max-[374px]:gap-1">
-                                <button
-                                    type="button"
-                                    className="flex h-9 w-9 items-center justify-center"
-                                    aria-label="Search"
-                                >
-                                    <Search size={29} strokeWidth={2.2} />
-                                </button>
-                                <button
-                                    type="button"
-                                    className="flex h-9 w-9 items-center justify-center"
-                                    aria-label="Notifications"
-                                >
-                                    <Bell size={28} strokeWidth={2.2} />
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={handleProfileNavigation}
-                                    className="flex h-9 w-9 items-center justify-center"
-                                    aria-label="Profile"
-                                >
-                                    <CircleUserRound size={32} strokeWidth={2.2} />
-                                </button>
-                            </div>
-                        </>
-                    )}
-
-                </div>
-            </div>
-        </header>
-        {/* Spacer div to prevent content overlap */}
-        <div className={`${isHomePage ? "h-[88px]" : showBrandBackHeader ? "h-[92px]" : "h-20"} w-full`}></div>
-        {showLanguageModal && (
-            <div className="fixed inset-0 z-[60] flex justify-end bg-black bg-opacity-40" onClick={closeLanguageModal}>
-                <div
-                    className="h-full w-full max-w-md bg-white shadow-2xl flex flex-col"
-                    onClick={(event) => event.stopPropagation()}
-                    role="dialog"
-                    aria-modal="true"
-                    aria-labelledby="language-modal-title"
-                >
-                    <div className="relative flex items-center justify-center px-6 pt-8 pb-7">
-                        <button
-                            type="button"
-                            onClick={closeLanguageModal}
-                            className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full p-2 hover:bg-gray-100 transition-colors"
-                            aria-label="Close language modal"
-                        >
-                            <ChevronLeft size={32} strokeWidth={2.8} className="text-black" />
-                        </button>
-                        <h2 id="language-modal-title" className="font-eng text-2xl font-bold tracking-normal text-black">
-                            Select Language
-                        </h2>
-                    </div>
-
-                    <div className="flex-1 overflow-y-auto px-5 pb-6">
-                        {languageLoading && (
-                            <p className="font-eng text-base text-gray-500">Loading languages...</p>
-                        )}
-
-                        {!languageLoading && languageError && (
-                            <div className="font-eng text-sm text-red-600">
-                                <p>{languageError}</p>
-                                <button
-                                    type="button"
-                                    onClick={fetchLanguages}
-                                    className="mt-3 rounded-xl border border-[#AA273F] px-4 py-2 text-[#AA273F]"
-                                >
-                                    Try again
-                                </button>
-                            </div>
-                        )}
-
-                        {!languageLoading && !languageError && (
-                            <div className="space-y-5">
-                                {languages.map((item) => {
-                                    const isSelected = item.code === pendingLanguage;
-                                    const languageImageUrl = getLanguageImageUrl(item.imageUrl);
-
-                                    return (
-                                        <button
-                                            key={item._id || item.code}
-                                            type="button"
-                                            onClick={() => handleLanguageSelect(item.code)}
-                                            className={`w-full flex items-center gap-4 rounded-2xl border px-4 py-4 text-left transition-colors ${
-                                                isSelected
-                                                    ? "border-[#AA273F] bg-[#EBD5DA] shadow-[0_8px_24px_rgba(170,39,63,0.22)]"
-                                                    : "border-[#E9C9B8] bg-white hover:border-[#AA273F]/70"
-                                            }`}
-                                        >
-                                            <div className="w-12 h-12 rounded-2xl bg-gray-100 flex items-center justify-center overflow-hidden shrink-0">
-                                                {languageImageUrl ? (
-                                                    <img src={languageImageUrl} crossOrigin = "anonoymous" alt={item.name} className="w-full h-full object-cover" />
-                                                ) : (
-                                                    <span className="w-8 h-8 rounded-full bg-[#FF9F2E] text-white flex items-center justify-center font-eng text-lg font-bold">
-                                                        !
-                                                    </span>
-                                                )}
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                <p className={`font-eng text-2xl font-bold truncate ${isSelected ? "text-[#AA273F]" : "text-[#222222]"}`}>
-                                                    {item.name}
-                                                </p>
-                                            </div>
-                                            <span className={`w-9 h-9 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                                                isSelected ? "border-[#AA273F] bg-[#AA273F]" : "border-[#B9B9B9] bg-white"
-                                            }`}>
-                                                {isSelected && <Check size={24} strokeWidth={2.8} className="text-white" />}
-                                            </span>
-                                        </button>
-                                    );
-                                })}
-                            </div>
-                        )}
-                    </div>
-
-                    <div className="px-5 pb-6 pt-3 bg-white">
-                        <button
-                            type="button"
-                            onClick={handleLanguageContinue}
-                            disabled={languageLoading || Boolean(languageError) || !languages.length}
-                            className="w-full rounded-2xl bg-[#AA273F] py-5 font-eng text-2xl font-bold text-white shadow-[0_8px_18px_rgba(0,0,0,0.18)] disabled:opacity-60"
-                        >
-                            Continue
-                        </button>
                     </div>
                 </div>
-            </div>
-        )}
+            )}
         </>
     );
 }
