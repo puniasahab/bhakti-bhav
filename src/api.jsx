@@ -506,6 +506,24 @@ export const homePageAPis = {
     }
   },
 
+  searchApi: async (query, lang = "hinglish", limit = 50, signal) => {
+    try {
+      // Each search owns its cancellation signal, so bypass shared GET deduplication.
+      const response = await api.request({
+        method: "get",
+        url: "https://api.bhaktibhav.app/api/v2/frontend/search",
+        params: { q: query, lang, limit },
+        signal,
+        timeout: 15000,
+      });
+      return response.data;
+    }
+    catch(error) {
+      if (!axios.isCancel(error)) console.log("Error Searching on Home Page Api: ", error);
+      throw error;
+    }
+  },
+
   fetchBannersData: async () => {
     try {
       const response = await api.get(endPoints.homeBanners);

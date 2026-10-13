@@ -11,6 +11,7 @@ import { homeSchema } from "../seo/schemas";
 import { rashifalSchema } from "../schemas/pageSchemas";
 import SchemaMarkup from "../components/SchemaMarkup";
 import { LanguageContext } from "../contexts/LanguageContext";
+import "./Rashifal.css";
 const RASHIFAL_CACHE_TTL = 5 * 60 * 1000;
 const RASHI_LIST_CACHE_KEY = "rashifal:rashi-list";
 const RASHI_LIST_API_URL = "https://api.bhaktibhav.app/api/v1/frontend-v4/all-rashis-v3";
@@ -245,45 +246,49 @@ function normalizeEnglishText(text) {
     <>
       <SchemaMarkup schema={rashifalSchema} />
       <SEO title = "Daily Horoscope Hindi, Today Rashifal, Weekly & Monthly Rashifal | भक्ति भाव" description="Get today rashifal in Hindi, daily horoscope updates, and weekly & monthly zodiac predictions for all signs – Bhakti Bhav." canonical="https://bhaktibhav.app/rashifal" schema = {homeSchema}/>
-      <Header showBrandBackHeader pageName={{ hi: "jkf'kQy", en: "Rashifal" }} />
+      <div className="rashifal-page">
+        <div className="rashifal-heading">
+          <Header inlineHeader showBrandBackHeader pageName={{ hi: "jkf'kQy", en: "Rashifal" }} />
+          <div className="rashifal-title">
+            <PageTitleCard
+              titleHi={"vkt dk jkf'kQy"}
+              titleEn={"Aaj Ka Rashifal"}
+              // isHinglishLanguageSelected={language === "hinglish"}
+              customEngFontSize={"14px"}
+              customFontSize={"22px"}
+            />
+          </div>
+        </div>
 
-      <PageTitleCard
-        titleHi={"vkt dk jkf'kQy"}
-        titleEn={"Aaj Ka Rashifal"}
-        isHinglishLanguageSelected={language === "hinglish"}
-        customEngFontSize={"14px"}
-        customFontSize={"22px"}
-      />
-
-        <div className="container mx-auto max-w-md px-4 pb-28 pt-4 md:max-w-5xl">
-          <ul className="grid grid-cols-3 gap-x-4 gap-y-6 text-center max-[374px]:gap-x-3 max-[374px]:gap-y-5 md:grid-cols-4 md:gap-5">
+        <div className="rashifal-list">
+          <ul className="rashifal-grid">
             {rashis.map((item) => (
               <li key={item._id}>
                 <button
                   onClick={() => openModal(item)}
-                  className="group flex min-h-[156px] w-full flex-col items-center justify-start overflow-hidden rounded-[18px] border border-[#EEDFBF] bg-[#FFFCF7] px-2.5 py-4 shadow-[0_5px_16px_rgba(154,40,61,0.06)] transition-all duration-300 ease-in-out hover:-translate-y-0.5 hover:shadow-[0_10px_24px_rgba(154,40,61,0.12)] max-[374px]:min-h-[148px] max-[374px]:px-2 max-[374px]:py-3 md:min-h-[180px]"
+                  className="rashifal-card"
                 >
-                  <div className="flex h-16 w-16 items-center justify-center rounded-full border border-[#F0DFC0] bg-[#FFF2D9] max-[374px]:h-14 max-[374px]:w-14 md:h-20 md:w-20">
+                  <div className="rashifal-card-icon">
                     <img
                       src={item.imageUrl || rashiImages[item.key] || "/img/default.png"}
                       crossOrigin="anonymous"
                       alt={item.name.en || item.name.hi || "Rashi"}
-                      className="h-11 w-11 object-contain max-[374px]:h-10 max-[374px]:w-10 md:h-14 md:w-14"
+                      className="rashifal-card-image"
                       style={{
                         filter: "brightness(0) saturate(100%) invert(20%) sepia(32%) saturate(1981%) hue-rotate(312deg) brightness(89%) contrast(89%)",
                       }}
                     />
                   </div>
-                  <div className="mt-3 flex w-full flex-1 flex-col items-center">
-                    <h2 className="font-devanagari text-[22px] font-bold leading-tight text-[#9A283D] max-[374px]:text-[20px] md:text-2xl">
+                  <div className="rashifal-card-label">
+                    <h2 className="font-devanagari rashifal-card-hindi">
                       {item.name.hi}
                     </h2>
-                    <div className="my-2 flex w-full items-center justify-center gap-1.5 text-[#B99758]">
-                      <span className="h-px w-8 bg-[#D8C293]" />
-                      <span className="text-[11px] leading-none">✦</span>
-                      <span className="h-px w-8 bg-[#D8C293]" />
+                    <div className="rashifal-card-divider" aria-hidden="true">
+                      <span />
+                      <span>✦</span>
+                      <span />
                     </div>
-                    <p className="font-eng text-[15px] font-semibold leading-tight text-[#9A283D] max-[374px]:text-sm md:text-base">
+                    <p className="font-eng rashifal-card-english">
                       {item.name.en}
                     </p>
                   </div>
@@ -313,7 +318,7 @@ function normalizeEnglishText(text) {
                     filter: "brightness(0) saturate(100%) invert(20%) sepia(32%) saturate(1981%) hue-rotate(312deg) brightness(89%) contrast(89%)",
                   }}
                 />
-                <h2 className="font-devanagari mt-3 text-[18px] font-bold leading-tight text-[#9A283D] max-[374px]:text-[22px]">
+                <h2 className="font-devanagari mt-3 text-[18px] font-bold leading-tight text-[#9A283D] max-[374px]:text-[18px]">
                   {selectedRashi.name?.hi}
                 </h2>
                 <div className="my-2.5 flex w-40 items-center justify-center gap-2 text-[#B99758]">
@@ -321,7 +326,7 @@ function normalizeEnglishText(text) {
                   <span className="text-sm leading-none">✦</span>
                   <span className="h-px flex-1 bg-[#D8C293]" />
                 </div>
-                <p className="font-eng text-[16px] font-semibold leading-tight text-[#9A283D] max-[374px]:text-xl">
+                <p className="font-eng text-[15px] font-semibold leading-tight text-[#9A283D] max-[374px]:text-sm">
                   {selectedRashi.name?.en}
                 </p>
               </div>
@@ -330,8 +335,8 @@ function normalizeEnglishText(text) {
                 {selectedRashi.content?.hi?.length > 0 && (
                   <ul className="space-y-3">
                     {selectedRashi.content.hi.map((line, idx) => (
-                      <li key={idx} className="font-devanagari flex items-start text-[16px] leading-[1.22] max-[374px]:text-[17px]">
-                        <span className="mr-4 mt-2.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[#9A283D]" />
+                      <li key={idx} className="font-devanagari flex items-start text-[15px] leading-[1.11] max-[374px]:text-[14px]">
+                        <span className="mr-4 mt-2.1 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[#9A283D]" />
                         <span className="flex-1">
                           {normalizeHindiText(line).replace(/\.\.\./g, "---").replace(/ँ/g, "ं").replace(/\u200D|\u200C/g, " ").normalize("NFC")}
                         </span>
@@ -351,8 +356,8 @@ function normalizeEnglishText(text) {
                 {selectedRashi.content?.en?.length > 0 && (
                   <ul className="space-y-3">
                     {selectedRashi.content.en.map((line, idx) => (
-                      <li key={idx} className="font-eng flex items-start text-[15px] leading-[1.22] max-[374px]:text-[17px]">
-                        <span className="mr-4 mt-2.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[#9A283D]" />
+                      <li key={idx} className="font-eng flex items-start text-[13px] leading-[1.11] max-[374px]:text-[12px]">
+                        <span className="mr-4 mt-2.1 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[#9A283D]" />
                         <span className="flex-1">
                           {normalizeEnglishText(line).replace(/\.\.\./g, "---").replace(/,/g, ",")}
                         </span>
@@ -373,8 +378,7 @@ function normalizeEnglishText(text) {
             </div>
           </div>
         )}
-
-      
+      </div>
     </>
   );
 }

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef} from "react";
 import Header from "../components/Header";
-import Footer from "../components/Footer";
+import PageTitleCard from "../components/PageTitleCard";
 import bannerImg from "../assets/img/paymentPageBanner.jpeg";
 import { Check, Tag } from "lucide-react";
 import { paymentApis, subscriptionApis, profileApis, wallpaperApis } from "../api";
@@ -13,6 +13,7 @@ import useGA4BaseParams from "../hooks/useGA4BaseParams";
 import { trackCustomEvent } from "../utils/metaPixel";
 import { PIXEL_STANDARD_EVENTS } from "../utils/pixelEvents";
 import { getMobileNoFromLS } from "../commonFunctions";
+import "./Payment.css";
 
 const CASHFREE_RETURN_BACKEND_URL =
   process.env.REACT_APP_CASHFREE_SUBSCRIPTION_RETURN_URL ||
@@ -41,6 +42,7 @@ export default function Payment() {
     expiryDate: "",
   });
   const [selectedPlan, setSelectedPlan] = useState(null);
+  const [showAllFeatures, setShowAllFeatures] = useState(false);
 
   const baseParams = useGA4BaseParams("Payment Screen");
   const { trackEvent } = useGA4Tracker(baseParams);
@@ -251,99 +253,92 @@ export default function Payment() {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="subscription-page">
+      <div className="subscription-heading">
+        <Header inlineHeader showBrandBackHeader hidePaymentAction />
+        <div className="subscription-title">
+          <PageTitleCard titleEn="Subscription" language="en" customEngFontSize="14px" />
+        </div>
+      </div>
 
-      <Header />
-
-      <div className="container mx-auto px-4 py-6 theme_text">
-        <div className="rounded-xl shadow flex flex-col items-center">
+      <main className="subscription-main">
+        <div className="subscription-banner">
           <img
-            src={(bannersData && bannersData[0]?.imageUrl) || "../assets/img/paymentPageBanner.jpeg"}
-            alt={"payment_bg"}
-            className="w-auto rounded-md max-h-[100%] md:max-h-[100%]"
+            src={(bannersData && bannersData[0]?.imageUrl) || bannerImg}
+            alt="Subscription benefits"
+            onError={(event) => {
+              if (event.currentTarget.getAttribute("src") !== bannerImg) event.currentTarget.src = bannerImg;
+            }}
           />
         </div>
 
-        {/* <div className="text-center mt-4">
-          <p className="font-hindi theme_text" style={{fontSize: '21px'}}>हो जायें प्रभु की भक्ति में लीन!</p>
-          <p className="theme_text font-eng">Ho jaye prabhu ki bhakti me leen</p>
-        </div> */}
-
-        <div className="container mx-auto px-4 mt-6 space-y-4">
+        <div className="subscription-plans" role="group" aria-label="Subscription plans">
           {plans && plans.length > 0  ? plans?.map((plan, index) => {
             const isOfferActive = plan.isOfferActive === true;
             const discountedPrice = plan.finalPrice ?? plan.offerPrice ?? plan.price;
 
             return (
-            <div
+            <label
               key={plan._id || plan.id}
-              onClick={() => setSelectedPlan(plan._id || plan.id)}
-              className={`relative cursor-pointer border-2 rounded-2xl bg-white transition-all duration-200
-          ${selectedPlan === (plan._id || plan.id)
-                  ? "border-[#9A283D] shadow-lg"
-                  : "border-gray-200 hover:border-[#9A283D]"}`}
+              className={`subscription-plan${selectedPlan === (plan._id || plan.id) ? " subscription-plan-selected" : ""}`}
             >
+              <input
+                type="radio"
+                name="subscription-plan"
+                value={plan._id || plan.id}
+                checked={selectedPlan === (plan._id || plan.id)}
+                onChange={() => setSelectedPlan(plan._id || plan.id)}
+                aria-label={`${plan.name || plan.title}, ${plan.days || plan.duration} Days`}
+              />
               {isOfferActive && (
-                <div className="absolute -top-3 right-3 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md z-10 font-eng">
+                <span className="subscription-offer-badge">
                   {plan.discountPercent || 0}% OFF
-                </div>
+                </span>
               )}
-              <div className="px-4 py-5">
-              <div className="flex items-center gap-2">
-                {/* Plan Logo Circle - shows plan.image from API (falls back to default logo) */}
-                <div className={`w-16 h-16 rounded-full flex items-center justify-center flex-shrink-0 text-center font-bold leading-tight overflow-hidden
-                    `}>
+              <span className="subscription-plan-row">
+                <span className="subscription-plan-icon">
                   <img
                     src={plan.image || "./img/logo_splash.png"}
                     alt="Bhakti Bhav"
                     className="w-full h-full object-contain"
                     onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = "./img/logo_splash.png"; }}
                   />
-                </div>
+                </span>
 
-                {/* Plan Name & Duration */}
-                <div className={`flex-1 ${isOfferActive ? "pr-3 border-r border-dashed border-gray-300" : ""}`}>
-                  <h3 className="font-eng text-[#9A283D] text-md font-bold leading-tight">
+                <span className="subscription-plan-info">
+                  <strong>
                     {plan.name || plan.title}
-                  </h3>
-                  <p className="font-eng text-xs text-[#9A283D] mt-0.5">
+                  </strong>
+                  <span>
                     {plan.days || plan.duration} Days
-                  </p>
-                </div>
+                  </span>
+                </span>
 
-                {/* Price */}
-                <div className={`flex flex-col items-end mr-4 flex-shrink-0 ${isOfferActive ? "pl-3" : ""}`}>
+                <span className="subscription-plan-price">
                   {isOfferActive && (
-                    <span className="text-gray-400 line-through text-md font-eng">
+                    <span className="subscription-original-price">
                       ₹{plan.price}
                     </span>
                   )}
-                  <span className={`text-[#9A283D] font-bold font-eng ${isOfferActive ? "text-xl" : "text-lg"}`}>
-                    ₹{isOfferActive ? discountedPrice : plan.price}
-                  </span>
-                </div>
+                  <strong>
+                    ₹{Number(isOfferActive ? discountedPrice : plan.price).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </strong>
+                </span>
 
-                {/* Checkmark for selected */}
-                {selectedPlan === (plan._id || plan.id) && (
-                  <div className="w-8 h-8 rounded-full bg-[#9A283D] flex items-center justify-center flex-shrink-0">
-                    <Check className="text-white w-5 h-5" />
-                  </div>
-                )}
-              </div>
-              </div>
+                <span className="subscription-plan-check" aria-hidden="true">
+                  {selectedPlan === (plan._id || plan.id) && <Check size={15} strokeWidth={3} />}
+                </span>
+              </span>
 
               {isOfferActive && (
-                <div
-                  className="px-4 py-3 rounded-b-2xl flex items-center gap-2"
-                  style={{ backgroundColor: "rgba(87, 0, 0, 0.05)" }}
-                >
-                  <Tag className="w-4 h-4 text-[#9A283D] font-semibold" />
-                  <span className="font-eng text-sm text-[#9A283D] font-semibold">
+                <span className="subscription-savings">
+                  <Tag size={16} aria-hidden="true" />
+                  <span>
                     You save ₹{plan.savings || (plan.price - discountedPrice)}
                   </span>
-                </div>
+                </span>
               )}
-            </div>
+            </label>
             );
           }) : (
 
@@ -377,10 +372,10 @@ export default function Payment() {
           )}
         </div>
 
-        <div className="mx-auto px-4 mt-8 flex flex-col items-center space-y-4">
+        <div className="subscription-actions">
           {plans && plans.length > 0 && (
             <button
-              className="w-full bg-[#9A283D] text-white py-4 rounded-full shadow-lg text-lg font-semibold hover:bg-[#7a1f30] transition-all duration-200"
+              className="subscription-start"
               onClick={() => {
                 if (!getIsLoggedIn()) {
                   navigate("/login");
@@ -391,12 +386,11 @@ export default function Payment() {
                 makePayment(selectedPlan);
               }}
             >
-              <span className="font-hindi">प्रारंभ करें</span>{" "}
-              <span className="font-eng text-sm">(Start Now)</span>
+              Start Now
             </button>
           )}
           <button
-            className="text-[#9A283D] font-eng text-base hover:text-[#9A283D] transition-colors py-1"
+            className="subscription-skip"
             onClick={() => {trackCustomEvent(PIXEL_STANDARD_EVENTS.PAYMENT_SKIPPED, { message: "User skipped payment", mobileNumber: getMobileNoFromLS() }); navigate("/")}}
           >
             Skip
@@ -405,35 +399,34 @@ export default function Payment() {
 
 
         {/* Benefits Section */}
-        <div className="container mx-auto px-2 mt-10 mb-8">
-          <h3 className="text-center font-hindi theme_text text-xl font-bold">
-            आपको क्या प्राप्त होगा
-          </h3>
-          <p className="text-center theme_text text-sm text-black mb-6 font-eng font-semibold">
+        <section className="subscription-benefits" aria-labelledby="subscription-benefits-title">
+          <h2 id="subscription-benefits-title">
             What will you get?
-          </p>
+          </h2>
 
-          <div className="flex gap-3 overflow-x-auto hide-scrollbar px-2 pb-1 snap-x snap-mandatory">
-            {items.map((item, index) => (
-              <div
+          <ul id="subscription-benefits-list">
+            {(showAllFeatures ? items : items.slice(0, 3)).map((item, index) => (
+              <li
                 key={index}
-                className="flex-shrink-0 w-[45%] sm:w-[220px] snap-start flex flex-col items-start gap-2 bg-white border border-[#E9B9C5] rounded-2xl px-3 py-4 shadow-sm"
               >
-                <div className="w-6 h-6 rounded-full bg-[#9A283D] flex items-center justify-center flex-shrink-0">
-                  <Check className="text-white w-4 h-4" strokeWidth={3} />
-                </div>
-
-                <div className="flex flex-col">
-                  <span className="font-hindi font-bold theme_text text-sm leading-snug">{item.hi}</span>
-                  <span className="font-eng text-black text-xs mt-0.5">{item.en}</span>
-                </div>
-              </div>
+                <span className="subscription-benefit-check" aria-hidden="true">
+                  <Check size={14} strokeWidth={3} />
+                </span>
+                <span className="font-devanagari">{item.hi}</span>
+              </li>
             ))}
-          </div>
-        </div>
-      </div>
-
-
+          </ul>
+          <button
+            type="button"
+            className="subscription-toggle"
+            aria-expanded={showAllFeatures}
+            aria-controls="subscription-benefits-list"
+            onClick={() => setShowAllFeatures((show) => !show)}
+          >
+            {showAllFeatures ? "Show Less" : "Show More"}
+          </button>
+        </section>
+      </main>
     </div>
   );
 }

@@ -31,9 +31,12 @@ function Header({
     showEnglishText = false,
     showVerticalLogout = false,
     showBrandBackHeader = false,
+    inlineHeader = false,
+    hidePaymentAction = false,
     onHomeMenuClick
 }) {
-    const { pathname } = useLocation();
+    const location = useLocation();
+    const { pathname } = location;
     const navigate = useNavigate();
     const {
         language,
@@ -211,8 +214,8 @@ function Header({
     return (
         <>
             <header
-                className={`fixed top-0 left-0 right-0 z-50 ${isHomePage ? "bg-transparent px-4 pt-4 shadow-none" : "bg-white px-4 pt-3 shadow-sm"}`}
-                style={{ height: isHomePage ? "88px" : showBrandBackHeader ? "92px" : "80px" }}
+                className={inlineHeader ? "relative z-20 px-4 pt-3" : `fixed top-0 left-0 right-0 z-50 ${isHomePage ? "home-header-surface px-4 pt-4 shadow-none" : "bg-white px-4 pt-3 shadow-sm"}`}
+                style={{ height: inlineHeader ? "auto" : isHomePage ? "88px" : showBrandBackHeader ? "92px" : "80px" }}
             >
                 <div className={`${isHomePage || showBrandBackHeader ? "container mx-auto max-w-md md:max-w-5xl" : "container mx-auto hd_bg rounded-xl"}`}>
                     <div className={`${isHomePage ? "flex h-12 items-center justify-between gap-3" : showBrandBackHeader ? "hd_bg flex h-16 items-center justify-between rounded-2xl px-4 shadow-[0_8px_22px_rgba(154,40,61,0.12)]" : "flex justify-between items-center px-4 py-6"}`}>
@@ -246,17 +249,18 @@ function Header({
                                     type="button"
                                     className="flex h-11 w-11 items-center justify-center rounded-full bg-[#FFF6D4]"
                                     aria-label="Search"
+                                    onClick={() => navigate("/search", { state: { from: location.pathname + location.search } })}
                                 >
                                     <Search size={27} strokeWidth={2.3} />
                                 </button>
-                                <button
+                                {!hidePaymentAction && <button
                                     type="button"
                                     onClick={() => { trackEvent(GA4Events.rupees_icon_clicked, {event_label: "rupees_icon_clicked_from_home_screen"}); handlePaymentNavigation(); }}
                                     className="flex h-11 w-11 items-center justify-center rounded-full bg-[#FFF6D4]"
                                     aria-label="Payment"
                                 >
                                     <IndianRupee size={25} strokeWidth={2.5} />
-                                </button>
+                                </button>}
                                 <button
                                     type="button"
                                     onClick={handleProfileNavigation}
@@ -434,6 +438,7 @@ function Header({
                                     type="button"
                                     className="flex h-9 w-9 items-center justify-center"
                                     aria-label="Search"
+                                    onClick={() => navigate("/search", { state: { from: location.pathname + location.search } })}
                                 >
                                     <Search size={29} strokeWidth={2.2} />
                                 </button>
@@ -460,7 +465,7 @@ function Header({
             </div>
         </header>
         {/* Spacer div to prevent content overlap */}
-        <div className={`${isHomePage ? "h-[88px]" : showBrandBackHeader ? "h-[92px]" : "h-20"} w-full`}></div>
+        {!inlineHeader && <div className={`${isHomePage ? "h-[88px]" : showBrandBackHeader ? "h-[92px]" : "h-20"} w-full`}></div>}
         {showLanguageModal && (
             <div className="fixed inset-0 z-[60] flex justify-end bg-black bg-opacity-40" onClick={closeLanguageModal}>
                 <div
