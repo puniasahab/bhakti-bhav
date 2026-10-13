@@ -45,9 +45,17 @@ function AartiDetail() {
     if (currentTrack === url && isPlaying) {
       pause();
     } else {
-      // Store aarti name for the global player
-      localStorage.setItem('currentTrackName', `${detail.name?.hi || detail.name?.en} आरती`);
-      play(url);
+      const primaryTitle = `${detail.name?.hi || detail.name?.en || "आरती"} आरती`;
+      const secondaryTitle = detail.name?.en ? `${detail.name.en} Aarti` : "";
+      const artwork = detail.imageUrl || detail.imagethumb || "";
+
+      play(url, {
+        title: primaryTitle,
+        englishTitle: secondaryTitle,
+        imageUrl: artwork,
+        subtitle: "Bhakti Bhav Aarti",
+        category: "आरती",
+      });
     }
   };
 

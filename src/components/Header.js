@@ -31,7 +31,9 @@ function Header({
     showEnglishText = false,
     showVerticalLogout = false,
     showBrandBackHeader = false,
-    onHomeMenuClick
+    onHomeMenuClick,
+    onBackClick,
+    backRoute
 }) {
     const { pathname } = useLocation();
     const navigate = useNavigate();
@@ -208,6 +210,18 @@ function Header({
     const pageTitle = getPageTitle();
 
 
+    const handleBackClick = () => {
+        if (onBackClick) {
+            onBackClick();
+        } else if (backRoute) {
+            navigate(backRoute);
+        } else if (window.history.state && window.history.state.idx > 0) {
+            navigate(-1);
+        } else {
+            navigate("/");
+        }
+    };
+
     return (
         <>
             <header
@@ -222,13 +236,7 @@ function Header({
                             <div className="flex min-w-0 items-center gap-3">
                                 <button
                                     type="button"
-                                    onClick={() => {
-                                        if (window.history.state && window.history.state.idx > 0) {
-                                            navigate(-1);
-                                        } else {
-                                            navigate("/");
-                                        }
-                                    }}
+                                    onClick={handleBackClick}
                                     className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#FFE2B7] text-[#9A283D]"
                                     aria-label="Go back"
                                 >
@@ -273,7 +281,7 @@ function Header({
                         <>
                             {/* Back Button and Profile Text */}
                             <div className="flex items-center gap-3">
-                                <button onClick={() => { navigate("/"); }}>
+                                <button onClick={handleBackClick} aria-label="Go back">
                                     <img src={backBtn} alt="Back" width="24" height="24" />
                                 </button>
                                 <span className={`${showEnglishText ? "font-eng" : "font-hindi"} text-xl theme_text`}>{profileText}</span>
@@ -282,14 +290,12 @@ function Header({
                             {/* Three Dots Menu */}
                             <div className="flex items-center gap-3">
 
-                                {/* Edit Icon - Only show if not hidden */}
                                 {!hideEditIcon && (
                                     <button className="bg-white rounded-full p-2 shadow-md border border-gray-200 hover:bg-gray-50 transition-colors" onClick={() => { navigate("/edit-profile"); }}>
                                         <Pencil size={20} className="text-[#9A283D]" style={{ background: "transparent !important" }} />
                                     </button>
                                 )}
 
-                                {/* Three Dots Menu */}
                                 {showVerticalLogout && <div className="relative" ref={dropdownRef}>
                                     <button
                                         className="bg-white rounded-full p-2 shadow-md border border-gray-200 hover:bg-gray-50 transition-colors"
@@ -316,14 +322,7 @@ function Header({
 
                     {!isHomeRoute && !showProfileHeader && !showBrandBackHeader && (
                         <div className="flex items-center" style={{ gap: window.innerWidth < 368 ? "2px" : "8px" }}>
-                            <button onClick={() => {
-
-                                if (window.history.state && window.history.state.idx > 0) {
-                                    navigate(-1);
-                                } else {
-                                    navigate("/");
-                                }
-                            }}>
+                            <button onClick={handleBackClick} aria-label="Go back">
                                 <img src={backBtn} alt="Back" width={window.innerWidth < 375 ? "22" : "24"} height={window.innerWidth < 375 ? "22" : "24"} />
                             </button>
 
@@ -388,7 +387,7 @@ function Header({
                         </div>
                     )}
 
-                    {isHomeRoute && !isHomePage && !showBrandBackHeader && (
+                    {isHomeRoute && !isHomePage && !showBrandBackHeader && !showProfileHeader && (
                         <>
                             <h1 className="text-lg font-bold">
                                 <a href="/">

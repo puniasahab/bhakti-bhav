@@ -257,6 +257,7 @@ function VratKathaCategoryDetails({ detail }) {
                 showProfileHeader={true}
                 profileText="भक्ति भाव"
                 hideEditIcon={true}
+                backRoute="/vrat-katha"
             />
 
             <div className="h-2"></div>

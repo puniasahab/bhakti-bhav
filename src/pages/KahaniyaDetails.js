@@ -183,8 +183,13 @@ export default function KahaniyaDetails() {
       return;
     }
 
-    localStorage.setItem("currentTrackName", title);
-    play(audioUrl);
+    play(audioUrl, {
+      title: title,
+      englishTitle: pageTitleEn,
+      imageUrl: imageUrl,
+      subtitle: "Bhakti Bhav Kahaniya",
+      category: "कहानियां",
+    });
   };
 
   const handleNativeShare = async () => {

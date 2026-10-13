@@ -564,9 +564,9 @@ export const vratKathaApis = {
     }
   },
 
-  fetchVratKathaCategoryData: async (version, categoryId, lang) => {
+  fetchVratKathaCategoryData: async (version, categoryId, lang, page = 1, limit = 10) => {
     try {
-      const response = await api.get(`${someNewUrlForV4}${endPoints.vratKathaCategoryList}-${version}/${categoryId}?lang=${lang}`);
+      const response = await api.get(`${someNewUrlForV4}${endPoints.vratKathaCategoryList}-${version}/${categoryId}?page=${page}&limit=${limit}&lang=${lang}`);
       return response.data;
     }
     catch (error) {
@@ -810,9 +810,49 @@ export const newJaapMalaApis = {
       const response = await api.post(`${endPoints.jaapMalaCount}/${id}/jaap`, {count});
       return response.data;
     }
-
     catch(error) {
       console.log("Error updating Jaap Mala count", error);
+      throw error;
+    }
+  },
+
+  getContentDetailsV4: async (id) => {
+    try {
+      const response = await api.get(`feature-category/content-v4/${id}?isCounterValue=true`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching Jaap Mala v4 details:", error);
+      throw error;
+    }
+  },
+
+  getJaapStreak: async () => {
+    try {
+      const response = await api.get('https://api.bhaktibhav.app/api/v2/frontend/jaap-streak');
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching Jaap streak:", error);
+      throw error;
+    }
+  },
+
+  submitJaapCompletion: async (id, count = 108) => {
+    try {
+      const response = await api.post(`feature-category/content-v4/${id}/jaap`, { count });
+      return response.data;
+    } catch (error) {
+      console.error("Error submitting Jaap completion:", error);
+      throw error;
+    }
+  },
+
+  getJaapMalaList: async (categoryId, page = 1, limit = 10, lang = 'hi') => {
+    try {
+      const catId = categoryId || '6a15885ebfbd4709a604eb40';
+      const response = await api.get(`${endPoints.featureCategoryContent}?lang=${lang}&catgeoryId=${catId}&page=${page}&limit=${limit}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching Jaap Mala list:", error);
       throw error;
     }
   }

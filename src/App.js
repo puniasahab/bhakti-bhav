@@ -153,7 +153,9 @@ function App() {
                     <Route path="/home-v1" element={<HomeV1Wrapper />} />
                     <Route path="/vrat-katha" element={<VratKatha />} />
                     <Route path="/vrat-katha/:id" element={<VratKathaDetail />} />
+                    <Route path="/vrat-katha/detail/:id" element={<VratKathaDetail />} />
                     <Route path="/vrat-katha/:id/date/:date" element={<VratKathaDetail />} />
+                    <Route path="/vrat-katha/category/:categoryId" element={<VratKathaCategoryDetails />} />
                     <Route path="/vrat-katha/categoryDetails/:id" element={<VratKathaCategoryDetails />} />
                     <Route path="/jaap-mala" element={<JaapMala />} />
                     <Route path="/newjaapMaala" element={<NewJaapMala />} />

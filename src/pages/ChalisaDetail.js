@@ -72,9 +72,17 @@ export default function ChalisaDetail() {
     if (currentTrack === url && isPlaying) {
       pause();
     } else {
-      // Store chalisa name in localStorage or you could modify the AudioContext to accept metadata
-      localStorage.setItem('currentTrackName', `${chalisa.name?.hi || chalisa.name?.en}`);
-      play(url);
+      const primaryTitle = `${chalisa.name?.hi || chalisa.name?.en || "चालीसा"} चालीसा`;
+      const secondaryTitle = chalisa.name?.en ? `${chalisa.name.en} Chalisa` : "";
+      const artwork = chalisa.imageUrl || chalisa.imagethumb || "";
+
+      play(url, {
+        title: primaryTitle,
+        englishTitle: secondaryTitle,
+        imageUrl: artwork,
+        subtitle: "Bhakti Bhav Chalisa",
+        category: "चालीसा",
+      });
     }
   };
 

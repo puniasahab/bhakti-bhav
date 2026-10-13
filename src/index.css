@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -874,3 +876,83 @@ display: inline-block;
   font-size: 0.82rem;
   padding: 0.1rem 0.3rem;
 }
+
+/* =========================================================
+   JAAP MALA & CHANTING SCREENS STYLES
+   ========================================================= */
+
+.jaap-flip-card {
+  perspective: 1000px;
+}
+
+.jaap-flip-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-style: preserve-3d;
+}
+
+.jaap-flip-inner.flipped {
+  transform: rotateX(180deg);
+}
+
+.jaap-flip-face {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  border-radius: 16px;
+}
+
+.jaap-flip-back {
+  transform: rotateX(180deg);
+}
+
+@keyframes floatPetal {
+  0% {
+    transform: translate(0, 0) scale(0.6) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--tx), var(--ty)) scale(1.2) rotate(var(--rot));
+    opacity: 0;
+  }
+}
+
+.petal-particle {
+  position: absolute;
+  pointer-events: none;
+  animation: floatPetal 0.65s cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
+  z-index: 50;
+}
+
+@keyframes beadPulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.94);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.bead-tap-active {
+  animation: beadPulse 0.18s ease-out;
+}
+
+.jaap-deity-card {
+  background: linear-gradient(135deg, #DEAC68 0%, #E3BA7E 42%, #B8833B 100%);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.jaap-deity-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.16);
+}
+

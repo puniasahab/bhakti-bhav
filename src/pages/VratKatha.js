@@ -1,7 +1,6 @@
 import React, { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Header from "../components/Header";
-import Footer from "../components/Footer";
 import Loader from "../components/Loader";
 import PageTitleCard from "../components/PageTitleCard";
 import { useKatha } from "../contexts/KathaContext";
@@ -11,8 +10,6 @@ import SEO from "../components/SEO";
 import { LanguageContext } from "../contexts/LanguageContext";
 import { vratKathaSchema } from "../schemas/pageSchemas";
 import SchemaMarkup from "../components/SchemaMarkup";
-
-
 import useGA4BaseParams from "../hooks/useGA4BaseParams";
 import useGA4Tracker from "../hooks/useGA4Tracker";
 import { GA4Events } from "../utils/ga4Events.enum";
@@ -27,21 +24,16 @@ const getVratKathaCacheKey = (version, page, limit, language) =>
 
 const getValidCachedVratKatha = (cacheKey) => {
   const cached = vratKathaPageCache.get(cacheKey);
-
   if (cached && Date.now() - cached.timestamp < VRAT_KATHA_CACHE_TTL) {
     return cached.data;
   }
-
   vratKathaPageCache.delete(cacheKey);
   return null;
 };
 
 const getCachedVratKatha = async (cacheKey, fetcher) => {
   const cached = getValidCachedVratKatha(cacheKey);
-
-  if (cached) {
-    return cached;
-  }
+  if (cached) return cached;
 
   if (pendingVratKathaRequests.has(cacheKey)) {
     return pendingVratKathaRequests.get(cacheKey);
@@ -49,10 +41,7 @@ const getCachedVratKatha = async (cacheKey, fetcher) => {
 
   const request = fetcher()
     .then((data) => {
-      vratKathaPageCache.set(cacheKey, {
-        data,
-        timestamp: Date.now(),
-      });
+      vratKathaPageCache.set(cacheKey, { data, timestamp: Date.now() });
       return data;
     })
     .finally(() => {
@@ -64,59 +53,35 @@ const getCachedVratKatha = async (cacheKey, fetcher) => {
 };
 
 const getVratKathaItems = (json) => (Array.isArray(json?.data) ? json.data : []);
-
 const hasMoreVratKatha = (json, limit) => getVratKathaItems(json).length >= limit;
 
 const stripHtmlTags = (value) => String(value || "").replace(/<[^>]*>/g, "").trim();
 
-const formatHindiName = (name) => String(name || "")
-  .replace(/\//g, "|").replace(/\|/g, "।")
-  .replace(/,/g, "]").replace(/\(/g, "¼").replace(/\)/g, "½")
-  .replace(/\:/g, "%").replace(/:/g, "ः")
-  .replace(/ँ/g, "ं")
-  .replace(/\u200D|\u200C/g, "  ")
-  .replace(/[.,;!?'"""'']/g, " ")
-  .replace(/[\[\]{}()]/g, "")
-  .replace(/[*/\\#%^+=_|<>~`@$₹]/g, " ")
-  .replace(/[^\u0900-\u097F\s।॥]/g, "")
-  .replace(/\u00A0/g, " ")
-  .replace(/\u200B|\u200C|\u200D/g, " ")
-  .replace(/\s+/g, " ")
-  .normalize("NFC");
+const formatHindiName = (name) => String(name || "").trim();
 
 const getHinglishNameParts = (name) => {
   const lines = stripHtmlTags(name)
     .split(/\n+/)
     .map((line) => line.trim())
     .filter(Boolean);
-
   const hindiText = lines[0] || "";
   const englishText = lines.slice(1).join(" ");
-
   return {
     hindiText,
     englishText: englishText
       ? englishText.startsWith("(") && englishText.endsWith(")")
         ? englishText
         : `(${englishText.replace(/^\(|\)$/g, "").trim()})`
-      : ""
+      : "",
   };
 };
 
 const renderVratKathaName = (katha, language) => {
-  if (language === "hi") {
-    return formatHindiName(katha.name);
-  }
-
-  if (language !== "hinglish") {
-    return katha.name;
-  }
+  if (language === "hi") return formatHindiName(katha.name);
+  if (language !== "hinglish") return katha.name;
 
   const { hindiText, englishText } = getHinglishNameParts(katha.name2 || katha.name);
-
-  if (!englishText) {
-    return <span className="font-eng">{hindiText}</span>;
-  }
+  if (!englishText) return <span className="font-eng">{hindiText}</span>;
 
   return (
     <>
@@ -127,13 +92,9 @@ const renderVratKathaName = (katha, language) => {
 };
 
 const getVratKathaAltText = (katha, language) => {
-  if (language === "hinglish") {
-    return stripHtmlTags(katha.name2 || katha.name);
-  }
-
+  if (language === "hinglish") return stripHtmlTags(katha.name2 || katha.name);
   return stripHtmlTags(katha.name);
 };
-
 
 export default function VratKatha() {
   const navigate = useNavigate();
@@ -153,7 +114,6 @@ export default function VratKatha() {
   const baseParams = useGA4BaseParams("Vrat Katha Screen");
   const { trackEvent } = useGA4Tracker(baseParams);
 
-  // Memoryize subscription status to prevent re-computation on each render
   const isSubscribed = useMemo(() => getSubscriptionStatusFromLS(), []);
   const hasToken = useMemo(() => getTokenFromLS(), []);
   const { setCategoryData } = useKatha();
@@ -161,101 +121,15 @@ export default function VratKatha() {
   // Reset list when language changes
   useEffect(() => {
     const cachedResponse = getValidCachedVratKatha(firstPageCacheKey);
-
     setKathas(getVratKathaItems(cachedResponse));
     setCurrentPage(1);
     setHasMore(cachedResponse ? hasMoreVratKatha(cachedResponse, limit) : true);
     setLoading(!cachedResponse);
   }, [firstPageCacheKey, limit]);
 
-  const processRawData = useCallback((categories = [], uncategorizedKathas = []) => {
-    const newData = [
-      ...(categories?.map(item => ({
-        ...item,
-        isCategory: true,
-      })) || []),
-      ...(uncategorizedKathas?.map(item => ({
-        ...item,
-        isCategory: false,
-      })) || [])
-    ];
-
-    // Assign accessType to categories based on their kathas
-    newData.forEach((item) => {
-      if (item.isCategory && item.kathas) {
-        const allKathasPaid = item.kathas.every(katha => katha.accessType === "paid");
-        item.accessType = allKathasPaid ? "paid" : "free";
-      }
-    });
-
-    return newData;
-  }, []);
-
-  // Helper function to sort data
-  const sortData = useCallback((data) => {
-    return [...data].sort((a, b) => {
-      if (a.accessType === "free" && b.accessType === "paid") {
-        return -1;
-      } else if (a.accessType === "paid" && b.accessType === "free") {
-        return 1;
-      }
-      return 0;
-    });
-  }, []);
-
-  // Helper function to remove duplicates by _id
-  const removeDuplicates = useCallback((data) => {
-    const seen = new Set();
-    return data.filter(item => {
-      if (seen.has(item._id)) {
-        return false;
-      }
-      seen.add(item._id);
-      return true;
-    });
-  }, []);
-
-  const getSortedData = (json) => {
-    const newData = [
-      ...(json?.categories?.map(item => ({
-        ...item, isCategory: true,
-      })) || []),
-      ...(json?.uncategorizedKathas?.map(item => ({
-        ...item, isCategory: false,
-      })) || [])
-    ]
-
-    newData?.map((item) => {
-      if (item.isCategory) {
-        const allKathasPaid = item.kathas.every(katha => katha.accessType === "paid");
-        if (allKathasPaid) {
-          item.accessType = "paid";
-        }
-        else {
-          item.accessType = "free";
-        }
-      }
-
-    })
-
-    newData.sort((a, b) => {
-      if (a.accessType === "free" && b.accessType === "paid") {
-        return -1;
-      }
-      else if (a.accessType === "paid" && b.accessType === "free") {
-        return 1;
-      }
-      else {
-        return 0;
-      }
-    });
-    return newData;
-  }
-
   useEffect(() => {
     async function fetchKathas() {
       try {
-        /// all-kathas
         const version = "v3";
         const cacheKey = getVratKathaCacheKey(version, currentPage, limit, language);
         const hasCachedResponse = Boolean(getValidCachedVratKatha(cacheKey));
@@ -267,167 +141,28 @@ export default function VratKatha() {
           vratKathaApis.fetchVratKathaData(version, currentPage, limit, language)
         );
 
-        if (json.status === 'success') {
-          const categories = json?.categories || [];
-          const uncategorizedKathas = json?.uncategorizedKathas || [];
-
-          // Calculate total items received
+        if (json.status === "success") {
           const totalItemsReceived = json?.data?.length;
-          // const totalItemsReceived = categories.length + uncategorizedKathas.length;
-
-          // Check if we received any data
           if (totalItemsReceived === 0) {
-            // No more data available
             setHasMore(false);
             setLoadingMore(false);
             setLoading(false);
             return;
           }
 
-          console.log("API Response:", json.data);
-
-          // setKathas(json?.data)
-
           if (currentPage === 1) {
-            // const sortedData = getSortedData(json);
             setKathas(json?.data);
+          } else {
+            setKathas((prevKathas) => [...prevKathas, ...json?.data]);
           }
-          else {
-            setKathas(prevKathas => [...prevKathas, ...json?.data]);
-          }
 
-          // Process new data from API
-          // const processedNewData = processRawData(categories, uncategorizedKathas);
-
-          // if (currentPage === 1) {
-          // const sortedData = getSortedData(json);
-          // setKathas(sortedData);
-          // } 
-
-          // else {
-          // Subsequent pages - merge with existing data
-          // setKathas(prevKathas => {
-          //   // Combine previous data with new data
-          //   const combinedData = [...prevKathas, ...processedNewData];
-          //   // Remove duplicates
-          //   const uniqueData = removeDuplicates(combinedData);
-          //   // Sort the combined data
-          //   return sortData(uniqueData);
-          // });
-          // }
-
-          // Check if there's more data to load
           if (totalItemsReceived < limit) {
             setHasMore(false);
           }
         } else {
-          // API returned non-success status
-          if (currentPage === 1) {
-            setKathas([]);
-          }
+          if (currentPage === 1) setKathas([]);
           setHasMore(false);
         }
-
-
-        // if (json.status === "success" && Array.isArray(json.data)) {
-        // Flatten all kathas from all categories
-        // const allKathas = [];
-        // json.forEach(category => {
-        //   if (category.kathas && Array.isArray(category.kathas)) {
-        //     allKathas.push(...category.kathas);
-        //   }
-        // });
-        // Sorting code starts from here 
-        // const newData = [
-        //   ...json.categories.map(item => ({
-        //     ...item, isCategory: true,
-        //   })),
-        //   ...json.uncategorizedKathas.map(item => ({
-        //     ...item, isCategory: false,
-        //   }))
-        // ]
-
-        // newData.map((item) => {
-        //   if (item.isCategory) {
-        //     const allKathasPaid = item.kathas.every(katha => katha.accessType === "paid");
-        //     if (allKathasPaid) {
-        //       item.accessType = "paid";
-        //     }
-        //     else {
-        //       item.accessType = "free";
-        //     }
-        //   }
-
-        // })
-
-        // newData.sort((a, b) => {
-        //   if(a.accessType === "free" && b.accessType === "paid") {
-        //     return -1;
-        //   }
-        //   else if(a.accessType === "paid" && b.accessType === "free") {
-        //     return 1;
-        //   }
-        //   else {
-        //     return 0;
-        //   }
-        // });
-        // sorting code ends here
-
-        // newData.sort((a, b) => {
-        //   if (a.isCategory && !b.isCategory) {
-        //     const allKathasPaid = a.kathas.every(katha => katha.accessType === "paid");
-        //     if (allKathasPaid && b.accessType === "paid") {
-        //       return 0;
-        //     }
-        //     else if (allKathasPaid && b.accessType === "free") {
-        //       return 1;
-        //     }
-        //     else {
-        //       return -1;
-        //     }
-        //   }
-        //   if (!a.isCategory && b.isCategory) {
-        //     const allKathasPaid = b.kathas.every(katha => katha.accessType === "paid");
-        //     if (allKathasPaid && a.accessType === "paid") {
-        //       return 0;
-        //     }
-        //     else if (allKathasPaid && a.accessType === "free") {
-        //       return 1;
-        //     }
-        //     else {
-        //       return -1;
-        //     }
-
-        //   }
-        //   if (!a.isCategory && !b.isCategory) {
-        //     if (a.accessType === "free" && b.accessType === "paid") {
-        //       return -1;
-        //     }
-        //     else if (a.accessType === "paid" && b.accessType === "free") {
-        //       return 1;
-        //     }
-        //     else {
-        //       return 0;
-        //     }
-        //   }
-
-        //   if (a.isCategory && b.isCategory) {
-        //     const allKathasPaidA = a.kathas.every(katha => katha.accessType === "paid");
-        //     const allKathasPaidB = b.kathas.every(katha => katha.accessType === "paid");
-        //     if ((allKathasPaidA && allKathasPaidB) || (!allKathasPaidA && !allKathasPaidB)) {
-        //       return 0;
-        //     }
-        //     else if (!allKathasPaidA && !allKathasPaidB) {
-        //       return 1;
-        //     }
-        //     else {
-        //       return -1;
-        //     }
-        //   }
-        // })
-        // } else {
-        //   setKathas([]);
-        // }
       } catch (error) {
         console.error("API Error:", error);
         setKathas([]);
@@ -441,22 +176,18 @@ export default function VratKatha() {
     fetchKathas();
   }, [currentPage, language]);
 
-
   useEffect(() => {
     let ticking = false;
-
     const handleScroll = () => {
       if (loadingMore || !hasMore) return;
-
       if (!ticking) {
         window.requestAnimationFrame(() => {
           const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
           const scrollHeight = document.documentElement.scrollHeight;
           const clientHeight = window.innerHeight;
-
           if (scrollTop + clientHeight >= scrollHeight - 100) {
             setLoadingMore(true);
-            setCurrentPage(prevPage => prevPage + 1);
+            setCurrentPage((prevPage) => prevPage + 1);
           }
           ticking = false;
         });
@@ -464,157 +195,76 @@ export default function VratKatha() {
       }
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
   }, [loadingMore, hasMore]);
 
   if (loading) return <Loader message="🙏 Loading भक्ति भाव 🙏" size={200} />;
   if (!kathas.length) return <p className="text-center py-10">❌ No kathas found</p>;
 
-  // const handleNavigation = (id, index) => {
-  //   if (kathas[index]?.kathas?.length > 0) {
-  //     // Set the category data in context before navigation
-  //     setCategoryData(kathas[index].kathas, kathas[index].name);
-  //     navigate(`/vrat-katha/categoryDetails/${id}`);
-  //   }
-  //   else {
-  //     navigate(`/vrat-katha/${id}`);
-  //   }
-  // }
-
   const handleNavigate = (id, index, accessType, type, kathaId) => {
     const isActiveSubscription = getSubscriptionStatusFromLS();
-    console.log("get Subscription Status From LS", isActiveSubscription);
-    console.log("Type of subscription status:", typeof isActiveSubscription);
     if (isActiveSubscription) {
-      if (type === 'multiple') {
+      if (type === "multiple") {
         navigate(`/vrat-katha/categoryDetails/${id}`);
         trackEvent(GA4Events.vrat_katha_category_selected, {
           vratKathaCatgoryId: id,
           event_label: "vrat_katha_category_selected",
-          name_en: kathas[index].name?.en,
-          name_hi: kathas[index].name?.hi,
         });
-      }
-      else {
+      } else {
         trackEvent(GA4Events.vrat_katha_selected, {
           vratKathaId: kathaId,
           event_label: "vrat_katha_selected",
-          name_en: kathas[index].name?.en,
-          name_hi: kathas[index].name?.hi,
         });
         navigate(`/vrat-katha/${kathaId}`);
       }
-    }
-    else {
-      if (type === 'single') {
-        if (accessType === 'free') {
+    } else {
+      if (type === "single") {
+        if (accessType === "free") {
           trackEvent(GA4Events.vrat_katha_selected, {
             vratKathaId: kathaId,
             event_label: "vrat_katha_selected",
-            name_en: kathas[index].name?.en,
-            name_hi: kathas[index].name?.hi,
           });
           navigate(`/vrat-katha/${kathaId}`);
+        } else {
+          navigate(getTokenFromLS() ? "/payment" : "/login");
         }
-        else {
-          if (getTokenFromLS()) {
-            navigate("/payment");
-          }
-          else {
-            navigate("/login");
-          }
-        }
-      }
-      else {
+      } else {
         trackEvent(GA4Events.vrat_katha_category_selected, {
           vratKathaCatgoryId: id,
           event_label: "vrat_katha_category_selected",
-          name_en: kathas[index].name?.en,
-          name_hi: kathas[index].name?.hi,
         });
         navigate(`/vrat-katha/categoryDetails/${id}`);
       }
     }
-  }
-
-  // const handleNavigate = (id, index, accessType) => {
-  //   const isActiveSubscription = getSubscriptionStatusFromLS();
-  //   console.log("get Subscription Status From LS", isActiveSubscription);
-  //   console.log("Type of subscription status:", typeof isActiveSubscription);
-  //   if (isActiveSubscription) {
-  //     console.log("Inside subscription true");
-  //     if (kathas[index]?.kathas?.length > 0 || kathas[index]?.isCategory) {
-  //       setCategoryData(kathas[index].kathas, kathas[index].name);
-  //       navigate(`/vrat-katha/categoryDetails/${id}`);
-  //     }
-  //     else {
-  //       navigate(`/vrat-katha/${id}`);
-  //     }
-  //   }
-  //   else {
-  //     if (kathas[index]?.kathas?.length > 0 || kathas[index]?.isCategory) {
-  //       if (kathas[index]?.kathas?.length > 0) {
-  //         // Set the category data in context before navigation
-  //         setCategoryData(kathas[index].kathas, kathas[index].name);
-  //         navigate(`/vrat-katha/categoryDetails/${id}`);
-  //       }
-  //       // Update this route as needed
-  //     }
-
-  //     else if (!kathas[index]?.isCategory) {
-  //       if (kathas[index]?.accessType === "free") {
-  //         navigate(`/vrat-katha/${id}`);
-  //       }
-  //       else {
-  //         if (getTokenFromLS()) {
-  //           navigate("/payment");
-  //         }
-  //         else {
-  //           navigate("/login");
-  //         }
-  //       }
-  //     }
-  //     else {
-  //       if (getTokenFromLS()) {
-  //         return "/payment";
-  //       }
-  //       else {
-  //         return "/login";
-  //       }
-  //     }
-  //   }
-
-  // }
+  };
 
   const getPaidLogic = (katha) => {
     if (katha.isCategory) {
-      const allKathasPaid = katha.kathas.every(katha => katha.accessType === "paid");
-      if (allKathasPaid) {
-        return "blur-sm";
-      }
-      else {
-        return "";
-      }
+      const allKathasPaid = katha.kathas?.every((k) => k.accessType === "paid");
+      return allKathasPaid ? "blur-sm" : "";
     }
-    else {
-      return katha.accessType === "paid" ? "blur-sm" : "";
-    }
-  }
+    return katha.accessType === "paid" ? "blur-sm" : "";
+  };
+
   return (
     <>
       <SchemaMarkup schema={vratKathaSchema} />
-      <SEO title="Complete Hindu Vrat Katha Collection in Hindi | All Vrat Stories | भक्ति भाव" description="Explore complete Hindu vrat katha collection including Ekadashi, Pradosh, Purnima, and more with pooja vidhi and benefits in Hindi" canonical="https://bhaktibhav.app/vrat-katha" schema={homeSchema}/>
-      <Header />
+      <SEO
+        title="Complete Hindu Vrat Katha Collection in Hindi | All Vrat Stories | भक्ति भाव"
+        description="Explore complete Hindu vrat katha collection including Ekadashi, Pradosh, Purnima, and more with pooja vidhi and benefits in Hindi"
+        canonical="https://bhaktibhav.app/vrat-katha"
+        schema={homeSchema}
+      />
+      <Header hideEditIcon={true} showProfileHeader={true} profileText="भक्ति भाव" backRoute="/" />
+      <div className="h-2"></div>
 
       <PageTitleCard
         titleHi={"ozr dFkk"}
         titleEn={"Vrat Katha"}
         isHinglishLanguageSelected={language === "hinglish"}
-        
         customEngFontSize={"18px"}
         customFontSize={"23px"}
-
       />
 
       <div className="container mx-auto px-4 mt-4">
@@ -622,20 +272,29 @@ export default function VratKatha() {
           {kathas.map((katha, index) => (
             <li key={katha._id}>
               <div
-                onClick={() => handleNavigate(katha._id, index, katha.accessType, katha.type, katha.kathaId)}
+                onClick={() =>
+                  handleNavigate(katha._id, index, katha.accessType, katha.type, katha.kathaId)
+                }
                 className="theme_bg bg-white rounded-xl shadow hover:bg-yellow-50 transition block overflow-hidden cursor-pointer"
               >
-                <div className="w-full h-40 flex items-center justify-center overflow-hidden  ">
+                <div className="w-full h-40 flex items-center justify-center overflow-hidden">
                   <img
-
                     src={`${katha.imagethumb}`}
                     alt={getVratKathaAltText(katha, language)}
-                    className={`w-auto rounded-md max-h-[100%] md:max-h-[100%] ${getSubscriptionStatusFromLS() ? "" : getPaidLogic(katha)}`}
+                    className={`w-auto rounded-md max-h-[100%] md:max-h-[100%] ${
+                      getSubscriptionStatusFromLS() ? "" : getPaidLogic(katha)
+                    }`}
                   />
                 </div>
                 <div className="p-2">
                   {(language === "hinglish" ? katha.name2 || katha.name : katha.name) && (
-                    <h2 className={`font-semibold pt-3 ${language === "hinglish" ? "text-center" : "truncate md:text-xl text-lg"} ${language === "hi" ? "font-hindi" : "font-eng text-sm"} ${getSubscriptionStatusFromLS() ? "" : getPaidLogic(katha)}`}>
+                    <h2
+                      className={`font-semibold pt-3 ${
+                        language === "hinglish" ? "text-center" : "truncate md:text-xl text-lg"
+                      } ${language === "hi" ? "font-hindi" : "font-eng text-sm"} ${
+                        getSubscriptionStatusFromLS() ? "" : getPaidLogic(katha)
+                      }`}
+                    >
                       {renderVratKathaName(katha, language)}
                     </h2>
                   )}
@@ -652,7 +311,6 @@ export default function VratKatha() {
           <span className="ml-2 text-[#9A283D] font-eng">Loading more...</span>
         </div>
       )}
-
     </>
   );
 }
