@@ -853,7 +853,16 @@ export const newJaapMalaApis = {
 
   getJaapMalaDatav4: async (lang, categoryId, pageNumber, limit) => {
     try {
-      const resp = await api.get(`https://api.bhaktibhav.app/api/v1/frontend/feature-category/content-v4?lang=${lang}&categoryId=${categoryId}&page=${pageNumber}&limit=${limit}`);
+      const resp = await api.get('https://api.bhaktibhav.app/api/v1/frontend/feature-category/content-v4', {
+        params: {
+          lang,
+          categoryId,
+          // The current v4 backend still reads this legacy spelling.
+          catgeoryId: categoryId,
+          page: pageNumber,
+          limit,
+        },
+      });
       return resp.data;
     }
     catch(error) {

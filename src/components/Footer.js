@@ -6,7 +6,7 @@ import useGA4BaseParams from "../hooks/useGA4BaseParams";
 import useGA4Tracker from "../hooks/useGA4Tracker";
 import { GA4Events } from "../utils/ga4Events.enum";
 
-function Footer({ variant = "default" }) {
+function Footer({ variant = "default", onSuvicharClick }) {
     const location = useLocation();
     const navigate = useNavigate();
     const baseParams = useGA4BaseParams("Home Screen");
@@ -18,6 +18,10 @@ function Footer({ variant = "default" }) {
     };
 
     const handleSuvicharClick = () => {
+        if (onSuvicharClick) {
+            onSuvicharClick();
+            return;
+        }
         navigate("/");
         window.setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 0);
     };

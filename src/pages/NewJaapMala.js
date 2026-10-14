@@ -8,7 +8,7 @@ import PageTitleCard from "../components/PageTitleCard";
 import SEO from "../components/SEO";
 import { getSubscriptionStatusFromLS, getTokenFromLS, replaceSpecialChars } from "../commonFunctions";
 import { LanguageContext } from "../contexts/LanguageContext";
-import { categoryContentApis } from "../api";
+import { newJaapMalaApis } from "../api";
 import useGA4BaseParams from "../hooks/useGA4BaseParams";
 import useGA4Tracker from "../hooks/useGA4Tracker";
 import { homeSchema } from "../seo/schemas";
@@ -143,7 +143,7 @@ export default function NewJaapMala() {
     location.state?.categoryId ||
     location.state?._id ||
     "";
-  const firstPageCacheKey = `new-jaap-mala:${categoryId}:${language}:1:${limit}`;
+  const firstPageCacheKey = `new-jaap-mala-v4:${categoryId}:${language}:1:${limit}`;
   const initialCachedResponse = getValidCachedContent(firstPageCacheKey);
   const initialCachedItems = getContentItems(initialCachedResponse);
 
@@ -184,7 +184,7 @@ export default function NewJaapMala() {
       }
 
       try {
-        const cacheKey = `new-jaap-mala:${categoryId}:${language}:${currentPage}:${limit}`;
+        const cacheKey = `new-jaap-mala-v4:${categoryId}:${language}:${currentPage}:${limit}`;
         const hasCachedResponse = Boolean(getValidCachedContent(cacheKey));
 
         if (currentPage === 1) {
@@ -194,7 +194,7 @@ export default function NewJaapMala() {
         }
 
         const response = await getCachedContent(cacheKey, () =>
-          categoryContentApis.fetchContentDataByCategoryId(categoryId, language, currentPage, limit)
+          newJaapMalaApis.getJaapMalaDatav4(language, categoryId, currentPage, limit)
         );
 
         const nextItems = getContentItems(response);

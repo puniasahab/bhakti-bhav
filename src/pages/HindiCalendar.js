@@ -286,17 +286,17 @@ export default function HindiCalendar() {
                       >
                         <span className="flex w-[76px] shrink-0 flex-col items-center justify-center">
                           <span className="font-eng text-[29px] font-bold leading-none">{day}</span>
-                          <span className="mt-1.5 text-[14px] font-medium leading-none">{weekdayHi}</span>
+                          <span className="mt-1.5 text-[14px] font-medium leading-relaxed">{weekdayHi}</span>
                         </span>
 
                         <span className="mx-3 h-12 w-px shrink-0 bg-[#E9DED8]" />
 
                         <span className="min-w-0 flex-1">
-                          <span className="flex min-w-0 items-center gap-3">
-                            <span className="truncate text-[18px] font-semibold leading-tight">{festivalName}</span>
-                            <span className="shrink-0 rounded-md bg-[#FFF0D1] px-2.5 py-1 text-xs font-semibold leading-none text-[#8C652E]">{badge}</span>
+                          <span className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1">
+                            <span className="min-w-0 max-w-full whitespace-normal break-words text-[18px] font-semibold leading-relaxed">{festivalName}</span>
+                            <span className="max-w-full whitespace-normal break-words rounded-md bg-[#FFF0D1] px-2.5 py-1 text-xs font-semibold leading-normal text-[#8C652E]">{badge}</span>
                           </span>
-                          <span className="mt-2 block truncate text-[14px] font-normal leading-tight text-[#7B6A62]">{summary}</span>
+                          <span className="mt-2 block whitespace-normal break-words text-[14px] font-normal leading-relaxed text-[#7B6A62]">{summary}</span>
                         </span>
 
                         <ChevronRight size={26} strokeWidth={2.6} className="ml-2 shrink-0 text-[#9A283D]" />

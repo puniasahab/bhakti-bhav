@@ -36,6 +36,7 @@ function Header({
     backRoute,
     inlineHeader = false,
     hidePaymentAction = false,
+    hideProfileAction = false,
 }) {
     const location = useLocation();
     const { pathname } = location;
@@ -269,14 +270,14 @@ function Header({
                                     >
                                         <IndianRupee size={25} strokeWidth={2.5} />
                                     </button>}
-                                    <button
+                                    {!hideProfileAction && <button
                                         type="button"
                                         onClick={handleProfileNavigation}
                                         className="flex h-11 w-11 items-center justify-center rounded-full bg-[#FFF6D4]"
                                         aria-label="Profile"
                                     >
                                         <CircleUserRound size={29} strokeWidth={2.3} />
-                                    </button>
+                                    </button>}
                                 </div>
                             </>
                         )}
@@ -441,13 +442,13 @@ function Header({
                                     >
                                         <Search size={29} strokeWidth={2.2} />
                                     </button>
-                                    <button
+                                    {/* <button
                                         type="button"
                                         className="flex h-9 w-9 items-center justify-center"
                                         aria-label="Notifications"
                                     >
                                         <Bell size={28} strokeWidth={2.2} />
-                                    </button>
+                                    </button> */}
                                     <button
                                         type="button"
                                         onClick={handleProfileNavigation}
