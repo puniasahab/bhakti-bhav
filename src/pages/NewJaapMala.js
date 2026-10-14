@@ -366,11 +366,11 @@ export default function NewJaapMala() {
                     loading="lazy"
                     decoding="async"
                   />
-                  <div className="absolute left-2 right-2 bottom-5 z-10 rounded-xl bg-white/80 px-3 py-2 text-center shadow-sm backdrop-blur-[1px]">
+                  {/* <div className="absolute left-2 right-2 bottom-5 z-10 rounded-xl bg-white/80 px-3 py-2 text-center shadow-sm backdrop-blur-[1px]">
                     <h2 className={`theme_text text-base font-semibold leading-tight ${language === "hi" ? "font-hindi" : "font-eng"}`}>
                       {renderTitle(title, language)}
                     </h2>
-                  </div>
+                  </div> */}
                 </Link>
               </li>
             );

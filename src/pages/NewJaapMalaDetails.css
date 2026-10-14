@@ -1,0 +1,321 @@
+/* Scoped to this detail page so shared headers and other mala pages stay intact. */
+.new-jaap-details-header header {
+  background: transparent;
+  box-shadow: none;
+}
+
+.new-jaap-details-header header > div {
+  max-width: 488px;
+  background: #ffdb70;
+}
+
+.new-jaap-details-header header > div > div {
+  padding-top: 15px;
+  padding-bottom: 15px;
+}
+
+.new-jaap-details-header header button {
+  min-height: 32px;
+}
+
+.new-jaap-details.new-jaap-screen {
+  width: min(100%, 520px);
+  height: auto;
+  min-height: calc(100svh - 80px);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  overflow: visible;
+  color: #963149;
+}
+
+.new-jaap-details .new-jaap-fixed-content {
+  position: relative;
+  inset: auto;
+  width: 100%;
+  max-height: none;
+  transform: none;
+  overflow: visible;
+  z-index: auto;
+}
+
+.new-jaap-details .new-jaap-fixed-content > div:first-child {
+  margin-top: -8px;
+}
+
+.new-jaap-details .new-jaap-main {
+  width: 100%;
+  margin: 18px auto 0;
+  padding: 0 24px 24px;
+  text-align: center;
+}
+
+.new-jaap-details .new-jaap-image-frame {
+  width: 65%;
+  height: clamp(155px, 25svh, 250px);
+  border-radius: 0;
+}
+
+.new-jaap-details .new-jaap-devta-image {
+  height: 100%;
+  border-radius: 0;
+}
+
+.new-jaap-change-mantra {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 14px auto 12px;
+  padding: 8px 16px;
+  border: 1px solid #dab5bd;
+  border-radius: 999px;
+  background: #9631490b;
+  color: #963149;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.new-jaap-details .new-jaap-title-scroll {
+  position: relative;
+  width: 100%;
+  max-height: none;
+  height: 64px;
+  margin: 0 auto;
+  padding: 4px 0;
+  display: flex;
+  align-content: flex-start;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 6px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #dab5bd transparent;
+}
+
+.new-jaap-name {
+  flex: 0 0 auto;
+  max-width: 100%;
+  padding: 2px 0;
+  border: 0;
+  background: transparent;
+  color: #b9b9b5;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+  transition: color 150ms ease;
+  touch-action: manipulation;
+}
+
+.new-jaap-name.is-complete {
+  color: #963149;
+}
+
+.new-jaap-name[aria-current="step"] {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-color: #96314950;
+}
+
+.new-jaap-large-text .new-jaap-name {
+  font-size: 19px;
+}
+
+.new-jaap-large-text .new-jaap-title-scroll {
+  height: 84px;
+}
+
+.new-jaap-details .new-jaap-bottom-panel {
+  position: relative;
+  inset: auto;
+  z-index: auto;
+  width: 100%;
+  min-height: 0;
+  margin-top: auto;
+  transform: none;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: 18px 12px;
+  padding: 22px 18px max(24px, env(safe-area-inset-bottom));
+  border-radius: 32px 32px 0 0;
+  background: #fff;
+  box-shadow: 0 -8px 30px #38251f12;
+}
+
+.new-jaap-totals {
+  grid-column: 1 / -1;
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.new-jaap-details .new-jaap-stat {
+  flex-direction: row;
+  justify-content: center;
+  gap: 16px;
+  min-height: 80px;
+  padding: 12px;
+  border: 1px solid #f0e8eb;
+  border-radius: 15px;
+  box-shadow: 0 4px 12px #38251f0c;
+  text-align: left;
+}
+
+.new-jaap-stat > img {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+}
+
+.new-jaap-details .new-jaap-stat p {
+  margin: 0 0 5px;
+  color: #888;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.new-jaap-details .new-jaap-stat strong {
+  font-size: 20px;
+  line-height: 1.2;
+}
+
+.new-jaap-summary {
+  width: 100%;
+  padding: 14px 12px 20px;
+  border: 1px solid #e8e8e8;
+  border-radius: 18px;
+}
+
+.new-jaap-summary h2 {
+  margin: 0 0 12px;
+  font-size: 15px;
+  font-family: 'PoppinsSemiBold', sans-serif;
+}
+
+.new-jaap-summary-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 10px;
+  border-radius: 12px;
+  background: #faf5f6;
+}
+
+.new-jaap-summary-item + .new-jaap-summary-item {
+  margin-top: 10px;
+}
+
+.new-jaap-summary-icon {
+  font-size: 25px;
+}
+
+.new-jaap-summary-item > img {
+  width: 28px;
+  height: 32px;
+  object-fit: contain;
+}
+
+.new-jaap-summary-item p {
+  margin: 0 0 3px;
+  color: #888;
+  font-size: 12px;
+}
+
+.new-jaap-summary-item strong {
+  font-family: 'PoppinsSemiBold', sans-serif;
+  font-size: 16px;
+}
+
+.new-jaap-streak-info {
+  flex-shrink: 0;
+  margin-left: auto;
+  color: #999;
+}
+
+.new-jaap-streak-copy {
+  padding: 8px 0;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.new-jaap-details .new-jaap-mala-button {
+  width: 100%;
+  max-width: 210px;
+  border-width: 3px;
+  box-shadow: 0 5px 16px #9631492b;
+}
+
+.new-jaap-details .new-jaap-mala-text {
+  min-height: 0;
+  gap: 5px;
+  font-size: clamp(10px, 2.6vw, 13px);
+}
+
+.new-jaap-details .new-jaap-mala-text small {
+  font-size: 12px;
+}
+
+.new-jaap-details .new-jaap-mala-title {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  max-height: 42px;
+}
+
+.new-jaap-details button:focus-visible {
+  outline: 2px solid #963149;
+  outline-offset: 3px;
+}
+
+.new-jaap-mantra-dialog {
+  width: min(90vw, 400px);
+  margin: auto;
+  padding: 24px;
+  border: none;
+  border-radius: 20px;
+  color: #963149;
+  background: white;
+  font-family: 'PoppinsRegular', 'Noto Sans Devanagari', sans-serif;
+}
+
+.new-jaap-mantra-dialog::backdrop {
+  background: #29151e80;
+}
+
+.new-jaap-dialog-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  font-weight: 700;
+}
+
+.new-jaap-mantra-dialog label,
+.new-jaap-mantra-dialog p {
+  display: block;
+  font-size: 13px;
+  margin: 12px 0;
+}
+
+.new-jaap-mantra-dialog input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #dab5bd;
+  border-radius: 8px;
+  color: #963149;
+  font-family: 'Noto Sans Devanagari', 'PoppinsRegular', sans-serif;
+}
+
+@media (max-width: 360px) {
+  .new-jaap-details .new-jaap-bottom-panel { padding-inline: 12px; gap: 14px 10px; }
+  .new-jaap-details .new-jaap-stat { gap: 10px; }
+  .new-jaap-summary { padding-inline: 8px; }
+  .new-jaap-summary-item { gap: 6px; padding-inline: 7px; }
+  .new-jaap-summary h2 { font-size: 13px; }
+  .new-jaap-summary-item p { font-size: 11px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .new-jaap-name { transition: none; }
+}

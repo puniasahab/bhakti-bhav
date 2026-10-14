@@ -851,6 +851,18 @@ export const newJaapMalaApis = {
     }
   },
 
+  getJaapMalaDatav4: async (lang, categoryId, pageNumber, limit) => {
+    try {
+      const resp = await api.get(`https://api.bhaktibhav.app/api/v1/frontend/feature-category/content-v4?lang=${lang}&categoryId=${categoryId}&page=${pageNumber}&limit=${limit}`);
+      return resp.data;
+    }
+    catch(error) {
+      console.log("Getting Error while fetching data for Jaap Mala using new api v4: ", error);
+      throw error;
+    }
+
+  },
+
   getContentDetailsV4: async (id) => {
     try {
       const response = await api.get(`feature-category/content-v4/${id}?isCounterValue=true`);

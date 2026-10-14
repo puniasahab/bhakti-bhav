@@ -1,6 +1,6 @@
-import { useContext, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
-import { CheckCircle, Hand } from "lucide-react";
+import { CheckCircle, Hand, Info, SlidersHorizontal, X } from "lucide-react";
 import Header from "../components/Header";
 import Loader from "../components/Loader";
 import PageTitleCard from "../components/PageTitleCard";
@@ -9,8 +9,7 @@ import { categoryContentApis, newJaapMalaApis } from "../api";
 import { replaceSpecialChars } from "../commonFunctions";
 import { LanguageContext } from "../contexts/LanguageContext";
 import { homeSchema } from "../seo/schemas";
-import SchemaMarkup from "../components/SchemaMarkup";
-import { newJaapMalaSchema } from "../schemas/pageSchemas";
+import "./NewJaapMalaDetails.css";
 
 const CACHE_TTL = 5 * 60 * 1000;
 const detailCache = new Map();
@@ -107,9 +106,12 @@ const CONFETTI_PIECES = Array.from({ length: 28 }, (_, index) => index);
 export default function NewJaapMalaDetails() {
   const { id } = useParams();
   const location = useLocation();
-  const { language } = useContext(LanguageContext);
+  const { language, fontSize } = useContext(LanguageContext);
   const malaVideoRef = useRef(null);
   const titleScrollRef = useRef(null);
+  const mantraDialogRef = useRef(null);
+  const completionTimerRef = useRef(null);
+  const countRef = useRef(0);
   const [detail, setDetail] = useState(() => location.state?.item || null);
   const [loading, setLoading] = useState(true);
   const [jaapCount, setJaapCount] = useState(0);
@@ -117,7 +119,12 @@ export default function NewJaapMalaDetails() {
   const [showCompletionModal, setShowCompletionModal] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const [jaapStats, setJaapStats] = useState(null);
-  
+  const [customMantra, setCustomMantra] = useState("");
+  const [mantraDraft, setMantraDraft] = useState("");
+  const [streakDays, setStreakDays] = useState(null);
+  const [showStreakInfo, setShowStreakInfo] = useState(false);
+
+  useEffect(() => () => window.clearTimeout(completionTimerRef.current), []);
 
   useEffect(() => {
     let isActive = true;
@@ -165,8 +172,25 @@ export default function NewJaapMalaDetails() {
   const imageUrl = normalizeAssetUrl(detail?.imageUrl);
   const displayImageUrl = imageUrl || "/img/shreeHanuman.png";
 
-  // Reusable function to fetch and apply jaap stats from API
-  const fetchJaapStats = async () => {
+  const mantra = customMantra || getHinglishTitleParts(title).hindiText || cleanTitle;
+  const todayMala = jaapStats?.todayMala ?? jaapStats?.currentMalaCounter ?? malaCount;
+  const totalJaap = (jaapStats
+    ? (jaapStats.malaSize ?? JAAP_PER_MALA) * (jaapStats.totalMala ?? 0)
+    : malaCount * JAAP_PER_MALA) + (jaapCount === JAAP_PER_MALA ? 0 : jaapCount);
+
+  const fetchStreak = useCallback(async () => {
+    try {
+      const response = await newJaapMalaApis.getJaapStreak();
+      const data = response?.data || response;
+      const days = data?.currentStreak ?? data?.streak;
+      setStreakDays(typeof days === "number" ? days : null);
+    } catch (error) {
+      console.error("Error fetching Jaap streak:", error);
+    }
+  }, []);
+
+  // Keep the existing saved-count API and completion flow.
+  const fetchJaapStats = useCallback(async () => {
     if (!id) return;
     try {
       const response = await newJaapMalaApis.getJaapMalaCount(id);
@@ -178,19 +202,28 @@ export default function NewJaapMalaDetails() {
     } catch (error) {
       console.error("Error fetching Jaap Mala count:", error);
     }
-  };
+  }, [id]);
 
   // Fetch saved mala count from API on page load
   useEffect(() => {
     fetchJaapStats();
-  }, [id]);
+    fetchStreak();
+  }, [fetchJaapStats, fetchStreak]);
 
   useEffect(() => {
     const titleScroll = titleScrollRef.current;
-    if (!titleScroll || jaapCount === 0) return;
-
-    titleScroll.scrollTop = titleScroll.scrollHeight;
-  }, [jaapCount]);
+    if (!titleScroll) return;
+    if (jaapCount === 0) {
+      titleScroll.scrollTop = 0;
+      return;
+    }
+    const activeName = titleScroll.children[jaapCount - 1];
+    if (!activeName) return;
+    const top = activeName.offsetTop;
+    if (top < titleScroll.scrollTop || top + activeName.offsetHeight > titleScroll.scrollTop + titleScroll.clientHeight) {
+      titleScroll.scrollTop = Math.max(0, top + activeName.offsetHeight - titleScroll.clientHeight);
+    }
+  }, [jaapCount, fontSize]);
 
   const playMalaAnimation = () => {
     const video = malaVideoRef.current;
@@ -210,22 +243,23 @@ export default function NewJaapMalaDetails() {
     // Persist updated mala count to the API, then re-fetch latest stats
     if (id) {
       newJaapMalaApis.updateJaapMalaCount(id, 108)
-        .then(() => fetchJaapStats())
+        .then(() => { fetchJaapStats(); fetchStreak(); })
         .catch((error) => {
           console.error("Error updating Jaap Mala count:", error);
         });
     }
 
-    window.setTimeout(() => {
+    completionTimerRef.current = window.setTimeout(() => {
       setShowConfetti(false);
     }, 3600);
   };
 
   const handleJaapTap = () => {
-    if (showCompletionModal || jaapCount >= JAAP_PER_MALA) return;
+    if (showCompletionModal || countRef.current >= JAAP_PER_MALA) return;
 
     playMalaAnimation();
-    const nextCount = jaapCount + 1;
+    const nextCount = countRef.current + 1;
+    countRef.current = nextCount;
 
     if (nextCount >= JAAP_PER_MALA) {
       completeOneMala();
@@ -236,6 +270,8 @@ export default function NewJaapMalaDetails() {
   };
 
   const handleStartNextMala = () => {
+    window.clearTimeout(completionTimerRef.current);
+    countRef.current = 0;
     setJaapCount(0);
     setShowCompletionModal(false);
     setShowConfetti(false);
@@ -254,15 +290,16 @@ export default function NewJaapMalaDetails() {
 
   return (
     <>
-    {/* <SchemaMarkup schema={newJaapMalaSchema(id)} /> */}
       <SEO
         title={`${cleanTitle} | भक्ति भाव`}
         description={cleanTitle}
         canonical={`https://bhaktibhav.app/newJaapMaala-details/${id}`}
         schema={homeSchema}
       />
-      <Header pageName={{ hi: "जाप माला", en: "Jaap Mala" }} hindiFontSize={language === "hi"} />
-      <div className="new-jaap-screen font-eng">
+      <div className="new-jaap-details-header">
+        <Header pageName={{ hi: "जाप माला", en: "Jaap Mala" }} fontSizeOption />
+      </div>
+      <div className={`new-jaap-screen new-jaap-details font-eng ${fontSize === "text-xl" ? "new-jaap-large-text" : ""}`} >
         <div className="new-jaap-fixed-content">
           <PageTitleCard
             titleHi={language === "hi" ? replaceSpecialChars(title) : ""}
@@ -282,28 +319,65 @@ export default function NewJaapMalaDetails() {
                 decoding="async"
               />
             </div>
-            {jaapCount > 0 && (
-              <div
-                ref={titleScrollRef}
-                className={`new-jaap-title-scroll ${language === "hi" ? "font-devanagari" : "font-eng"}`}
-              >
-                {Array.from({ length: jaapCount }, (_, index) => (
-                  <span key={`${cleanTitle}-${index}`}>
-                    {renderTitle(title, language, "scroll")}
-                  </span>
-                ))}
-              </div>
-            )}
+            <button
+              type="button"
+              className="new-jaap-change-mantra font-devanagari"
+              onClick={() => {
+                setMantraDraft(mantra);
+                mantraDialogRef.current?.showModal();
+              }}
+            >
+              <SlidersHorizontal size={17} aria-hidden="true" />
+              {language === "en" ? "Change mantra" : "मंत्र बदलें"}
+            </button>
+            <div
+              ref={titleScrollRef}
+              className={`new-jaap-title-scroll ${language === "hi" && !customMantra ? "font-hindi" : "font-devanagari"}`}
+              role="group"
+              aria-label="108 mantra repetitions"
+            >
+              {Array.from({ length: JAAP_PER_MALA }, (_, index) => (
+                <button
+                  type="button"
+                  key={index}
+                  className={`new-jaap-name ${index < jaapCount ? "is-complete" : ""}`}
+                  onClick={handleJaapTap}
+                  aria-label={`Chant ${index + 1}: ${mantra}`}
+                  aria-pressed={index < jaapCount}
+                  aria-current={index === jaapCount - 1 ? "step" : undefined}
+                  disabled={showCompletionModal}
+                >
+                  {language === "hi" && !customMantra ? replaceSpecialChars(mantra) : mantra}
+                </button>
+              ))}
+            </div>
+            <span className="sr-only" role="status">{jaapCount} of {JAAP_PER_MALA} chants completed</span>
           </main>
         </div>
 
         <section className="new-jaap-bottom-panel" aria-label="Jaap mala counter">
-          <div className="new-jaap-stat">
-            <div className="new-jaap-temple-circle">
-              <img src="/img/temple.png" alt="" />
+          <div className="new-jaap-totals">
+            <div className="new-jaap-stat">
+              <img src="/img/jaap_mala.svg" alt="" />
+              <div><p>Total<br />Mala</p><strong>{jaapStats?.totalMala ?? malaCount}</strong></div>
             </div>
-            <p>Mala</p>
-            <strong>{jaapStats?.totalMala ?? malaCount}</strong>
+            <div className="new-jaap-stat">
+              <Hand size={36} strokeWidth={1.2} aria-hidden="true" />
+              <div><p>Total<br />Jaap</p><strong>{totalJaap}</strong></div>
+            </div>
+          </div>
+          <div className="new-jaap-summary">
+            <h2>Stats Summary</h2>
+            <div className="new-jaap-summary-item">
+              <span className="new-jaap-summary-icon" aria-hidden="true">🔥</span>
+              <div><p>Streak</p><strong>{streakDays === null ? "—" : `${streakDays} ${streakDays === 1 ? "Day" : "Days"}`}</strong></div>
+              <button type="button" className="new-jaap-streak-info" aria-label="About your streak" onClick={() => setShowStreakInfo((value) => !value)} aria-expanded={showStreakInfo}><Info size={15} /></button>
+            </div>
+            {showStreakInfo && <p className="new-jaap-streak-copy">Your streak is the number of consecutive days you complete a mala.</p>}
+            <div className="new-jaap-summary-item">
+              <img src="/img/jaap_mala.svg" alt="" />
+              <div><p>Today Mala</p><strong>{todayMala}</strong></div>
+            </div>
           </div>
 
           <button
@@ -311,6 +385,7 @@ export default function NewJaapMalaDetails() {
             className="new-jaap-mala-button"
             onClick={handleJaapTap}
             aria-label="Tap here to start jaap"
+            disabled={showCompletionModal}
           >
             <video
               ref={malaVideoRef}
@@ -324,8 +399,7 @@ export default function NewJaapMalaDetails() {
                 event.currentTarget.currentTime = 0;
               }}
             />
-            <span className="
-            new-jaap-mala-text">
+            <span className="new-jaap-mala-text">
               {jaapCount === 0 ? (
                 <>
                   <Hand size={24} strokeWidth={2.6} />
@@ -337,21 +411,34 @@ export default function NewJaapMalaDetails() {
                   <small>Today's</small>
                   <b style={{fontSize: '20px'}}>{jaapCount} / {JAAP_PER_MALA}</b>
                   <span className={`new-jaap-mala-title ${language === "hinglish" ? "new-jaap-mala-title-hinglish" : ""} ${language === "hi" ? "font-devanagari" : "font-eng"}`}>
-                    {renderTitle(title, language, "mala")}
+                    {language === "hi" && !customMantra ? replaceSpecialChars(mantra) : mantra}
                   </span>
                 </>
               )}
             </span>
           </button>
 
-          <div className="new-jaap-stat">
-            <div className="new-jaap-temple-circle">
-              <img src="/img/temple.png" alt="" />
-            </div>
-            <p>Jaap</p>
-            <strong>{jaapStats ? (jaapStats.malaSize ?? JAAP_PER_MALA) * (jaapStats.totalMala ?? 0) : jaapCount}</strong>
-          </div>
         </section>
+
+        <dialog ref={mantraDialogRef} className="new-jaap-mantra-dialog" aria-labelledby="change-mantra-title" onClick={(event) => {
+          if (event.target === event.currentTarget) event.currentTarget.close();
+        }}>
+          <form onSubmit={(event) => {
+            event.preventDefault();
+            if (!mantraDraft.trim()) return;
+            setCustomMantra(mantraDraft.trim());
+            mantraDialogRef.current.close();
+          }}>
+            <div className="new-jaap-dialog-heading">
+              <h2 id="change-mantra-title">{language === "en" ? "Change mantra" : "मंत्र बदलें"}</h2>
+              <button type="button" aria-label="Close" onClick={() => mantraDialogRef.current.close()}><X size={22} /></button>
+            </div>
+            <label htmlFor="jaap-mantra">God name or mantra</label>
+            <input id="jaap-mantra" value={mantraDraft} onChange={(event) => setMantraDraft(event.target.value)} maxLength={120} required autoFocus />
+            <p>Your current count will be kept.</p>
+            <button type="submit" className="new-jaap-next-button" disabled={!mantraDraft.trim()}>Apply</button>
+          </form>
+        </dialog>
 
         {showConfetti && (
           <div className="new-jaap-confetti" aria-hidden="true">
