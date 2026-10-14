@@ -251,9 +251,11 @@ export const AudioProvider = ({ children }) => {
 
     if (isNewTrack) {
       audio.src = url;
-      setCurrentTrack(url);
-      localStorage.setItem("currentAudioTrack", url);
     }
+
+    // Always ensure currentTrack state is set (covers case after stop() clears it)
+    setCurrentTrack(url);
+    localStorage.setItem("currentAudioTrack", url);
 
     if (metadata) {
       const cleanMeta = {
@@ -315,6 +317,9 @@ export const AudioProvider = ({ children }) => {
     if (audio) {
       audio.pause();
       audio.currentTime = 0;
+      // Clear src so next play() of same URL is always treated as a new track
+      audio.src = "";
+      audio.load();
     }
     setCurrentTrack(null);
     setIsPlaying(false);

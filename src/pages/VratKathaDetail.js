@@ -188,9 +188,10 @@ export default function VratKathaDetail() {
   const [detail, setDetail] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("katha"); // 'katha' | 'vidhi' | 'samagri' | 'muhurat'
+  const [fontSizePx, setFontSizePx] = useState(16);
 
   const { language, fontSize, setFontSize } = useContext(LanguageContext);
-  const { play, pause, isPlaying, currentTrack } = useAudio();
+  const { play, pause, isPlaying, currentTrack, trackMetadata, setTrackMetadata } = useAudio();
 
   const baseParams = useGA4BaseParams("Vrat Katha Detail Screen");
   const { trackEvent } = useGA4Tracker(baseParams);
@@ -234,6 +235,28 @@ export default function VratKathaDetail() {
   const isThisAudioPlaying =
     Boolean(detail?.audioUrl) && currentTrack === detail.audioUrl && isPlaying;
 
+  // Auto-sync image and metadata if this katha audio is already active/loaded in the player
+  useEffect(() => {
+    if (detail && currentTrack === detail.audioUrl && (!trackMetadata?.imageUrl || trackMetadata.imageUrl === "")) {
+      const names = getLocalizedNames(detail.name, detail.name2);
+      const trackTitle = `${names.hindi || names.english || "व्रत कथा"} कथा`;
+      const trackEnglishTitle = names.english ? `${names.english} Katha` : "";
+      const artwork = detail.imageUrl || detail.imagethumb || detail.image || "";
+
+      if (artwork) {
+        setTrackMetadata((prev) => ({
+          ...prev,
+          title: prev?.title || trackTitle,
+          englishTitle: prev?.englishTitle || trackEnglishTitle,
+          imageUrl: artwork,
+          subtitle: prev?.subtitle || "Bhakti Bhav Vrat Katha",
+          category: prev?.category || "व्रत कथा",
+        }));
+        localStorage.setItem("currentTrackImage", artwork);
+      }
+    }
+  }, [detail, currentTrack, trackMetadata?.imageUrl, setTrackMetadata]);
+
   const handleAudioToggle = () => {
     if (!detail?.audioUrl) return;
 
@@ -246,15 +269,21 @@ export default function VratKathaDetail() {
       pause();
     } else {
       const names = getLocalizedNames(detail.name, detail.name2);
-      const primaryTitle = names.hindi || "व्रत कथा";
-      const secondaryTitle = names.english || "";
-      const artwork = detail.imageUrl || detail.imagethumb || "";
+      const trackTitle = `${names.hindi || names.english || "व्रत कथा"} कथा`;
+      const trackEnglishTitle = names.english ? `${names.english} Katha` : "";
+      const artwork = detail.imageUrl || detail.imagethumb || detail.image || "";
+
+      localStorage.setItem("currentTrackName", trackTitle);
+      localStorage.setItem("currentTrackEnglishName", trackEnglishTitle);
+      localStorage.setItem("currentTrackImage", artwork);
+      localStorage.setItem("currentTrackSubtitle", "Bhakti Bhav Vrat Katha");
+      localStorage.setItem("currentTrackCategory", "व्रत कथा");
 
       play(detail.audioUrl, {
-        title: primaryTitle,
-        englishTitle: secondaryTitle,
+        title: trackTitle,
+        englishTitle: trackEnglishTitle,
         imageUrl: artwork,
-        subtitle: "Bhakti Bhav Devotional",
+        subtitle: "Bhakti Bhav Vrat Katha",
         category: "व्रत कथा",
       });
     }
@@ -338,8 +367,8 @@ export default function VratKathaDetail() {
     typeof rawVidhi === "string"
       ? rawVidhi
       : Array.isArray(rawVidhi)
-      ? rawVidhi.join("\n")
-      : "";
+        ? rawVidhi.join("\n")
+        : "";
 
   // Puja Samagri parsing
   const rawSamagri = getNonEmptyContent(
@@ -354,7 +383,7 @@ export default function VratKathaDetail() {
       try {
         const parsed = JSON.parse(target);
         if (Array.isArray(parsed)) target = parsed;
-      } catch (e) {}
+      } catch (e) { }
     }
 
     let items = [];
@@ -385,11 +414,9 @@ export default function VratKathaDetail() {
     typeof rawMuhurat === "string"
       ? rawMuhurat
       : Array.isArray(rawMuhurat)
-      ? rawMuhurat.join("\n")
-      : "";
+        ? rawMuhurat.join("\n")
+        : "";
 
-  // Font size class mapper
-  const contentFontSize = fontSize === "text-xl" ? "text-lg md:text-xl" : "text-base md:text-lg";
 
   return (
     <>
@@ -399,366 +426,378 @@ export default function VratKathaDetail() {
         canonical={`https://bhaktibhav.app/vrat-katha/${id}`}
       />
 
-      {/* ── Top Header Toolbar matching Reference Screenshot ── */}
-      <header className="sticky top-0 z-40 w-full bg-[#F5BF46] shadow-sm px-4 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => {
-              if (window.history.state && window.history.state.idx > 0) {
-                navigate(-1);
-              } else {
-                navigate("/vrat-katha");
-              }
-            }}
-            className="p-1 text-[#851C2C] hover:opacity-80 transition"
-            aria-label="Go Back"
-          >
-            <ChevronLeft size={28} strokeWidth={2.8} />
-          </button>
-          <span className="text-[#851C2C] font-bold text-lg md:text-xl font-hindi">
-            व्रत कथा
-          </span>
-        </div>
-
-        {/* Font Size Controls [A] and [A+] matching reference screenshot */}
-        <div className="flex items-center gap-2 font-eng">
-          <button
-            type="button"
-            onClick={() => setFontSize("text-base")}
-            style={{ fontFamily: "'PoppinsRegular', -apple-system, sans-serif" }}
-            className={`w-8 h-8 flex items-center justify-center rounded-lg border border-[#851C2C] text-sm font-semibold transition font-eng ${
-              fontSize === "text-base"
-                ? "bg-[#851C2C]/15 font-bold"
-                : "bg-transparent hover:bg-[#851C2C]/10"
-            } text-[#851C2C]`}
-            title="Normal Font Size"
-          >
-            A
-          </button>
-          <button
-            type="button"
-            onClick={() => setFontSize("text-xl")}
-            style={{ fontFamily: "'PoppinsRegular', -apple-system, sans-serif" }}
-            className={`px-2.5 h-8 flex items-center justify-center rounded-lg border border-[#851C2C] text-sm font-semibold transition font-eng ${
-              fontSize === "text-xl"
-                ? "bg-[#851C2C]/15 font-bold"
-                : "bg-transparent hover:bg-[#851C2C]/10"
-            } text-[#851C2C]`}
-            title="Large Font Size"
-          >
-            A+
-          </button>
-        </div>
-      </header>
-
-      {/* ── Main Content Area ── */}
-      <main className="container mx-auto max-w-lg md:max-w-xl px-4 pt-2 pb-12 text-gray-800">
-        {/* ── Double-Bordered Rounded Title Box matching Screenshots ── */}
-        <div className="flex justify-center mb-2">
-          <div className="relative inline-block px-6 py-2 bg-white/95 rounded-2xl border-2 border-[#D96B27] shadow-[0_4px_12px_rgba(217,107,39,0.12)]">
-            <div className="absolute inset-[2.5px] rounded-[13px] border border-[#D96B27]/40 pointer-events-none"></div>
-            <div className="relative z-10 text-center">
-              <h1 className="text-xl md:text-2xl font-bold text-[#851C2C] font-hindi leading-snug">
-                {hindiTitle}
-              </h1>
-              {englishTitle && englishTitle !== hindiTitle && (
-                <p className="text-sm md:text-base font-semibold text-[#851C2C] font-eng mt-0.5 leading-snug">
-                  {englishTitle}
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* ── Centered Deity / Hero Image matching Reference Screenshot ── */}
-        {(detail.imageUrl || detail.imagethumb) && (
-          <div className="flex justify-center my-3">
-            <img
-              src={detail.imageUrl || detail.imagethumb}
-              alt={hindiTitle}
-              className="w-auto h-48 sm:h-56 md:h-64 max-w-[260px] sm:max-w-[300px] object-contain"
-            />
-          </div>
-        )}
-
-        {/* ── Date & Tithi Card (Two columns with calendar icons) ── */}
-        {hasTithiInfo && (
-          <div className="my-2.5 bg-white rounded-2xl p-3 sm:p-4 shadow-sm border border-gray-100">
-            <div className="grid grid-cols-2 divide-x divide-gray-200">
-              {/* Tithi Start */}
-              <div className="flex items-center gap-2.5 pr-2 sm:pr-4">
-                <div className="w-10 h-10 shrink-0 rounded-xl bg-[#FDEAEB] flex items-center justify-center text-[#851C2C]">
-                  <Calendar size={20} strokeWidth={2.3} />
-                </div>
-                <div className="min-w-0">
-                  <span className="block text-[11px] sm:text-xs text-gray-500 font-medium">
-                    तिथि प्रारंभ:
-                  </span>
-                  <span className="block text-xs sm:text-sm font-bold text-gray-900 font-eng">
-                    {startTime?.date || "—"}
-                  </span>
-                  <span className="block text-[11px] sm:text-xs text-gray-500 font-eng">
-                    {startTime?.time || "—"}
-                  </span>
-                </div>
-              </div>
-
-              {/* Tithi End */}
-              <div className="flex items-center gap-2.5 pl-2.5 sm:pl-4">
-                <div className="w-10 h-10 shrink-0 rounded-xl bg-[#FDEAEB] flex items-center justify-center text-[#851C2C]">
-                  <Calendar size={20} strokeWidth={2.3} />
-                </div>
-                <div className="min-w-0">
-                  <span className="block text-[11px] sm:text-xs text-gray-500 font-medium">
-                    तिथि समाप्त:
-                  </span>
-                  <span className="block text-xs sm:text-sm font-bold text-gray-900 font-eng">
-                    {endTime?.date || "—"}
-                  </span>
-                  <span className="block text-[11px] sm:text-xs text-gray-500 font-eng">
-                    {endTime?.time || "—"}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* ── Action Bar: Share & Listen Buttons ── */}
-        <div className="flex items-center justify-center gap-3 my-3">
-          {/* Share Button (Solid Maroon Pill) */}
-          <button
-            type="button"
-            onClick={handleShare}
-            className="flex-1 max-w-[160px] flex items-center justify-center gap-2 bg-[#851C2C] hover:bg-[#6E1624] text-white py-2.5 px-4 rounded-full shadow-[0_4px_12px_rgba(133,28,44,0.3)] transition font-semibold text-sm sm:text-base font-eng"
-          >
-            <Share2 size={18} strokeWidth={2.4} />
-            <span>Share</span>
-          </button>
-
-          {/* Listen Button (Light Cream/Peach Pill) */}
-          <button
-            type="button"
-            onClick={handleAudioToggle}
-            disabled={!detail.audioUrl}
-            className={`flex-1 max-w-[160px] flex items-center justify-center gap-2 py-2.5 px-4 rounded-full border transition font-semibold text-sm sm:text-base font-eng ${
-              !detail.audioUrl
-                ? "bg-[#FFF5ED]/50 border-gray-200 text-gray-400 cursor-not-allowed"
-                : isThisAudioPlaying
-                ? "bg-[#FDECE2] border-[#851C2C] text-[#851C2C] shadow-inner"
-                : "bg-[#FFF5ED] hover:bg-[#FDECE2] border-[#F3D7C5] text-[#851C2C] shadow-sm"
-            }`}
-          >
-            {isThisAudioPlaying ? (
-              <>
-                <Pause size={18} strokeWidth={2.4} />
-                <span>Pause &gt;</span>
-              </>
-            ) : (
-              <>
-                <Headphones size={18} strokeWidth={2.4} />
-                <span>Listen &gt;</span>
-              </>
-            )}
-          </button>
-        </div>
-
-        {/* ── 4 Interactive Tabs ── */}
-        <div className="flex items-center justify-between gap-1.5 sm:gap-2 my-3 overflow-x-auto pb-1 no-scrollbar">
-          {[
-            { id: "katha", label: "कथा" },
-            { id: "vidhi", label: "पूजा विधि" },
-            { id: "samagri", label: "पूजा सामग्री" },
-            { id: "muhurat", label: "पूजा मुहूर्त" },
-          ].map((tab) => {
-            const isActive = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex-1 text-center py-2 px-2.5 sm:px-3 rounded-full text-xs sm:text-sm font-semibold transition whitespace-nowrap ${
-                  isActive
-                    ? "bg-[#851C2C] text-white shadow-[0_4px_12px_rgba(133,28,44,0.25)]"
-                    : "bg-[#FFF8F5] text-[#851C2C] border border-[#E8BCC2] hover:bg-[#FDECE2]"
-                }`}
-              >
-                {tab.label}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* ── Tab Content Card ── */}
-        <div className="bg-white rounded-2xl shadow-sm border border-[#F2E5DC] p-4 sm:p-5 mb-4">
-          {/* TAB 1: KATHA */}
-          {activeTab === "katha" && (
-            <div>
-              {/* Card Header Badge */}
-              <div className="flex items-center gap-2.5 mb-3">
-                <div className="w-9 h-9 rounded-full bg-[#FDECE2] flex items-center justify-center p-1.5 shadow-sm">
-                  <img
-                    src="/img/kumbh-kalash_509984 1.png"
-                    alt="कथा"
-                    className="w-5 h-5 object-contain"
-                    onError={(e) => {
-                      e.target.style.display = "none";
-                      e.target.nextSibling.style.display = "block";
-                    }}
-                  />
-                  <Sparkles size={18} className="text-[#851C2C] hidden" />
-                </div>
-                <h2 className="text-[#851C2C] font-bold text-base sm:text-lg font-hindi">
-                  कथा
-                </h2>
-              </div>
-
-
-              {/* Katha Rich Text Body */}
-              {sanitizedKatha ? (
-                <div
-                  className={`font-devanagari text-gray-800 leading-normal [&>p]:mb-2.5 ${contentFontSize}`}
-                  dangerouslySetInnerHTML={{ __html: wrapNumbersInHtml(sanitizedKatha) }}
-                />
-              ) : (
-                <p className="text-gray-500 font-devanagari text-center py-4">
-                  कथा का विवरण उपलब्ध नहीं है।
-                </p>
-              )}
-            </div>
-          )}
-
-          {/* TAB 2: PUJA VIDHI */}
-          {activeTab === "vidhi" && (
-            <div>
-              {/* Card Header Badge */}
-              <div className="flex items-center gap-2.5 mb-3">
-                <div className="w-9 h-9 rounded-full bg-[#FDECE2] flex items-center justify-center p-1.5 shadow-sm">
-                  <img
-                    src="/img/deep.png"
-                    alt="पूजा विधि"
-                    className="w-5 h-5 object-contain"
-                    onError={(e) => {
-                      e.target.style.display = "none";
-                      e.target.nextSibling.style.display = "block";
-                    }}
-                  />
-                  <Flame size={18} className="text-[#851C2C] hidden" />
-                </div>
-                <h2 className="text-[#851C2C] font-bold text-base sm:text-lg font-hindi">
-                  पूजा विधि
-                </h2>
-              </div>
-
-              {/* Vidhi content */}
-              {vidhiContent ? (
-                <div className={`font-devanagari text-gray-800 leading-relaxed whitespace-pre-line ${contentFontSize}`}>
-                  {renderWithEnglishNumbers(vidhiContent)}
-                </div>
-              ) : (
-                <p className="text-gray-500 font-devanagari text-center py-4">
-                  पूजा विधि का विवरण उपलब्ध नहीं है।
-                </p>
-              )}
-            </div>
-          )}
-
-          {/* TAB 3: PUJA SAMAGRI */}
-          {activeTab === "samagri" && (
-            <div>
-              {/* Card Header Badge */}
-              <div className="flex items-center gap-2.5 mb-3">
-                <div className="w-9 h-9 rounded-full bg-[#FDECE2] flex items-center justify-center p-1.5 shadow-sm">
-                  <img
-                    src="/img/card_bg_icon.png"
-                    alt="पूजा सामग्री"
-                    className="w-5 h-5 object-contain"
-                    onError={(e) => {
-                      e.target.style.display = "none";
-                      e.target.nextSibling.style.display = "block";
-                    }}
-                  />
-                  <Sparkles size={18} className="text-[#851C2C] hidden" />
-                </div>
-                <h2 className="text-[#851C2C] font-bold text-base sm:text-lg font-hindi">
-                  पूजा सामग्री
-                </h2>
-              </div>
-
-              {/* Samagri bullet list */}
-              {samagriList.length > 0 ? (
-                <ul className="space-y-1.5 pt-0.5">
-                  {samagriList.map((item, idx) => (
-                    <li key={idx} className={`flex items-start font-devanagari text-gray-800 ${contentFontSize}`}>
-                      <span className="text-[#851C2C] text-lg leading-none mr-2 mt-0.5 select-none">
-                        •
-                      </span>
-                      <span className="leading-relaxed">{renderWithEnglishNumbers(item)}</span>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-gray-500 font-devanagari text-center py-4">
-                  पूजा सामग्री का विवरण उपलब्ध नहीं है।
-                </p>
-              )}
-            </div>
-          )}
-
-          {/* TAB 4: PUJA MUHURAT */}
-          {activeTab === "muhurat" && (
-            <div>
-              {/* Card Header Badge */}
-              <div className="flex items-center gap-2.5 mb-3">
-                <div className="w-9 h-9 rounded-full bg-[#FDECE2] flex items-center justify-center p-1.5 shadow-sm text-[#851C2C]">
-                  <Clock size={20} strokeWidth={2.3} />
-                </div>
-                <h2 className="text-[#851C2C] font-bold text-base sm:text-lg font-hindi">
-                  पूजा मुहूर्त
-                </h2>
-              </div>
-
-              {/* Muhurat content */}
-              {muhuratContent ? (
-                <div className={`font-devanagari text-gray-800 leading-relaxed whitespace-pre-line ${contentFontSize}`}>
-                  {renderWithEnglishNumbers(muhuratContent)}
-                </div>
-              ) : (
-                <p className="text-gray-500 font-devanagari text-center py-4">
-                  पूजा मुहूर्त का विवरण उपलब्ध नहीं है।
-                </p>
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* ── Aarti Button (Conditional on artiId) matching Screenshot 5 ── */}
-        {detail.artiId && (
-          <div className="flex justify-center my-4">
-            <Link
-              to={`/aarti/${detail.artiId}`}
+      <div className="min-h-screen w-full max-w-[100vw] overflow-x-hidden flex flex-col text-gray-800">
+        {/* ── Top Header Toolbar matching Reference Screenshot ── */}
+        <header className="sticky top-0 z-40 w-full bg-[#F5BF46] shadow-sm px-3.5 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
               onClick={() => {
-                trackEvent(GA4Events.aarti_cta_tapped_on_vrat_katha, {
-                  event_label: "aarti_cta_tapped_on_vrat_katha",
-                  aartiId: detail.artiId,
-                });
+                if (window.history.state && window.history.state.idx > 0) {
+                  navigate(-1);
+                } else {
+                  navigate("/vrat-katha");
+                }
               }}
-              className="flex items-center justify-center gap-2 bg-[#851C2C] hover:bg-[#6E1624] text-white px-7 py-2.5 rounded-full shadow-[0_4px_14px_rgba(133,28,44,0.35)] transition font-semibold text-base font-hindi"
+              className="p-1 text-[#851C2C] hover:opacity-80 transition active:scale-95"
+              aria-label="Go Back"
             >
-              <Music size={19} strokeWidth={2.4} />
-              <span>आरती</span>
-            </Link>
+              <ChevronLeft size={28} strokeWidth={2.8} />
+            </button>
+            <span className="text-[#851C2C] font-bold text-lg md:text-xl font-hindi">
+              व्रत कथा
+            </span>
           </div>
-        )}
 
-        {/* ── Footer Decoration Divider matching Screenshot 5 ── */}
-        <div className="flex items-center justify-center my-5 text-gray-400 gap-2 select-none">
-          <div className="h-[1px] w-16 sm:w-24 bg-gray-300"></div>
-          <span className="text-gray-500 text-sm tracking-widest font-serif">❖ ❖</span>
-          <div className="h-[1px] w-16 sm:w-24 bg-gray-300"></div>
-        </div>
-      </main>
+          {/* Font Size Controls [A] and [A+] with incremental capacity up to 26px */}
+          <div className="flex items-center gap-2 font-eng">
+            <button
+              type="button"
+              onClick={() => setFontSizePx(16)}
+              style={{ fontFamily: "'PoppinsRegular', -apple-system, sans-serif" }}
+              className={`w-8 h-8 flex items-center justify-center rounded-lg border border-[#851C2C] text-sm font-semibold transition font-eng active:scale-95 ${
+                fontSizePx === 16
+                  ? "bg-[#851C2C]/15 font-bold"
+                  : "bg-transparent hover:bg-[#851C2C]/10"
+              } text-[#851C2C]`}
+              title="Normal Font Size (16px)"
+            >
+              A
+            </button>
+            <button
+              type="button"
+              onClick={() => setFontSizePx((prev) => Math.min(26, prev + 2))}
+              style={{ fontFamily: "'PoppinsRegular', -apple-system, sans-serif" }}
+              className={`px-2.5 h-8 flex items-center justify-center rounded-lg border border-[#851C2C] text-sm font-semibold transition font-eng active:scale-95 ${
+                fontSizePx > 16
+                  ? "bg-[#851C2C]/15 font-bold"
+                  : "bg-transparent hover:bg-[#851C2C]/10"
+              } text-[#851C2C]`}
+              title={`Increase Font Size (Current: ${fontSizePx}px, Max: 26px)`}
+            >
+              A+
+            </button>
+          </div>
+        </header>
+
+        {/* ── Main Content Area ── */}
+        <main className="w-full max-w-lg md:max-w-xl mx-auto px-3.5 sm:px-4 pt-2 pb-12 text-gray-800">
+          {/* ── Double-Bordered Rounded Title Box matching Screenshots ── */}
+          <div className="flex justify-center mb-2">
+            <div className="relative inline-block px-6 py-2 bg-white/95 rounded-2xl border-2 border-[#D96B27] shadow-[0_4px_12px_rgba(217,107,39,0.12)]">
+              <div className="absolute inset-[2.5px] rounded-[13px] border border-[#D96B27]/40 pointer-events-none"></div>
+              <div className="relative z-10 text-center">
+                <h1 className="text-xl md:text-2xl font-bold text-[#851C2C] font-hindi leading-snug">
+                  {hindiTitle}
+                </h1>
+                {englishTitle && englishTitle !== hindiTitle && (
+                  <p className="text-sm md:text-base font-semibold text-[#851C2C] font-eng mt-0.5 leading-snug">
+                    {englishTitle}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* ── Centered Deity / Hero Image matching Reference Screenshot ── */}
+          {(detail.imageUrl || detail.imagethumb) && (
+            <div className="flex justify-center my-3">
+              <img
+                src={detail.imageUrl || detail.imagethumb}
+                alt={hindiTitle}
+                className="w-auto h-48 sm:h-56 md:h-64 max-w-[260px] sm:max-w-[300px] object-contain vrat-katha-hero-img"
+              />
+            </div>
+          )}
+
+          {/* ── Date & Tithi Card (Two columns with calendar icons) ── */}
+          {hasTithiInfo && (
+            <div className="my-2.5 bg-white rounded-2xl p-2.5 sm:p-4 shadow-sm border border-gray-100 w-full max-w-full overflow-hidden">
+              <div className="grid grid-cols-2 divide-x divide-gray-200">
+                {/* Tithi Start */}
+                <div className="flex items-center gap-1.5 sm:gap-2.5 pr-1.5 sm:pr-4 min-w-0">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 shrink-0 rounded-xl bg-[#FDEAEB] flex items-center justify-center text-[#851C2C]">
+                    <Calendar size={18} className="sm:w-5 sm:h-5" strokeWidth={2.3} />
+                  </div>
+                  <div className="min-w-0">
+                    <span className="block text-[10px] sm:text-xs text-gray-500 font-medium truncate">
+                      तिथि प्रारंभ:
+                    </span>
+                    <span className="block text-xs sm:text-sm font-bold text-gray-900 font-eng truncate">
+                      {startTime?.date || "—"}
+                    </span>
+                    <span className="block text-[10px] sm:text-xs text-gray-500 font-eng truncate">
+                      {startTime?.time || "—"}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Tithi End */}
+                <div className="flex items-center gap-1.5 sm:gap-2.5 pl-2 sm:pl-4 min-w-0">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 shrink-0 rounded-xl bg-[#FDEAEB] flex items-center justify-center text-[#851C2C]">
+                    <Calendar size={18} className="sm:w-5 sm:h-5" strokeWidth={2.3} />
+                  </div>
+                  <div className="min-w-0">
+                    <span className="block text-[10px] sm:text-xs text-gray-500 font-medium truncate">
+                      तिथि समाप्त:
+                    </span>
+                    <span className="block text-xs sm:text-sm font-bold text-gray-900 font-eng truncate">
+                      {endTime?.date || "—"}
+                    </span>
+                    <span className="block text-[10px] sm:text-xs text-gray-500 font-eng truncate">
+                      {endTime?.time || "—"}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ── Action Bar: Share & Listen Buttons ── */}
+          <div className="flex items-center justify-center gap-3 my-3">
+            {/* Share Button (Solid Maroon Pill) */}
+            <button
+              type="button"
+              onClick={handleShare}
+              className="flex-1 max-w-[160px] flex items-center justify-center gap-2 bg-[#851C2C] hover:bg-[#6E1624] text-white py-2.5 px-4 rounded-full shadow-[0_4px_12px_rgba(133,28,44,0.3)] transition font-semibold text-sm sm:text-base font-eng active:scale-95"
+            >
+              <Share2 size={18} strokeWidth={2.4} />
+              <span>Share</span>
+            </button>
+
+            {/* Listen Button (Light Cream/Peach Pill) */}
+            <button
+              type="button"
+              onClick={handleAudioToggle}
+              disabled={!detail.audioUrl}
+              className={`flex-1 max-w-[160px] flex items-center justify-center gap-2 py-2.5 px-4 rounded-full border transition font-semibold text-sm sm:text-base font-eng active:scale-95 ${
+                !detail.audioUrl
+                  ? "bg-[#FFF5ED]/50 border-gray-200 text-gray-400 cursor-not-allowed"
+                  : isThisAudioPlaying
+                  ? "bg-[#FDECE2] border-[#851C2C] text-[#851C2C] shadow-inner"
+                  : "bg-[#FFF5ED] hover:bg-[#FDECE2] border-[#F3D7C5] text-[#851C2C] shadow-sm"
+              }`}
+            >
+              {isThisAudioPlaying ? (
+                <>
+                  <Pause size={18} strokeWidth={2.4} />
+                  <span>Pause &gt;</span>
+                </>
+              ) : (
+                <>
+                  <Headphones size={18} strokeWidth={2.4} />
+                  <span>Listen &gt;</span>
+                </>
+              )}
+            </button>
+          </div>
+
+          {/* ── 4 Interactive Tabs ── */}
+          <div className="flex items-center justify-between gap-1 sm:gap-2 my-3 overflow-x-auto pb-1 no-scrollbar w-full max-w-full">
+            {[
+              { id: "katha", label: "कथा" },
+              { id: "vidhi", label: "पूजा विधि" },
+              { id: "samagri", label: "पूजा सामग्री" },
+              { id: "muhurat", label: "पूजा मुहूर्त" },
+            ].map((tab) => {
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex-1 min-w-0 text-center py-2 px-1 sm:px-3 rounded-full text-xs sm:text-sm font-semibold transition whitespace-nowrap active:scale-95 ${
+                    isActive
+                      ? "bg-[#851C2C] text-white shadow-[0_4px_12px_rgba(133,28,44,0.25)]"
+                      : "bg-[#FFF8F5] text-[#851C2C] border border-[#E8BCC2] hover:bg-[#FDECE2]"
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* ── Tab Content Card ── */}
+          <div className="bg-white rounded-2xl shadow-sm border border-[#F2E5DC] p-3.5 sm:p-5 mb-4 w-full max-w-full overflow-hidden break-words">
+            {/* TAB 1: KATHA */}
+            {activeTab === "katha" && (
+              <div>
+                {/* Card Header Badge */}
+                <div className="flex items-center gap-2.5 mb-3">
+                  <div className="w-9 h-9 rounded-full bg-[#FDECE2] flex items-center justify-center p-1.5 shadow-sm">
+                    <img
+                      src="/img/kumbh-kalash_509984 1.png"
+                      alt="कथा"
+                      className="w-5 h-5 object-contain"
+                      onError={(e) => {
+                        e.target.style.display = "none";
+                        e.target.nextSibling.style.display = "block";
+                      }}
+                    />
+                    <Sparkles size={18} className="text-[#851C2C] hidden" />
+                  </div>
+                  <h2 className="text-[#851C2C] font-bold text-base sm:text-lg font-hindi">
+                    कथा
+                  </h2>
+                </div>
+
+                {/* Katha Rich Text Body */}
+                {sanitizedKatha ? (
+                  <div
+                    style={{ fontSize: `${fontSizePx}px`, lineHeight: 1.8 }}
+                    className="font-devanagari text-gray-800 leading-normal [&>p]:mb-2.5 [&_*]:!text-[inherit]"
+                    dangerouslySetInnerHTML={{ __html: wrapNumbersInHtml(sanitizedKatha) }}
+                  />
+                ) : (
+                  <p className="text-gray-500 font-devanagari text-center py-4">
+                    कथा का विवरण उपलब्ध नहीं है।
+                  </p>
+                )}
+              </div>
+            )}
+
+            {/* TAB 2: PUJA VIDHI */}
+            {activeTab === "vidhi" && (
+              <div>
+                {/* Card Header Badge */}
+                <div className="flex items-center gap-2.5 mb-3">
+                  <div className="w-9 h-9 rounded-full bg-[#FDECE2] flex items-center justify-center p-1.5 shadow-sm">
+                    <img
+                      src="/img/deep.png"
+                      alt="पूजा विधि"
+                      className="w-5 h-5 object-contain"
+                      onError={(e) => {
+                        e.target.style.display = "none";
+                        e.target.nextSibling.style.display = "block";
+                      }}
+                    />
+                    <Flame size={18} className="text-[#851C2C] hidden" />
+                  </div>
+                  <h2 className="text-[#851C2C] font-bold text-base sm:text-lg font-hindi">
+                    पूजा विधि
+                  </h2>
+                </div>
+
+                {/* Vidhi content */}
+                {vidhiContent ? (
+                  <div
+                    style={{ fontSize: `${fontSizePx}px`, lineHeight: 1.8 }}
+                    className="font-devanagari text-gray-800 leading-relaxed whitespace-pre-line"
+                  >
+                    {renderWithEnglishNumbers(vidhiContent)}
+                  </div>
+                ) : (
+                  <p className="text-gray-500 font-devanagari text-center py-4">
+                    पूजा विधि का विवरण उपलब्ध नहीं है।
+                  </p>
+                )}
+              </div>
+            )}
+
+            {/* TAB 3: PUJA SAMAGRI */}
+            {activeTab === "samagri" && (
+              <div>
+                {/* Card Header Badge */}
+                <div className="flex items-center gap-2.5 mb-3">
+                  <div className="w-9 h-9 rounded-full bg-[#FDECE2] flex items-center justify-center p-1.5 shadow-sm">
+                    <img
+                      src="/img/card_bg_icon.png"
+                      alt="पूजा सामग्री"
+                      className="w-5 h-5 object-contain"
+                      onError={(e) => {
+                        e.target.style.display = "none";
+                        e.target.nextSibling.style.display = "block";
+                      }}
+                    />
+                    <Sparkles size={18} className="text-[#851C2C] hidden" />
+                  </div>
+                  <h2 className="text-[#851C2C] font-bold text-base sm:text-lg font-hindi">
+                    पूजा सामग्री
+                  </h2>
+                </div>
+
+                {/* Samagri bullet list */}
+                {samagriList.length > 0 ? (
+                  <ul className="space-y-1.5 pt-0.5">
+                    {samagriList.map((item, idx) => (
+                      <li
+                        key={idx}
+                        style={{ fontSize: `${fontSizePx}px`, lineHeight: 1.8 }}
+                        className="flex items-start font-devanagari text-gray-800"
+                      >
+                        <span className="text-[#851C2C] text-lg leading-none mr-2 mt-0.5 select-none">
+                          •
+                        </span>
+                        <span className="leading-relaxed">{renderWithEnglishNumbers(item)}</span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-gray-500 font-devanagari text-center py-4">
+                    पूजा सामग्री का विवरण उपलब्ध नहीं है।
+                  </p>
+                )}
+              </div>
+            )}
+
+            {/* TAB 4: PUJA MUHURAT */}
+            {activeTab === "muhurat" && (
+              <div>
+                {/* Card Header Badge */}
+                <div className="flex items-center gap-2.5 mb-3">
+                  <div className="w-9 h-9 rounded-full bg-[#FDECE2] flex items-center justify-center p-1.5 shadow-sm text-[#851C2C]">
+                    <Clock size={20} strokeWidth={2.3} />
+                  </div>
+                  <h2 className="text-[#851C2C] font-bold text-base sm:text-lg font-hindi">
+                    पूजा मुहूर्त
+                  </h2>
+                </div>
+
+                {/* Muhurat content */}
+                {muhuratContent ? (
+                  <div
+                    style={{ fontSize: `${fontSizePx}px`, lineHeight: 1.8 }}
+                    className="font-devanagari text-gray-800 leading-relaxed whitespace-pre-line"
+                  >
+                    {renderWithEnglishNumbers(muhuratContent)}
+                  </div>
+                ) : (
+                  <p className="text-gray-500 font-devanagari text-center py-4">
+                    पूजा मुहूर्त का विवरण उपलब्ध नहीं है।
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* ── Aarti Button (Conditional on artiId) matching Screenshot 5 ── */}
+          {detail.artiId && (
+            <div className="flex justify-center my-4">
+              <Link
+                to={`/aarti/${detail.artiId}`}
+                onClick={() => {
+                  trackEvent(GA4Events.aarti_cta_tapped_on_vrat_katha, {
+                    event_label: "aarti_cta_tapped_on_vrat_katha",
+                    aartiId: detail.artiId,
+                  });
+                }}
+                className="flex items-center justify-center gap-2 bg-[#851C2C] hover:bg-[#6E1624] text-white px-7 py-2.5 rounded-full shadow-[0_4px_14px_rgba(133,28,44,0.35)] transition font-semibold text-base font-hindi active:scale-95"
+              >
+                <Music size={19} strokeWidth={2.4} />
+                <span>आरती</span>
+              </Link>
+            </div>
+          )}
+
+          {/* ── Footer Decoration Divider matching Screenshot 5 ── */}
+          <div className="flex items-center justify-center my-5 text-gray-400 gap-2 select-none">
+            <div className="h-[1px] w-16 sm:w-24 bg-gray-300"></div>
+            <span className="text-gray-500 text-sm tracking-widest font-serif">❖ ❖</span>
+            <div className="h-[1px] w-16 sm:w-24 bg-gray-300"></div>
+          </div>
+        </main>
+      </div>
     </>
   );
 }

@@ -615,33 +615,41 @@ function Home() {
         });
         const imageUrl = normalizeImageUrl(cardData.additionalImageUrl || cardData.imageUrl || "/img/banner-1.jpg");
 
+        const isHindiText = (str) => /[\u0900-\u097F]/.test(String(str || ""));
+        const bannerTitle = cardData.title || (isHindiText(guidanceTitle) ? "आज का व्रत" : "Today's Vrat");
+        const bannerCtaLabel = cardData.ctaLabel || guidance?.cta?.label || (isHindiText(guidanceTitle) ? "आज का व्रत" : "Today's Vrat");
+
         return (
             <Link
                 to={route}
                 onClick={(e) => handleAccessControlledClick(cardData, e, GA4Events.main_banner_clicked, {
                     event_label: "main_guidance_card_clicked_from_home_screen"
                 })}
-                className="relative block min-h-[228px] overflow-hidden rounded-[22px] bg-[#FFF1DD] shadow-[0_10px_28px_rgba(154,40,61,0.08)] sm:min-h-[220px] md:h-[320px] md:min-h-0 md:rounded-[28px]"
+                className="relative block min-h-[190px] overflow-hidden rounded-[22px] bg-[#FFF1DD] shadow-[0_10px_28px_rgba(154,40,61,0.08)] sm:min-h-[220px] md:h-[320px] md:min-h-0 md:rounded-[28px]"
             >
                 <img
                     src={imageUrl}
                     crossOrigin="anonymous"
                     alt={stripHtmlTags(cardData.title || guidanceTitle)}
-                    className="absolute inset-0 h-full w-full object-cover object-[62%_center] sm:object-center"
+                    className="absolute inset-0 h-full w-full object-cover object-right"
                 />
-                <div className="absolute inset-0 bg-gradient-to-r from-[#FFF2DF] via-[#FFF2DF]/95 via-[64%] to-transparent md:via-[58%]" />
-                <div className="relative z-10 flex min-h-[228px] max-w-[68%] flex-col justify-center px-4 py-4 text-[#9A283D] sm:min-h-[220px] sm:max-w-[66%] md:h-full md:min-h-0 md:px-8 md:py-5">
-                    <span className="font-devanagari inline-flex w-fit rounded-xl bg-[#FFE1AC] px-3 py-1.5 text-[13px] font-bold leading-none md:px-4 md:py-2 md:text-base">{guidanceTitle}</span>
-                    <h2 className="font-devanagari mt-3 text-[27px] font-bold leading-none md:mt-4 md:text-5xl">{cardData.title || "आज का व्रत"}</h2>
-                    {guidanceDate && <p className="font-eng mt-3 text-sm text-[#5E5E5E] md:mt-4 md:text-lg">{guidanceDate}</p>}
+                <div className="absolute inset-0 bg-gradient-to-r from-[#FFF2DF] via-[#FFF2DF]/90 via-[54%] to-transparent md:via-[48%]" />
+                <div className="relative z-10 flex min-h-[190px] max-w-[64%] flex-col justify-center px-4 py-3 text-[#9A283D] sm:min-h-[220px] sm:max-w-[62%] md:h-full md:min-h-0 md:max-w-[55%] md:px-8 md:py-5">
+                    <span className={`${isHindiText(guidanceTitle) ? "font-devanagari" : "font-eng"} inline-flex w-fit rounded-xl bg-[#FFE1AC] px-2.5 py-1 text-[12px] font-bold leading-none sm:px-3 sm:py-1.5 sm:text-[13px] md:px-4 md:py-2 md:text-base`}>
+                        {guidanceTitle}
+                    </span>
+                    <h2 className={`${isHindiText(bannerTitle) ? "font-devanagari" : "font-eng"} mt-2 text-[20px] font-bold leading-tight sm:mt-3 sm:text-[26px] md:mt-4 md:text-5xl`}>
+                        {bannerTitle}
+                    </h2>
+                    {guidanceDate && <p className="font-eng mt-2 text-xs text-[#5E5E5E] sm:mt-3 sm:text-sm md:mt-4 md:text-lg">{guidanceDate}</p>}
                     {guidanceDescription && (
-                        <p className="font-devanagari mt-2.5 text-[15px] leading-snug text-[#4E4E4E] md:mt-3 md:text-lg md:leading-tight">
+                        <p className={`${isHindiText(guidanceDescription) ? "font-devanagari" : "font-eng"} mt-2 text-[12px] leading-snug text-[#4E4E4E] sm:text-[14px] md:mt-3 md:text-lg md:leading-tight line-clamp-2 sm:line-clamp-none`}>
                             {guidanceDescription}
                         </p>
                     )}
-                    <span className="font-devanagari mt-4 inline-flex w-fit items-center gap-1 rounded-xl bg-[#9A283D] px-5 py-2.5 text-[15px] font-semibold leading-none text-white shadow-[0_8px_16px_rgba(154,40,61,0.22)] md:mt-5 md:px-6 md:py-3 md:text-lg">
-                        {cardData.ctaLabel || guidance?.cta?.label || "आज का व्रत"}
-                        <ArrowRight size={16} />
+                    <span className={`${isHindiText(bannerCtaLabel) ? "font-devanagari" : "font-eng"} mt-3 inline-flex w-fit items-center gap-1 rounded-xl bg-[#9A283D] px-3.5 py-2 text-[13px] font-semibold leading-none text-white shadow-[0_8px_16px_rgba(154,40,61,0.22)] sm:mt-4 sm:px-5 sm:py-2.5 sm:text-[15px] md:mt-5 md:px-6 md:py-3 md:text-lg`}>
+                        {bannerCtaLabel}
+                        <ArrowRight size={14} />
                     </span>
                 </div>
             </Link>
@@ -801,22 +809,24 @@ function Home() {
 
                 <section className="mb-4">
                     <Link
-                        to={jaapStreak?.categoryId ? `/newjaapMaala/${jaapStreak.categoryId}` : "/newjaapMaala"}
+                        to={`/newjaapMaala/${jaapStreak?.categoryId || "6a15885ebfbd4709a604eb40"}`}
                         onClick={() => trackEvent(GA4Events.jaap_mala_widget_clicked, {
                             event_label: "jaap_streak_card_clicked_on_home_screen",
-                            categoryId: jaapStreak?.categoryId
+                            categoryId: jaapStreak?.categoryId || "6a15885ebfbd4709a604eb40"
                         })}
-                        className="flex min-h-[108px] items-center justify-between overflow-hidden rounded-[22px] border border-[#F5E5D7] bg-white px-4 py-4 shadow-[0_8px_24px_rgba(154,40,61,0.08)]"
+                        className="flex min-h-[88px] items-center justify-between overflow-hidden rounded-[22px] border border-[#F5E5D7] bg-white px-3 py-3 shadow-[0_8px_24px_rgba(154,40,61,0.08)] sm:min-h-[108px] sm:px-4 sm:py-4"
                     >
-                        <div className="flex min-w-0 flex-1 items-center gap-3">
-                            <div className="flex h-20 w-20 shrink-0 items-center justify-center">
-                                <img src={malaGif} alt="" className="h-20 w-20 object-contain" />
+                        <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
+                            <div className="flex h-16 w-16 shrink-0 items-center justify-center sm:h-20 sm:w-20">
+                                <img src={malaGif} alt="Mala" className="h-16 w-16 object-contain sm:h-20 sm:w-20" />
                             </div>
                             <div className="min-w-0 flex-1">
-                                <h2 className="font-devanagari whitespace-nowrap text-[18px] font-bold leading-tight text-[#9A283D]">{jaapStreak?.ctaLabel || "अपना जाप जारी रखें"}</h2>
+                                <h2 className={`${language === "en" ? "font-eng" : "font-devanagari"} text-[15px] font-bold leading-tight text-[#9A283D] sm:text-[18px]`}>
+                                    {language === "en" ? "Continue your Jaap" : (jaapStreak?.ctaLabel || "अपना जाप जारी रखें")}
+                                </h2>
                             </div>
                         </div>
-                        <span className="font-eng ml-3 inline-flex shrink-0 items-center gap-1 rounded-full bg-[#9A283D] px-3 py-2 text-xs font-semibold text-white">
+                        <span className="font-eng ml-2 inline-flex shrink-0 items-center gap-1 rounded-full bg-[#9A283D] px-2.5 py-1.5 text-xs font-semibold text-white sm:ml-3 sm:px-3 sm:py-2">
                             Click Here <ArrowRight size={14} />
                         </span>
                     </Link>
@@ -885,7 +895,7 @@ function Home() {
                             </button>
                         )}
                     </div>
-                    <div id="home-quick-access-cards" className="grid grid-cols-4 gap-x-4 gap-y-5 text-center md:grid-cols-6">
+                    <div id="home-quick-access-cards" className="grid grid-cols-4 gap-x-2 gap-y-4 text-center sm:gap-x-4 sm:gap-y-5 md:grid-cols-6">
                         {visibleQuickAccessCategories.map((category) => (
                             <Link
                                 key={category._id || category.url || category.title}
@@ -897,15 +907,15 @@ function Home() {
                                 onClick={(e) => handleHomeCategoryClicked(category, e)}
                                 className="group flex min-w-0 flex-col items-center"
                             >
-                                <span className="flex h-[70px] w-[70px] items-center justify-center rounded-xl border border-[#F0E4DC] bg-white shadow-[0_6px_16px_rgba(154,40,61,0.06)] transition group-hover:border-[#9A283D] group-hover:bg-[#FFF8F0] md:h-20 md:w-20">
+                                <span className="flex h-[60px] w-[60px] items-center justify-center rounded-xl border border-[#F0E4DC] bg-white shadow-[0_6px_16px_rgba(154,40,61,0.06)] transition group-hover:border-[#9A283D] group-hover:bg-[#FFF8F0] sm:h-[70px] sm:w-[70px] md:h-20 md:w-20">
                                     <img
                                         src={normalizeImageUrl(category.imageUrl)}
                                         alt={getCategoryRoute(category) === "/guru-ji" ? "गुरु जी" : stripHtmlTags(category.title)}
                                         crossOrigin="anonymous"
-                                        className="h-10 w-10 object-contain"
+                                        className="h-8 w-8 object-contain sm:h-10 sm:w-10"
                                     />
                                 </span>
-                                <p className="font-devanagari mt-2 w-full truncate text-sm leading-tight text-[#2F2724] md:text-base">
+                                <p className="font-devanagari mt-1.5 w-full truncate text-xs leading-tight text-[#2F2724] sm:text-sm md:text-base">
                                     {renderCategoryTitle(category.title, category)}
                                 </p>
                             </Link>

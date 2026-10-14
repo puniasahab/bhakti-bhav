@@ -615,6 +615,15 @@ body::before,
   }
 }
 
+/* Specifically decrease image size for iPhone SE */
+@media (max-width: 375px) {
+  .vrat-katha-hero-img {
+    height: 120px !important;
+    max-height: 120px !important;
+    max-width: 155px !important;
+  }
+}
+
 @media (max-width: 380px) {
   .new-jaap-fixed-content {
     max-height: calc(100vh - 276px);

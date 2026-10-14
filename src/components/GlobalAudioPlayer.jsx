@@ -165,7 +165,8 @@ const GlobalAudioPlayer = () => {
   // Fallback artwork image
   const artworkUrl =
     trackMetadata?.imageUrl ||
-    "/img/default_katha.png";
+    localStorage.getItem("currentTrackImage") ||
+    "/img/logo_splash.png";
 
   const primaryTitle =
     trackMetadata?.title ||
@@ -266,7 +267,7 @@ const GlobalAudioPlayer = () => {
                 className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                 onError={(e) => {
                   e.target.onerror = null;
-                  e.target.src = "/img/default_katha.png";
+                  e.target.src = "/img/logo_splash.png";
                 }}
               />
               {/* Music Note Badge on Bottom-Right Corner */}
@@ -459,7 +460,7 @@ const GlobalAudioPlayer = () => {
                   className="w-full h-full object-cover rounded-[24px]"
                   onError={(e) => {
                     e.target.onerror = null;
-                    e.target.src = "/img/default_katha.png";
+                    e.target.src = "/img/logo_splash.png";
                   }}
                 />
               </div>

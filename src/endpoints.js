@@ -40,5 +40,6 @@ export const endPoints = {
     homeData: 'homedata',
     newHomeApi: 'home-screen',
     teachingCategoriesV3: 'teaching-categories-v3',
-    teachingCategoryV3: 'teaching-category-v3'
+    teachingCategoryV3: 'teaching-category-v3',
+    teachingContentV3: 'teaching-content-v3'
 }

@@ -143,6 +143,23 @@ export const teachingApis = {
       throw error;
     }
   },
+
+  getTeachingContentV3: async (contentId) => {
+    try {
+      const response = await api.get(`${someNewUrlForV4}${endPoints.teachingContentV3}/${contentId}`);
+      return response.data;
+    }
+    catch (error) {
+      if (error?.response?.status === 404) {
+        try {
+          const stagingRes = await axios.get(`https://stagingapi.bhaktibhav.app/api/v1/frontend-v4/teaching-content-v3/${contentId}`);
+          return stagingRes.data;
+        } catch (e2) {}
+      }
+      console.error("Error fetching teaching content items:", error);
+      throw error;
+    }
+  },
 }
 
 export const wallpaperApis = {
