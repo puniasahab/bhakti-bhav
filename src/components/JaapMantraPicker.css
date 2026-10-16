@@ -1,0 +1,37 @@
+.jaap-mantra-picker {
+  box-sizing: border-box;
+  width: min( calc(100% - 40px), 420px);
+  max-height: calc(100dvh - 40px);
+  margin: auto;
+  padding: 28px 24px 32px;
+  overflow-y: auto;
+  border: 0;
+  border-radius: 28px;
+  background: #fff;
+  color: #982b43;
+  box-shadow: 0 20px 60px #0002;
+}
+
+.jaap-mantra-picker::backdrop { background: #0008; }
+.jaap-mantra-picker-heading { display: flex; align-items: center; gap: 12px; }
+.jaap-mantra-picker-heading h2 { margin: 0; font-size: 21px; font-weight: 700; line-height: 1.5; }
+.jaap-mantra-picker-close { display: grid; place-items: center; flex-shrink: 0; margin-left: auto; padding: 6px; border: 0; border-radius: 50%; background: transparent; color: #982b43; }
+.jaap-mantra-picker-description { margin: 20px 0; color: #858585; font-size: 16px; line-height: 1.6; }
+.jaap-mantra-picker-options { display: grid; gap: 12px; }
+.jaap-mantra-picker-option { display: flex; align-items: center; gap: 18px; min-height: 66px; padding: 14px 20px; border: 2px solid #e4e4e4; border-radius: 18px; background: #fafafa; color: #242424; cursor: pointer; font-size: 18px; line-height: 1.6; overflow-wrap: anywhere; }
+.jaap-mantra-picker-option.is-selected { border-color: #982b43; background: #f7eef0; color: #982b43; font-weight: 700; }
+.jaap-mantra-picker-option input { flex-shrink: 0; width: 23px; height: 23px; margin: 0; accent-color: #982b43; }
+.jaap-mantra-picker-actions { display: flex; justify-content: flex-end; margin-top: 32px; }
+.jaap-mantra-picker-actions button { padding: 14px 28px; border: 0; border-radius: 999px; background: #982b43; color: #fff; font: 700 18px/1.4 sans-serif; box-shadow: 0 2px 4px #0003; }
+.jaap-mantra-picker-actions button:disabled { opacity: .5; cursor: not-allowed; }
+.jaap-mantra-picker-custom { margin-top: 18px; font-size: 14px; }
+.jaap-mantra-picker-custom > button { text-decoration: underline; }
+.jaap-mantra-picker-custom label { display: block; margin: 12px 0 6px; }
+.jaap-mantra-picker-custom input { width: 100%; padding: 12px; border: 1px solid #dab5bd; border-radius: 8px; }
+.jaap-mantra-picker button:focus-visible, .jaap-mantra-picker input:focus-visible { outline: 2px solid #982b43; outline-offset: 4px; }
+@media (max-width: 360px) {
+  .jaap-mantra-picker { padding: 24px 18px; }
+  .jaap-mantra-picker-heading { gap: 8px; }
+  .jaap-mantra-picker-heading h2 { font-size: 18px; }
+  .jaap-mantra-picker-option { padding: 12px; gap: 12px; font-size: 16px; }
+}

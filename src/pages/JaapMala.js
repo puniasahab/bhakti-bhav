@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback, useContext } from "react";
 import { Link } from "react-router-dom";
-import Header from "../components/Header";
+import DevotionalHeader from "../components/DevotionalHeader";
 import Footer from "../components/Footer";
 import Loader from "../components/Loader";
 import PageTitleCard from "../components/PageTitleCard";
@@ -241,17 +241,18 @@ const renderHinglishName = (aarti) => {
 
     <SchemaMarkup schema={jaapMalaSchema} />
     <SEO title = "Best Jaap Mala Counter App – Digital Chanting Beads & Jap | भक्ति भाव" description="Track your mantra chanting with a digital mala jap app. Supports 5 mukhi, 9 mukhi Rudraksha, Tulsi mala and more. Simple, accurate and भक्तिमय experience." canonical="https://bhaktibhav.app/jaap-mala" schema={homeSchema} />
-      <Header pageName={{ hi: "tkkp ekyk", en: "Jaap mala" }} />
-      <PageTitleCard
-        titleHi={"uke tki"}
-        titleEn={"Naam Jaap"}
-        isHinglishLanguageSelected={language==='hinglish'}
-        // customEngFontSize={"18px"}
-        customEngFontSize={language === "hinglish" ? "16px" : "18px"}
-        customFontSize={"23px"}
-      />
+      <DevotionalHeader>
+        <PageTitleCard
+          variant="attached"
+          titleHi="नाम जाप"
+          titleEn="Naam Jaap"
+          language={language === "hinglish" ? "hi" : language}
+          customFontSize="16px"
+          customEngFontSize="16px"
+        />
+      </DevotionalHeader>
 
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-4 mt-3">
 
         <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
           {data.map((item) => (

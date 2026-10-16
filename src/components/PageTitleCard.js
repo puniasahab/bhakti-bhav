@@ -1,6 +1,7 @@
 // components/TitleCard.jsx
 import React, { useContext } from "react";
 import { LanguageContext } from "../contexts/LanguageContext";
+import "./PageTitleCard.css";
 
 const PageTitleCard = ({ 
   titleHi, 
@@ -10,6 +11,8 @@ const PageTitleCard = ({
   textSize = "text-xl", 
   customFontSize,    // Font size in pixels for Hindi title
   customEngFontSize, // Font size in pixels for English title
+  variant = "default",
+  as: TitleElement = "div",
   isFromJaapMala = false, // New prop to indicate if it's from JaapMala
   isHinglishLanguageSelected = false // When true, show both Hindi and English titles together (Hindi bigger, English smaller, next line)
 }) => {
@@ -74,6 +77,30 @@ const PageTitleCard = ({
   const appliedFontSize = activeLanguage === "hi"
     ? customFontSize
     : (customEngFontSize || customFontSize);
+
+  if (variant === "attached") {
+    const hindiClass = /[\u0900-\u097F]/.test(String(titleHi || "")) ? "font-devanagari" : "font-hindi";
+    const renderHindiTitle = (text) => {
+      if (!isFromJaapMala || typeof text !== "string") return text;
+      return text.split(/([0-9]+)/).map((part, index) => (
+        /^[0-9]+$/.test(part) ? <span key={index} className="font-eng">{part}</span> : part
+      ));
+    };
+    return (
+      <div className="page-title-card-attached">
+        <TitleElement className="page-title-card-attached-tab">
+          {titleData.isHinglish ? (
+            <>
+              {titleData.hindiText && <span className={hindiClass} style={{ fontSize: customFontSize || "16px" }}>{renderHindiTitle(titleData.hindiText)}</span>}
+              {titleData.englishText && <span className="font-eng" style={{ fontSize: customEngFontSize || "14px" }}>{titleData.englishText}</span>}
+            </>
+          ) : (
+            <span className={titleData.className === "font-hindi" ? hindiClass : titleData.className} style={{ fontSize: appliedFontSize || "16px" }}>{titleData.className === "font-hindi" ? renderHindiTitle(titleData.text) : titleData.text}</span>
+          )}
+        </TitleElement>
+      </div>
+    );
+  }
 
   return (
     <div className="flex justify-center items-center mt-1 mb-3">

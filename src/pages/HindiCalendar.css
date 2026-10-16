@@ -1,0 +1,34 @@
+.hindi-calendar-header-surface {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 50;
+  padding-top: env(safe-area-inset-top);
+  background: #fff url("../../public/img/home_bg.png") center top / 100% auto no-repeat;
+}
+
+/* Reserve the top inset, header, and title tab so the first month stays visible. */
+.hindi-calendar-main {
+  padding-top: calc(144px + env(safe-area-inset-top));
+  scroll-margin-top: calc(144px + env(safe-area-inset-top));
+}
+
+.hindi-calendar-brand-title {
+  flex-shrink: 0;
+  margin: 0;
+  padding-block: 2px;
+  font-size: 22px;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+@media (max-width: 374px) {
+  .hindi-calendar-header-surface header {
+    /* Keep the existing 68px header height and make room for the full title. */
+    padding: 17px 10px;
+  }
+
+  .hindi-calendar-header-surface header > div:first-child { gap: 8px; }
+  .hindi-calendar-header-surface header > div:first-child > div { gap: 6px; }
+  .hindi-calendar-header-surface header button { width: 34px; height: 34px; }
+  .hindi-calendar-brand-title { font-size: 20px; }
+}

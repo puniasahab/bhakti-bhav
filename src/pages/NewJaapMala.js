@@ -1,6 +1,6 @@
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
-import backBtn from "../assets/img/back_icon.svg";
+import { ChevronLeft, Search } from "lucide-react";
 import rupeesIcon from "../assets/img/rupees_icon.png";
 import userIcon from "../assets/img/hd_user_icon.png";
 import Loader from "../components/Loader";
@@ -15,6 +15,9 @@ import { homeSchema } from "../seo/schemas";
 import { GA4Events } from "../utils/ga4Events.enum";
 import { newJaapMalaSchema } from "../schemas/pageSchemas";
 import SchemaMarkup from "../components/SchemaMarkup";
+import JaapMantraPicker from "../components/JaapMantraPicker";
+import { getJaapMantras } from "../utils/jaapMantras";
+import "./NewJaapMala.css";
 
 const API_BASE_URL = "https://api.bhaktibhav.app";
 const CACHE_TTL = 5 * 60 * 1000;
@@ -148,6 +151,7 @@ export default function NewJaapMala() {
   const initialCachedItems = getContentItems(initialCachedResponse);
 
   const [items, setItems] = useState(initialCachedItems);
+  const [mantraItem, setMantraItem] = useState(null);
   const [loading, setLoading] = useState(!initialCachedResponse);
   const [loadingMore, setLoadingMore] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -165,6 +169,7 @@ export default function NewJaapMala() {
     const cachedItems = getContentItems(cachedResponse);
 
     setItems(cachedItems);
+    setMantraItem(null);
     setCurrentPage(1);
     setHasMore(cachedResponse ? hasMoreContent(cachedResponse, cachedItems, 1, limit) : true);
     setLoading(!cachedResponse);
@@ -278,38 +283,40 @@ export default function NewJaapMala() {
 
   const renderHeader = () => (
     <>
-      <header className="fixed top-0 left-0 right-0 z-50 px-4 pt-3 bg-white shadow-sm" style={{ height: "80px" }}>
-        <div className="container mx-auto hd_bg rounded-xl">
-          <div className="flex justify-between items-center px-4 py-6">
-            <div className="flex items-center gap-3">
-              <button
-                type="button"
-                onClick={() => {
-                  if (window.history.state && window.history.state.idx > 0) {
-                    navigate(-1);
-                  } else {
-                    navigate("/");
-                  }
-                }}
-                aria-label="Back"
-              >
-                <img src={backBtn} alt="Back" width="24" height="24" />
-              </button>
-              <span className="font-hindi text-xl font-semibold theme_text">भक्ति भाव</span>
-            </div>
+      <header className="new-jaap-list-header">
+        <div className="container mx-auto new-jaap-list-header-bar">
+          <div className="new-jaap-list-brand">
+            <button
+              type="button"
+              className="new-jaap-list-header-button"
+              onClick={() => {
+                if (window.history.state && window.history.state.idx > 0) {
+                  navigate(-1);
+                } else {
+                  navigate("/");
+                }
+              }}
+              aria-label="Back"
+            >
+              <ChevronLeft size={24} strokeWidth={2.6} aria-hidden="true" />
+            </button>
+            <span className="new-jaap-list-brand-title font-devanagari">भक्ति भाव</span>
+          </div>
 
-            <div className="flex items-center space-x-6 text-xl">
-              <button type="button" onClick={() => navigate(hasToken ? "/payment" : "/login")} aria-label="Payment">
-                <img src={rupeesIcon} alt="Payment" width="22" height="22" />
-              </button>
-              <button type="button" onClick={() => navigate(hasToken ? "/profile" : "/login")} aria-label="Profile">
-                <img src={userIcon} alt="Profile" width="22" height="20" />
-              </button>
-            </div>
+          <div className="new-jaap-list-header-actions">
+            <button type="button" className="new-jaap-list-header-button" onClick={() => navigate("/search", { state: { from: location.pathname + location.search } })} aria-label="Search">
+              <Search size={24} strokeWidth={2.3} aria-hidden="true" />
+            </button>
+            <button type="button" className="new-jaap-list-header-button" onClick={() => navigate(hasToken ? "/payment" : "/login")} aria-label="Payment">
+              <img src={rupeesIcon} alt="Payment" width="22" height="22" />
+            </button>
+            <button type="button" className="new-jaap-list-header-button" onClick={() => navigate(hasToken ? "/profile" : "/login")} aria-label="Profile">
+              <img src={userIcon} alt="Profile" width="22" height="20" />
+            </button>
           </div>
         </div>
       </header>
-      <div className="h-20 w-full"></div>
+      <div className="new-jaap-list-header-spacer" aria-hidden="true" />
     </>
   );
 
@@ -354,7 +361,14 @@ export default function NewJaapMala() {
               <li key={item._id || idx}>
                 <Link
                   to={handleNavigate(item)}
-                  onClick={() => handleTrackEvent(item)}
+                  onClick={(event) => {
+                    if (!isRestricted && getJaapMantras(item.mantras, language).length) {
+                      event.preventDefault();
+                      setMantraItem(item);
+                      return;
+                    }
+                    handleTrackEvent(item);
+                  }}
                   state={{ item, categoryId }}
                   className="relative block overflow-hidden rounded-xl shadow-lg bg-black"
                 >
@@ -383,6 +397,17 @@ export default function NewJaapMala() {
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#9A283D]"></div>
           <span className="ml-2 text-[#9A283D] font-eng">Loading more...</span>
         </div>
+      )}
+      {mantraItem && (
+        <JaapMantraPicker
+          options={getJaapMantras(mantraItem.mantras, language)}
+          language={language}
+          onClose={() => setMantraItem(null)}
+          onConfirm={(selectedMantraKey) => {
+            handleTrackEvent(mantraItem);
+            navigate(handleNavigate(mantraItem), { state: { item: mantraItem, categoryId, selectedMantraKey } });
+          }}
+        />
       )}
     </>
   );

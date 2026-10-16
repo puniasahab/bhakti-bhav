@@ -1,6 +1,6 @@
 import React, { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import Header from "../components/Header";
+import VratKathaHeader from "../components/VratKathaHeader";
 import Loader from "../components/Loader";
 import PageTitleCard from "../components/PageTitleCard";
 import { useKatha } from "../contexts/KathaContext";
@@ -256,16 +256,16 @@ export default function VratKatha() {
         canonical="https://bhaktibhav.app/vrat-katha"
         schema={homeSchema}
       />
-      <Header hideEditIcon={true} showProfileHeader={true} profileText="भक्ति भाव" backRoute="/" />
-      <div className="h-2"></div>
-
-      <PageTitleCard
-        titleHi={"ozr dFkk"}
-        titleEn={"Vrat Katha"}
-        isHinglishLanguageSelected={language === "hinglish"}
-        customEngFontSize={"18px"}
-        customFontSize={"23px"}
-      />
+      <VratKathaHeader backRoute="/">
+        <PageTitleCard
+          variant="attached"
+          titleHi="व्रत कथा"
+          titleEn="Vrat Katha"
+          language={language === "hinglish" ? "hi" : language}
+          customFontSize="16px"
+          customEngFontSize="16px"
+        />
+      </VratKathaHeader>
 
       <div className="container mx-auto px-4 mt-4">
         <ul className="grid grid-cols-2 lg:grid-cols-4 gap-4 text-center">

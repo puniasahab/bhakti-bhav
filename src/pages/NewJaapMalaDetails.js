@@ -1,6 +1,8 @@
 import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
-import { CheckCircle, Hand, Info, SlidersHorizontal, X } from "lucide-react";
+import { CheckCircle, Hand, Info, SlidersHorizontal } from "lucide-react";
+import JaapMantraPicker from "../components/JaapMantraPicker";
+import { getJaapMantras } from "../utils/jaapMantras";
 import Header from "../components/Header";
 import Loader from "../components/Loader";
 import PageTitleCard from "../components/PageTitleCard";
@@ -109,7 +111,6 @@ export default function NewJaapMalaDetails() {
   const { language, fontSize } = useContext(LanguageContext);
   const malaVideoRef = useRef(null);
   const titleScrollRef = useRef(null);
-  const mantraDialogRef = useRef(null);
   const completionTimerRef = useRef(null);
   const countRef = useRef(0);
   const [detail, setDetail] = useState(() => location.state?.item || null);
@@ -117,14 +118,29 @@ export default function NewJaapMalaDetails() {
   const [jaapCount, setJaapCount] = useState(0);
   const [malaCount, setMalaCount] = useState(0);
   const [showCompletionModal, setShowCompletionModal] = useState(false);
+  const [completionTotalMalas, setCompletionTotalMalas] = useState(0);
+  const [refreshingCompletion, setRefreshingCompletion] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const [jaapStats, setJaapStats] = useState(null);
   const [customMantra, setCustomMantra] = useState("");
-  const [mantraDraft, setMantraDraft] = useState("");
+  const [selectedMantraKey, setSelectedMantraKey] = useState(location.state?.selectedMantraKey);
+  const [showMantraPicker, setShowMantraPicker] = useState(false);
   const [streakDays, setStreakDays] = useState(null);
   const [showStreakInfo, setShowStreakInfo] = useState(false);
 
   useEffect(() => () => window.clearTimeout(completionTimerRef.current), []);
+
+  useEffect(() => {
+    if (loading || !detail) return;
+    document.body.classList.add("new-jaap-details-active");
+    return () => document.body.classList.remove("new-jaap-details-active");
+  }, [loading, detail]);
+
+  useEffect(() => {
+    setSelectedMantraKey(location.state?.selectedMantraKey);
+    setCustomMantra("");
+    setShowMantraPicker(false);
+  }, [id, location.state?.selectedMantraKey]);
 
   useEffect(() => {
     let isActive = true;
@@ -172,8 +188,16 @@ export default function NewJaapMalaDetails() {
   const imageUrl = normalizeAssetUrl(detail?.imageUrl);
   const displayImageUrl = imageUrl || "/img/shreeHanuman.png";
 
-  const mantra = customMantra || getHinglishTitleParts(title).hindiText || cleanTitle;
+  // The list response can include mantras omitted by the detail endpoint.
+  // An explicit empty/null mantras field from details still takes precedence.
+  const mantraOptions = useMemo(() => getJaapMantras(
+    detail?.mantras !== undefined ? detail.mantras : location.state?.item?.mantras,
+    language
+  ), [detail, location.state?.item, language]);
+  const selectedMantra = mantraOptions.find((option) => option.key === selectedMantraKey) || mantraOptions[0];
+  const mantra = mantraOptions.length ? customMantra || selectedMantra.text : "";
   const todayMala = jaapStats?.todayMala ?? jaapStats?.currentMalaCounter ?? malaCount;
+  const streakLabel = streakDays === null ? "—" : `${streakDays} ${streakDays === 1 ? "Day" : "Days"}`;
   const totalJaap = (jaapStats
     ? (jaapStats.malaSize ?? JAAP_PER_MALA) * (jaapStats.totalMala ?? 0)
     : malaCount * JAAP_PER_MALA) + (jaapCount === JAAP_PER_MALA ? 0 : jaapCount);
@@ -199,6 +223,7 @@ export default function NewJaapMalaDetails() {
         setJaapStats(jaap);
         setMalaCount(jaap.currentMalaCounter ?? 0);
       }
+      return jaap;
     } catch (error) {
       console.error("Error fetching Jaap Mala count:", error);
     }
@@ -223,7 +248,7 @@ export default function NewJaapMalaDetails() {
     if (top < titleScroll.scrollTop || top + activeName.offsetHeight > titleScroll.scrollTop + titleScroll.clientHeight) {
       titleScroll.scrollTop = Math.max(0, top + activeName.offsetHeight - titleScroll.clientHeight);
     }
-  }, [jaapCount, fontSize]);
+  }, [jaapCount, fontSize, mantra]);
 
   const playMalaAnimation = () => {
     const video = malaVideoRef.current;
@@ -236,17 +261,23 @@ export default function NewJaapMalaDetails() {
   const completeOneMala = () => {
     const newMalaCount = malaCount + 1;
     setMalaCount(newMalaCount);
+    setCompletionTotalMalas((jaapStats?.totalMala ?? malaCount) + 1);
     setJaapCount(JAAP_PER_MALA);
     setShowCompletionModal(true);
     setShowConfetti(true);
 
     // Persist updated mala count to the API, then re-fetch latest stats
     if (id) {
+      setRefreshingCompletion(true);
       newJaapMalaApis.updateJaapMalaCount(id, 108)
-        .then(() => { fetchJaapStats(); fetchStreak(); })
+        .then(() => Promise.all([fetchJaapStats(), fetchStreak()]))
+        .then(([jaap]) => {
+          if (typeof jaap?.totalMala === "number") setCompletionTotalMalas(jaap.totalMala);
+        })
         .catch((error) => {
           console.error("Error updating Jaap Mala count:", error);
-        });
+        })
+        .finally(() => setRefreshingCompletion(false));
     }
 
     completionTimerRef.current = window.setTimeout(() => {
@@ -289,7 +320,7 @@ export default function NewJaapMalaDetails() {
   }
 
   return (
-    <>
+    <div className="new-jaap-viewport">
       <SEO
         title={`${cleanTitle} | भक्ति भाव`}
         description={cleanTitle}
@@ -297,7 +328,7 @@ export default function NewJaapMalaDetails() {
         schema={homeSchema}
       />
       <div className="new-jaap-details-header">
-        <Header pageName={{ hi: "जाप माला", en: "Jaap Mala" }} fontSizeOption />
+        <Header pageName={{ hi: "जाप माला", en: "Jaap Mala" }} fontSizeOption inlineHeader />
       </div>
       <div className={`new-jaap-screen new-jaap-details font-eng ${fontSize === "text-xl" ? "new-jaap-large-text" : ""}`} >
         <div className="new-jaap-fixed-content">
@@ -319,38 +350,39 @@ export default function NewJaapMalaDetails() {
                 decoding="async"
               />
             </div>
-            <button
-              type="button"
-              className="new-jaap-change-mantra font-devanagari"
-              onClick={() => {
-                setMantraDraft(mantra);
-                mantraDialogRef.current?.showModal();
-              }}
-            >
-              <SlidersHorizontal size={17} aria-hidden="true" />
-              {language === "en" ? "Change mantra" : "मंत्र बदलें"}
-            </button>
-            <div
-              ref={titleScrollRef}
-              className={`new-jaap-title-scroll ${language === "hi" && !customMantra ? "font-hindi" : "font-devanagari"}`}
-              role="group"
-              aria-label="108 mantra repetitions"
-            >
-              {Array.from({ length: JAAP_PER_MALA }, (_, index) => (
+            {mantraOptions.length > 0 && (
+              <>
                 <button
                   type="button"
-                  key={index}
-                  className={`new-jaap-name ${index < jaapCount ? "is-complete" : ""}`}
-                  onClick={handleJaapTap}
-                  aria-label={`Chant ${index + 1}: ${mantra}`}
-                  aria-pressed={index < jaapCount}
-                  aria-current={index === jaapCount - 1 ? "step" : undefined}
-                  disabled={showCompletionModal}
+                  className="new-jaap-change-mantra font-devanagari"
+                  onClick={() => setShowMantraPicker(true)}
                 >
-                  {language === "hi" && !customMantra ? replaceSpecialChars(mantra) : mantra}
+                  <SlidersHorizontal size={17} aria-hidden="true" />
+                  {language === "en" ? "Change mantra" : "मंत्र बदलें"}
                 </button>
-              ))}
-            </div>
+                <div
+                  ref={titleScrollRef}
+                  className="new-jaap-title-scroll font-devanagari"
+                  role="group"
+                  aria-label="108 mantra repetitions"
+                >
+                  {Array.from({ length: JAAP_PER_MALA }, (_, index) => (
+                    <button
+                      type="button"
+                      key={index}
+                      className={`new-jaap-name ${index < jaapCount ? "is-complete" : ""}`}
+                      onClick={handleJaapTap}
+                      aria-label={`Chant ${index + 1}: ${mantra}`}
+                      aria-pressed={index < jaapCount}
+                      aria-current={index === jaapCount - 1 ? "step" : undefined}
+                      disabled={showCompletionModal}
+                    >
+                      {mantra}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
             <span className="sr-only" role="status">{jaapCount} of {JAAP_PER_MALA} chants completed</span>
           </main>
         </div>
@@ -370,7 +402,7 @@ export default function NewJaapMalaDetails() {
             <h2>Stats Summary</h2>
             <div className="new-jaap-summary-item">
               <span className="new-jaap-summary-icon" aria-hidden="true">🔥</span>
-              <div><p>Streak</p><strong>{streakDays === null ? "—" : `${streakDays} ${streakDays === 1 ? "Day" : "Days"}`}</strong></div>
+              <div><p>Streak</p><strong>{streakLabel}</strong></div>
               <button type="button" className="new-jaap-streak-info" aria-label="About your streak" onClick={() => setShowStreakInfo((value) => !value)} aria-expanded={showStreakInfo}><Info size={15} /></button>
             </div>
             {showStreakInfo && <p className="new-jaap-streak-copy">Your streak is the number of consecutive days you complete a mala.</p>}
@@ -410,9 +442,7 @@ export default function NewJaapMalaDetails() {
                 <>
                   <small>Today's</small>
                   <b style={{fontSize: '20px'}}>{jaapCount} / {JAAP_PER_MALA}</b>
-                  <span className={`new-jaap-mala-title ${language === "hinglish" ? "new-jaap-mala-title-hinglish" : ""} ${language === "hi" ? "font-devanagari" : "font-eng"}`}>
-                    {language === "hi" && !customMantra ? replaceSpecialChars(mantra) : mantra}
-                  </span>
+                  {mantra && <span className="new-jaap-mala-title font-devanagari">{mantra}</span>}
                 </>
               )}
             </span>
@@ -420,25 +450,21 @@ export default function NewJaapMalaDetails() {
 
         </section>
 
-        <dialog ref={mantraDialogRef} className="new-jaap-mantra-dialog" aria-labelledby="change-mantra-title" onClick={(event) => {
-          if (event.target === event.currentTarget) event.currentTarget.close();
-        }}>
-          <form onSubmit={(event) => {
-            event.preventDefault();
-            if (!mantraDraft.trim()) return;
-            setCustomMantra(mantraDraft.trim());
-            mantraDialogRef.current.close();
-          }}>
-            <div className="new-jaap-dialog-heading">
-              <h2 id="change-mantra-title">{language === "en" ? "Change mantra" : "मंत्र बदलें"}</h2>
-              <button type="button" aria-label="Close" onClick={() => mantraDialogRef.current.close()}><X size={22} /></button>
-            </div>
-            <label htmlFor="jaap-mantra">God name or mantra</label>
-            <input id="jaap-mantra" value={mantraDraft} onChange={(event) => setMantraDraft(event.target.value)} maxLength={120} required autoFocus />
-            <p>Your current count will be kept.</p>
-            <button type="submit" className="new-jaap-next-button" disabled={!mantraDraft.trim()}>Apply</button>
-          </form>
-        </dialog>
+        {showMantraPicker && mantraOptions.length > 0 && (
+          <JaapMantraPicker
+            options={mantraOptions}
+            selectedKey={selectedMantra.key}
+            language={language}
+            allowCustom
+            customMantra={customMantra}
+            onClose={() => setShowMantraPicker(false)}
+            onConfirm={(key, text) => {
+              setSelectedMantraKey(key);
+              setCustomMantra(text);
+              setShowMantraPicker(false);
+            }}
+          />
+        )}
 
         {showConfetti && (
           <div className="new-jaap-confetti" aria-hidden="true">
@@ -461,9 +487,15 @@ export default function NewJaapMalaDetails() {
             <div className="new-jaap-complete-modal">
               <h2 id="mala-complete-title">🙏 Congratulations! 🙏</h2>
               <p className="new-jaap-modal-copy">You completed one Mala!</p>
-              <div className="new-jaap-total-pill">
-                <CheckCircle size={34} fill="#fff" strokeWidth={3} />
-                <span>Total Malas: {malaCount}</span>
+              <div className="new-jaap-total-pill" aria-live="polite" aria-busy={refreshingCompletion}>
+                <div className="new-jaap-completion-stat">
+                  <CheckCircle size={26} fill="#fff" stroke="#9a283d" strokeWidth={3} aria-hidden="true" />
+                  <span>Total Malas: {completionTotalMalas}</span>
+                </div>
+                <div className="new-jaap-completion-stat">
+                  <span className="new-jaap-completion-flame" aria-hidden="true">🔥</span>
+                  <span>Streak: {streakLabel}</span>
+                </div>
               </div>
               <p className="new-jaap-blessing">May your devotion grow stronger! 🕉️</p>
               <button type="button" className="new-jaap-next-button" onClick={handleStartNextMala}>
@@ -473,6 +505,6 @@ export default function NewJaapMalaDetails() {
           </div>
         )}
       </div>
-    </>
+    </div>
   );
 }
