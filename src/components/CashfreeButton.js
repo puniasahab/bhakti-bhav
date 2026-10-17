@@ -12,7 +12,8 @@ const CashfreeButton: React = () => {
       setLoading(true);
 
       // 1️⃣ Call your NestJS backend to create order
-      const { data } = await axios.post("http://localhost:3007/cashfree/create-order", {
+      const apiBase = process.env.REACT_APP_API_BASE_URL || "https://api.bhaktibhav.app/api/v1/frontend/";
+      const { data } = await axios.post(`${apiBase.replace(/\/$/, "")}/cashfree/create-order`, {
         order_id: "ORD123", // you can generate dynamically
         order_amount: 500,
         customer_details: {
@@ -22,13 +23,13 @@ const CashfreeButton: React = () => {
           customer_phone: "1234567890",
         },
         order_note: "Test Order",
-        return_url: "http://localhost:3000/payment-status?order_id=ORD123",
+        return_url: `${window.location.origin}/payment-status?order_id=ORD123`,
       });
 
       const sessionId = data.data.payment_session_id;
 
       // 2️⃣ Load SDK
-      const cashfree = await load({ mode: "sandbox" }); // or "production"
+      const cashfree = await load({ mode: process.env.REACT_APP_CASHFREE_MODE || "production" });
 
       // 3️⃣ Open checkout
       cashfree.checkout({

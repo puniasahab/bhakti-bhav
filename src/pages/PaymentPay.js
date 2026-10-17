@@ -4,6 +4,7 @@ import { CheckCircle, Clock, XCircle } from "lucide-react";
 import { paymentApis, profileApis } from "../api";
 import {
   getMobileNoFromLS,
+  getTokenFromLS,
   setSubscriptionStatusInLS,
   setUserIdInLS,
   setUserName,
@@ -11,9 +12,34 @@ import {
 import { trackCustomEvent } from "../utils/metaPixel";
 import { PIXEL_STANDARD_EVENTS } from "../utils/pixelEvents";
 
+const APPSFLYER_URL =
+  process.env.REACT_APP_APPSFLYER_URL ||
+  process.env.NEXT_PUBLIC_APPSFLYER_URL ||
+  "https://bhakti-bhav-referral.onelink.me/VOv8";
+
+const WEB_LOGIN_TOKEN_URL =
+  process.env.REACT_APP_WEB_LOGIN_TOKEN_URL ||
+  "https://api.bhaktibhav.app/api/v2/users/web-login-token";
+
+async function createPaymentPayWebLoginToken(userJwtToken) {
+  const response = await fetch(WEB_LOGIN_TOKEN_URL, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${userJwtToken}`,
+      "Content-Type": "application/json",
+    },
+  });
+
+  const data = await response.json();
+  if (!response.ok || !data?.token) {
+    throw new Error(data?.message || "Unable to generate app login token");
+  }
+  return data.token;
+}
+
 const POLL_INTERVAL_MS = 3000;
-const SUCCESS_STATUSES = ["ACTIVE"];
-const WAITING_STATUSES = ["INITIALIZED", "PENDING", "BANK_APPROVAL_PENDING", "VERIFYING"];
+const SUCCESS_STATUSES = ["ACTIVE", "PAID", "SUCCESS", "COMPLETED"];
+const WAITING_STATUSES = ["INITIALIZED", "INITIATED", "PENDING", "BANK_APPROVAL_PENDING", "VERIFYING", "PROCESSING"];
 const FAILURE_STATUSES = ["FAILED", "CANCELLED", "AUTHORIZATION_CANCELLED", "EXPIRED"];
 
 const getStatusFromResponse = (response) => {
@@ -172,7 +198,18 @@ export default function PaymentPay() {
     };
   }, [subscriptionId]);
 
-  const handleDownloadApp = () => {
+  const handleDownloadApp = async () => {
+    const userJwtToken = getTokenFromLS();
+    if (userJwtToken) {
+      try {
+        const token = await createPaymentPayWebLoginToken(userJwtToken);
+        const link = `${APPSFLYER_URL}?pid=User_invite&af_click_lookback=30d&c=web_login&deep_link_value=auto_login&deep_link_sub1=${encodeURIComponent(token)}`;
+        window.location.href = link;
+        return;
+      } catch (err) {
+        console.error("PaymentPay: Error generating app login token:", err);
+      }
+    }
     window.location.href = "https://bhakti-bhav-referral.onelink.me/VOv8/vc1rvamj";
   };
 

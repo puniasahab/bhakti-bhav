@@ -3,7 +3,7 @@ import { getTokenFromLS } from './commonFunctions';
 import { endPoints } from './endpoints';
 
 const BASEURL = process.env.REACT_APP_API_BASE_URL || 'https://api.bhaktibhav.app/api/v1/frontend/';
-const CORE_API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'https://stagingapi.bhaktibhav.app/api/v1/';
+const CORE_API_BASE_URL = process.env.REACT_APP_CORE_API_BASE_URL || process.env.REACT_APP_API_BASE_URL || 'https://api.bhaktibhav.app/api/v1/';
 console.log("API Base URL:", BASEURL);
 const api = axios.create({
   baseURL: BASEURL,
@@ -152,8 +152,8 @@ export const teachingApis = {
     catch (error) {
       if (error?.response?.status === 404) {
         try {
-          const stagingRes = await axios.get(`https://stagingapi.bhaktibhav.app/api/v1/frontend-v4/teaching-content-v3/${contentId}`);
-          return stagingRes.data;
+          const liveRes = await axios.get(`https://api.bhaktibhav.app/api/v1/frontend-v4/teaching-content-v3/${contentId}`);
+          return liveRes.data;
         } catch (e2) {}
       }
       console.error("Error fetching teaching content items:", error);
@@ -284,6 +284,20 @@ export const paymentApis = {
       return response.data;
     } catch (error) {
       console.error("Error creating subscription:", error);
+      throw error;
+    }
+  },
+
+  // Direct UPI intent pay endpoint for landing page
+  subscriptionPayIntent: async (data) => {
+    try {
+      const response = await api.post(endPoints.subscriptionPayIntent, data);
+      return response.data;
+    } catch (error) {
+      console.error("Error getting subscription pay intent:", error);
+      if (error?.response?.data) {
+        return error.response.data;
+      }
       throw error;
     }
   },

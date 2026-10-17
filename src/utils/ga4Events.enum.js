@@ -156,6 +156,18 @@ export const GA4Events = {
     blogs_clicked                       : "blogs_clicked",
     contact_us_clicked                  : "contact_us_clicked",
 
+    // ─── LANDING PAGE 1 ───────────────────────────────────────────
+    landingpage1_number_input           : "landingpage1_number_input",
+    landingpage1_otp_verification       : "landingpage1_otp_verification",
+    landingpage1_upi_choosed            : "landingpage1_upi_choosed",
+    landingpage1_payment_done           : "landingpage1_payment_done",
+
+    // ─── LANDING PAGE 2 ───────────────────────────────────────────
+    landingpage2_number_input           : "landingpage2_number_input",
+    landingpage2_otp_verification       : "landingpage2_otp_verification",
+    landingpage2_upi_choosed            : "landingpage2_upi_choosed",
+    landingpage2_payment_done           : "landingpage2_payment_done",
+
     // ─── ERRORS & EDGE CASES ──────────────────────────────────────
     network_error                       : "network_error",
     audio_load_error                    : "audio_load_error",

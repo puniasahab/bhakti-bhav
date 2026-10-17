@@ -75,8 +75,12 @@ async function verifyAppEvents2Otp(mobileNumber, otp) {
   return data;
 }
 
+const WEB_LOGIN_TOKEN_URL =
+  process.env.REACT_APP_WEB_LOGIN_TOKEN_URL ||
+  "https://api.bhaktibhav.app/api/v2/users/web-login-token";
+
 async function createAppEvents2WebLoginToken(userJwtToken) {
-  const response = await fetch("https://api.bhaktibhav.app/api/v2/users/web-login-token", {
+  const response = await fetch(WEB_LOGIN_TOKEN_URL, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${userJwtToken}`,
@@ -201,7 +205,7 @@ const AppEvents2 = () => {
 
   const handleResendOtp = async () => {
     if (timeLeft > 0 || isSendingOtp) return;
-    await handleGenerateOtp({ preventDefault: () => {} });
+    await handleGenerateOtp({ preventDefault: () => { } });
   };
 
   const handleDownloadAppClick = async () => {
@@ -218,7 +222,7 @@ const AppEvents2 = () => {
     setIsGeneratingLink(true);
     try {
       const token = await createAppEvents2WebLoginToken(userJwtToken);
-      const link = `${APPSFLYER_URL}?af_xp=custom&pid=web_login&deep_link_value=auto_login&web_token=${encodeURIComponent(token)}`;
+      const link = `${APPSFLYER_URL}?pid=User_invite&af_click_lookback=30d&c=web_login&deep_link_value=auto_login&deep_link_sub1=${encodeURIComponent(token)}`;
       window.location.href = link;
     } catch (err) {
       console.error("Error generating app link:", err);
@@ -387,9 +391,8 @@ const AppEvents2 = () => {
 
           {(message || error) && (
             <div
-              className={`mt-5 rounded-lg border px-4 py-3 text-sm font-bold ${
-                error ? "border-red-200 bg-red-50 text-red-700" : "border-green-200 bg-green-50 text-green-700"
-              }`}
+              className={`mt-5 rounded-lg border px-4 py-3 text-sm font-bold ${error ? "border-red-200 bg-red-50 text-red-700" : "border-green-200 bg-green-50 text-green-700"
+                }`}
             >
               {error || message}
             </div>

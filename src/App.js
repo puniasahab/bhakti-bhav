@@ -68,6 +68,8 @@ import GameEvents from "./pages/GameEvents";
 import GuruJi from "./pages/GuruJi";
 import GuruJiCategory from "./pages/GuruJiCategory";
 import GuruJiDetail from "./pages/GuruJiDetail";
+import LandingPage from "./pages/LandingPage";
+import LandingPage2 from "./pages/LandingPage2";
 
 
 // Wrapper that marks the login flow source when /home-v1 is accessed
@@ -209,6 +211,12 @@ function App() {
                     <Route path="/app-events" element={<AppEvents />} />
                     <Route path="/app-events1" element={<AppEvents1 />} />
                     <Route path="/app-events2" element={<AppEvents2 />} />
+                    <Route path="/landing-page" element={<LandingPage />} />
+                    <Route path="/landing-page1" element={<LandingPage />} />
+                    <Route path="/landingpage1" element={<LandingPage />} />
+                    <Route path="/landing-page2" element={<LandingPage2 />} />
+                    <Route path="/landing-page-2" element={<LandingPage2 />} />
+                    <Route path="/landingpage2" element={<LandingPage2 />} />
                     <Route path="/game_events" element={<GameEvents />} />
                     <Route path="/game-events" element={<GameEvents />} />
                   </Routes>
