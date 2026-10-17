@@ -58,6 +58,7 @@ export const GA4Events = {
     facebook_icon_clicked               : "facebook_icon_clicked",        // ✅ fix: duplicate _clicked
     // done
     whatsapp_icon_clicked               : "whatsapp_icon_clicked",        // ✅ fix: duplicate _clicked
+    youtube_icon_clicked                : "youtube_icon_clicked",
 
     // ─── LOGIN & AUTH ─────────────────────────────────────────────
     login_screen_opened                 : "login_screen_opened",

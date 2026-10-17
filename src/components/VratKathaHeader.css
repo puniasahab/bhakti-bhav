@@ -1,0 +1,59 @@
+.vrat-katha-header-surface {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 50;
+  padding-top: max(12px, env(safe-area-inset-top));
+  padding-bottom: 8px;
+  background: #fff url("../../public/img/repeat_bg.png") center top / 100% auto no-repeat;
+}
+
+.vrat-katha-header-inner { padding-inline: 16px; }
+.vrat-katha-header-surface.is-reading .vrat-katha-header-inner { max-width: 576px; }
+.vrat-katha-header-bar {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 64px;
+  padding: 10px 14px;
+  border-radius: 20px;
+  background: linear-gradient(to right, #eba24a, #fff179);
+  color: #9a283d;
+}
+
+.vrat-katha-header-brand,
+.vrat-katha-header-actions,
+.vrat-katha-font-actions { display: flex; align-items: center; gap: 10px; }
+.vrat-katha-header-brand { min-width: 0; }
+.vrat-katha-header-actions { flex-shrink: 0; gap: 8px; }
+.vrat-katha-header-label { font-size: 24px; font-weight: 700; line-height: 1.5; white-space: nowrap; }
+.vrat-katha-header-back,
+.vrat-katha-header-actions button {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: #fff4c680;
+  color: inherit;
+}
+
+.vrat-katha-header-surface.is-reading .vrat-katha-header-bar { background: #ffdb70; border-radius: 10px; }
+.vrat-katha-header-surface.is-reading .vrat-katha-header-back { background: transparent; }
+.vrat-katha-header-surface.is-reading .vrat-katha-header-label { font-size: 18px; font-weight: 500; }
+.vrat-katha-font-actions { flex-shrink: 0; }
+.vrat-katha-font-actions button { min-width: 36px; height: 36px; padding: 0 9px; border: 1px solid #9a283d; border-radius: 10px; font-size: 18px; color: inherit; }
+.vrat-katha-font-actions button[aria-pressed="true"] { background: #9a283d0d; }
+.vrat-katha-header-bar button:focus-visible { outline: 2px solid #9a283d; outline-offset: 3px; }
+
+@media (max-width: 374px) {
+  .vrat-katha-header-bar { padding-inline: 10px; gap: 6px; }
+  .vrat-katha-header-brand, .vrat-katha-header-actions { gap: 6px; }
+  .vrat-katha-header-label { font-size: 20px; }
+  .vrat-katha-header-back, .vrat-katha-header-actions button { width: 34px; height: 34px; }
+}

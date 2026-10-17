@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useContext } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import {
-  ChevronLeft,
   Calendar,
   Share2,
   Headphones,
@@ -15,6 +14,8 @@ import { LanguageContext } from "../contexts/LanguageContext";
 import { useAudio } from "../contexts/AudioContext";
 import Loader from "../components/Loader";
 import SEO from "../components/SEO";
+import VratKathaHeader from "../components/VratKathaHeader";
+import PageTitleCard from "../components/PageTitleCard";
 import { vratKathaApis } from "../api";
 import useGA4BaseParams from "../hooks/useGA4BaseParams";
 import useGA4Tracker from "../hooks/useGA4Tracker";
@@ -427,78 +428,26 @@ export default function VratKathaDetail() {
       />
 
       <div className="min-h-screen w-full max-w-[100vw] overflow-x-hidden flex flex-col text-gray-800">
-        {/* ── Top Header Toolbar matching Reference Screenshot ── */}
-        <header className="sticky top-0 z-40 w-full bg-[#F5BF46] shadow-sm px-3.5 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => {
-                if (window.history.state && window.history.state.idx > 0) {
-                  navigate(-1);
-                } else {
-                  navigate("/vrat-katha");
-                }
-              }}
-              className="p-1 text-[#851C2C] hover:opacity-80 transition active:scale-95"
-              aria-label="Go Back"
-            >
-              <ChevronLeft size={28} strokeWidth={2.8} />
-            </button>
-            <span className="text-[#851C2C] font-bold text-lg md:text-xl font-hindi">
-              व्रत कथा
-            </span>
-          </div>
+        <VratKathaHeader
+          reading
+          language={language}
+          fontSizePx={fontSizePx}
+          onResetFont={() => setFontSizePx(16)}
+          onIncreaseFont={() => setFontSizePx((prev) => Math.min(26, prev + 2))}
+        >
+          <PageTitleCard
+            variant="attached"
+            as="h1"
+            titleHi={hindiTitle}
+            titleEn={englishTitle !== hindiTitle ? englishTitle : ""}
+            language="hi"
+            isHinglishLanguageSelected={Boolean(englishTitle && englishTitle !== hindiTitle)}
+            customFontSize="18px"
+            customEngFontSize="16px"
+          />
+        </VratKathaHeader>
 
-          {/* Font Size Controls [A] and [A+] with incremental capacity up to 26px */}
-          <div className="flex items-center gap-2 font-eng">
-            <button
-              type="button"
-              onClick={() => setFontSizePx(16)}
-              style={{ fontFamily: "'PoppinsRegular', -apple-system, sans-serif" }}
-              className={`w-8 h-8 flex items-center justify-center rounded-lg border border-[#851C2C] text-sm font-semibold transition font-eng active:scale-95 ${
-                fontSizePx === 16
-                  ? "bg-[#851C2C]/15 font-bold"
-                  : "bg-transparent hover:bg-[#851C2C]/10"
-              } text-[#851C2C]`}
-              title="Normal Font Size (16px)"
-            >
-              A
-            </button>
-            <button
-              type="button"
-              onClick={() => setFontSizePx((prev) => Math.min(26, prev + 2))}
-              style={{ fontFamily: "'PoppinsRegular', -apple-system, sans-serif" }}
-              className={`px-2.5 h-8 flex items-center justify-center rounded-lg border border-[#851C2C] text-sm font-semibold transition font-eng active:scale-95 ${
-                fontSizePx > 16
-                  ? "bg-[#851C2C]/15 font-bold"
-                  : "bg-transparent hover:bg-[#851C2C]/10"
-              } text-[#851C2C]`}
-              title={`Increase Font Size (Current: ${fontSizePx}px, Max: 26px)`}
-            >
-              A+
-            </button>
-          </div>
-        </header>
-
-        {/* ── Main Content Area ── */}
         <main className="w-full max-w-lg md:max-w-xl mx-auto px-3.5 sm:px-4 pt-2 pb-12 text-gray-800">
-          {/* ── Double-Bordered Rounded Title Box matching Screenshots ── */}
-          <div className="flex justify-center mb-2">
-            <div className="relative inline-block px-6 py-2 bg-white/95 rounded-2xl border-2 border-[#D96B27] shadow-[0_4px_12px_rgba(217,107,39,0.12)]">
-              <div className="absolute inset-[2.5px] rounded-[13px] border border-[#D96B27]/40 pointer-events-none"></div>
-              <div className="relative z-10 text-center">
-                <h1 className="text-xl md:text-2xl font-bold text-[#851C2C] font-hindi leading-snug">
-                  {hindiTitle}
-                </h1>
-                {englishTitle && englishTitle !== hindiTitle && (
-                  <p className="text-sm md:text-base font-semibold text-[#851C2C] font-eng mt-0.5 leading-snug">
-                    {englishTitle}
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
-
           {/* ── Centered Deity / Hero Image matching Reference Screenshot ── */}
           {(detail.imageUrl || detail.imagethumb) && (
             <div className="flex justify-center my-3">

@@ -10,6 +10,7 @@ import SEO from "../components/SEO";
 import { homeSchema } from "../seo/schemas";
 import { hindiCalendarSchema } from "../schemas/pageSchemas";
 import SchemaMarkup from "../components/SchemaMarkup";
+import "./HindiCalendar.css";
 import { ChevronDown, ChevronLeft, ChevronRight, CircleUserRound, IndianRupee, Search } from "lucide-react";
 
 const HINDI_CALENDAR_CACHE_KEY = "hindi-calendar:panchang-calendar";
@@ -184,58 +185,62 @@ export default function HindiCalendar() {
       <SchemaMarkup schema={hindiCalendarSchema} />
       <SEO title="Best Hindu Calendar App | हिंदी पंचांग कैलेंडर डाउनलोड | भक्ति भाव" description="Hindi Calendar 2026 और Hindu Panchang ऐप डाउनलोड करें। सभी व्रत, त्योहार, शुभ मुहूर्त और चंद्र कैलेंडर की जानकारी एक जगह | भक्ति भाव" canonical="https://bhaktibhav.app/hindi-calendar" schema={homeSchema}/>
       <div className="min-h-screen w-full bg-[url('../img/home_bg.png')] bg-cover bg-top bg-no-repeat font-devanagari text-[#9A283D]">
-        <main className="container mx-auto flex max-w-md flex-col px-4 pb-10 pt-8 md:max-w-5xl">
-          <header className="relative mb-11 rounded-[22px] bg-gradient-to-r from-[#F2A13A] to-[#FFF56A] px-4 py-3.5 shadow-[0_10px_24px_rgba(154,40,61,0.08)] sm:px-5">
-            <div className="flex items-center justify-between gap-3 sm:gap-4">
-              <div className="flex min-w-0 items-center gap-3 sm:gap-4">
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (window.history.state && window.history.state.idx > 0) {
-                      navigate(-1);
-                    } else {
-                      navigate("/");
-                    }
-                  }}
-                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#FFE8B5]/95 text-[#9A283D]"
-                  aria-label="Back"
-                >
-                  <ChevronLeft size={27} strokeWidth={2.6} />
-                </button>
-                <h1 className="truncate text-[22px] font-bold leading-none">भक्ति भाव</h1>
+        <div className="hindi-calendar-header-surface">
+          <div className="container mx-auto max-w-md px-4 pt-8 md:max-w-5xl">
+            <header className="relative mb-11 rounded-[22px] bg-gradient-to-r from-[#F2A13A] to-[#FFF56A] px-4 py-3.5 shadow-[0_10px_24px_rgba(154,40,61,0.08)] sm:px-5">
+              <div className="flex items-center justify-between gap-3 sm:gap-4">
+                <div className="flex min-w-0 items-center gap-3 sm:gap-4">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (window.history.state && window.history.state.idx > 0) {
+                        navigate(-1);
+                      } else {
+                        navigate("/");
+                      }
+                    }}
+                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#FFE8B5]/95 text-[#9A283D]"
+                    aria-label="Back"
+                  >
+                    <ChevronLeft size={27} strokeWidth={2.6} />
+                  </button>
+                  <h1 className="hindi-calendar-brand-title font-bold">भक्ति भाव</h1>
+                </div>
+
+                <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+                  <button type="button" className="flex h-10 w-10 items-center justify-center rounded-full bg-[#FFF4B6]/90 text-[#9A283D]" aria-label="Search">
+                    <Search size={24} strokeWidth={2.4} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      trackEvent(GA4Events.rupees_icon_clicked, { event_label: "rupees_icon_clicked_from_hindi_calendar" });
+                      navigate(getTokenFromLS() ? "/payment" : "/login");
+                    }}
+                    className="flex h-10 w-10 items-center justify-center rounded-full bg-[#FFF4B6]/90 text-[#9A283D]"
+                    aria-label="Payment"
+                  >
+                    <IndianRupee size={24} strokeWidth={2.7} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => navigate(getTokenFromLS() ? "/profile" : "/login")}
+                    className="flex h-10 w-10 items-center justify-center rounded-full bg-[#FFF4B6]/90 text-[#9A283D]"
+                    aria-label="Profile"
+                  >
+                    <CircleUserRound size={26} strokeWidth={2.4} />
+                  </button>
+                </div>
               </div>
 
-              <div className="flex shrink-0 items-center gap-2 sm:gap-3">
-                <button type="button" className="flex h-10 w-10 items-center justify-center rounded-full bg-[#FFF4B6]/90 text-[#9A283D]" aria-label="Search">
-                  <Search size={24} strokeWidth={2.4} />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    trackEvent(GA4Events.rupees_icon_clicked, { event_label: "rupees_icon_clicked_from_hindi_calendar" });
-                    navigate(getTokenFromLS() ? "/payment" : "/login");
-                  }}
-                  className="flex h-10 w-10 items-center justify-center rounded-full bg-[#FFF4B6]/90 text-[#9A283D]"
-                  aria-label="Payment"
-                >
-                  <IndianRupee size={24} strokeWidth={2.7} />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => navigate(getTokenFromLS() ? "/profile" : "/login")}
-                  className="flex h-10 w-10 items-center justify-center rounded-full bg-[#FFF4B6]/90 text-[#9A283D]"
-                  aria-label="Profile"
-                >
-                  <CircleUserRound size={26} strokeWidth={2.4} />
-                </button>
+              <div className="absolute left-1/2 top-full flex h-[36px] w-[128px] -translate-x-1/2 -translate-y-[1px] items-center justify-center rounded-b-[16px] border-2 border-t-0 border-[#E65C21] bg-white text-center text-[16px] font-semibold leading-normal shadow-[0_8px_18px_rgba(154,40,61,0.08)]">
+                हिन्दी कैलेंडर
               </div>
-            </div>
+            </header>
+          </div>
+        </div>
 
-            <div className="absolute left-1/2 top-full flex h-[48px] w-[150px] -translate-x-1/2 -translate-y-[1px] items-center justify-center rounded-b-[20px] border-[3px] border-t-0 border-[#E65C21] bg-white text-center text-[18px] font-semibold leading-none shadow-[0_8px_18px_rgba(154,40,61,0.08)]">
-              हिन्दी कैलेंडर
-            </div>
-          </header>
-
+        <main className="hindi-calendar-main container mx-auto flex max-w-md flex-col px-4 pb-10 md:max-w-5xl">
           <section>
             <ul className="grid grid-cols-3 gap-x-4 gap-y-4">
               {months.map((m, idx) => {
@@ -286,17 +291,17 @@ export default function HindiCalendar() {
                       >
                         <span className="flex w-[76px] shrink-0 flex-col items-center justify-center">
                           <span className="font-eng text-[29px] font-bold leading-none">{day}</span>
-                          <span className="mt-1.5 text-[14px] font-medium leading-none">{weekdayHi}</span>
+                          <span className="mt-1.5 text-[14px] font-medium leading-relaxed">{weekdayHi}</span>
                         </span>
 
                         <span className="mx-3 h-12 w-px shrink-0 bg-[#E9DED8]" />
 
                         <span className="min-w-0 flex-1">
-                          <span className="flex min-w-0 items-center gap-3">
-                            <span className="truncate text-[18px] font-semibold leading-tight">{festivalName}</span>
-                            <span className="shrink-0 rounded-md bg-[#FFF0D1] px-2.5 py-1 text-xs font-semibold leading-none text-[#8C652E]">{badge}</span>
+                          <span className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1">
+                            <span className="min-w-0 max-w-full whitespace-normal break-words text-[18px] font-semibold leading-relaxed">{festivalName}</span>
+                            <span className="max-w-full whitespace-normal break-words rounded-md bg-[#FFF0D1] px-2.5 py-1 text-xs font-semibold leading-normal text-[#8C652E]">{badge}</span>
                           </span>
-                          <span className="mt-2 block truncate text-[14px] font-normal leading-tight text-[#7B6A62]">{summary}</span>
+                          <span className="mt-2 block whitespace-normal break-words text-[14px] font-normal leading-relaxed text-[#7B6A62]">{summary}</span>
                         </span>
 
                         <ChevronRight size={26} strokeWidth={2.6} className="ml-2 shrink-0 text-[#9A283D]" />

@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef, useContext } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import TodayThoughtSheet from "../components/TodayThoughtSheet";
 import { Link, useNavigate } from "react-router-dom";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination, Autoplay } from "swiper/modules";
-import { ArrowRight, BookOpen, CalendarDays, ChevronDown, ChevronUp, Gift, Globe2, IndianRupee, Instagram, Sparkles, WalletCards } from "lucide-react";
+import { ArrowRight, BookOpen, CalendarDays, ChevronDown, ChevronUp, CirclePlay, Gift, Globe2, IndianRupee, Instagram, Sparkles, WalletCards } from "lucide-react";
 import { homeSchema } from "../seo/schemas";
 import { useAppStoreRedirect } from "../hooks/useAppStoreRedirect";
 
@@ -21,8 +22,23 @@ import { LanguageContext } from "../contexts/LanguageContext";
 import malaGif from "../assets/img/mala.gif";
 import hindiCalendarHomeImage from '../assets/img/hindi_calendar_home.png';
 import vratKathaHomeImage from "../assets/img/vrat_katha_home.png";
+import instagramIcon from "../assets/img/insta_icon.png";
+import facebookIcon from "../assets/img/fb_icon.png";
+import whatsappIcon from "../assets/img/hd_whatsapp_icon.png";
 
 const ASSET_BASE_URL = "https://api.bhaktibhav.app";
+
+const facebookUrl = "https://www.facebook.com/appbhaktibhav/";
+const instagramUrl = "https://www.instagram.com/bhaktibhavapp/";
+const youtubeUrl = "https://www.youtube.com/@Bhaktibhavofficialapp";
+const whatsappUrl = "https://whatsapp.com/channel/0029VbDtNtvADTOHarvD3x00";
+
+const homeSocialLinks = [
+    { key: "instagram", label: "Instagram", href: instagramUrl, image: instagramIcon, filled: true, eventName: GA4Events.instagram_icon_clicked },
+    { key: "whatsapp", label: "WhatsApp", href: whatsappUrl, image: whatsappIcon, eventName: GA4Events.whatsapp_icon_clicked },
+    { key: "facebook", label: "Facebook", href: facebookUrl, image: facebookIcon, filled: true, eventName: GA4Events.facebook_icon_clicked },
+    { key: "youtube", label: "YouTube", href: youtubeUrl, eventName: GA4Events.youtube_icon_clicked }
+];
 
 const normalizeImageUrl = (url) => {
     if (!url) return "";
@@ -81,6 +97,7 @@ function Home() {
 
     const [isOpen, setIsOpen] = useState(false);
     const [isHomeMenuOpen, setIsHomeMenuOpen] = useState(false);
+    const [isThoughtOpen, setIsThoughtOpen] = useState(false);
     const [isQuickAccessExpanded, setIsQuickAccessExpanded] = useState(true);
     const [showLoginModal, setShowLoginModal] = useState(false);
     const [panchangData, setPanchangData] = useState(() => {
@@ -729,7 +746,11 @@ function Home() {
         }
     };
 
-    const renderHomeMenuTitle = (title) => {
+    const renderHomeMenuTitle = (title, category) => {
+        if (getCategoryRoute(category) === "/guru-ji") {
+            return language === "en" ? "Guru Ji" : "गुरुजी";
+        }
+
         const normalizedTitle = String(title || "").replace(/<\/?p[^>]*>/gi, "").trim();
         const [primaryTitle = ""] = normalizedTitle.split(/<\/?br\s*\/?>/i);
 
@@ -915,7 +936,7 @@ function Home() {
                                         className="h-8 w-8 object-contain sm:h-10 sm:w-10"
                                     />
                                 </span>
-                                <p className="font-devanagari mt-1.5 w-full truncate text-xs leading-tight text-[#2F2724] sm:text-sm md:text-base">
+                                <p className="font-devanagari mt-1.5 w-full truncate text-sm leading-tight text-[#2F2724] sm:text-md md:text-base">
                                     {renderCategoryTitle(category.title, category)}
                                 </p>
                             </Link>
@@ -969,7 +990,7 @@ function Home() {
                                             event_label: "social_reel_clicked_on_home_screen",
                                             id: reel._id
                                         })}
-                                        className="relative aspect-[9/16] shrink-0 basis-[43%] max-w-[188px] overflow-hidden rounded-[28px] bg-[#2F2724] shadow-[0_14px_32px_rgba(0,0,0,0.2)] md:basis-[32%] md:max-w-[380px]"
+                                        className="relative grid shrink-0 basis-[43%] before:col-start-1 before:row-start-1 before:pt-[177.7778%] before:content-[''] max-w-[188px] overflow-hidden rounded-[28px] bg-[#2F2724] shadow-[0_14px_32px_rgba(0,0,0,0.2)] md:basis-[32%] md:max-w-[380px]"
                                     >
                                         {videoUrl ? (
                                             <video
@@ -980,25 +1001,24 @@ function Home() {
                                                 muted
                                                 playsInline
                                                 preload="auto"
-                                                className="h-full w-full bg-[#1B1514] object-contain"
+                                                className="absolute inset-0 h-full w-full bg-[#1B1514] object-contain"
                                             />
                                         ) : (
                                             <img
                                                 src={thumbnailUrl}
                                                 crossOrigin="anonymous"
                                                 alt={stripHtmlTags(reel.title)}
-                                                className="h-full w-full bg-[#1B1514] object-contain"
+                                                className="absolute inset-0 h-full w-full bg-[#1B1514] object-contain"
                                             />
                                         )}
-                                        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/80 to-transparent" />
                                         <span className="font-eng absolute left-3 top-4 inline-flex items-center gap-2 rounded-full bg-black/60 px-3 py-2 text-[11px] font-bold text-white md:left-5 md:top-5 md:text-lg">
                                             <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#9A283D] md:h-7 md:w-7">
                                                 <Instagram size={13} className="md:h-4 md:w-4" />
                                             </span>
                                             Insta Reel
                                         </span>
-                                        <div className="absolute inset-x-0 bottom-0 p-3 text-white md:p-6">
-                                            <p className="font-devanagari line-clamp-2 text-base font-bold leading-tight drop-shadow md:text-3xl">{reel.title || reel.label || "भक्ति भाव"}</p>
+                                        <div className="relative col-start-1 row-start-1 min-w-0 self-end bg-gradient-to-t from-black/90 via-black/60 to-transparent px-3 pb-3 pt-20 text-white md:px-6 md:pb-6 md:pt-24">
+                                            <p className="font-devanagari truncate py-1 text-base font-bold leading-relaxed drop-shadow md:text-3xl md:leading-relaxed">{reel.title || reel.label || "भक्ति भाव"}</p>
                                             <span className="font-eng mt-3 flex items-center justify-between text-xs font-bold md:mt-6 md:text-2xl">
                                                 View on Instagram
                                                 <ArrowRight size={18} className="md:h-8 md:w-8" />
@@ -1019,6 +1039,39 @@ function Home() {
                         </div>
                     </section>
                 )}
+                <section className="mb-4 mt-5" aria-labelledby="home-connect-heading">
+                    <div className="mb-6 flex items-center gap-3">
+                        <span className="h-px flex-1 bg-[#9A283D]/60" aria-hidden="true" />
+                        <h2 id="home-connect-heading" className="font-eng shrink-0 text-xs font-bold tracking-[0.12em] text-[#9A283D] sm:text-sm">
+                            CONNECT WITH US
+                        </h2>
+                        <span className="h-px flex-1 bg-[#9A283D]/60" aria-hidden="true" />
+                    </div>
+                    <div className="mx-auto flex max-w-sm items-center justify-evenly gap-3">
+                        {homeSocialLinks.map(({ key, label, href, image, filled, eventName }) => (
+                            <a
+                                key={key}
+                                href={href}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                aria-label={`Connect with us on ${label} (opens in a new tab)`}
+                                onClick={() => trackEvent(eventName, {
+                                    platform: key,
+                                    event_label: `${key}_icon_clicked_on_home_screen`
+                                })}
+                                className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-white text-[#9A283D] shadow-[0_6px_18px_rgba(0,0,0,0.10)] transition hover:bg-[#FFF7F8] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#9A283D] sm:h-16 sm:w-16"
+                            >
+                                {image ? (
+                                    <span className={`flex h-8 w-8 items-center justify-center rounded-full ${filled ? "bg-[#740B29]" : ""}`}>
+                                        <img src={image} alt="" aria-hidden="true" className={filled ? "h-5 w-5 object-contain" : "h-8 w-8 object-contain"} />
+                                    </span>
+                                ) : (
+                                    <CirclePlay size={30} strokeWidth={2.5} aria-hidden="true" />
+                                )}
+                            </a>
+                        ))}
+                    </div>
+                </section>
             </main>
 
             {isOpen && (
@@ -1137,14 +1190,14 @@ function Home() {
                                                 <img
                                                     src={normalizeImageUrl(category.imageUrl)}
                                                     crossOrigin="anonymous"
-                                                    alt={stripHtmlTags(category.title)}
+                                                    alt={renderHomeMenuTitle(category.title, category)}
                                                     className="h-7 w-7 object-contain"
                                                 />
                                             ) : (
                                                 <BookOpen size={26} className="text-[#9A283D]" />
                                             )}
                                         </span>
-                                        <span className="min-w-0">{renderHomeMenuTitle(category.title)}</span>
+                                        <span className="min-w-0">{renderHomeMenuTitle(category.title, category)}</span>
                                     </Link>
                                 ))}
                             </div>
@@ -1153,7 +1206,15 @@ function Home() {
                 </div>
             )}
 
-            <Footer variant="homeNav" />
+            {isThoughtOpen && (
+                <TodayThoughtSheet
+                    thought={guidance?.thought}
+                    language={language}
+                    loading={categoriesLoading}
+                    onClose={() => setIsThoughtOpen(false)}
+                />
+            )}
+            <Footer variant="homeNav" onSuvicharClick={() => setIsThoughtOpen(true)} />
         </>
     );
 }

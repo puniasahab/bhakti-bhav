@@ -842,6 +842,63 @@ export const wallpaperDeepLinkingApi = {
 };
 
 
+export const latestJaapMalaApis = {
+  getJaapMalaList: async (lang, categoryId, pageNumber, limit) => {
+    try {
+      const response = await api.get('https://api.bhaktibhav.app/api/v1/frontend/feature-category/content-v4', {
+        params: {
+          lang,
+          // categoryId,
+          // The current v4 backend still reads this legacy spelling.
+          catgeoryId: categoryId,
+          page: pageNumber,
+          limit,
+        },
+      });
+      return response.data;
+    }
+    catch(error) {
+      console.log("Getting error while fectching jaap mala data: ", error);
+      throw error;
+    }
+  },
+
+  getJaapMalaDetailScreen: async (id) => {
+    try {
+      const response = await api.get(`https://api.bhaktibhav.app/api/v1/frontend-v4/jaapmala-v3/${id}`);
+      return response.data;
+    }
+    catch(error) {
+      console.log("Getting error while fetching data for particular jaap mala detail screen: ", error);
+      throw error;
+    }
+  },
+
+  getJaapMalaStreak: async () => {
+    try {
+      const response = await api.get();
+      return response.data;
+    }
+    catch(error) {
+      console.log("Getting error while fetching japa mala streak data: ", error);
+      throw error;
+    }
+  },
+
+  updateJaapMalaCount: async (id) => {
+    try {
+      const response = await api.post(`https://api.bhaktibhav.app/api/v1/frontend/feature-category/content-v4/${id}/jaap`);
+      return response.data;
+
+    }
+    catch(error) {
+      console.log("Getting error while updating jaap mala count: ", error);
+      throw error;
+    }
+  }
+}
+
+
 export const newJaapMalaApis = {
   getJaapMalaCount: async (id, getCounterBoolean = true) => {
     try {
@@ -863,6 +920,27 @@ export const newJaapMalaApis = {
       console.log("Error updating Jaap Mala count", error);
       throw error;
     }
+  },
+
+  getJaapMalaDatav4: async (lang, categoryId, pageNumber, limit) => {
+    try {
+      const resp = await api.get('https://api.bhaktibhav.app/api/v1/frontend/feature-category/content-v4', {
+        params: {
+          lang,
+          // categoryId,
+          // The current v4 backend still reads this legacy spelling.
+          catgeoryId: categoryId,
+          page: pageNumber,
+          limit,
+        },
+      });
+      return resp.data;
+    }
+    catch(error) {
+      console.log("Getting Error while fetching data for Jaap Mala using new api v4: ", error);
+      throw error;
+    }
+
   },
 
   getContentDetailsV4: async (id) => {

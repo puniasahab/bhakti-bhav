@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import Header from "../components/Header";
+import VratKathaHeader from "../components/VratKathaHeader";
 import PageTitleCard from "../components/PageTitleCard";
 import Loader from "../components/Loader";
 import { useKatha } from "../contexts/KathaContext";
@@ -66,26 +66,27 @@ export default function VratKathaCategoryDetails() {
 
   return (
     <>
-      <Header hideEditIcon={true} showProfileHeader={true} profileText="भक्ति भाव" backRoute="/vrat-katha" />
-      <div className="h-2"></div>
-      {(() => {
-        const rawName = kathaCategoryData?.category?.name;
-        const hiName = (typeof rawName === "string" ? rawName : rawName?.hi || "").trim();
-        const enName = (typeof rawName === "string" ? rawName : rawName?.en || "Katha").trim();
-        const name2 = kathaCategoryData?.category?.name2 || "";
-        const hinglishLanguageNames = name2.includes("\n") ? name2.split("\n") : [name2, ""];
-        const hiHin = hinglishLanguageNames[0]?.trim() || hiName;
-        const enHin = hinglishLanguageNames[1]?.trim() || enName;
-        return (
-          <PageTitleCard
-            titleHi={language === "hinglish" ? hiHin : hiName}
-            titleEn={language === "hinglish" ? enHin : enName}
-            isHinglishLanguageSelected={language === "hinglish"}
-            customEngFontSize={language === "hinglish" ? "15px" : "16px"}
-            customFontSize={"19px"}
-          />
-        );
-      })()}
+      <VratKathaHeader backRoute="/vrat-katha">
+        {(() => {
+          const rawName = kathaCategoryData?.category?.name;
+          const hiName = (typeof rawName === "string" ? rawName : rawName?.hi || "").trim();
+          const enName = (typeof rawName === "string" ? rawName : rawName?.en || "Katha").trim();
+          const name2 = kathaCategoryData?.category?.name2 || "";
+          const hinglishLanguageNames = name2.includes("\n") ? name2.split("\n") : [name2, ""];
+          const hiHin = hinglishLanguageNames[0]?.trim() || hiName;
+          const enHin = hinglishLanguageNames[1]?.trim() || enName;
+          return (
+            <PageTitleCard
+              variant="attached"
+              titleHi={language === "hinglish" ? hiHin : hiName}
+              titleEn={language === "hinglish" ? `(${enHin.replace(/^\(|\)$/g, "")})` : enName}
+              isHinglishLanguageSelected={language === "hinglish"}
+              customEngFontSize={language === "hinglish" ? "14px" : "16px"}
+              customFontSize="16px"
+            />
+          );
+        })()}
+      </VratKathaHeader>
 
       <div className="container mx-auto px-4 mt-3">
         <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 sm:gap-3">

@@ -1,0 +1,424 @@
+/* Scoped to this detail page so shared headers and other mala pages stay intact. */
+body.new-jaap-details-active {
+  overflow: hidden;
+  padding-bottom: 0;
+}
+
+.new-jaap-viewport {
+  position: fixed;
+  inset: 0;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding-top: env(safe-area-inset-top);
+}
+
+.new-jaap-details-header {
+  flex: 0 0 auto;
+  position: relative;
+  z-index: 50;
+  background: #fff;
+}
+
+.new-jaap-details-header header {
+  background: #fff;
+  box-shadow: none;
+}
+
+.new-jaap-details-header header > div {
+  max-width: 488px;
+  background: #ffdb70;
+}
+
+.new-jaap-details-header header > div > div {
+  padding-top: 15px;
+  padding-bottom: 15px;
+}
+
+.new-jaap-details-header header button {
+  min-height: 32px;
+}
+
+.new-jaap-details.new-jaap-screen {
+  width: min(100%, 520px);
+  height: auto;
+  min-height: 0;
+  flex: 1;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: #963149;
+}
+
+.new-jaap-details .new-jaap-fixed-content {
+  position: relative;
+  inset: auto;
+  width: 100%;
+  max-height: none;
+  min-height: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  transform: none;
+  overflow: hidden;
+  z-index: auto;
+}
+
+.new-jaap-details .new-jaap-fixed-content > div:first-child {
+  flex-shrink: 0;
+  margin: 0 0 4px;
+}
+
+.new-jaap-details .new-jaap-main {
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: clamp(4px, 1.2dvh, 14px) auto 0;
+  padding: 0 24px clamp(8px, 2dvh, 20px);
+  text-align: center;
+}
+
+.new-jaap-details .new-jaap-image-frame {
+  width: 75%;
+  height: auto;
+  min-height: 0;
+  max-height: 300px;
+  flex: 1;
+  border-radius: 0;
+}
+
+.new-jaap-details .new-jaap-devta-image {
+  height: 100%;
+  border-radius: 0;
+}
+
+.new-jaap-change-mantra {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-shrink: 0;
+  margin: clamp(6px, 1.5dvh, 14px) auto clamp(6px, 1dvh, 12px);
+  padding: 8px 16px;
+  border: 1px solid #dab5bd;
+  border-radius: 999px;
+  background: #9631490b;
+  color: #963149;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.new-jaap-details .new-jaap-title-scroll {
+  position: relative;
+  width: 100%;
+  max-height: none;
+  height: 72px;
+  flex-shrink: 0;
+  margin: 0 auto;
+  padding: 4px 0;
+  display: flex;
+  align-content: flex-start;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 6px;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #dab5bd transparent;
+}
+
+.new-jaap-name {
+  flex: 0 0 auto;
+  max-width: 100%;
+  padding: 2px 0;
+  border: 0;
+  background: transparent;
+  color: #b9b9b5;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+  transition: color 150ms ease;
+  touch-action: manipulation;
+}
+
+.new-jaap-name.is-complete {
+  color: #963149;
+}
+
+.new-jaap-name[aria-current="step"] {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-color: #96314950;
+}
+
+.new-jaap-large-text .new-jaap-name {
+  font-size: 19px;
+}
+
+.new-jaap-details.new-jaap-large-text .new-jaap-title-scroll {
+  height: 88px;
+}
+
+.new-jaap-details .new-jaap-bottom-panel {
+  position: relative;
+  inset: auto;
+  z-index: auto;
+  width: 100%;
+  min-height: 0;
+  flex: 0 0 auto;
+  margin-top: 0;
+  transform: none;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: clamp(10px, 2dvh, 18px) 12px;
+  padding: clamp(12px, 2.4dvh, 22px) 18px max(12px, env(safe-area-inset-bottom));
+  border-radius: 32px 32px 0 0;
+  background: #fff;
+  box-shadow: 0 -8px 30px #38251f12;
+}
+
+.new-jaap-totals {
+  grid-column: 1 / -1;
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.new-jaap-details .new-jaap-stat {
+  flex-direction: row;
+  justify-content: center;
+  gap: 16px;
+  min-height: clamp(60px, 9.5dvh, 80px);
+  padding: clamp(6px, 1.4dvh, 12px);
+  border: 1px solid #f0e8eb;
+  border-radius: 15px;
+  box-shadow: 0 4px 12px #38251f0c;
+  text-align: left;
+}
+
+.new-jaap-stat > img {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+}
+
+.new-jaap-details .new-jaap-stat p {
+  margin: 0 0 5px;
+  color: #888;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.new-jaap-details .new-jaap-stat strong {
+  font-size: 20px;
+  line-height: 1.2;
+}
+
+.new-jaap-summary {
+  position: relative;
+  width: 100%;
+  padding: clamp(8px, 1.6dvh, 14px) 12px;
+  border: 1px solid #e8e8e8;
+  border-radius: 18px;
+}
+
+.new-jaap-summary h2 {
+  margin: 0 0 12px;
+  font-size: 15px;
+  font-family: 'PoppinsSemiBold', sans-serif;
+}
+
+.new-jaap-summary-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: clamp(6px, 1.4dvh, 12px) 10px;
+  border-radius: 12px;
+  background: #faf5f6;
+}
+
+.new-jaap-summary-item + .new-jaap-summary-item {
+  margin-top: 10px;
+}
+
+.new-jaap-summary-icon {
+  font-size: 25px;
+}
+
+.new-jaap-summary-item > img {
+  width: 28px;
+  height: 32px;
+  object-fit: contain;
+}
+
+.new-jaap-summary-item p {
+  margin: 0 0 3px;
+  color: #888;
+  font-size: 12px;
+}
+
+.new-jaap-summary-item strong {
+  font-family: 'PoppinsSemiBold', sans-serif;
+  font-size: 16px;
+}
+
+.new-jaap-streak-info {
+  flex-shrink: 0;
+  margin-left: auto;
+  color: #999;
+}
+
+.new-jaap-streak-copy {
+  position: absolute;
+  z-index: 2;
+  inset: auto 8px 12px;
+  padding: 12px;
+  border: 1px solid #dab5bd;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 4px 16px #38251f24;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.new-jaap-details .new-jaap-mala-button {
+  width: 100%;
+  max-width: clamp(120px, 24dvh, 210px);
+  border-width: 3px;
+  box-shadow: 0 5px 16px #9631492b;
+}
+
+.new-jaap-details .new-jaap-mala-text {
+  min-height: 0;
+  gap: 5px;
+  font-size: clamp(10px, 2.6vw, 13px);
+}
+
+.new-jaap-details .new-jaap-mala-text small {
+  font-size: 12px;
+}
+
+.new-jaap-details .new-jaap-mala-title {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  max-height: 42px;
+}
+
+.new-jaap-details button:focus-visible {
+  outline: 2px solid #963149;
+  outline-offset: 3px;
+}
+
+.new-jaap-details .new-jaap-complete-modal {
+  width: min(100%, 420px);
+  max-height: calc(100svh - 44px);
+  padding: clamp(40px, 7svh, 70px) 24px 40px;
+  overflow-y: auto;
+  border-radius: 36px;
+  background: linear-gradient(135deg, #fff5e1, #ffe3b5);
+}
+
+.new-jaap-details .new-jaap-complete-modal h2 {
+  font-size: clamp(18px, 4.8vw, 24px);
+  line-height: 1.5;
+}
+
+.new-jaap-details .new-jaap-modal-copy {
+  margin: 22px 0 26px;
+  font-size: clamp(17px, 4.5vw, 22px);
+  line-height: 1.5;
+}
+
+.new-jaap-details .new-jaap-total-pill {
+  width: fit-content;
+  max-width: 100%;
+  min-height: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 20px 28px;
+  border-radius: 28px;
+  background: linear-gradient(110deg, #9c233e, #ab4355);
+  font-size: clamp(17px, 4.4vw, 22px);
+  line-height: 1.4;
+}
+
+.new-jaap-completion-stat {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  text-align: left;
+}
+
+.new-jaap-completion-stat > :first-child {
+  flex-shrink: 0;
+  width: 26px;
+}
+
+.new-jaap-completion-flame {
+  font-size: 24px;
+  line-height: 1;
+  text-align: center;
+}
+
+.new-jaap-details .new-jaap-blessing {
+  margin: 30px 0 36px;
+  font-size: clamp(14px, 3.7vw, 18px);
+  line-height: 1.6;
+}
+
+.new-jaap-details .new-jaap-next-button {
+  width: min(100%, 270px);
+  min-height: 64px;
+  padding: 14px 20px;
+  background: #9a283d;
+  font-size: clamp(18px, 4.6vw, 22px);
+}
+
+@media (max-width: 360px) {
+  .new-jaap-details .new-jaap-bottom-panel { padding-inline: 12px; gap: 14px 10px; }
+  .new-jaap-details .new-jaap-stat { gap: 10px; }
+  .new-jaap-summary { padding-inline: 8px; }
+  .new-jaap-summary-item { gap: 6px; padding-inline: 7px; }
+  .new-jaap-summary h2 { font-size: 13px; }
+  .new-jaap-summary-item p { font-size: 11px; }
+}
+
+@media (max-height: 740px) {
+  .new-jaap-details-header header > div > div { padding-block: 10px; }
+  .new-jaap-details .new-jaap-bottom-panel { gap: 8px 10px; padding: 10px 12px max(8px, env(safe-area-inset-bottom)); }
+  .new-jaap-details .new-jaap-stat { min-height: 56px; gap: 10px; padding: 6px; }
+  .new-jaap-details .new-jaap-stat p { font-size: 12px; margin-bottom: 2px; line-height: 1.25; }
+  .new-jaap-details .new-jaap-stat strong { font-size: 18px; }
+  .new-jaap-summary h2 { margin-bottom: 6px; font-size: 13px; }
+  .new-jaap-summary { padding-block: 8px; }
+  .new-jaap-summary-item { gap: 6px; padding: 6px 8px; }
+  .new-jaap-summary-item p { line-height: 1.3; }
+  .new-jaap-summary-item + .new-jaap-summary-item { margin-top: 6px; }
+  .new-jaap-summary-item strong { display: block; font-size: 14px; line-height: 1.3; }
+  .new-jaap-details .new-jaap-change-mantra { padding-block: 5px; margin-block: 6px; }
+}
+
+@media (orientation: landscape) and (max-height: 650px) {
+  .new-jaap-details.new-jaap-screen {
+    width: min(100%, 940px);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: stretch;
+  }
+  .new-jaap-details .new-jaap-bottom-panel { align-self: center; border-radius: 24px; }
+  .new-jaap-details .new-jaap-mala-button { max-width: 140px; }
+  .new-jaap-details .new-jaap-main { padding-bottom: 6px; margin-top: 4px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .new-jaap-name { transition: none; }
+}

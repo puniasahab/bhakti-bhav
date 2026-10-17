@@ -222,6 +222,10 @@ const AppEvents2 = () => {
     setIsGeneratingLink(true);
     try {
       const token = await createAppEvents2WebLoginToken(userJwtToken);
+<<<<<<< HEAD
+=======
+      // const link = `${APPSFLYER_URL}?af_xp=custom&pid=web_login&deep_link_value=auto_login&web_token=${encodeURIComponent(token)}`;
+>>>>>>> f4293be508118a4e64904c80be104d20fc82ddf9
       const link = `${APPSFLYER_URL}?pid=User_invite&af_click_lookback=30d&c=web_login&deep_link_value=auto_login&deep_link_sub1=${encodeURIComponent(token)}`;
       window.location.href = link;
     } catch (err) {

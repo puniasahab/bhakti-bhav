@@ -1,346 +1,195 @@
 import React, { useState, useEffect } from "react";
-import Header from "../components/Header";
-import Footer from "../components/Footer";
-import { Camera } from "lucide-react";
-import { profileApis } from "../api";
-import { getTokenFromLS } from "../commonFunctions";
-import kundaliBanner from "../assets/img/kundali_banner.png";
+import { BadgeCheck, Camera, ChevronDown, LocateFixed, Mail, Map, UserRound } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import ProfileLayout, { ProfileSettingsMenu } from "../components/ProfileLayout";
+import { profileApis } from "../api";
+import { setUserName, setUserIdInLS } from "../commonFunctions";
 import { trackCustomEvent } from "../utils/metaPixel";
 import { PIXEL_STANDARD_EVENTS } from "../utils/pixelEvents";
+import { normalizeProfile, profileImageUrl } from "../utils/profile";
 
-function EditProfile() {
+function Field({ label, name, errors, children }) {
+  return (
+    <div className="profile-field">
+      <label htmlFor={`profile-${name}`} className="profile-field-label">{label}</label>
+      {children}
+      {errors[name] && <p id={`profile-${name}-error`} className="profile-error" role="alert">{errors[name]}</p>}
+    </div>
+  );
+}
+
+export default function EditProfile() {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    name: "",
-    mobileNumber: "",
-    email: "",
-    state: "",
-    dateOfBirth: "",
-    birthPlace: "",
-    timeOfBirth: "",
-    gender: "",
-    imageUrl: "",
-  });
-
+  const [formData, setFormData] = useState(() => normalizeProfile());
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
-  const [imagePreview, setImagePreview] = useState(null);
+  const [loadError, setLoadError] = useState("");
+  const [saveError, setSaveError] = useState("");
+  const [retry, setRetry] = useState(0);
   const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState("");
+  const [locating, setLocating] = useState(false);
 
-  // Fetch existing profile data on component mount
   useEffect(() => {
-    const fetchProfileData = async () => {
-      try {
-        const response = await profileApis.getProfile();
-        console.log("Fetched profile data:", response);
-        
-        if (response) {
-          setFormData({
-            name: response.name === "New User" ? "" : response.name || "",
-            mobileNumber: response.mobileNumber || "",
-            email: response.email || "",
-            state: response.state || "",
-            dateOfBirth: response.dateOfBirth || "",
-            birthPlace: response.birthPlace || "",
-            timeOfBirth: response.timeOfBirth || "",
-            gender: response.gender || "",
-            imageUrl: response.imageUrl || "",
-          });
-          
-          // Set image preview if imageUrl exists
-          if (response.imageUrl) {
-            const imageUrl = response.imageUrl.startsWith("http") 
-              ? response.imageUrl 
-              : `https://api.bhaktibhav.app${response.imageUrl}`;
-            setImagePreview(imageUrl);
-          }
-        }
-      } catch (error) {
-        console.error("Error fetching profile data:", error);
-      } finally {
-        setInitialLoading(false);
-      }
-    };
+    let active = true;
+    setInitialLoading(true);
+    setLoadError("");
+    profileApis.getProfile().then((response) => {
+      if (active) setFormData(normalizeProfile(response));
+    }).catch(() => {
+      if (active) setLoadError("Unable to load your profile. Please try again before editing.");
+    }).finally(() => {
+      if (active) setInitialLoading(false);
+    });
+    return () => { active = false; };
+  }, [retry]);
 
-    fetchProfileData();
-  }, []);
+  useEffect(() => {
+    if (!imageFile) return;
+    const preview = URL.createObjectURL(imageFile);
+    setImagePreview(preview);
+    return () => URL.revokeObjectURL(preview);
+  }, [imageFile]);
 
-  const validate = () => {
-    const newErrors = {};
-    if (!formData.name) newErrors.name = "Name is required";
-    if (!formData.mobileNumber) newErrors.mobileNumber = "Mobile number is required";
-    else if (!/^\d{10}$/.test(formData.mobileNumber))
-      newErrors.mobileNumber = "Mobile number must be 10 digits";
-    if (!formData.email) newErrors.email = "Email is required";
-    else if (!/\S+@\S+\.\S+/.test(formData.email))
-      newErrors.email = "Email is invalid";
-    // Note: Other fields are optional as per requirement
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setFormData((previous) => ({ ...previous, [name]: value }));
+    setErrors((previous) => ({ ...previous, [name]: "" }));
   };
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const inputProps = (name) => ({
+    id: `profile-${name}`, name, value: formData[name], onChange: handleChange,
+    "aria-invalid": Boolean(errors[name]),
+    "aria-describedby": errors[name] ? `profile-${name}-error` : undefined,
+  });
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setImageFile(file);
-      // Create preview URL
-      const previewUrl = URL.createObjectURL(file);
-      setImagePreview(previewUrl);
+  const fetchLocation = () => {
+    if (!navigator.geolocation) {
+      setErrors((previous) => ({ ...previous, state: "Location is unavailable. Please enter your location manually." }));
+      return;
     }
+    setLocating(true);
+    setErrors((previous) => ({ ...previous, state: "" }));
+    navigator.geolocation.getCurrentPosition(({ coords }) => {
+      setFormData((previous) => ({ ...previous, state: `${coords.latitude.toFixed(5)}, ${coords.longitude.toFixed(5)}` }));
+      setLocating(false);
+    }, () => {
+      setErrors((previous) => ({ ...previous, state: "Couldn't fetch your location. You can enter it manually." }));
+      setLocating(false);
+    }, { timeout: 10000, maximumAge: 60000 });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (validate()) {
-      setLoading(true);
-      try {
-        // Create FormData to handle both text fields and image file
-        const submitFormData = new FormData();
-        
-        // Append all text fields
-        submitFormData.append('name', formData.name);
-        submitFormData.append('mobileNumber', formData.mobileNumber);
-        submitFormData.append('email', formData.email);
-        submitFormData.append('state', formData.state || '');
-        submitFormData.append('dateOfBirth', formData.dateOfBirth || '');
-        submitFormData.append('birthPlace', formData.birthPlace || '');
-        submitFormData.append('timeOfBirth', formData.timeOfBirth || '');
-        submitFormData.append('gender', formData.gender || '');
-        
-        // Append image file if selected
-        if (imageFile) {
-          console.log("Adding new image file:", imageFile.name, imageFile.type, imageFile.size);
-          submitFormData.append('imageUrl', imageFile, imageFile.name);
-        }
-        
-        console.log("FormData contents:");
-        for (let [key, value] of submitFormData.entries()) {
-          if (value instanceof File) {
-            console.log(`${key}:`, {
-              name: value.name,
-              type: value.type,
-              size: value.size,
-              lastModified: value.lastModified
-            });
-          } else {
-            console.log(`${key}:`, value);
-          }
-        }
-        
-        console.log("Sending FormData to API...");
-        const response = await profileApis.updateProfile(submitFormData);
-        console.log("Profile updated successfully:", response);
-        trackCustomEvent(PIXEL_STANDARD_EVENTS.PROFILE_UPDATED, { message: "User updated profile successfully", mobileNumber: formData.mobileNumber });
-        alert("Profile saved successfully!");
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    if (loading || locating) return;
+    const nextErrors = {};
+    if (!formData.name.trim()) nextErrors.name = "Name is required";
+    if (!formData.mobileNumber) nextErrors.mobileNumber = "Mobile number is required";
+    else if (!/^\d{10}$/.test(formData.mobileNumber)) nextErrors.mobileNumber = "Mobile number must be 10 digits";
+    if (!formData.email.trim()) nextErrors.email = "Email is required";
+    else if (!/^\S+@\S+\.\S+$/.test(formData.email.trim())) nextErrors.email = "Email is invalid";
+    setErrors(nextErrors);
+    if (Object.keys(nextErrors).length) return;
 
-        navigate("/");
-      } catch (error) {
-        console.error("Error updating profile:", error);
-        console.error("Error details:", error.response?.data || error.message);
-        alert("Error saving profile. Please try again.");
-      } finally {
-        setLoading(false);
-      }
+    setLoading(true);
+    setSaveError("");
+    const body = new FormData();
+    ["name", "mobileNumber", "email", "state", "dateOfBirth", "birthPlace", "timeOfBirth", "gender"].forEach((name) => body.append(name, formData[name].trim()));
+    if (imageFile) body.append("imageUrl", imageFile, imageFile.name);
+    try {
+      await profileApis.updateProfile(body);
+      setUserName(formData.name === "New User" ? "" : formData.name.trim());
+      if (formData._id) setUserIdInLS(formData._id);
+      trackCustomEvent(PIXEL_STANDARD_EVENTS.PROFILE_UPDATED, { message: "User updated profile successfully", mobileNumber: formData.mobileNumber });
+      // The profile screen fetches the saved record again through GET profile.
+      navigate("/profile");
+    } catch {
+      setSaveError("Unable to update your profile. Your changes are still here; please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <>
-      <Header 
-        showProfileHeader={true}
-        profileText="Edit Profile"
-        hideEditIcon={true}
-        showEnglishText={true}
-        showVerticalLogout={true}
-      />
-      <div className="h-2"></div>
-      <div className="container mx-auto px-4 mt-4 text-center font-eng">
-        {initialLoading ? (
-          <div className="flex justify-center items-center h-64">
-            <div className="text-[#9A283D] text-lg">Loading profile data...</div>
-          </div>
-        ) : (
-          <>
-            <div className="flex justify-center mb-6 mt-4">
-              <div className="relative">
-                <div className="w-32 h-32 rounded-full border-2 border-[#9A283D] flex items-center justify-center text-[#9A283D] font-bold text-lg bg-white shadow-lg overflow-hidden">
-                  {imagePreview ? (
-                    <img 
-                      src={imagePreview} 
-                      alt="Profile" 
-                      className="w-full h-full object-cover rounded-full"
-                    />
-                  ) : (
-                    <div className="w-28 h-28 rounded-full bg-gradient-to-br from-[#FFFAF8] to-[#FCD34D] flex items-center justify-center">
-                      <span className="text-[#9A283D] font-eng text-sm">Profile Picture</span>
-                    </div>
-                  )}
+    <ProfileLayout title="Edit Profile">
+      {initialLoading ? <p className="py-16 text-center" role="status">Loading profile data...</p> : loadError ? (
+        <div role="alert" className="rounded-xl bg-white p-5 text-center">
+          <p>{loadError}</p>
+          <button type="button" onClick={() => setRetry((value) => value + 1)} className="mt-3 underline">Try again</button>
+        </div>
+      ) : (
+        <>
+          <form onSubmit={handleSubmit} className="profile-form" noValidate>
+            <fieldset disabled={loading}>
+              <Field label="FULL NAME*" name="name" errors={errors}>
+                <div className="profile-input-wrap">
+                  <input {...inputProps("name")} type="text" autoComplete="name" className="profile-input" required />
+                  <UserRound className="profile-input-icon" aria-hidden="true" />
                 </div>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  className="hidden"
-                  id="profile-image-input"
-                />
-                <label
-                  htmlFor="profile-image-input"
-                  className="absolute bottom-2 right-2 bg-white rounded-full p-2 shadow-lg border border-[#9A283D] hover:bg-[#FFFAF8] transition-colors cursor-pointer"
-                >
-                  <Camera size={18} className="text-[#9A283D]" />
-                </label>
+              </Field>
+              <Field label="MOBILE NUMBER*" name="mobileNumber" errors={errors}>
+                <div className="profile-input-wrap">
+                  <input {...inputProps("mobileNumber")} type="tel" autoComplete="tel-national" className="profile-input profile-mobile" readOnly />
+                  {formData.mobileNumber && <span className="profile-verified"><BadgeCheck size={16} aria-hidden="true" /> VERIFIED</span>}
+                </div>
+              </Field>
+              <Field label="EMAIL*" name="email" errors={errors}>
+                <div className="profile-input-wrap">
+                  <input {...inputProps("email")} type="email" autoComplete="email" className="profile-input" required />
+                  <Mail className="profile-input-icon" aria-hidden="true" />
+                </div>
+              </Field>
+              <Field label="LOCATION" name="state" errors={errors}>
+                <div className="profile-input-wrap">
+                  <input {...inputProps("state")} type="text" autoComplete="address-level1" className="profile-input" placeholder="Tap to fetch current location" />
+                  <button type="button" className="profile-location-button" aria-label="Fetch current location" onClick={fetchLocation} disabled={locating}>
+                    <LocateFixed size={28} aria-hidden="true" />
+                  </button>
+                </div>
+                {locating && <p className="mt-2 text-xs" role="status">Fetching your location...</p>}
+              </Field>
+              <div className="profile-birth-fields">
+                <Field label="DATE OF BIRTH" name="dateOfBirth" errors={errors}>
+                  <input {...inputProps("dateOfBirth")} type="date" className="profile-input" />
+                </Field>
+                <Field label="TIME OF BIRTH" name="timeOfBirth" errors={errors}>
+                  <input {...inputProps("timeOfBirth")} type="time" className="profile-input" />
+                </Field>
               </div>
-            </div>
-
-            <form onSubmit={handleSubmit} className="space-y-4 theme_text max-w-md mx-auto">
-              <div className="space-y-4">
-                <div>
-                  <input
-                    type="text"
-                    name="name"
-                    placeholder="Name*"
-                    value={formData.name}
-                    onChange={handleChange}
-                    className="w-full border-2 border-[#9A283D] rounded-xl px-4 py-3 bg-[#FFFAF8] focus:outline-none focus:border-[#7A1C2B] transition-colors"
-                  />
-                  {errors.name && <p className="text-red-500 text-sm mt-1 text-left">{errors.name}</p>}
+              <Field label="BIRTH PLACE" name="birthPlace" errors={errors}>
+                <div className="profile-input-wrap">
+                  <input {...inputProps("birthPlace")} type="text" className="profile-input" />
+                  <Map className="profile-input-icon" aria-hidden="true" />
                 </div>
-                
-                <div>
-                  <input
-                    disabled
-                    type="text"
-                    name="mobileNumber"
-                    placeholder="Mobile number*"
-                    value={formData.mobileNumber}
-                    onChange={handleChange}
-                    className="w-full border-2 border-[#9A283D] rounded-xl px-4 py-3 bg-[#FFFAF8] focus:outline-none focus:border-[#7A1C2B] transition-colors"
-                  />
-                  {errors.mobileNumber && <p className="text-red-500 text-sm mt-1 text-left">{errors.mobileNumber}</p>}
+              </Field>
+              <Field label="GENDER" name="gender" errors={errors}>
+                <div className="profile-input-wrap">
+                  <select {...inputProps("gender")} className="profile-input appearance-none">
+                    <option value=""></option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                    {formData.gender && !["male", "female", "other"].includes(formData.gender) && <option value={formData.gender}>{formData.gender}</option>}
+                  </select>
+                  <ChevronDown className="profile-input-icon" aria-hidden="true" />
                 </div>
-                
-                <div>
-                  <input
-                    type="email"
-                    name="email"
-                    placeholder="Email*"
-                    value={formData.email}
-                    onChange={handleChange}
-                    className="w-full border-2 border-[#9A283D] rounded-xl px-4 py-3 bg-[#FFFAF8] focus:outline-none focus:border-[#7A1C2B] transition-colors"
-                  />
-                  {errors.email && <p className="text-red-500 text-sm mt-1 text-left">{errors.email}</p>}
+              </Field>
+              <details className="mb-4 rounded-2xl border border-[#eadde1] bg-white p-4">
+                <summary className="cursor-pointer text-sm font-semibold">Profile photo</summary>
+                <div className="mt-4 flex flex-wrap items-center gap-4">
+                  {(imagePreview || formData.imageUrl) && <img src={imagePreview || profileImageUrl(formData.imageUrl)} alt="Profile preview" className="h-16 w-16 rounded-full object-cover" />}
+                  <label htmlFor="profile-image-input" className="flex cursor-pointer items-center gap-2 text-sm"><Camera size={20} aria-hidden="true" /> Choose photo</label>
+                  <input type="file" id="profile-image-input" accept="image/*" onChange={(event) => { if (event.target.files[0]) setImageFile(event.target.files[0]); }} className="w-full min-w-0 text-xs" />
                 </div>
-                
-                <select
-                  name="state"
-                  value={formData.state}
-                  onChange={handleChange}
-                  className="w-full border-2 border-[#9A283D] rounded-xl px-4 py-3 bg-[#FFFAF8] focus:outline-none focus:border-[#7A1C2B] transition-colors"
-                >
-                  <option value="">Select State</option>
-                  {/* <option value="Andaman and Nicobar Islands">Andaman and Nicobar Islands</option> */}
-                  <option value="Andhra Pradesh">Andhra Pradesh</option>
-                  <option value="Arunachal Pradesh">Arunachal Pradesh</option>
-                  <option value="Assam">Assam</option>
-                  <option value="Bihar">Bihar</option>
-                  <option value="Chandigarh">Chandigarh</option>
-                  <option value="Chhattisgarh">Chhattisgarh</option>
-                  {/* <option value="Dadra and Nagar Haveli and Daman and Diu">Dadra and Nagar Haveli and Daman and Diu</option> */}
-                  <option value="Delhi">Delhi</option>
-                  <option value="Goa">Goa</option>
-                  <option value="Gujarat">Gujarat</option>
-                  <option value="Haryana">Haryana</option>
-                  <option value="Himachal Pradesh">Himachal Pradesh</option>
-                  <option value="Jammu and Kashmir">Jammu and Kashmir</option>
-                  <option value="Jharkhand">Jharkhand</option>
-                  <option value="Karnataka">Karnataka</option>
-                  <option value="Kerala">Kerala</option>
-                  {/* <option value="Ladakh">Ladakh</option> */}
-                  {/* <option value="Lakshadweep">Lakshadweep</option> */}
-                  <option value="Madhya Pradesh">Madhya Pradesh</option>
-                  <option value="Maharashtra">Maharashtra</option>
-                  <option value="Manipur">Manipur</option>
-                  <option value="Meghalaya">Meghalaya</option>
-                  <option value="Mizoram">Mizoram</option>
-                  <option value="Nagaland">Nagaland</option>
-                  <option value="Odisha">Odisha</option>
-                  {/* <option value="Puducherry">Puducherry</option> */}
-                  <option value="Punjab">Punjab</option>
-                  <option value="Rajasthan">Rajasthan</option>
-                  <option value="Sikkim">Sikkim</option>
-                  <option value="Tamil Nadu">Tamil Nadu</option>
-                  <option value="Telangana">Telangana</option>
-                  <option value="Tripura">Tripura</option>
-                  <option value="Uttar Pradesh">Uttar Pradesh</option>
-                  <option value="Uttarakhand">Uttarakhand</option>
-                  <option value="West Bengal">West Bengal</option>
-                </select>
-
-                {/* <input
-                  type="date"
-                  name="dateOfBirth"
-                  placeholder="Date of Birth"
-                  value={formData.dateOfBirth}
-                  onChange={handleChange}
-                  className="w-full border-2 border-[#9A283D] rounded-xl px-4 py-3 bg-[#FFFAF8] focus:outline-none focus:border-[#7A1C2B] transition-colors"
-                />
-
-                <input
-                  type="text"
-                  name="birthPlace"
-                  placeholder="Birth Place"
-                  value={formData.birthPlace}
-                  onChange={handleChange}
-                  className="w-full border-2 border-[#9A283D] rounded-xl px-4 py-3 bg-[#FFFAF8] focus:outline-none focus:border-[#7A1C2B] transition-colors"
-                />
-
-                <input
-                  type="time"
-                  name="timeOfBirth"
-                  placeholder="Time of Birth"
-                  value={formData.timeOfBirth}
-                  onChange={handleChange}
-                  className="w-full border-2 border-[#9A283D] rounded-xl px-4 py-3 bg-[#FFFAF8] focus:outline-none focus:border-[#7A1C2B] transition-colors"
-                />
-
-                <select
-                  name="gender"
-                  value={formData.gender}
-                  onChange={handleChange}
-                  className="w-full border-2 border-[#9A283D] rounded-xl px-4 py-3 bg-[#FFFAF8] focus:outline-none focus:border-[#7A1C2B] transition-colors"
-                >
-                  <option value="">Select Gender (Optional)</option>
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                  <option value="other">Other</option>
-                </select> */}
-              </div>
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-[#9A283D] text-white py-3 rounded-xl shadow-lg font-medium text-lg disabled:opacity-50 hover:bg-[#7A1C2B] transition-colors mt-6"
-                style={{marginTop: '40px', width: '80%'}}
-              >
-                {loading ? "Saving..." : "Save Profile"}
-              </button>
-
-            </form>
-
-            {/* <img onClick = {()=>{navigate('/kundli')}} style={{width: '90%', height: 'auto', margin: '32px auto'}} src={kundaliBanner} alt="Kundali Banner" className="w-full h-40 object-cover" /> */}
-
+              </details>
+              {saveError && <p role="alert" className="profile-error">{saveError}</p>}
+              <button type="submit" className="profile-update-button" disabled={loading || locating}>{loading ? "Updating..." : "Update Changes"}</button>
+            </fieldset>
+          </form>
+          <div className="profile-actions"><ProfileSettingsMenu /></div>
         </>
-        )}
-      </div>
-    </>
+      )}
+    </ProfileLayout>
   );
 }
-
-export default EditProfile;

@@ -1,0 +1,22 @@
+/* Opt-in attached title tab; existing PageTitleCard layouts keep their styles. */
+.page-title-card-attached { display: flex; justify-content: center; margin: 0; }
+.page-title-card-attached-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  margin: 0;
+  min-width: 96px;
+  max-width: calc(100% - 24px);
+  padding: 5px 18px 7px;
+  border: 2px solid #d86622;
+  border-top: 0;
+  border-radius: 0 0 18px 18px;
+  background: #fffaf4e6;
+  color: #963149;
+  text-align: center;
+  font-weight: 600;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.page-title-card-attached-tab > span { max-width: 100%; }

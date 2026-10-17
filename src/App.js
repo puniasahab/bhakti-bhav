@@ -183,6 +183,7 @@ function App() {
                     <Route path="/chalisa/:id" element={<ChalisaDetail />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/verify-otp" element={<VerifyOtp />} />
+                    {/* these  three section also has to show on home screen properly */}
                     <Route path="/termsAndConditions" element={<TermsAndConditions />} />
                     <Route path="/privacyPolicy" element={<PrivacyPolicy />} />
                     <Route path="/aboutUs" element={<AboutUs />} />
@@ -196,9 +197,11 @@ function App() {
                     <Route path="/kundli" element={<Kundli />} />
                     <Route path="/parsad" element={<ParsadPage />} />
                     <Route path="/winners" element={<WinnersList />} />
+                    {/* have to show this section route and navigation click link on home page above footer */}
                     <Route path="/blogs" element={<Blogs />} />
                     <Route path="/blogs/:id" element={<BlogDetail />} />
                     <Route path="/payment-complete" element={<PaymentComplete />} />
+                    {/* have to show its routing on home page */}
                     <Route path="/contact-us" element={<ContactUs />} />
                     <Route path="/kahaniya" element={<Kahaniya />} />
                     <Route path="/kahaniya/:categoryId" element={<Kahaniya />} />

@@ -1,6 +1,6 @@
 import { useEffect, useState, useContext } from "react";
 import { useParams } from "react-router-dom";
-import Header from "../components/Header";
+import DevotionalHeader from "../components/DevotionalHeader";
 import Footer from "../components/Footer";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
@@ -10,7 +10,6 @@ import { LanguageContext } from "../contexts/LanguageContext";
 import Loader from "../components/Loader";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import PageTitleCard from "../components/PageTitleCard";
-import PageTitleCardJaapMala from "../components/PageTitleCardJaapMala";
 import useGA4BaseParams from "../hooks/useGA4BaseParams";
 import useGA4Tracker from "../hooks/useGA4Tracker";
 import { GA4Events } from "../utils/ga4Events.enum";
@@ -83,16 +82,17 @@ function JaapMalaDetail() {
     };
   return (
     <>
-      <Header pageName={{ hi: "tuke tki", en: "Naam Jaap" }} />
-      <div className="h-2"></div>
-      <PageTitleCardJaapMala
-        titleHi={detail.title.hi}
-        titleEn={detail.title.en}
-        isHinglishLanguageSelected={language === "hinglish"}
-        customEngFontSize={"13px"}
-        customFontSize={"15px"}
-        isFromJaapMala={true}
-      />
+      <DevotionalHeader>
+        <PageTitleCard
+          variant="attached"
+          titleHi={detail.title.hi}
+          titleEn={detail.title.en ? `(${detail.title.en.replace(/^\(|\)$/g, "")})` : ""}
+          isHinglishLanguageSelected
+          customEngFontSize="14px"
+          customFontSize="16px"
+          isFromJaapMala
+        />
+      </DevotionalHeader>
 
       <div className="container mx-auto px-4 relative">
         

@@ -1,0 +1,12 @@
+.suvichar-dialog { position: fixed; inset: 0; width: 100%; max-width: none; height: 100%; max-height: none; margin: 0; padding: 0; border: 0; background: transparent; color: #9a283d; }
+.suvichar-dialog[open] { display: flex; align-items: flex-end; justify-content: center; }
+.suvichar-dialog::backdrop { background: rgba(0, 0, 0, .32); }
+.suvichar-sheet { width: 100%; max-width: 640px; max-height: 85dvh; overflow-y: auto; border-radius: 32px 32px 0 0; padding: 30px 20px max(24px, env(safe-area-inset-bottom)); background: linear-gradient(115deg, #fff4df, #ffe5bd); box-shadow: 0 -8px 30px #00000012; }
+.suvichar-title { display: flex; align-items: center; justify-content: center; gap: 14px; margin-bottom: 24px; font-size: 24px; font-weight: 700; line-height: 1.7; }
+.suvichar-title svg { flex-shrink: 0; }
+.suvichar-text { white-space: pre-line; overflow-wrap: anywhere; color: #36342f; font-size: 19px; line-height: 1.9; text-align: center; }
+.suvichar-author { margin-top: 20px; font-size: 17px; font-style: italic; font-weight: 700; line-height: 1.8; text-align: right; overflow-wrap: anywhere; }
+.suvichar-share { display: flex; width: 100%; align-items: center; justify-content: center; gap: 12px; margin-top: 32px; padding: 17px 20px; border-radius: 16px; background: #9a283d; color: white; box-shadow: 0 6px 14px #9a283d33; font-size: 18px; font-weight: 600; }
+.suvichar-share:disabled { opacity: .6; }
+.suvichar-close { display: block; min-height: 44px; margin: 24px auto 0; padding: 8px 24px; color: #77736b; font-size: 16px; }
+.suvichar-share:focus-visible, .suvichar-close:focus-visible { outline: 2px solid #9a283d; outline-offset: 4px; }
