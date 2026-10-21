@@ -731,19 +731,55 @@ const LandingPage = () => {
     }
   };
 
-  // OTP Change & backspace handlers
+  // OTP Change, paste & backspace handlers
+  const handleOtpPaste = (e) => {
+    e.preventDefault();
+    const pasted = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 4);
+    if (!pasted) return;
+    const updated = ["", "", "", ""];
+    pasted.split("").forEach((ch, i) => { updated[i] = ch; });
+    setOtp(updated);
+    const nextIdx = Math.min(pasted.length, 3);
+    document.getElementById(`landing-otp-${nextIdx}`)?.focus();
+    if (pasted.length === 4) {
+      handleOtpVerify(pasted);
+    }
+  };
+
   const handleOtpChange = (e, index) => {
-    const value = e.target.value.replace(/\D/g, "").slice(0, 1);
+    const val = e.target.value.replace(/\D/g, "");
+    if (!val) {
+      const updated = [...otp];
+      updated[index] = "";
+      setOtp(updated);
+      return;
+    }
+
+    if (val.length > 1) {
+      const digits = val.slice(0, 4).split("");
+      const updated = [...otp];
+      digits.forEach((d, i) => {
+        if (index + i < 4) updated[index + i] = d;
+      });
+      setOtp(updated);
+      const nextIdx = Math.min(index + digits.length, 3);
+      document.getElementById(`landing-otp-${nextIdx}`)?.focus();
+      if (updated.every((d) => d !== "")) {
+        handleOtpVerify(updated.join(""));
+      }
+      return;
+    }
+
     const updated = [...otp];
-    updated[index] = value;
+    updated[index] = val;
     setOtp(updated);
 
-    if (value && index < otp.length - 1) {
+    if (index < otp.length - 1) {
       document.getElementById(`landing-otp-${index + 1}`)?.focus();
     }
 
-    if (value && updated.every((d) => d !== "")) {
-      setTimeout(() => document.getElementById("landing-verify-btn")?.click(), 100);
+    if (updated.every((d) => d !== "")) {
+      handleOtpVerify(updated.join(""));
     }
   };
 
@@ -754,8 +790,8 @@ const LandingPage = () => {
   };
 
   // Step 1 -> Step 2: Verify OTP
-  const handleOtpVerify = async () => {
-    const otpCode = otp.join("");
+  const handleOtpVerify = async (explicitOtp) => {
+    const otpCode = typeof explicitOtp === "string" ? explicitOtp : otp.join("");
     if (otpCode.length !== 4) {
       alert("Kripya 4-digit ka valid OTP enter karein");
       return;
@@ -1285,34 +1321,8 @@ const LandingPage = () => {
           {/* ── Scrollable Content ── */}
           <div className="relative z-10 flex-1 overflow-y-auto px-4 pb-6 w-full max-w-md mx-auto">
 
-            {/* Badge + Title */}
-            <div className="text-center mt-1 mb-5">
-              <span className="inline-block text-[10px] font-black uppercase tracking-widest text-[#9A283D] bg-orange-100 border border-orange-200/70 px-3 py-1 rounded-full mb-2">
-                ✨ Aakhri Kadam — Sirf 30 Second
-              </span>
-              <h1 className="text-2xl font-black text-gray-900 leading-tight">
-                Apna UPI App Chunein
-              </h1>
-              <p className="text-xs text-gray-500 mt-1 font-medium">Seedha app open hoga, mandate approve karo — ho gaya!</p>
-            </div>
-
-            {/* ── Plan Summary Pill ── */}
-            <div className="flex items-center justify-between bg-white border-2 border-orange-200 rounded-2xl px-4 py-3 mb-5 shadow-sm">
-              <div>
-                <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">{activePlanInfo.name}</p>
-                <p className="text-lg font-black text-[#9A283D]">₹{activePlanInfo.price} <span className="text-xs text-gray-400 line-through font-semibold">₹{activePlanInfo.originalPrice}</span></p>
-                <p className="text-[10px] text-gray-500 font-medium">{activePlanInfo.dailyCost}</p>
-              </div>
-              <div className="text-right">
-                <span className="inline-block bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[10px] font-black px-3 py-1 rounded-full">
-                  {activePlanInfo.savings}
-                </span>
-                <p className="text-[10px] text-gray-400 mt-1 font-medium">Cancel anytime</p>
-              </div>
-            </div>
-
             {/* ── UPI Apps Header ── */}
-            <div className="flex items-center gap-2 mb-3">
+            <div className="flex items-center gap-2 mb-3 pt-2">
               <span className="text-sm">📱</span>
               <h2 className="text-sm font-black text-gray-800 uppercase tracking-wide">UPI se Pay Karein</h2>
               <div className="flex-1 h-px bg-gradient-to-r from-orange-200 to-transparent"></div>
@@ -1796,7 +1806,7 @@ const LandingPage = () => {
                     <span>
                       {loginLoading
                         ? "OTP Bheja Ja Raha Hai..."
-                        : "Aage Badhein"}
+                        : "Next"}
                     </span>
                   </button>
                 </form>
@@ -2051,6 +2061,7 @@ const LandingPage = () => {
                   value={digit}
                   onChange={(e) => handleOtpChange(e, idx)}
                   onKeyDown={(e) => handleOtpKeyDown(e, idx)}
+                  onPaste={handleOtpPaste}
                   className="w-13 h-15 w-[3.2rem] h-[3.8rem] rounded-2xl border-2 border-orange-200 text-center text-2xl font-black text-[#9A283D] bg-white focus:border-[#9A283D] focus:ring-2 focus:ring-[#9A283D]/15 focus:outline-none transition shadow-sm"
                 />
               ))}
