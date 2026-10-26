@@ -80,15 +80,23 @@ function Login() {
 
         trackEvent(GA4Events.login_otp_requested, { event_label: "send_otp_button_clicked_on_login_screen" });
 
-        const response = await loginApis.generateOtp(mobileNumber, deviceId, userId);
-        console.log("OTP Response:", response);
-        setUserIdInLS(response?.userId);
-        setLoading(false);
-        if (response.success) {
-            setMobileNoInLS(mobile)
+        try {
+            const response = await loginApis.generateOtp(mobileNumber, deviceId, userId);
+            console.log("OTP Response:", response);
+            setUserIdInLS(response?.userId);
+            setLoading(false);
+            if (response.success) {
+                setMobileNoInLS(mobile);
+                navigate("/verify-otp", { state: { mobile, loginSource } });
+            } else {
+                alert(response?.message || "OTP bhejne mein samasya aayi. Kripya punah prayas karein.");
+            }
+        } catch (error) {
+            console.error("Login OTP Error:", error);
+            setLoading(false);
+            const msg = error?.response?.data?.message || "OTP bhejne mein samasya aayi. Kripya punah prayas karein.";
+            alert(msg);
         }
-
-        navigate("/verify-otp", { state: { mobile, loginSource } });
     };
 
     useEffect(() => {

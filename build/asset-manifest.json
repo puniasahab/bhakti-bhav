@@ -1,10 +1,12 @@
 {
   "files": {
-    "main.css": "/static/css/main.3232eae1.css",
-    "main.js": "/static/js/main.595264e3.js",
+    "main.css": "/static/css/main.e24aac48.css",
+    "main.js": "/static/js/main.9c967c2f.js",
     "static/media/repeat_bg.png": "/static/media/repeat_bg.8dd1983cdffb3ac0324e.png",
+    "static/media/home_bg.png": "/static/media/home_bg.cfec5901bf6c5986e615.png",
     "static/media/jaapMala_bgs.png": "/static/media/jaapMala_bgs.ee5726354a96ee5ed2da.png",
     "static/media/prasad.png": "/static/media/prasad.09f89478e000c8eb4c52.png",
+    "static/media/vrat_katha_home.png": "/static/media/vrat_katha_home.1244af251752bdf9d72e.png",
     "static/media/mala.gif": "/static/media/mala.6369bf78d4184b15f703.gif",
     "static/media/bell_ring.png": "/static/media/bell_ring.1eaeff18fc37a8f7bdb6.png",
     "static/media/Poppins-Regular.ttf": "/static/media/Poppins-Regular.35d26b781dc5fda684cc.ttf",
@@ -15,11 +17,11 @@
     "static/media/paymentPageBanner.jpeg": "/static/media/paymentPageBanner.f880b2c165b626a10eff.jpeg",
     "index.html": "/index.html",
     "static/media/back_icon.svg": "/static/media/back_icon.7e7814d35251d606ef1805bb74b76d9f.svg",
-    "main.3232eae1.css.map": "/static/css/main.3232eae1.css.map",
-    "main.595264e3.js.map": "/static/js/main.595264e3.js.map"
+    "main.e24aac48.css.map": "/static/css/main.e24aac48.css.map",
+    "main.9c967c2f.js.map": "/static/js/main.9c967c2f.js.map"
   },
   "entrypoints": [
-    "static/css/main.3232eae1.css",
-    "static/js/main.595264e3.js"
+    "static/css/main.e24aac48.css",
+    "static/js/main.9c967c2f.js"
   ]
 }

@@ -169,6 +169,12 @@ export const GA4Events = {
     landingpage2_upi_choosed            : "landingpage2_upi_choosed",
     landingpage2_payment_done           : "landingpage2_payment_done",
 
+    // ─── LANDING PAGE 3 (₹1 Trial) ─────────────────────────────────
+    landingpage3_number_input           : "landingpage3_number_input",
+    landingpage3_otp_verification       : "landingpage3_otp_verification",
+    landingpage3_upi_choosed            : "landingpage3_upi_choosed",
+    landingpage3_payment_done           : "landingpage3_payment_done",
+
     // ─── ERRORS & EDGE CASES ──────────────────────────────────────
     network_error                       : "network_error",
     audio_load_error                    : "audio_load_error",

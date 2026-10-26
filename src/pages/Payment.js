@@ -24,6 +24,21 @@ const buildCashfreeReturnUrl = (frontendReturnUrl) => {
   return `${CASHFREE_RETURN_BACKEND_URL}?redirect_url=${encoded}`;
 };
 
+const TRIAL_PLAN_IDS = [
+  "6adef76adf79dec30ff0bfd3", // Live Gold Trial plan ID
+  "6adef7de0e5b417874cb5213", // Staging Gold Trial plan ID
+];
+
+const isTrialPlan = (plan) => {
+  if (!plan) return false;
+  if (plan.isTrial === true || plan.isTrial === "true") return true;
+  const id = String(plan._id || plan.id || "");
+  if (TRIAL_PLAN_IDS.includes(id)) return true;
+  const name = String(plan.name || plan.title || "").toLowerCase();
+  if (name.includes("trial")) return true;
+  return false;
+};
+
 export default function Payment() {
   const DEFAULT_SUBSCRIPTION_PLAN_ID = "69cf557fd51b9fa7a048826c";
   
@@ -83,16 +98,20 @@ export default function Payment() {
     const fetchSubscriptionPlans = async () => {
       try {
         const response = await subscriptionApis.getSubscriptionPlans();
-        setPlans(response.plans.sort((a, b) => b.price - a.price));
+        const rawPlans = Array.isArray(response?.plans) ? response.plans : [];
+        const nonTrialPlans = rawPlans.filter((plan) => !isTrialPlan(plan));
+        const sortedPlans = nonTrialPlans.sort((a, b) => (b.price || 0) - (a.price || 0));
+
+        setPlans(sortedPlans);
         // Set the first plan as selected by default
         setSelectedActivePlanName({
-          activePlanName: response.activePlanName || "",
-          expiryDate: response.expiryDate || "",
-        })
-        if (response && response.plans.length > 0) {
-          setSelectedPlan(response.plans[0]._id || response.plans[0].id);
+          activePlanName: response?.activePlanName || "",
+          expiryDate: response?.expiryDate || "",
+        });
+        if (sortedPlans.length > 0) {
+          setSelectedPlan(sortedPlans[0]._id || sortedPlans[0].id);
         }
-        console.log("Fetched subscription plans:", response);
+        console.log("Fetched subscription plans:", response, "Filtered non-trial plans:", sortedPlans);
       } catch (error) {
         console.error("Error fetching subscription plans:", error);
       }
@@ -190,7 +209,7 @@ export default function Payment() {
       navigate("/payment");
     }
     else {
-      const planDetails = plans.filter((plan) => plan?._id === selectedPlan);
+      const planDetails = plans.filter((plan) => (plan?._id || plan?.id) === selectedPlan);
       const planData = planDetails[0];
       if (!planData) {
         alert("No valid plan is selected for payment.");
@@ -381,8 +400,9 @@ export default function Payment() {
                   navigate("/login");
                   return;
                 }
-                trackEvent(GA4Events.subscription_plan_selected, {event_label: "payment_button_clicked_from_payment_screen", selectedPlan: plans.find((x) => x._id === selectedPlan).name});
-                handlePaymentOptionSelected({selectedPlan: plans.find((x) => x._id === selectedPlan)});
+                const chosenPlan = plans.find((x) => (x?._id || x?.id) === selectedPlan);
+                trackEvent(GA4Events.subscription_plan_selected, {event_label: "payment_button_clicked_from_payment_screen", selectedPlan: chosenPlan?.name});
+                handlePaymentOptionSelected({selectedPlan: chosenPlan});
                 makePayment(selectedPlan);
               }}
             >
