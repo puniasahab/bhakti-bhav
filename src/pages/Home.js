@@ -5,7 +5,7 @@ import TodayThoughtSheet from "../components/TodayThoughtSheet";
 import { Link, useNavigate } from "react-router-dom";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination, Autoplay } from "swiper/modules";
-import { ArrowRight, BookOpen, CalendarDays, ChevronDown, ChevronUp, CirclePlay, Gift, Globe2, IndianRupee, Instagram, Sparkles, WalletCards } from "lucide-react";
+import { ArrowRight, BookOpen, CalendarDays, ChevronDown, ChevronUp, CirclePlay, Gift, Globe2, IndianRupee, Instagram, Sparkles, Trophy, WalletCards } from "lucide-react";
 import { homeSchema } from "../seo/schemas";
 import { useAppStoreRedirect } from "../hooks/useAppStoreRedirect";
 
@@ -576,6 +576,12 @@ function Home() {
                     navigate("/login");
                 }
             }
+        },
+        {
+            key: "winners",
+            label: language === "en" ? "Winners" : "विजेता",
+            Icon: Trophy,
+            onClick: () => navigate("/winners")
         },
         {
             key: "refer",

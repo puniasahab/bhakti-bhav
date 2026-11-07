@@ -1,21 +1,45 @@
-import React from "react";
+import React, { useRef, useState } from "react";
 import Header from "../components/Header";
-import Footer from "../components/Footer";
-import prasadImg from "../assets/img/prasad.png";
+import winnersCelebrationImage from "../assets/img/winnersCelebrationImage.png";
+import silverCoinImage from "../assets/img/winners/silver-coin.webp";
+import giftHamperImage from "../assets/img/winners/gift-hamper.webp";
+import subscriptionImage from "../assets/img/winners/subscription.webp";
+import { giftHamperWinners, silverCoinWinners, subscriptionWinners } from "./winnersData";
+import "./WinnersList.css";
 
-const winners = [
-  { name: "Ishaan Malhotra", state: "Sikkim" },
-  { name: "Ananya Iyer", state: "Rajasthan" },
-  { name: "Rohan Deshmukh", state: "Kerala" },
-  { name: "Arjun Reddy", state: "Himachal Pradesh" },
-  { name: "Kavya Nair", state: "Rajasthan" },
-  { name: "Devansh Joshi", state: "Kerala" },
-  { name: "Kabir Gill", state: "Puducherry" },
-  { name: "Sia Bharadwaj", state: "Uttar Pradesh" },
-  { name: "Zoya Khan", state: "Ladakh" },
+const categories = [
+  { id: "silver-coin", label: "Silver Coin", shortLabel: "Silver Coin", title: "Silver Coin Winners", image: silverCoinImage, winners: silverCoinWinners },
+  { id: "gift-hamper", label: "Diwali Gift Hamper", shortLabel: "Gift Hamper", title: "70 Diwali Gift Hamper Winners", image: giftHamperImage, winners: giftHamperWinners },
+  { id: "subscription", label: "Free Subscription", shortLabel: "Subscription", title: "One Month Free Subscription Winners", image: subscriptionImage, winners: subscriptionWinners },
 ];
 
 export default function WinnersList() {
+  const [activeTab, setActiveTab] = useState("silver-coin");
+  const tabRefs = useRef([]);
+
+  const handleTabKeyDown = (event, index) => {
+    let nextIndex;
+    switch (event.key) {
+      case "ArrowRight":
+        nextIndex = (index + 1) % categories.length;
+        break;
+      case "ArrowLeft":
+        nextIndex = (index - 1 + categories.length) % categories.length;
+        break;
+      case "Home":
+        nextIndex = 0;
+        break;
+      case "End":
+        nextIndex = categories.length - 1;
+        break;
+      default:
+        return;
+    }
+    event.preventDefault();
+    setActiveTab(categories[nextIndex].id);
+    tabRefs.current[nextIndex]?.focus();
+  };
+
   return (
     <>
       <Header />
@@ -25,38 +49,76 @@ export default function WinnersList() {
         {/* Banner Image */}
         <div className="rounded-2xl overflow-hidden shadow-md mb-5 mt-5">
           <img
-            src={prasadImg}
+            src={winnersCelebrationImage}
             alt="Vaishno Devi Temple"
             className="w-full h-auto object-cover"
           />
         </div>
 
         {/* Section Title */}
-        <h2 className="font-hindi theme_text text-2xl font-bold text-center mb-5">
-          माता की भेंट पाने वाले भक्त
-        </h2>
+        <div className="font-devanagari theme_text text-center mb-5">
+          <h2 className="text-2xl font-bold mb-2">
+            शुभ दीपावली! बधाई हो हमारे विजेताओं को
+          </h2>
+          <p className="text-base italic">आपकी भक्ति, आपका इनाम</p>
+        </div>
 
-        {/* Winners List */}
-        <div className="space-y-3">
-          {winners.map((winner, index) => (
-            <div
-              key={index}
-              className="flex items-center justify-between px-5 py-4 rounded-2xl shadow-sm"
-              style={{ backgroundColor: "#faeeb1ff" }}
+        <div className="winners-tabs font-eng" role="tablist" aria-label="Winner categories">
+          {categories.map(({ id, label, shortLabel, image, winners }, index) => (
+            <button
+              key={id}
+              ref={(element) => { tabRefs.current[index] = element; }}
+              id={`winners-tab-${id}`}
+              type="button"
+              role="tab"
+              aria-label={`${label}, ${winners.length} winners`}
+              aria-selected={activeTab === id}
+              aria-controls={`winners-panel-${id}`}
+              tabIndex={activeTab === id ? 0 : -1}
+              className="winners-tab"
+              onClick={() => setActiveTab(id)}
+              onKeyDown={(event) => handleTabKeyDown(event, index)}
             >
-              <span className="font-eng font-bold text-[#3B1A08] text-lg">
-                {index + 1}. {winner.name}
+              <img className="winners-tab-image" src={image} alt="" width="80" height="80" />
+              <span className="winners-tab-label">
+                <span className="winners-tab-label-full">{label}</span>
+                <span className="winners-tab-label-short" aria-hidden="true">{shortLabel}</span>
               </span>
-              <span className="font-eng text-[#3B1A08] text-base text-xs">
-                {winner.state}
-              </span>
-            </div>
+              <span className="winners-tab-count" aria-hidden="true">{winners.length}</span>
+            </button>
           ))}
         </div>
 
+        {categories.map(({ id, title, winners }) => (
+          <section
+            key={id}
+            id={`winners-panel-${id}`}
+            role="tabpanel"
+            aria-labelledby={`winners-tab-${id}`}
+            hidden={activeTab !== id}
+            tabIndex={0}
+            className="winners-panel font-eng"
+          >
+            {activeTab === id && (
+              <>
+                <h3 className="winners-list-title">{title}</h3>
+                <ol className="winners-list" aria-label={title}>
+                  {winners.map((winner, index) => (
+                    <li key={`${winner.name}-${winner.state}`} className="winner-card shadow-sm">
+                      <span className="winner-number" aria-hidden="true">{index + 1}.</span>
+                      <div className="winner-details">
+                        <span className="winner-name">{winner.name}</span>
+                        {winner.gender && <span className="winner-gender">{winner.gender}</span>}
+                      </div>
+                      <span className="winner-location">{winner.state}</span>
+                    </li>
+                  ))}
+                </ol>
+              </>
+            )}
+          </section>
+        ))}
       </div>
-
-      {/* <Footer /> */}
     </>
   );
 }
