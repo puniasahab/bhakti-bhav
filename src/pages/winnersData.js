@@ -15,6 +15,16 @@ export const silverCoinWinners = [
   { name: "Nitesh Kumar", state: "Bhilwara" },
   { name: "Akash Sharma", state: "Firojabad" },
   { name: "Devansh Singh", state: "Jaipur" },
+  {name: "Raghav Mehta", state:	"Mumbai"},
+{name: "Saurabh Verma", state: "Lucknow"},
+{name:	"Deepak Chauhan", state:	"Dehradun"},
+{	name:"Manish Patel",	state:"Ahmedabad"},
+	{name:"Abhishek Kumar",	state:"Patna"},
+	{name:"Nitin Joshi",	state:"Indore"},
+	{name:"Varun Malhotra",	state:"Chandigarh"},
+	{name:"Rohit Agarwal",	state:"Kolkata"},
+	{name:"Prateek Mishra",	state: "Bhopal"},
+	{name: "Harsh Vardhan", state:	"Noida"},
 ];
 
 export const giftHamperWinners = [
